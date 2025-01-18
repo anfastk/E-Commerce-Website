@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -41,16 +42,16 @@ func AddProductVariants(c *gin.Context) {
 	}
 	var mainProduct models.ProductDetail
 
-	if err:=config.DB.First(&mainProduct,productID).Error;err!=nil{
+	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-            "status": "Not Found",
-            "error":  "Product not found",
-            "code":   404,
-        })
-        return
+			"status": "Not Found",
+			"error":  "Product not found",
+			"code":   404,
+		})
+		return
 	}
 
-	categoryID:=mainProduct.CategoryID
+	categoryID := mainProduct.CategoryID
 
 	productNames := c.PostFormArray("product-name[]")
 	productSummaries := c.PostFormArray("product-summary[]")
@@ -94,7 +95,7 @@ func AddProductVariants(c *gin.Context) {
 
 		productVariant := models.ProductVariantDetails{
 			ProductID:      uint(productID),
-			ProductName: productNames[i],
+			ProductName:    productNames[i],
 			Size:           sizes[i],
 			Colour:         colors[i],
 			Ram:            rams[i],
@@ -104,9 +105,9 @@ func AddProductVariants(c *gin.Context) {
 			StockQuantity:  stockQuantity,
 			SKU:            skus[i],
 			ProductSummary: productSummaries[i],
-			CategoryID: categoryID,
+			CategoryID:     categoryID,
 		}
-
+		fmt.Println(productVariant.SalePrice, productVariant.RegularPrice)
 		if err := tx.Create(&productVariant).Error; err != nil {
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -188,8 +189,42 @@ func ShowMutiProductVariantDetails(c *gin.Context) {
 		return
 	}
 
+	var formattedVariantDetails []map[string]interface{}
+
+	for _, variant := range variantDetails {
+		formattedVariant := map[string]interface{}{
+			"Id":              variant.Id,
+			"ProductId":       variant.ProductId,
+			"ProductName":     variant.ProductName,
+			"BrandName":       variant.BrandName,
+			"IsReturnable":    variant.IsReturnable,
+			"IsCodAvailable":  variant.IsCodAvailable,
+			"CategoryName":    variant.CategoryName,
+			"Descriptions":    variant.Descriptions,
+			"Images":          variant.Images,
+			"OfferName":       variant.OfferName,
+			"OfferDetails":    variant.OfferDetails,
+			"OfferStartDate":  variant.OfferStartDate,
+			"OfferEndDate":    variant.OfferEndDate,
+			"OfferPercentage": variant.OfferPercentage,
+			"OfferAmount":     variant.OfferAmount,
+			"Size":            variant.Size,
+			"Colour":          variant.Colour,
+			"Ram":             variant.Ram,
+			"Storage":         variant.Storage,
+			"StockQuantity":   variant.StockQuantity,
+			"RegularPrice":    fmt.Sprintf("%.2f", variant.RegularPrice),
+			"SalePrice":       fmt.Sprintf("%.2f", variant.SalePrice),
+			"SKU":             variant.SKU,
+			"ProductSummary":  variant.ProductSummary,
+			"Specification":   variant.Specification,
+		}
+
+		formattedVariantDetails = append(formattedVariantDetails, formattedVariant)
+	}
+
 	c.HTML(http.StatusSeeOther, "productAllVariantsDetails.html", gin.H{
-		"Product": variantDetails,
+		"Product": formattedVariantDetails,
 	})
 }
 
@@ -213,7 +248,9 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusSeeOther, "productVariantDetails.html", gin.H{
-		"Variant": variantDetails,
+		"Variant":       variantDetails,
+		"Regular_Price": fmt.Sprintf("%.2f", variantDetails.RegularPrice),
+		"Sale_Price":    fmt.Sprintf("%.2f", variantDetails.SalePrice),
 	})
 }
 
@@ -307,6 +344,6 @@ func DeleteVariantImage(c *gin.Context) {
 		})
 		return
 	}
-	redirectURL := "/admin/products/variant/details?product_id=" + strconv.Itoa(int(variantImage.ProductVariantID))
+	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variantImage.ProductVariantID))
 	c.Redirect(http.StatusFound, redirectURL)
 }

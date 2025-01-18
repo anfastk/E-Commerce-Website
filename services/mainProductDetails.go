@@ -21,7 +21,7 @@ type MainProductDetails struct {
 	OfferStartDate  string
 	OfferEndDate    string
 	OfferPercentage float64
-	OfferAmount     int
+	OfferAmount     float64
 }
 
 func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {

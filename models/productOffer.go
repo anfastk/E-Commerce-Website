@@ -10,11 +10,11 @@ type ProductOffer struct {
 	gorm.Model
 	OfferName       string  `gorm:"size:255" json:"offername"`
 	OfferDetails    string  `gorm:"size:255" json:"offer"`
-	OfferAmount     int     `json:"discount"`
+	OfferAmount     float64 `gorm:"type:numeric(10,2)" json:"discount"`
 	OfferPercentage float64 `json:"discountpercentage"`
 	StartDate       time.Time
 	EndDate         time.Time
-	ProductID       uint          /* `gorm:"unique;not null" json:"productid"` */ `gorm:"not null" json:"productid"`
+	ProductID       uint          `gorm:"unique;not null" json:"productid"`
 	IsValid         bool          `gorm:"default:true"`
 	IsDeleted       bool          `gorm:"default:false"`
 	Product         ProductDetail `gorm:"foreignKey:ProductID"`

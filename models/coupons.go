@@ -12,7 +12,7 @@ type Coupon struct {
 	FixedDiscount      int       `json:"fixdiscound"`
 	DiscountPercentage float64   `json:"discount_percentage"`
 	MaxDiscount        int       `json:"max_value"`
-	MinProductPrice    float64   `json:"min_productvalue"`
+	MinProductPrice    float64   `gorm:"type:numeric(10,2)" json:"min_productvalue"`
 	UsersUsedCount     int       `json:"used_count"`
 	MaxUseCount        int       `json:"max_usecount"`
 	ValidFrom          time.Time `json:"validfrom"`

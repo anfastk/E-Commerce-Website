@@ -23,7 +23,7 @@ type VariantsDetails struct {
 	OfferStartDate  string
 	OfferEndDate    string
 	OfferPercentage float64
-	OfferAmount     int
+	OfferAmount     float64
 	Size            string
 	Colour          string
 	Ram             string
@@ -80,7 +80,7 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 	if err := tx.Where("product_variant_id = ? AND is_deleted = ?", variantID, false).Find(&specification).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("Specification not found")
-	} 
+	}
 
 	tx.Commit()
 	return VariantsDetails{
@@ -155,11 +155,10 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 			return nil, errors.New("Images not found for variant")
 		}
 
-
-		  if err := tx.Where("product_variant_id = ? AND is_deleted = ?", variant.ID, false).Find(&specification).Error; err != nil {
-		 	tx.Rollback()
-		 	return nil, errors.New("Specifications not found for variant")
-		 } 
+		if err := tx.Where("product_variant_id = ? AND is_deleted = ?", variant.ID, false).Find(&specification).Error; err != nil {
+			tx.Rollback()
+			return nil, errors.New("Specifications not found for variant")
+		}
 
 		result = append(result, VariantsDetails{
 			Id:              variant.ID,
@@ -193,4 +192,3 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 	tx.Commit()
 	return result, nil
 }
-

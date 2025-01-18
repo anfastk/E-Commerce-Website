@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -44,10 +45,10 @@ func ShowProductsAdmin(c *gin.Context) {
 			images = append(images, img.ProductVariantsImages)
 		}
 
-		/* categoryName := "Uncategorized" // Default value
+		categoryName := "Uncategorized" // Default value
 		if variant.Category.ID != 0 {   // Check if category exists
 			categoryName = variant.Category.Name
-		} */
+		}
 
 		productName := variant.ProductName
         if productName == "" && variant.Product.ID != 0 {
@@ -57,19 +58,31 @@ func ShowProductsAdmin(c *gin.Context) {
 		response = append(response, ProductVariantResponse{
 			ID:             variant.ID,
 			ProductName:    variant.ProductName,
-			/* CategoryName:   categoryName, */
+			CategoryName:   categoryName,
 			RegularPrice:   variant.RegularPrice,
 			SalePrice:      variant.SalePrice,
 			ProductSummary: variant.ProductSummary,
 			Images:         images,
 		})
 	}
-
+	var formattedResponceDetails []map[string]interface{}
+	for  _,variant := range response {
+		formattedVariant:= map[string]interface{}{
+			"ID":             variant.ID,
+			"ProductName":    variant.ProductName,
+			"CategoryName":   variant.CategoryName,
+			"RegularPrice":   variant.RegularPrice,
+			"SalePrice":      fmt.Sprintf("%.2f",variant.SalePrice),
+			"ProductSummary": variant.ProductSummary,
+			"Images":         variant.Images,
+		}
+		formattedResponceDetails = append(formattedResponceDetails, formattedVariant)
+	}
 
 	c.HTML(http.StatusFound, "productPageAdmin.html", gin.H{
 		"status":  true,
 		"message": "Product variants fetched successfully",
-		"data":    response,
+		"data":    formattedResponceDetails,
 	})
 
 }

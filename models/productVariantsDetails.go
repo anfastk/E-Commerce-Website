@@ -13,8 +13,8 @@ type ProductVariantDetails struct {
 	Ram            string                 `gorm:"size:100" json:"ram"`
 	Storage        string                 `gorm:"size:100" json:"storage"`
 	StockQuantity  int                    `json:"stock"`
-	RegularPrice   float64                `json:"regular"`
-	SalePrice      float64                `json:"saleprice"`
+	RegularPrice   float64                `gorm:"type:numeric(10,2)" json:"regular"`
+	SalePrice      float64                `gorm:"type:numeric(10,2)" json:"saleprice"`
 	SKU            string                 `gorm:"unique" json:"sku"`
 	ProductSummary string                 `gorm:"size:255" json:"summery"`
 	IsDeleted      bool                   `gorm:"default:false"`

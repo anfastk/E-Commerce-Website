@@ -68,7 +68,7 @@ func AddProductOffer(c *gin.Context) {
 		OfferDetails:    offerDetails,
 		StartDate:       startDates,
 		EndDate:         endDates,
-		OfferAmount:     int(priceValue),
+		OfferAmount:     priceValue,
 		OfferPercentage: percentageValue,
 		ProductID:       uint(productID),
 	}

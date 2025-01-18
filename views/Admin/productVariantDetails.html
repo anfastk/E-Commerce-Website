@@ -210,19 +210,6 @@
                     {{if .Variant.Images}}
                     <img class="rounded shadow w-full h-auto max-w-[400px] mx-auto"
                         src="{{(index .Variant.Images 0).ProductVariantsImages}}" alt="Main Product Image">
-                
-                    <!-- Options Button -->
-                    <div class="group absolute top-0 right-2"> <!-- The group div shouldn't interfere with button positioning -->
-                        <button class="options-btn  text-2xl text-gray-500 hover:text-gray-700">
-                            &#x22EE;
-                        </button>
-                        <div class="options hidden absolute top-10 right-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
-                            <ul>
-                                <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Change</li>
-                                <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Delete</li>
-                            </ul>
-                        </div>
-                    </div>
                     {{else}}
                     <p>No images available</p>
                     {{end}}
@@ -286,8 +273,8 @@
                     </div>
                     <div class="space-y-6">
                         <p><span class="font-semibold">SKU:</span> {{ .Variant.SKU}}</p>
-                        <p><span class="font-semibold">Regular Price:</span> ₹{{ .Variant.RegularPrice}}</p>
-                        <p><span class="font-semibold">Sale Price:</span> ₹{{ .Variant.SalePrice}}</p>
+                        <p><span class="font-semibold">Regular Price:</span> ₹{{.Regular_Price}}</p>
+                        <p><span class="font-semibold">Sale Price:</span> ₹{{ .Sale_Price}}</p>
                         <p><span class="font-semibold">Stock Quantity:</span> {{ .Variant.StockQuantity}}</p>
                         <p><span class="font-semibold">Return Available:</span> {{if .Variant.IsReturnable}} YES
                             {{else}} NO
@@ -304,7 +291,7 @@
                         <p><span class="font-semibold">Offer Percentage:</span> {{ .Variant.OfferPercentage }}%</p>
                         {{else}}
                         {{end}}
-                        {{ if .OfferAmount }}
+                        {{ if .Variant.OfferAmount }}
                         <p><span class="font-semibold">Offer Amount:</span> ₹{{ .Variant.OfferAmount }}</p>
                         {{else}}
                         {{end}}

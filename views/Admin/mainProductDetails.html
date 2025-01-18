@@ -251,12 +251,12 @@
                         <p><span class="font-semibold">Offer Name:</span> {{ .Product.OfferName }}</p>
                         <p><span class="font-semibold">Offer Details:</span> {{ .Product.OfferDetails }}</p>
                         <p><span class="font-semibold">Offer Start Date:</span> {{ .Product.OfferStartDate }}</p>
-                        {{ if .Product.OfferPercentage }}
-                        <p><span class="font-semibold">Offer Percentage:</span> {{ .Product.OfferPercentage }}%</p>
-                        {{else}}
-                        {{end}}
                         {{ if .Product.OfferAmount }}
                         <p><span class="font-semibold">Offer Amount:</span> ₹{{ .Product.OfferAmount }}</p>
+                        {{else}}
+                        {{end}}
+                        {{ if .Product.OfferPercentage }}
+                        <p><span class="font-semibold">Offer Percentage:</span> {{ .Product.OfferPercentage }}%</p>
                         {{else}}
                         {{end}}
                         <p><span class="font-semibold">Offer End Date:</span> {{ .Product.OfferEndDate }}</p>
