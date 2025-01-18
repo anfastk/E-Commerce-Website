@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laptix Adimin Product Page</title>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/nav&sideBar.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="bg-white min-h-screen flex flex-col lg:flex-row">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+        <div class="py-6 px-4 flex items-center justify-start space-x-4">
+            <!-- Hamburger Menu for Small Screens inside Sidebar -->
+            <button class="lg:hidden text-white" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
+        </div>
+        <nav class="flex-1">
+            <ul>
+                <li class="py-3 px-4 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Dashboard</a>
+                </li>
+                <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
+                    <!-- All Products Button with Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
+                            stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
+                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                    </svg>
+                    <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor" fill-rule="evenodd"
+                            d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
+                            clip-rule="evenodd" />
+                        <path fill="currentColor"
+                            d="M15.75 2.824c0-.184.193-.301.336-.186q.182.147.323.342l3.013 4.197c.068.096-.006.22-.124.22H16a.25.25 0 0 1-.25-.25z" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Order List</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M12 12.75c3.942 0 7.987 2.563 8.249 7.712a.75.75 0 0 1-.71.787c-2.08.106-11.713.171-15.077 0a.75.75 0 0 1-.711-.787C4.013 15.314 8.058 12.75 12 12.75m0-9a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 0 0 0-7.5" />
+                    </svg>
+                    <a href="/admin/users" class="text-base font-medium hover:text-blue-500">User Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2" />
+                    </svg>
+                    <a href="/admin/category" class="text-base font-medium hover:text-blue-500">Category Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M14.8 8L16 9.2L9.2 16L8 14.8zM4 4h16c1.11 0 2 .89 2 2v4a2 2 0 1 0 0 4v4c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4c1.11 0 2-.89 2-2a2 2 0 0 0-2-2V6a2 2 0 0 1 2-2m0 2v2.54a3.994 3.994 0 0 1 0 6.92V18h16v-2.54a3.994 3.994 0 0 1 0-6.92V6zm5.5 2c.83 0 1.5.67 1.5 1.5S10.33 11 9.5 11S8 10.33 8 9.5S8.67 8 9.5 8m5 5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Coupon Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
+                        <path fill="currentColor"
+                            d="M30 6V4h-3V2h-2v2h-1c-1.103 0-2 .898-2 2v2c0 1.103.897 2 2 2h4v2h-6v2h3v2h2v-2h1c1.103 0 2-.897 2-2v-2c0-1.102-.897-2-2-2h-4V6zm-6 14v2h2.586L23 25.586l-2.292-2.293a1 1 0 0 0-.706-.293H20a1 1 0 0 0-.706.293L14 28.586L15.414 30l4.587-4.586l2.292 2.293a1 1 0 0 0 1.414 0L28 23.414V26h2v-6zM4 30H2v-5c0-3.86 3.14-7 7-7h6c1.989 0 3.89.85 5.217 2.333l-1.49 1.334A5 5 0 0 0 15 20H9c-2.757 0-5 2.243-5 5zm8-14a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-12a5 5 0 1 1 0 10a5 5 0 0 1 0-10" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Sales</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M7.05 6.462a2 2 0 0 0 2.63-1.519l.32-1.72a9 9 0 0 1 3.998 0l.322 1.72a2 2 0 0 0 2.63 1.519l1.649-.58a9 9 0 0 1 2.001 3.46l-1.33 1.14a2 2 0 0 0 0 3.037l1.33 1.139a9 9 0 0 1-2.001 3.46l-1.65-.58a2 2 0 0 0-2.63 1.519L14 20.777a9 9 0 0 1-3.998 0l-.322-1.72a2 2 0 0 0-2.63-1.519l-1.649.58a9 9 0 0 1-2.001-3.46l1.33-1.14a2 2 0 0 0 0-3.036L3.4 9.342a9 9 0 0 1 2-3.46zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Settings</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Top Navigation -->
+        <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-40">
+            <!-- Hamburger Menu for Small Screens (Main Header) -->
+            <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-2xl font-bold tracking-wide logo-font block lg:hidden">LAPTIX</h1>
+            <!-- Right-aligned buttons -->
+            <div class="flex items-center space-x-4 ml-auto">
+                <div class="h-6 w-6"></div>
+            </div>
+        </header>
+
+        <!-- Breadcrumbs -->
+        <div class=" text-gray-500 mx-5 text-xs mt-2">Home &gt; All Products &gt; Update Product Variants</div>
+
+        <!-- Content -->
+        <main class="mx-5 flex-1 font-roboto-medium">
+            <div class="py-5">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Update Product Variants</h2>
+                </div>
+            </div>
+            <form class="mb-4" action="#" method="POST">
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                        <input type="text" id="product-name" name="product-name" value="Adidas Ultra boost"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
+                            required>
+
+                        <label for="product-summary" class="block mt-4 text-sm font-medium text-gray-700">Product
+                            Summary</label>
+                        <input type="text" id="product-summary" name="product-summary"
+                            value="Long distance running requires a lot from athletes."
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+
+                        <label for="size" class="block mt-4 text-sm font-medium text-gray-700">Size</label>
+                        <input type="text" id="size" name="size"
+                            value="Long distance running requires a lot from athletes."
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+
+                        <label for="color" class="block mt-4 text-sm font-medium text-gray-700">Colour</label>
+                        <input type="text" id="color" name="color"
+                            value="Long distance running requires a lot from athletes."
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+
+                        <label for="ram" class="block mt-4 text-sm font-medium text-gray-700">Ram</label>
+                        <input type="text" id="ram" name="ram"
+                            value="Long distance running requires a lot from athletes."
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+
+                        <label for="storage" class="block mt-4 text-sm font-medium text-gray-700">Storage</label>
+                        <input type="text" id="storage" name="storage"
+                            value="Long distance running requires a lot from athletes."
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    </div>
+
+                    <div class="flex justify-center">
+                        <img src="https://via.placeholder.com/300x300" alt="Product Image" class="object-contain">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 mt-6">
+                    <div>
+                        <label for="regular-price" class="block text-sm font-medium text-gray-700">Regular Price</label>
+                        <input type="text" id="regular-price" name="regular-price" value="$110.40"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    </div>
+                    <div>
+                        <label for="sale-price" class="block text-sm font-medium text-gray-700">Sale Price</label>
+                        <input type="text" id="sale-price" name="sale-price" value="$450"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 mt-6">
+                    <div>
+                        <label for="stock-quantity" class="block text-sm font-medium text-gray-700">Stock
+                            Quantity</label>
+                        <input type="number" id="stock-quantity" name="stock-quantity" value="21"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    </div>
+                    <div>
+                        <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+                        <input type="text" id="sku" name="sku" value="21"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-8 space-x-4">
+                    <button type="button"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">CANCEL</button>
+                    <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">UPDATE</button>
+                </div>
+            </form>
+    </div>
+    </main>
+    </div>
+</body>
+
+</html>

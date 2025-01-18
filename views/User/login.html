@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - LAPTIX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <header class="p-6 bg-white shadow">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold logo-font">LAPTIX</h1>
+        </div>
+    </header>
+
+    <main class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-sm bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <p class="mb-4">Do not have an account? <a href="#" class="text-blue-500 underline">create a new one.</a>
+            </p>
+            <form>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Enter Your Email</label>
+                    <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="michael.jee@gmail.com">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Enter Your Password</label>
+                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <button type="submit" class="w-full bg-black text-white py-2 rounded-md">Login</button>
+                <div class="text-center mt-4">
+                    <a href="#" class="text-sm text-blue-500 underline">Forgot Your Password?</a>
+                </div>
+                <div class="mt-4 flex items-center justify-between">
+
+                    <button type="button"
+                        class="flex items-center w-full py-2 bg-gray-100 border border-gray-300 rounded-md mr-2">
+                        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google logo" class="mr-2">
+                        <a href="/auth/google/login">Login with Google </a>
+                    </button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-black text-white py-6">
+        <div class="container mx-auto text-center">
+            <h2 class="text-xl font-bold">About us</h2>
+            <p class="mt-2">We are the biggest hyperstore in the universe. We got you all cover with our exclusive
+                collections and latest laptops.</p>
+            <p class="mt-2">laptix@gmail.com</p>
+            <div class="mt-4 flex justify-center space-x-4">
+                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="container mx-auto mt-6 border-t border-gray-700 pt-4 text-center">
+            <p>&copy; 2025 LAPTIX, Inc.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

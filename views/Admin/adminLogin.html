@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptix Admin Login</title>
+    <link rel="stylesheet" href="/static/css/admin_login_style.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto:wght@400;500&display=swap">
+    <style>
+        /* Optional styling for error messages */
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .error {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <div class="card-left">
+                <div class="image-cover">
+                    <img src="/static/images/logos/Admin_login.png" alt="Laptix">
+                </div>
+            </div>
+            <div class="card-right">
+                <h1 class="title">
+                    <img src="/static/images/logos/logo.png" width="200px" height="40px" alt="Laptix">
+                </h1>
+                <h2 class="welcome">Welcome to Laptix Admin Page</h2>
+                <form id="adminLoginForm" method="post">
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" name="email" placeholder="Email" required>
+                        <div id="emailError" class="error-message"></div>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <div id="passwordError" class="error-message"></div>
+                    </div>
+                    <div class="actions">
+                        <button type="button" id="loginButton" class="btn" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginButton').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            const emailField = document.getElementById('email');
+            const passwordField = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Clear previous error messages and styles
+            emailError.textContent = "";
+            passwordError.textContent = "";
+            emailField.classList.remove('error');
+            passwordField.classList.remove('error');
+
+            const email = emailField.value;
+            const password = passwordField.value;
+
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Successful login - Redirect to dashboard
+                    console.log('Login successful:', result);
+                    window.location.href = '/admin/products/';
+                } else {
+                    // Display error messages under respective fields
+                    if (result.error.includes("Email")) {
+                        emailError.textContent = result.error;
+                        emailField.classList.add('error'); // Highlight error
+                    } 
+                    if (result.error.includes("Password")) {
+                        passwordError.textContent = result.error;
+                        passwordField.classList.add('error'); // Highlight error
+                    }
+                }
+            } catch (err) {
+                console.error('Request failed:', err);
+                emailError.textContent = "An unexpected error occurred";
+                emailField.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>
