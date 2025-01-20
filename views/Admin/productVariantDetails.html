@@ -187,9 +187,9 @@
                     </a>
                     <a href="/admin/products/variant/details?product_id={{.Variant.ProductId}}">
                         <button
-                        class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                        SHOW ALL VARIANTS
-                    </button>
+                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
+                            SHOW ALL VARIANTS
+                        </button>
                     </a>
                     <form action="/admin/products/variant/delete/{{.Variant.Id}}" method="post">
                         <button
@@ -214,25 +214,28 @@
                     <p>No images available</p>
                     {{end}}
                 </div>
-                
+
                 <div class="grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-2 gap-4 w-full lg:w-1/2">
-                    <!-- Loop through and show images for the current variant -->
                     {{range .Variant.Images}}
-                    <img class="rounded shadow w-full h-[120px] object-cover" src="{{.ProductVariantsImages}}" alt="Product Image">
-                    <div class="group relative">
-                        <button class="options-btn text-2xl text-gray-500 hover:text-gray-700">
-                            &#x22EE;
-                        </button>
-                        <div class="options hidden absolute top-8 right-0 mt-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
-                            <ul>
-                                <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Change</li>
-                                <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">
-                                    <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
-                                        <button type="submit">Delete</button>
-                                    </form>
-                                </li>
-                            </ul>
+                    <div>
+                        <div class="group relative">
+                            <button class="options-btn text-2xl text-gray-500 hover:text-gray-700 absolute top-0 right-0">
+                                &#x22EE;
+                            </button>
+                            <div
+                                class="options hidden absolute top-8 right-0 mt-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
+                                <ul>
+                                    <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Change</li>
+                                    <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                                        <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
+                                            <button type="submit">Delete</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
+                        <img class="rounded shadow w-full h-auto object-cover" src="{{.ProductVariantsImages}}"
+                            alt="Product Image">
                     </div>
                     {{end}}
                 </div>

@@ -16,7 +16,7 @@ func UserRouter(r *gin.Engine) {
 		auth.GET("/google/callback", controllers.HandleGoogleCallback)
 	}
 	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
-	r.GET("/products/details",middleware.NoCacheMiddleware(),controllers.ShowProductDetail)
+	r.GET("/products/details/:id",middleware.NoCacheMiddleware(),controllers.ShowProductDetail)
 
 	userSignup := r.Group("/user/signup")
 	userSignup.Use(middleware.NoCacheMiddleware())

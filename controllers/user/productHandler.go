@@ -54,83 +54,103 @@ func ShowProducts(c *gin.Context) {
 	})
 }
 
-
-
 type ProductDetailResponse struct {
-    ID            uint      `json:"id"`
-    ProductName   string    `json:"product_name"`
-    CategoryName  string    `json:"category_name"`
-    CategoryID    uint      `json:"category_id"`
-    RegularPrice  float64   `json:"regular_price"`
-    SalePrice     float64   `json:"sale_price"`
-    Images        []string  `json:"images"`
-    Size          string    `json:"size"`
-    Color         string    `json:"color"`
-    Ram           string    `json:"ram"`
-    Storage       string    `json:"storage"`
-    Stock         int       `json:"stock"`
-    Summary       string    `json:"summary"`
-    Specifications []SpecificationResponse `json:"specifications"`
+	ID             uint                    `json:"id"`
+	ProductName    string                  `json:"product_name"`
+	CategoryName   string                  `json:"category_name"`
+	CategoryID     uint                    `json:"category_id"`
+	RegularPrice   float64                 `json:"regular_price"`
+	SalePrice      float64                 `json:"sale_price"`
+	Images         []string                `json:"images"`
+	Size           string                  `json:"size"`
+	Color          string                  `json:"color"`
+	Ram            string                  `json:"ram"`
+	Storage        string                  `json:"storage"`
+	Stock          int                     `json:"stock"`
+	Summary        string                  `json:"summary"`
+	Specifications []SpecificationResponse `json:"specifications"`
 }
 
 type SpecificationResponse struct {
-    Key   string `json:"key"`
-    Value string `json:"value"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func ShowProductDetail(c *gin.Context) {
-    productID := c.Param("id")
-    
-    var variant models.ProductVariantDetails
-    
-    result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
-        Preload("Category", "is_deleted = ?", false).
-        Preload("Specification", "is_deleted = ?", false).
-        Where("id = ? AND is_deleted = ?", productID, false).
-        First(&variant)
-        
-    if result.Error != nil {
-        c.HTML(http.StatusNotFound, "404.html", nil)
-        return
-    }
-    
-    var images []string
-    for _, img := range variant.VariantsImages {
-        images = append(images, img.ProductVariantsImages)
-    }
-    
-    var specs []SpecificationResponse
-    for _, spec := range variant.Specification {
-        specs = append(specs, SpecificationResponse{
-            Key:   spec.SpecificationKey,
-            Value: spec.SpecificationValue,
-        })
-    }
-    
-    var relatedProducts []models.ProductVariantDetails
-    config.DB.Preload("VariantsImages", "is_deleted = ?", false).
-        Where("category_id = ? AND id != ? AND is_deleted = ?", variant.CategoryID, variant.ID, false).
-        Limit(4).
-        Find(&relatedProducts)
-    
-    
-    c.HTML(http.StatusOK, "productDetails.html", gin.H{
-        "product": ProductDetailResponse{
-            ID:            variant.ID,
-            ProductName:   variant.ProductName,
-            CategoryName:  variant.Category.Name,
-            CategoryID:    variant.CategoryID,
-            RegularPrice:  variant.RegularPrice,
-            SalePrice:     variant.SalePrice,
-            Images:        images,
-            Size:          variant.Size,
-            Color:         variant.Colour,
-            Ram:           variant.Ram,
-            Storage:       variant.Storage,
-            Stock:         variant.StockQuantity,
-            Summary:       variant.ProductSummary,
-            Specifications: specs,
-        },
-    })
-}
+	productID := c.Param("id")
 
+	var variant models.ProductVariantDetails
+
+	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
+		Preload("Category", "is_deleted = ?", false).
+		Preload("Specification", "is_deleted = ?", false).
+		Where("id = ? AND is_deleted = ?", productID, false).
+		First(&variant)
+
+	if result.Error != nil {
+		c.HTML(http.StatusNotFound, "404.html", nil)
+		return
+	}
+
+	var images []string
+	for _, img := range variant.VariantsImages {
+		images = append(images, img.ProductVariantsImages)
+	}
+
+	var specs []SpecificationResponse
+	for _, spec := range variant.Specification {
+		specs = append(specs, SpecificationResponse{
+			Key:   spec.SpecificationKey,
+			Value: spec.SpecificationValue,
+		})
+	}
+
+	var relatedProducts []models.ProductVariantDetails
+	config.DB.Preload("VariantsImages", "is_deleted = ?", false).
+		Where("category_id = ? AND id != ? AND is_deleted = ?", variant.CategoryID, variant.ID, false).
+		Limit(20).
+		Find(&relatedProducts)
+
+	type RelatedProductsResponce struct {
+		ID             uint     `json:"id"`
+		ProductSummary string   `json:"product_summary"`
+		SalePrice      float64  `json:"sale_price "`
+		Images         []string `json:"images"`
+	}
+	var relatedProductsResponce []RelatedProductsResponce
+
+	for _, product := range relatedProducts {
+		var images []string
+		for _, image := range product.VariantsImages {
+			images = append(images, image.ProductVariantsImages)
+		}
+		relatedProductsResponce = append(relatedProductsResponce, RelatedProductsResponce{
+			ID: product.ID,
+			ProductSummary: product.ProductSummary,
+			SalePrice: product.SalePrice,
+			Images: images,
+		})
+	}
+
+	product := ProductDetailResponse{
+		ID:             variant.ID,
+		ProductName:    variant.ProductName,
+		CategoryName:   variant.Category.Name,
+		CategoryID:     variant.CategoryID,
+		RegularPrice:   variant.RegularPrice,
+		SalePrice:      variant.SalePrice,
+		Images:         images,
+		Size:           variant.Size,
+		Color:          variant.Colour,
+		Ram:            variant.Ram,
+		Storage:        variant.Storage,
+		Stock:          variant.StockQuantity,
+		Summary:        variant.ProductSummary,
+		Specifications: specs,
+	}
+
+	c.HTML(http.StatusFound, "productDetails.html", gin.H{
+		"product":         product,
+		"relatedProducts": relatedProductsResponce,
+	})
+}
