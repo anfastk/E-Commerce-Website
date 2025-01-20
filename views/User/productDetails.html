@@ -9,13 +9,104 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/productPage.css" type="text/css" />
     <script src="/static/js/productpage.js" defer></script>
-    <script src="/static/js/productsetailsuser.js" defer></script>
+    <script src="/static/js/productdetailsuser.js" defer></script>
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
 
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
+        .aspect-16-10 {
+            aspect-ratio: 16/10;
+        }
+
+        .thumbnail-wrapper {
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .thumbnail-wrapper:hover {
+            border-color: #E5E7EB;
+        }
+
+        .thumbnail-wrapper.active {
+            border-color: #3B82F6;
+        }
+
+        .thumbnail-wrapper.active:hover {
+            border-color: #3B82F6;
+        }
+
+        #thumbnail-container {
+            max-height: 90px;
+        }
+
+        .main-image-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .magnifier-box {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            display: none;
+        }
+
+        .zoom-container {
+            margin-top: 100px;
+            position: fixed;
+            width: 50%;
+            height: 500px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            display: none;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 50;
+            top: 2rem;
+            right: 2rem;
+        }
+
+        .zoom-image {
+            position: absolute;
+            max-width: none;
+            max-height: none;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Added new style for image wrapper */
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body class="bg-white">
-
     <!-- Header Section -->
     <div class="bg-black py-4 sticky top-0 z-50">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
@@ -78,7 +169,7 @@
         </header>
     </div>
 
-    <div class="max-w-7xl mx-auto p-8">
+    <div class="max-w-7xl mx-auto p-5">
         <!-- Breadcrumb Navigation -->
         <nav class="text-sm text-gray-500 mb-6">
             <a href="#" class="hover:underline">Home</a> /
@@ -90,28 +181,46 @@
         <div class="flex flex-wrap lg:flex-nowrap gap-8">
             <!-- Left Section: Image Gallery -->
             <div class="flex flex-col w-full lg:w-1/2">
+                <!-- Main Image Container -->
                 <div class="border rounded-lg p-4">
-                    {{if len .product.Images}}
-                    <img id="main-image" src="{{index .product.Images 0}}" alt="{{.product.ProductName}}"
-                        class="rounded-lg mb-4">
-                    {{end}}
+                    <!-- <div class="aspect-16-10 relative">
+                        {{if len .product.Images}}
+                        <img id="main-image" src="{{index .product.Images 0}}" alt="{{.product.ProductName}}"
+                            class="absolute inset-0 w-full h-full object-contain rounded-lg">
+                        {{end}}
+                    </div> -->
+                    <div class="main-image-container">
+                        <div class="image-wrapper">
+                            {{if len .product.Images}}
+                            <img id="main-image" src="{{index .product.Images 0}}" alt="Product"
+                                class="w-full h-full object-contain">
+                            {{end}}
+                            <div class="magnifier-box"></div>
+                            <div class="zoom-hint"></div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Thumbnails Navigation -->
                 <div class="flex items-center justify-between mt-4">
-                    <button id="prev-button" class="p-2 border rounded-full bg-gray-100 hover:bg-gray-200"
-                        onclick="scrollThumbnails(-1)">
+                    <button onclick="scrollThumbnails(-1)"
+                        class="p-2 border rounded-full bg-gray-100 hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <div id="thumbnail-container" class="flex gap-2 overflow-x-scroll scrollbar-hide">
+
+                    <div id="thumbnail-container" class="flex gap-2 overflow-x-scroll scrollbar-hide mx-2">
                         {{range .product.Images}}
-                        <img src="{{.}}" alt="Thumbnail 1" class="border rounded-lg cursor-pointer thumbnail"
-                            onclick="changeImage(this)">
-                        {{end}}
+                        <div class="thumbnail-wrapper flex-shrink-0 w-20 h-20 rounded-lg cursor-pointer">
+                            <img src="{{.}}" alt="Thumbnail" class="w-full h-full object-contain rounded-lg"
+                                onclick="changeImage(this)">
+                        </div>
+                        {{ end }}
                     </div>
-                    <button id="next-button" class="p-2 border rounded-full bg-gray-100 hover:bg-gray-200"
-                        onclick="scrollThumbnails(1)">
+
+                    <button onclick="scrollThumbnails(1)" class="p-2 border rounded-full bg-gray-100 hover:bg-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -120,8 +229,14 @@
                 </div>
             </div>
 
+
             <!-- Right Section: Product Info -->
             <div class="w-full lg:w-1/2 p-6 bg-white">
+                <div class="zoom-container">
+                    <img id="zoom-image" src="" alt="Zoomed Product" class="zoom-image">
+                </div>
+                <div class="zoom-container">
+                </div>
                 <h1 class="text-2xl md:text-3xl font-bold mb-2">
                     {{.product.Summary}}
                 </h1>
@@ -246,6 +361,7 @@
 
 
         </div>
+
     </div>
 
     <div class="max-w-7xl mx-auto mb-20 p-8 bg-white border shadow-lg">
@@ -452,27 +568,6 @@
             </div>
         </div>
     </footer>
-    <script>
-        function changeImage(thumbnail) {
-            const mainImage = document.getElementById('main-image');
-            const thumbnailContainer = document.getElementById('thumbnail-container');
-
-            // Swap the main image with the clicked thumbnail
-            const tempSrc = mainImage.src;
-            mainImage.src = thumbnail.src;
-            thumbnail.src = tempSrc;
-
-            // Scroll the clicked thumbnail into view
-            thumbnail.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-
-        function scrollThumbnails(direction) {
-            const container = document.getElementById('thumbnail-container');
-            const scrollAmount = 120; // Adjust scroll amount as needed
-            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-        }
-    </script>
-
 </body>
 
 </html>
