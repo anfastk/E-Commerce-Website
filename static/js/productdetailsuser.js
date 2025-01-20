@@ -158,3 +158,10 @@ window.addEventListener('resize', initZoom);
 
 // Initialize zoom when image loads
 mainImage.addEventListener('load', initZoom);
+
+function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+    document.getElementById(`content-${tab}`).classList.remove('hidden');
+    document.querySelectorAll('button').forEach(tab => tab.classList.remove('tab-active'));
+    document.getElementById(`tab-${tab}`).classList.add('tab-active');
+}
