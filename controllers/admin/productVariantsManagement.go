@@ -40,6 +40,7 @@ func AddProductVariants(c *gin.Context) {
 		})
 		return
 	}
+
 	var mainProduct models.ProductDetail
 
 	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
@@ -107,7 +108,7 @@ func AddProductVariants(c *gin.Context) {
 			ProductSummary: productSummaries[i],
 			CategoryID:     categoryID,
 		}
-		fmt.Println(productVariant.SalePrice, productVariant.RegularPrice)
+
 		if err := tx.Create(&productVariant).Error; err != nil {
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -120,8 +121,9 @@ func AddProductVariants(c *gin.Context) {
 
 		form, _ := c.MultipartForm()
 		if form != nil {
-			files, ok := form.File["product_images[]"]
-			if ok {
+			// Get files specific to this variant
+			files := form.File[fmt.Sprintf("product_images[%d][]", i)]
+			if files != nil {
 				for _, fileHeader := range files {
 					file, _ := fileHeader.Open()
 					defer file.Close()
@@ -153,20 +155,18 @@ func AddProductVariants(c *gin.Context) {
 						return
 					}
 				}
-			} else {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  "Bad Request",
-					"message": "No files found in the request",
-					"code":    400,
-				})
-				return
 			}
 		}
 	}
 
 	tx.Commit()
 	redirectURL := "/admin/products/variant/details?product_id=" + strconv.Itoa(int(productID))
-	c.Redirect(http.StatusFound, redirectURL)
+	c.JSON(http.StatusOK, gin.H{
+		"status":   "success",
+		"code":     200,
+		"redirect": redirectURL,
+		"message":  "Product variants added successfully",
+	})
 }
 
 func ShowMutiProductVariantDetails(c *gin.Context) {

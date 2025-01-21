@@ -363,9 +363,6 @@
         <div class="flex flex-wrap justify-center border-b mb-6">
             <button onclick="showTab('description')" id="tab-description"
                 class="py-2 px-4 lg:px-6 tab-active font-semibold text-sm lg:text-base">DESCRIPTION</button>
-            <button onclick="showTab('additional')" id="tab-additional"
-                class="py-2 px-4 lg:px-6 text-gray-500 hover:text-orange-500 text-sm lg:text-base">ADDITIONAL
-                INFORMATION</button>
             <button onclick="showTab('specification')" id="tab-specification"
                 class="py-2 px-4 lg:px-6 text-gray-500 hover:text-orange-500 text-sm lg:text-base">SPECIFICATION</button>
             <button onclick="showTab('review')" id="tab-review"
@@ -376,17 +373,14 @@
         <div id="content-description" class="tab-content">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Description -->
-                {{if .product.Specifications}}
                 <div class="col-span-2">
-
-                    <h2 class="text-lg lg:text-xl font-bold text-center mb-4">Specification</h2>
-                    {{range .product.Specifications}}
+                    <h2 class="text-lg lg:text-xl font-bold text-center mb-4">Description</h2>
+                    {{range .product.Description}}
                     <p class="text-gray-600 mb-4 text-sm lg:text-base">
-                        {{.Value}}
+                        &#x2022; {{.Description}}
                     </p>
                     {{end}}
                 </div>
-                {{end}}
                 <!-- Features -->
                 <div class="grid grid-cols-1 gap-4">
                     <div>
@@ -402,19 +396,13 @@
                 </div>
             </div>
         </div>
-
-        <div id="content-additional" class="tab-content hidden">
-            <h2 class="text-lg lg:text-xl font-bold text-center">Additional Information</h2>
-            <p class="text-gray-600 text-center mt-4 text-sm lg:text-base">
-                Details about the product's additional features and compatibility.
-            </p>
-        </div>
-
         <div id="content-specification" class="tab-content hidden">
             <h2 class="text-lg lg:text-xl font-bold text-center">Specification</h2>
-            <p class="text-gray-600 text-center mt-4 text-sm lg:text-base">
-                Complete technical specifications of the product.
+            {{range .product.Specifications}}
+            <p class="text-gray-600  mt-4 text-sm lg:text-base">
+                &#x2022; {{.Value}}
             </p>
+            {{end}}
         </div>
 
         <div id="content-review" class="tab-content hidden">
@@ -422,53 +410,6 @@
             <p class="text-gray-600 text-center mt-4 text-sm lg:text-base">
                 User reviews and ratings for the product.
             </p>
-        </div>
-    </div>
-
-
-    <div class="max-w-7xl mx-auto p-8">
-
-        <div class="text-center mb-8">
-            <img src="https://via.placeholder.com/600x400" alt="MacBook Pro"
-                class="mx-auto w-full sm:max-w-md md:max-w-lg lg:max-w-xl">
-        </div>
-
-        <div class="mb-12">
-            <h2 class="text-xl sm:text-2xl font-bold mb-4">DETAILS</h2>
-            <p class="text-gray-600 mb-6 text-sm sm:text-base">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat.
-            </p>
-            <p class="text-gray-600 mb-6 text-sm sm:text-base">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat.
-            </p>
-        </div>
-
-        <div class="mb-12">
-            <img src="https://via.placeholder.com/600x300" alt="React in real time"
-                class="mx-auto w-full sm:max-w-md md:max-w-lg lg:max-w-xl">
-        </div>
-
-        <div class="mb-12">
-            <h2 class="text-xl sm:text-2xl font-bold mb-4">DETAILS</h2>
-            <p class="text-gray-600 mb-6 text-sm sm:text-base">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat.
-            </p>
-            <p class="text-gray-600 mb-6 text-sm sm:text-base">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat.
-            </p>
-        </div>
-
-        <div>
-            <img src="https://via.placeholder.com/600x300" alt="React in real time"
-                class="mx-auto w-full sm:max-w-md md:max-w-lg lg:max-w-xl">
         </div>
     </div>
 

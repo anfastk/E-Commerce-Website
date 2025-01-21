@@ -69,6 +69,12 @@ type ProductDetailResponse struct {
 	Stock          int                     `json:"stock"`
 	Summary        string                  `json:"summary"`
 	Specifications []SpecificationResponse `json:"specifications"`
+	Description    []DescriptionResponse   `json:"description"`
+}
+
+type DescriptionResponse struct {
+	Heading     string `json:"heading"`
+	Description string `json:"description "`
 }
 
 type SpecificationResponse struct {
@@ -84,6 +90,7 @@ func ShowProductDetail(c *gin.Context) {
 	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
 		Preload("Category", "is_deleted = ?", false).
 		Preload("Specification", "is_deleted = ?", false).
+		Preload("Product.Descriptions","is_deleted = ?",false).
 		Where("id = ? AND is_deleted = ?", productID, false).
 		First(&variant)
 
@@ -102,6 +109,14 @@ func ShowProductDetail(c *gin.Context) {
 		specs = append(specs, SpecificationResponse{
 			Key:   spec.SpecificationKey,
 			Value: spec.SpecificationValue,
+		})
+	}
+
+	var description []DescriptionResponse
+	for _, descrip := range variant.Product.Descriptions {
+		description = append(description, DescriptionResponse{
+			Heading:   descrip.Heading,
+			Description: descrip.Description,
 		})
 	}
 
@@ -125,10 +140,10 @@ func ShowProductDetail(c *gin.Context) {
 			images = append(images, image.ProductVariantsImages)
 		}
 		relatedProductsResponce = append(relatedProductsResponce, RelatedProductsResponce{
-			ID: product.ID,
+			ID:             product.ID,
 			ProductSummary: product.ProductSummary,
-			SalePrice: product.SalePrice,
-			Images: images,
+			SalePrice:      product.SalePrice,
+			Images:         images,
 		})
 	}
 
@@ -147,6 +162,7 @@ func ShowProductDetail(c *gin.Context) {
 		Stock:          variant.StockQuantity,
 		Summary:        variant.ProductSummary,
 		Specifications: specs,
+		Description: description,
 	}
 
 	c.HTML(http.StatusFound, "productDetails.html", gin.H{
