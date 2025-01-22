@@ -217,7 +217,8 @@
                 </form>
               </td>
               <td class="manage-offer-btn px-4 py-2">
-                <button id="manage-offer-btn" class="bg-cyan-600 text-white px-3 py-1 rounded hover:bg-cyan-500">Manage Offer</button>
+                <button id="manage-offer-btn" class="bg-cyan-600 text-white px-3 py-1 rounded hover:bg-cyan-500">Manage
+                  Offer</button>
               </td>
             </tr>
 
@@ -226,12 +227,11 @@
               class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
               <div class="bg-white p-6 rounded-lg w-96">
                 <h3 class="text-2xl font-bold mb-4">Edit Item</h3>
-                <form action="/admin/category/{{.ID}}/edit" method="post">
+                <form id="editCategoryForm" onsubmit="handleEditSubmit(event)" data-category-id="{{.ID}}">
                   <input type="text" id="editName" name="name" class="border p-2 w-full mb-4"
                     placeholder="Enter New Name" required />
                   <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded mr-2"
-                      value="Save">Save</button>
+                    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded mr-2">Save</button>
                     <button type="button" id="close-edit-popup"
                       class="bg-gray-300 text-black px-4 py-2 rounded">Close</button>
                   </div>
@@ -277,6 +277,61 @@
       </div>
     </main>
   </div>
+  <script>
+    async function handleEditSubmit(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const categoryId = form.dataset.categoryId;
+      const formData = new FormData(form);
+      const name = formData.get('name');
+
+      try {
+        const response = await fetch(`/admin/category/${categoryId}/edit`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update category');
+        }
+
+        // On success
+        const result = await response.json();
+        // Close the popup
+        document.getElementById('edit-popup').classList.add('hidden');
+        // Redirect to product detail page
+        window.location.href = `/admin/category/`;
+
+      } catch (error) {
+        console.error('Error updating category:', error);
+        alert('Failed to update category. Please try again.');
+      }
+    }
+
+    // Add click handler to edit buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const categoryId = button.closest('tr').querySelector('td').textContent;
+        const categoryName = button.closest('tr').querySelectorAll('td')[1].textContent;
+
+        const form = document.getElementById('editCategoryForm');
+        form.dataset.categoryId = categoryId;
+        document.getElementById('editName').value = categoryName;
+        document.getElementById('edit-popup').classList.remove('hidden');
+      });
+    });
+
+    // Close popup handler
+    document.getElementById('close-edit-popup').addEventListener('click', () => {
+      document.getElementById('edit-popup').classList.add('hidden');
+    });
+  </script>
 </body>
 
 </html>

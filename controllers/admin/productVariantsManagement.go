@@ -21,7 +21,7 @@ func ShowProductVariant(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Image not find",
-			"code":   500,
+			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
@@ -36,7 +36,7 @@ func AddProductVariants(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid product ID",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -47,7 +47,7 @@ func AddProductVariants(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Product not found",
-			"code":   404,
+			"code":   http.StatusNotFound,
 		})
 		return
 	}
@@ -72,7 +72,7 @@ func AddProductVariants(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Mismatched form data lengths",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -89,7 +89,7 @@ func AddProductVariants(c *gin.Context) {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"status": "Unprocessable Entity",
 				"error":  "Invalid price or quantity values",
-				"code":   422,
+				"code":   http.StatusUnprocessableEntity,
 			})
 			return
 		}
@@ -114,14 +114,13 @@ func AddProductVariants(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status": "Internal Server Error",
 				"error":  "Failed to save product variant",
-				"code":   500,
+				"code":   http.StatusInternalServerError,
 			})
 			return
 		}
 
 		form, _ := c.MultipartForm()
 		if form != nil {
-			// Get files specific to this variant
 			files := form.File[fmt.Sprintf("product_images[%d][]", i)]
 			if files != nil {
 				for _, fileHeader := range files {
@@ -135,7 +134,7 @@ func AddProductVariants(c *gin.Context) {
 							"status":  "Internal Server Error",
 							"message": "Failed to upload product image",
 							"error":   err.Error(),
-							"code":    500,
+							"code":    http.StatusInternalServerError,
 						})
 						return
 					}
@@ -150,7 +149,7 @@ func AddProductVariants(c *gin.Context) {
 							"status":  "Internal Server Error",
 							"message": "Failed to save product image",
 							"error":   err.Error(),
-							"code":    500,
+							"code":    http.StatusInternalServerError,
 						})
 						return
 					}
@@ -175,7 +174,7 @@ func ShowMutiProductVariantDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid product ID",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -184,7 +183,7 @@ func ShowMutiProductVariantDetails(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Failed to fetch product details",
-			"code":   500,
+			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
@@ -234,7 +233,7 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid product ID",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -243,7 +242,7 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Failed to fetch product details",
-			"code":   500,
+			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
@@ -260,7 +259,7 @@ func AddProductSpecification(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid product variant ID",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -270,7 +269,7 @@ func AddProductSpecification(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Mismatch in headings and specification",
-			"code":   400,
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
@@ -284,7 +283,7 @@ func AddProductSpecification(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status": "Internal Server Error",
 				"error":  "Failed to save specification",
-				"code":   500,
+				"code":   http.StatusInternalServerError,
 			})
 			return
 		}
@@ -302,7 +301,7 @@ func DeleteProductVariant(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Product not found",
-			"code":   500,
+			"code":   http.StatusNotFound,
 		})
 		return
 	}
@@ -313,7 +312,7 @@ func DeleteProductVariant(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Failed to delete product",
-			"code":   500,
+			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
@@ -329,7 +328,7 @@ func DeleteVariantImage(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Image not found",
-			"code":   500,
+			"code":   http.StatusNotFound,
 		})
 		return
 	}
@@ -340,10 +339,102 @@ func DeleteVariantImage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Failed to delete image",
-			"code":   500,
+			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
 	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variantImage.ProductVariantID))
 	c.Redirect(http.StatusFound, redirectURL)
+}
+
+func ShowEditProductVariant(c *gin.Context) {
+	variantID := c.Param("id")
+
+	var productVariant models.ProductVariantDetails
+	if err := config.DB.First(&productVariant, "id = ?", variantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product variant not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	var variantImage models.ProductVariantsImage
+	if err := config.DB.First(&variantImage, "product_variant_id = ? AND is_deleted = ?", variantID, false).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Image not found",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "updateProductVariants.html", gin.H{
+		"Details": productVariant,
+		"Image":   variantImage,
+	})
+}
+
+type updateProductVariants struct {
+	ProductName    string  `json:"productname"`
+	ProductSummary string  `json:"productsummary"`
+	Size           string  `json:"size"`
+	Colour         string  `json:"colour"`
+	Ram            string  `json:"ram"`
+	Storage        string  `json:"storage"`
+	StockQuantity  int     `json:"stockquantity"`
+	RegularPrice   float64 `json:"regularprice"`
+	SalePrice      float64 `json:"saleprice"`
+	SKU            string  `json:"sku"`
+}
+
+func EditProductVariant(c *gin.Context) {
+	variantID := c.Param("id")
+
+	var existingVariant models.ProductVariantDetails
+	if err := config.DB.First(&existingVariant, variantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product variant not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	var updateData updateProductVariants
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid input data",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	if err := config.DB.Model(&existingVariant).Updates(updateProductVariants{
+		ProductName:    updateData.ProductName,
+		ProductSummary: updateData.ProductSummary,
+		Size:           updateData.Size,
+		Colour:         updateData.Colour,
+		Ram:            updateData.Ram,
+		Storage:        updateData.Storage,
+		StockQuantity:  updateData.StockQuantity,
+		RegularPrice:   updateData.RegularPrice,
+		SalePrice:      updateData.SalePrice,
+		SKU:            updateData.SKU,
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Failed to save data",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Product updated successfully",
+		"code":    http.StatusOK,
+	})
 }

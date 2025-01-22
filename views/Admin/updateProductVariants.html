@@ -129,55 +129,53 @@
                     <h2 class="text-2xl font-bold">Update Product Variants</h2>
                 </div>
             </div>
-            <form class="mb-4" action="#" method="POST">
+            <form id="updateProductForm" class="mb-4">
                 <div class="grid grid-cols-2 gap-8">
                     <div>
                         <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
-                        <input type="text" id="product-name" name="product-name" value="Adidas Ultra boost"
-                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-500"
-                            required>
+                        <input type="text" id="product-name" name="product-name" value="{{.Details.ProductName}}"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
 
                         <label for="product-summary" class="block mt-4 text-sm font-medium text-gray-700">Product
                             Summary</label>
                         <input type="text" id="product-summary" name="product-summary"
-                            value="Long distance running requires a lot from athletes."
+                            value="{{.Details.ProductSummary}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
 
                         <label for="size" class="block mt-4 text-sm font-medium text-gray-700">Size</label>
-                        <input type="text" id="size" name="size"
-                            value="Long distance running requires a lot from athletes."
+                        <input type="text" id="size" name="size" value="{{.Details.Size}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
 
                         <label for="color" class="block mt-4 text-sm font-medium text-gray-700">Colour</label>
-                        <input type="text" id="color" name="color"
-                            value="Long distance running requires a lot from athletes."
+                        <input type="text" id="color" name="color" value="{{.Details.Colour}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
 
                         <label for="ram" class="block mt-4 text-sm font-medium text-gray-700">Ram</label>
-                        <input type="text" id="ram" name="ram"
-                            value="Long distance running requires a lot from athletes."
+                        <input type="text" id="ram" name="ram" value="{{.Details.Ram}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
 
                         <label for="storage" class="block mt-4 text-sm font-medium text-gray-700">Storage</label>
-                        <input type="text" id="storage" name="storage"
-                            value="Long distance running requires a lot from athletes."
+                        <input type="text" id="storage" name="storage" value="{{.Details.Storage}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     </div>
-
+                    {{if .Image.ProductVariantsImages}}
                     <div class="flex justify-center">
-                        <img src="https://via.placeholder.com/300x300" alt="Product Image" class="object-contain">
+                        <img src="{{.Image.ProductVariantsImages}}" alt="Product Image" class="object-contain">
                     </div>
+                    {{else}}
+                    <p>No image available</p>
+                    {{end}}
                 </div>
 
                 <div class="grid grid-cols-2 gap-8 mt-6">
                     <div>
                         <label for="regular-price" class="block text-sm font-medium text-gray-700">Regular Price</label>
-                        <input type="text" id="regular-price" name="regular-price" value="$110.40"
+                        <input type="number" id="regular-price" name="regular-price" value="{{.Details.RegularPrice}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     </div>
                     <div>
                         <label for="sale-price" class="block text-sm font-medium text-gray-700">Sale Price</label>
-                        <input type="text" id="sale-price" name="sale-price" value="$450"
+                        <input type="number" id="sale-price" name="sale-price" value="{{.Details.SalePrice}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     </div>
                 </div>
@@ -186,26 +184,68 @@
                     <div>
                         <label for="stock-quantity" class="block text-sm font-medium text-gray-700">Stock
                             Quantity</label>
-                        <input type="number" id="stock-quantity" name="stock-quantity" value="21"
+                        <input type="number" id="stock-quantity" name="stock-quantity"
+                            value="{{.Details.StockQuantity}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     </div>
                     <div>
                         <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
-                        <input type="text" id="sku" name="sku" value="21"
+                        <input type="text" id="sku" name="sku" value="{{.Details.SKU}}"
                             class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     </div>
                 </div>
 
+                <input type="hidden" id="product-id" name="product-id" value="{{.Details.ID}}">
+
                 <div class="flex justify-end mt-8 space-x-4">
-                    <button type="button"
+                    <button type="button" onclick="window.history.back()"
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">CANCEL</button>
                     <button type="submit"
                         class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">UPDATE</button>
                 </div>
             </form>
+        </main>
     </div>
-    </main>
-    </div>
+    <script>
+        document.getElementById('updateProductForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const productId = document.getElementById('product-id').value;
+
+            const formData = {
+                productName: document.getElementById('product-name').value,
+                productSummary: document.getElementById('product-summary').value,
+                size: document.getElementById('size').value,
+                colour: document.getElementById('color').value,
+                ram: document.getElementById('ram').value,
+                storage: document.getElementById('storage').value,
+                regularPrice: parseFloat(document.getElementById('regular-price').value), // Convert to number
+                salePrice: parseFloat(document.getElementById('sale-price').value),     // Convert to number
+                stockQuantity: parseInt(document.getElementById('stock-quantity').value, 10), // Convert to integer
+                sku: document.getElementById('sku').value
+            };
+
+            try {
+                const response = await fetch(`/admin/products/variant/detail/update/${productId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    // Redirect to product detail page after successful update
+                    window.location.href = `/admin/products/variant/detail?variant_id=${productId}`;
+                } else {
+                    const errorData = await response.json();
+                    alert('Error updating product: ' + (errorData.message || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                alert('Error updating product: ' + error.message);
+            }
+        });
+    </script>
 </body>
 
 </html>

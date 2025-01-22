@@ -33,6 +33,8 @@ func AdminRoutes(r *gin.Engine) {
 		product.POST("/variant/submit-specification", controllers.AddProductSpecification)
 		product.POST("/variant/delete/:id",controllers.DeleteProductVariant)
 		product.POST("/variant/image/delete/:id",controllers.DeleteVariantImage)
+		product.GET("/variant/detail/update/:id",controllers.ShowEditProductVariant)
+		product.PATCH("/variant/detail/update/:id",controllers.EditProductVariant)
 	}
 	// Admin User Managemant
 	adminUser := r.Group("/admin/users")
@@ -49,7 +51,7 @@ func AdminRoutes(r *gin.Engine) {
 	category.Use(middleware.NoCacheMiddleware())
 	{
 		category.GET("/", controllers.ListCategory)
-		category.POST("/:id/edit", controllers.EditCategory)
+		category.PATCH("/:id/edit", controllers.EditCategory)
 		category.POST("/add", controllers.AddCategory)
 		category.POST("/:id/delete", controllers.DeleteCategory)
 	}
