@@ -52,9 +52,9 @@ func ShowProductsAdmin(c *gin.Context) {
 		}
 
 		productName := variant.ProductName
-        if productName == "" && variant.Product.ID != 0 {
-            productName = variant.ProductName 
-        }
+		if productName == "" && variant.Product.ID != 0 {
+			productName = variant.ProductName
+		}
 
 		response = append(response, ProductVariantResponse{
 			ID:             variant.ID,
@@ -67,13 +67,13 @@ func ShowProductsAdmin(c *gin.Context) {
 		})
 	}
 	var formattedResponceDetails []map[string]interface{}
-	for  _,variant := range response {
-		formattedVariant:= map[string]interface{}{
+	for _, variant := range response {
+		formattedVariant := map[string]interface{}{
 			"ID":             variant.ID,
 			"ProductName":    variant.ProductName,
 			"CategoryName":   variant.CategoryName,
 			"RegularPrice":   variant.RegularPrice,
-			"SalePrice":      fmt.Sprintf("%.2f",variant.SalePrice),
+			"SalePrice":      fmt.Sprintf("%.2f", variant.SalePrice),
 			"ProductSummary": variant.ProductSummary,
 			"Images":         variant.Images,
 		}
@@ -240,10 +240,10 @@ func AddProductDescription(c *gin.Context) {
 	c.Redirect(http.StatusFound, redirectURL)
 }
 
-func DeleteMainProductImage(c *gin.Context){
-	imageID:=c.Param("id")
+func DeleteMainProductImage(c *gin.Context) {
+	imageID := c.Param("id")
 	var productImage models.ProductImage
-	if err:=config.DB.First(&productImage,imageID).Error;err!=nil {
+	if err := config.DB.First(&productImage, imageID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Image not found",
@@ -252,8 +252,8 @@ func DeleteMainProductImage(c *gin.Context){
 		return
 	}
 
-	publicID,err:=helper.ExtractCloudinaryPublicID(productImage.ProductImages)
-	if err !=nil {
+	publicID, err := helper.ExtractCloudinaryPublicID(productImage.ProductImages)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Failed to extract Cloudinary public ID",
@@ -262,8 +262,8 @@ func DeleteMainProductImage(c *gin.Context){
 		return
 	}
 
-	cld:=config.InitCloudinary()
-	if err:=utils.DeleteCloudinaryImage(cld,publicID,c);err!=nil {
+	cld := config.InitCloudinary()
+	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Failed to delete image from Cloudinary",
@@ -272,7 +272,7 @@ func DeleteMainProductImage(c *gin.Context){
 		return
 	}
 
-	if err:=config.DB.Unscoped().Delete(&productImage).Error;err!=nil {
+	if err := config.DB.Unscoped().Delete(&productImage).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Failed to delete image from database",
@@ -285,11 +285,10 @@ func DeleteMainProductImage(c *gin.Context){
 	c.Redirect(http.StatusFound, redirectURL)
 }
 
-func ShowEditMainProduct(c *gin.Context){
-	productID:=c.Param("id")
+func ShowEditMainProduct(c *gin.Context) {
+	productID := c.Param("id")
 	var mainProduct models.ProductDetail
-
-	if err:=config.DB.First(&mainProduct,productID).Error;err!=nil {
+	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Product variant not found",
@@ -297,8 +296,72 @@ func ShowEditMainProduct(c *gin.Context){
 		})
 		return
 	}
+	var categories []models.Categories
+	if err := config.DB.Where("is_deleted = ? AND status = ?", false, "Active").Find(&categories).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "Internal Server Error",
+			"message": "Failed to fetch categories",
+			"error":   err.Error(),
+			"code":    500,
+		})
+		return
+	}
 
-	c.HTML(http.StatusOK,"mainProductUpdate.html",gin.H{
-		"Details":mainProduct,
+	c.HTML(http.StatusOK, "mainProductUpdate.html", gin.H{
+		"Details": mainProduct,
+		"categories": categories,
+	})
+}
+
+type updateProduct struct {
+	ProductName    string `json:"productname"`
+	Category       string `json:"category"`
+	BrandName      string `json:"brandname"`
+	IsCodAvailable bool   `json:"iscodavailable"`
+	IsReturnable   bool   `json:"isreturnable"`
+}
+
+func EditMainProduct(c *gin.Context) {
+	productID := c.Param("id")
+
+	var existingProduct models.ProductDetail
+	if err := config.DB.First(&existingProduct, productID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	var updateData updateProduct
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid input data",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	if err := config.DB.Model(&existingProduct).Updates(updateProduct{
+		ProductName:    updateData.ProductName,
+		Category:       updateData.Category,
+		BrandName:      updateData.BrandName,
+		IsCodAvailable: updateData.IsCodAvailable,
+		IsReturnable:   updateData.IsReturnable,
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Failed to save data",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Product updated successfully",
+		"code":    http.StatusOK,
 	})
 }

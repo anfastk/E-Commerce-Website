@@ -8,13 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/nav&sideBar.js" defer></script>
-    <script src="/static/js/addNewMainProductDetails.js" defer></script>
 
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
     <!-- Sidebar -->
-    <aside id="sidebar" class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+    <aside id="sidebar"
+        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
         <div class="py-6 px-4 flex items-center justify-start space-x-4">
             <!-- Hamburger Menu for Small Screens inside Sidebar -->
             <button class="lg:hidden text-white" onclick="toggleSidebar()">
@@ -39,9 +39,11 @@
                 <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
                     <!-- All Products Button with Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
-                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
-                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M144 80h224m-256 48h288" />
-                    </svg>                    
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
+                            stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
+                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                    </svg>
                     <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
                 </li>
                 <li class="py-3 px-4 flex items-center">
@@ -162,78 +164,103 @@
 
             <div class="flex-1 mt-6">
                 <!-- Form -->
-                <div class="bg-white p-8 rounded shadow">
+                <form id="productUpdateForm" class="bg-white p-8 rounded shadow w-full">
                     <div class="grid lg:grid-cols-2 grid-cols-1 gap-8">
                         <!-- Left Side -->
                         <div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Product Name</label>
-                                <input type="text" placeholder="" class="w-full border border-black rounded px-4 py-2">
+                                <input type="text" id="productName" name="productName" value="{{.Details.ProductName}}"
+                                    class="w-full border border-black rounded px-4 py-2" required>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Category</label>
-                                <select class="w-full border border-black rounded px-4 py-2">
-                                    <option>Categories</option>
+                                <select class="w-full border border-black rounded px-4 py-2" id="category"
+                                    name="category" required>
+                                    <option disabled selected>Categories</option>
+                                    {{range .categories}}
+                                    <option value="{{.ID}}">{{.Name}}</option>
+                                    {{end}}
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Brand Name</label>
-                                <input type="text" placeholder="" class="w-full border border-black rounded px-4 py-2">
-                            </div>
-                            <div class="mb-4">
-                                <div class="mb-6">
-                                    <label class="block text-black font-medium mb-2">Product Banners</label>
-                                    <div id="banner-drop-area"
-                                        class="border-dashed border-2 rounded px-4 py-6 text-center bg-white border-grey-500">
-                                        <input id="banner-input" type="file" multiple accept="image/*" class="hidden">
-                                        <p class="text-gray-500">Drop your images here, or <span
-                                                class="text-blue-500 underline cursor-pointer"
-                                                onclick="document.getElementById('banner-input').click()">browse</span>
-                                        </p>
-                                    </div>
-                                    <div id="banner-preview" class="mt-4 space-y-2"></div>
-                                </div>
+                                <input type="text" id="brandName" name="brandName"
+                                    class="w-full border border-black rounded px-4 py-2" value="{{.Details.BrandName}}"
+                                    required>
                             </div>
                         </div>
                         <!-- Right Side -->
                         <div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Cash on Delivery Available</label>
-                                <select class="w-full border border-black rounded px-4 py-2">
-                                    <option>YES</option>
-                                    <option>NO</option>
+                                <select id="cashOnDelivery" name="cashOnDelivery"
+                                    class="w-full border border-black rounded px-4 py-2" required>
+                                    <option value="true">YES</option>
+                                    <option value="false">NO</option>
                                 </select>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Return Available</label>
-                                <select class="w-full border border-black rounded px-4 py-2">
-                                    <option>YES</option>
-                                    <option>NO</option>
+                                <select id="returnAvailable" name="returnAvailable"
+                                    class="w-full border border-black rounded px-4 py-2" required>
+                                    <option value="true">YES</option>
+                                    <option value="false">NO</option>
                                 </select>
                             </div>
-                            <div class="mb-6">
-                                <label class="block text-black font-medium mb-2">Product Gallery</label>
-                                <div id="gallery-drop-area"
-                                    class="border-dashed border-2 rounded px-4 py-6 text-center bg-white">
-                                    <input id="gallery-input" type="file" multiple accept="image/*" class="hidden">
-                                    <p class="text-gray-500">Drop your images here, or <span
-                                            class="text-blue-500 underline cursor-pointer"
-                                            onclick="document.getElementById('gallery-input').click()">browse</span></p>
-                                </div>
-                                <div id="gallery-preview" class="mt-4 space-y-2"></div>
-                            </div>
-                            
                         </div>
                     </div>
+                    <!-- Hidden input for product ID -->
+                    <input type="hidden" name="productId" id="productId"  value="{{.Details.ID}}">
                     <!-- Buttons -->
                     <div class="flex justify-end space-x-4 mt-8">
-                        <button class="bg-red-500 text-white px-6 py-2 rounded">Cancel</button>
-                        <button class="bg-green-500 text-white px-6 py-2 rounded">UPDATE</button>
+                        <button type="button" onclick="window.history.back()"
+                            class="bg-red-500 text-white px-6 py-2 rounded">Cancel</button>
+                        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded">UPDATE</button>
                     </div>
-                </div>
+                </form>
             </div>
         </main>
     </div>
+    <script>
+        document.getElementById('productUpdateForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Ensure productId is set before submission
+            const productId = document.getElementById('productId').value;
+            if (!productId) {
+                alert('Product ID is missing');
+                return;
+            }
+
+            const formData = {
+                productName: document.getElementById('productName').value,
+                category: document.getElementById('category').value,
+                brandName: document.getElementById('brandName').value,
+                cashOnDelivery: document.getElementById('cashOnDelivery').value === 'true',
+                returnAvailable: document.getElementById('returnAvailable').value === 'true'
+            };
+
+            try {
+                const response = await fetch(`/admin/products/main/details/update/${productId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    window.location.href = `/admin/products/main/details?product_id=${productId}`;
+                } else {
+                    const errorData = await response.json();
+                    alert('Error updating product: ' + (errorData.message || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                alert('Error updating product: ' + error.message);
+            }
+        });
+    </script>
 </body>
 
 </html>
