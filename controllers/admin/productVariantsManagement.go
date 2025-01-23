@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/helper"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils"
@@ -319,6 +320,7 @@ func DeleteProductVariant(c *gin.Context) {
 	redirectURL := "/admin/products/variant/details?product_id=" + strconv.Itoa(int(variant.ProductID))
 	c.Redirect(http.StatusFound, redirectURL)
 }
+
 func DeleteVariantImage(c *gin.Context) {
 	imageID := c.Param("id")
 
@@ -333,16 +335,35 @@ func DeleteVariantImage(c *gin.Context) {
 		return
 	}
 
-	variantImage.IsDeleted = true
-	variantImage.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
-	if err := config.DB.Save(&variantImage).Error; err != nil {
+	publicID, err := helper.ExtractCloudinaryPublicID(variantImage.ProductVariantsImages)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
-			"error":  "Failed to delete image",
+			"error":  "Failed to extract Cloudinary public ID",
 			"code":   http.StatusInternalServerError,
 		})
 		return
 	}
+
+	cld := config.InitCloudinary()
+	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to delete image from Cloudinary",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if err := config.DB.Unscoped().Delete(&variantImage).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to delete image from database",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
 	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variantImage.ProductVariantID))
 	c.Redirect(http.StatusFound, redirectURL)
 }

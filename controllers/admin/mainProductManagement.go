@@ -238,3 +238,20 @@ func AddProductDescription(c *gin.Context) {
 	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(int(productID))
 	c.Redirect(http.StatusFound, redirectURL)
 }
+func ShowEditMainProduct(c *gin.Context){
+	productID:=c.Param("id")
+	var mainProduct models.ProductDetail
+
+	if err:=config.DB.First(&mainProduct,productID).Error;err!=nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product variant not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK,"mainProductUpdate.html",gin.H{
+		"Details":mainProduct,
+	})
+}
