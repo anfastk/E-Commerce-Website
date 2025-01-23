@@ -18,7 +18,7 @@ import (
 func ShowProductVariant(c *gin.Context) {
 	var images models.ProductImage
 	productID := c.Param("id")
-	if err := config.DB.Where("product_id = ? AND is_deleted = ?", productID, false).First(&images).Error; err != nil {
+	if err := config.DB.Where("product_id = ? AND is_deleted = ?", productID, false).Find(&images).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Image not find",

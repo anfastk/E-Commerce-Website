@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/helper"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils"
@@ -238,6 +239,52 @@ func AddProductDescription(c *gin.Context) {
 	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(int(productID))
 	c.Redirect(http.StatusFound, redirectURL)
 }
+
+func DeleteMainProductImage(c *gin.Context){
+	imageID:=c.Param("id")
+	var productImage models.ProductImage
+	if err:=config.DB.First(&productImage,imageID).Error;err!=nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Image not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	publicID,err:=helper.ExtractCloudinaryPublicID(productImage.ProductImages)
+	if err !=nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to extract Cloudinary public ID",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	cld:=config.InitCloudinary()
+	if err:=utils.DeleteCloudinaryImage(cld,publicID,c);err!=nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to delete image from Cloudinary",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if err:=config.DB.Unscoped().Delete(&productImage).Error;err!=nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to delete image from database",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(int(productImage.ProductID))
+	c.Redirect(http.StatusFound, redirectURL)
+}
+
 func ShowEditMainProduct(c *gin.Context){
 	productID:=c.Param("id")
 	var mainProduct models.ProductDetail

@@ -15,7 +15,7 @@ type MainProductDetails struct {
 	IsCodAvailable  bool
 	CategoryName    string
 	Descriptions    []models.ProductDescription
-	Images          string
+	Images          []models.ProductImage
 	OfferName       string
 	OfferDetails    string
 	OfferStartDate  string
@@ -27,7 +27,7 @@ type MainProductDetails struct {
 func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 	var product models.ProductDetail
 	var descriptions []models.ProductDescription
-	var images models.ProductImage
+	var images []models.ProductImage
 	var offer models.ProductOffer
 	var category models.Categories
 
@@ -48,7 +48,7 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		return MainProductDetails{}, errors.New("descriptions not found")
 	}
 
-	if err := tx.Where("product_id = ? AND is_deleted = ?", productID, false).First(&images).Error; err != nil {
+	if err := tx.Where("product_id = ? AND is_deleted = ?", productID, false).Find(&images).Error; err != nil {
 		tx.Rollback()
 		return MainProductDetails{}, errors.New("images not found")
 	}
@@ -65,7 +65,7 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		IsCodAvailable:  product.IsCODAvailable,
 		CategoryName:    category.Name,
 		Descriptions:    descriptions,
-		Images:          images.ProductImages,
+		Images:          images,
 		OfferName:       offer.OfferName,
 		OfferDetails:    offer.OfferDetails,
 		OfferStartDate:  offer.StartDate.Format("02-01-2006"),

@@ -36,6 +36,7 @@ func AdminRoutes(r *gin.Engine) {
 		product.GET("/variant/detail/update/:id",controllers.ShowEditProductVariant)
 		product.PATCH("/variant/detail/update/:id",controllers.EditProductVariant)
 		product.GET("/main/details/:id",controllers.ShowEditMainProduct)
+		product.POST("/main/image/delete/:id",controllers.DeleteMainProductImage)
 	}
 	// Admin User Managemant
 	adminUser := r.Group("/admin/users")

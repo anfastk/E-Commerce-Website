@@ -199,9 +199,9 @@
                     </form>
                     <a href="/admin/products/variant/detail/update/{{.Variant.Id}}">
                         <button
-                        class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                        UPDATE PRODUCT
-                    </button>
+                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
+                            UPDATE PRODUCT
+                        </button>
                     </a>
                 </div>
             </div>
@@ -221,16 +221,23 @@
                     {{range .Variant.Images}}
                     <div>
                         <div class="group relative">
-                            <button class="options-btn text-2xl text-gray-500 hover:text-gray-700 absolute top-0 right-0">
+                            <button
+                                class="options-btn text-2xl text-gray-500 hover:text-gray-700 absolute top-0 right-0">
                                 &#x22EE;
                             </button>
                             <div
                                 class="options hidden absolute top-8 right-0 mt-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
                                 <ul>
-                                    <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">Change</li>
-                                    <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                                    <li>
                                         <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
-                                            <button type="submit">Delete</button>
+                                            <button class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer"
+                                                type="submit">Delete</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
+                                            <button class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer"
+                                                type="submit">Delete</button>
                                         </form>
                                     </li>
                                 </ul>
