@@ -197,6 +197,17 @@
                             UPDATE MAIN PRODUCT
                         </button>
                     </a>
+                    <form action="/admin/products/main/details/delete/{{.Product.Id}}" method="post">
+                        {{if .Product.IsDeleted}}
+                        <button
+                            class="bg-green-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">RECOVER
+                            PRODUCT</button>
+                        {{else}}
+                        <button
+                            class="bg-red-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">DELETE
+                            PRODUCT</button>
+                        {{end}}
+                    </form>
                 </div>
             </div>
 
@@ -205,8 +216,8 @@
                 <div class="w-full lg:w-1/2 relative group">
                     <!-- Image container with hover effect -->
                     {{if .Product.Images}}
-                    <img class="rounded shadow w-full h-auto max-w-[400px] mx-auto" src="{{(index .Product.Images 0).ProductImages}}"
-                        alt="Main Product Image">
+                    <img class="rounded shadow w-full h-auto max-w-[400px] mx-auto"
+                        src="{{(index .Product.Images 0).ProductImages}}" alt="Main Product Image">
                     <!-- Three dots icon visible on hover -->
                     <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button id="options-btn" class="text-2xl text-gray-500 hover:text-gray-700">
@@ -219,7 +230,8 @@
                             <ul>
                                 <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Change</li>
                                 <li>
-                                    <form action="/admin/products/main/image/delete/{{(index .Product.Images 0).ID}}" method="post">
+                                    <form action="/admin/products/main/image/delete/{{(index .Product.Images 0).ID}}"
+                                        method="post">
                                         <button class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer"
                                             type="submit">Delete</button>
                                     </form>
@@ -244,14 +256,18 @@
                         <p class="text-semibold"><span class="font-semibold">Brand Name:</span><br> {{
                             .Product.BrandName }}</p>
                         <p class="font-semibold">Descriptions:</p>
-                        <ul class="list-disc pl-5 text-sm">
+                        <ul class="list-disc pl-5 text-sm max-w-xl">
                             {{ range .Product.Descriptions }}
-                            <li> {{ .Description }}</li>
+                            <li class="break-words whitespace-normal"> {{ .Description }}</li>
                             {{ end }}
-
                         </ul>
                     </div>
                     <div class="space-y-6">
+                        {{if .Product.IsDeleted}}
+                        <p class="text-xl font-bold mt-1">Status:<span class=" text-red-600">Deleted</span></p>
+                        {{else}}
+                        <p class="text-xl font-bold mt-1">Status:<span class="text-green-600">Active</span></p>
+                        {{end}}
                         <p><span class="font-semibold">Return Available:</span> {{ if .Product.IsReturnable }} YES
                             {{else}} NO {{end}}</p>
                         <p><span class="font-semibold">Cash On Delivery Available:</span> {{ if .Product.IsCodAvailable
@@ -435,6 +451,65 @@
                                     class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Submit</button>
                                 <span id="closeModal"
                                     class="text-white text-xl bg-gray-600 float-right cursor-pointer py-2 px-4 rounded hover:bg-blue-600 transition">Close</span>
+                            </form>
+                        </div>
+                    </div>
+                    <button id="openUpdatePopup"
+                        class="bg-red-600 text-white py-2 px-6 rounded font-bold hover:bg-red-700 transition">
+                        Update/Delete Descriptions
+                    </button>
+
+                    <!-- Popup Modal -->
+                    <div id="updatePopupModal"
+                        class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+                        <div
+                            class="w-full max-w-2xl mx-4 p-6 bg-white shadow-lg rounded-lg overflow-y-auto max-h-screen">
+                            <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Update/Delete Product
+                                Descriptions</h1>
+
+                            <!-- Form for Updating Product Specifications -->
+                            <form action="/admin/products/variant/update/description/{{.Product.Id}}" method="post"
+                                class="space-y-4" id="updateDescriptionsForm">
+                                <input hidden name="variant_id" value="{{.Product.Id}}" />
+
+                                <!-- Dynamically Populated Specifications -->
+                                <div id="updateDescriptionsList">
+                                    {{if .Product.Descriptions}}
+                                    {{range .Product.Descriptions}}
+                                    <div class="Descriptions-item flex flex-row gap-4 items-center">
+                                        <input type="hidden" name="description_id[]" value="{{.ID}}" />
+                                        <div class="flex-1">
+                                            <label for="key-{{.ID}}" class="block text-gray-700 font-medium">Description
+                                                Heading</label>
+                                            <input type="text" id="key-{{.ID}}" name="heading[]" value="{{.Heading}}"
+                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+                                        <div class="flex-1">
+                                            <label for="value-{{.ID}}"
+                                                class="block text-gray-700 font-medium">Description</label>
+                                            <input type="text" id="value-{{.ID}}" name="description[]"
+                                                value="{{.Description}}"
+                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+                                        <a href="/admin/products/variant/description/delete/{{.ID}}"
+                                            class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"
+                                            onclick="event.preventDefault(); deleteDescription('{{.ID}},{{.ProductID}}');">
+                                            Delete
+                                        </a>
+                                    </div>
+                                    {{end}}
+                                    {{else}}
+                                    <p>No description available for this product.</p>
+                                    {{end}}
+                                </div>
+
+                                <!-- Submit and Close Buttons -->
+                                <div class="flex justify-center space-x-4 mt-4">
+                                    <button type="submit"
+                                        class="bg-blue-500 text-white p-2 w-32 rounded-lg hover:bg-blue-600">Update</button>
+                                    <button type="button" id="closeUpdatePopup"
+                                        class="bg-red-500 text-white p-2 w-32 rounded-lg hover:bg-red-600">Close</button>
+                                </div>
                             </form>
                         </div>
                     </div>

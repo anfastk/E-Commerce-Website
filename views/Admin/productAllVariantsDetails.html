@@ -151,6 +151,11 @@
             <div class="bg-white p-4 sm:p-6 mt-8 rounded shadow">
                 <div style="font-family: rubik;" class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                     <div class="space-y-6">
+                        {{if .IsDeleted}}
+                        <p class="text-xl font-bold  mt-1">Status: <span class="text-red-600">Deleted</span></p>
+                        {{else}}
+                        <p class="text-xl font-bold  mt-1">Status: <span class="text-green-600">Active</span></p>
+                        {{end}}
                         <p class="text-semibold"><span class="font-semibold">Product Name:</span> {{.ProductName}}</p>
                         <p class="text-semibold"><span class="font-semibold">Product Summary:</span><br>
                             {{.ProductSummary}}</p>

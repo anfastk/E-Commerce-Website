@@ -33,6 +33,7 @@ type VariantsDetails struct {
 	SalePrice       float64
 	SKU             string
 	ProductSummary  string
+	IsDeleted       bool
 	Specification   []models.ProductSpecification
 }
 
@@ -47,12 +48,12 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 
 	tx := config.DB.Begin()
 
-	if err := tx.Where("ID = ? AND is_deleted = ?", variantID, false).First(&productVariant).Error; err != nil {
+	if err := tx.Unscoped().Where("ID = ?", variantID).First(&productVariant).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("Product variant not found")
 	}
 
-	if err := tx.Where("ID = ? AND is_deleted = ?", productVariant.ProductID, false).First(&product).Error; err != nil {
+	if err := tx.Unscoped().Where("ID = ?", productVariant.ProductID).First(&product).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("Main product not found")
 	}
@@ -109,6 +110,7 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 		SKU:             productVariant.SKU,
 		ProductSummary:  productVariant.ProductSummary,
 		Specification:   specification,
+		IsDeleted:       productVariant.IsDeleted,
 	}, nil
 }
 
@@ -122,7 +124,7 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 
 	tx := config.DB.Begin()
 
-	if err := tx.Where("ID = ? AND is_deleted = ?", productID, false).First(&product).Error; err != nil {
+	if err := tx.Unscoped().Where("ID = ?", productID).First(&product).Error; err != nil {
 		tx.Rollback()
 		return nil, errors.New("Main product not found")
 	}
@@ -142,7 +144,7 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 		offers = models.ProductOffer{}
 	}
 
-	if err := tx.Where("product_id = ? AND is_deleted = ?", productID, false).Find(&productVariants).Error; err != nil {
+	if err := tx.Unscoped().Where("product_id = ?", productID).Find(&productVariants).Error; err != nil {
 		tx.Rollback()
 		return nil, errors.New("Variants not found")
 	}
@@ -186,6 +188,7 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 			SKU:             variant.SKU,
 			ProductSummary:  variant.ProductSummary,
 			Specification:   specification,
+			IsDeleted:       variant.IsDeleted,
 		})
 	}
 

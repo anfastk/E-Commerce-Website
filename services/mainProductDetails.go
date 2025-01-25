@@ -22,6 +22,7 @@ type MainProductDetails struct {
 	OfferEndDate    string
 	OfferPercentage float64
 	OfferAmount     float64
+	IsDeleted       bool
 }
 
 func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
@@ -33,7 +34,7 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 
 	tx := config.DB.Begin()
 
-	if err := tx.Where("ID = ? AND is_deleted = ? ", productID, false).First(&product).Error; err != nil {
+	if err := tx.Unscoped().Where("ID = ?", productID).First(&product).Error; err != nil {
 		tx.Rollback()
 		return MainProductDetails{}, errors.New("Product not found")
 	}
@@ -72,5 +73,6 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		OfferEndDate:    offer.EndDate.Format("02-01-2006"),
 		OfferPercentage: offer.OfferPercentage,
 		OfferAmount:     offer.OfferAmount,
+		IsDeleted:       product.IsDeleted,
 	}, nil
 }

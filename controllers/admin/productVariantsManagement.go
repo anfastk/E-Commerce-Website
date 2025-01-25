@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
-	"github.com/anfastk/E-Commerce-Website/helper"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -19,11 +19,7 @@ func ShowProductVariant(c *gin.Context) {
 	var images models.ProductImage
 	productID := c.Param("id")
 	if err := config.DB.Where("product_id = ? AND is_deleted = ?", productID, false).Find(&images).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Image not find",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Image not find")
 		return
 	}
 	c.HTML(http.StatusSeeOther, "addProductVariants.html", gin.H{
@@ -34,22 +30,14 @@ func ShowProductVariant(c *gin.Context) {
 func AddProductVariants(c *gin.Context) {
 	productID, err := strconv.Atoi(c.PostForm("product_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product ID",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
 		return
 	}
 
 	var mainProduct models.ProductDetail
 
 	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Product not found",
-			"code":   http.StatusNotFound,
-		})
+		helper.RespondWithError(c, http.StatusNotFound, "Product not found")
 		return
 	}
 
@@ -70,11 +58,7 @@ func AddProductVariants(c *gin.Context) {
 	if formLength == 0 || formLength != len(productSummaries) || formLength != len(sizes) || formLength != len(colors) ||
 		formLength != len(rams) || formLength != len(storages) || formLength != len(regularPrices) ||
 		formLength != len(salePrices) || formLength != len(stockQuantities) || formLength != len(skus) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Mismatched form data lengths",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Mismatched form data lengths")
 		return
 	}
 
@@ -87,11 +71,7 @@ func AddProductVariants(c *gin.Context) {
 		stockQuantity, err3 := strconv.Atoi(stockQuantities[i])
 		if err != nil || err2 != nil || err3 != nil {
 			tx.Rollback()
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"status": "Unprocessable Entity",
-				"error":  "Invalid price or quantity values",
-				"code":   http.StatusUnprocessableEntity,
-			})
+			helper.RespondWithError(c, http.StatusUnprocessableEntity, "Invalid price or quantity values")
 			return
 		}
 
@@ -112,11 +92,7 @@ func AddProductVariants(c *gin.Context) {
 
 		if err := tx.Create(&productVariant).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": "Internal Server Error",
-				"error":  "Failed to save product variant",
-				"code":   http.StatusInternalServerError,
-			})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product variant")
 			return
 		}
 
@@ -131,12 +107,7 @@ func AddProductVariants(c *gin.Context) {
 					url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProductVariants")
 					if err != nil {
 						tx.Rollback()
-						c.JSON(http.StatusInternalServerError, gin.H{
-							"status":  "Internal Server Error",
-							"message": "Failed to upload product image",
-							"error":   err.Error(),
-							"code":    http.StatusInternalServerError,
-						})
+						helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image")
 						return
 					}
 
@@ -146,12 +117,7 @@ func AddProductVariants(c *gin.Context) {
 					}
 					if err := tx.Create(&variantImage).Error; err != nil {
 						tx.Rollback()
-						c.JSON(http.StatusInternalServerError, gin.H{
-							"status":  "Internal Server Error",
-							"message": "Failed to save product image",
-							"error":   err.Error(),
-							"code":    http.StatusInternalServerError,
-						})
+						helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product image")
 						return
 					}
 				}
@@ -172,20 +138,12 @@ func AddProductVariants(c *gin.Context) {
 func ShowMutiProductVariantDetails(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Query("product_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product ID",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
 		return
 	}
 	variantDetails, err := services.ShowMultipleProductVariants(uint(productID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to fetch product details",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details")
 		return
 	}
 
@@ -218,6 +176,7 @@ func ShowMutiProductVariantDetails(c *gin.Context) {
 			"SKU":             variant.SKU,
 			"ProductSummary":  variant.ProductSummary,
 			"Specification":   variant.Specification,
+			"IsDeleted":       variant.IsDeleted,
 		}
 
 		formattedVariantDetails = append(formattedVariantDetails, formattedVariant)
@@ -231,20 +190,12 @@ func ShowMutiProductVariantDetails(c *gin.Context) {
 func ShowSingleProductVariantDetail(c *gin.Context) {
 	variantID, idErr := strconv.Atoi(c.Query("variant_id"))
 	if idErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product ID",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
 		return
 	}
 	variantDetails, err := services.ShowSingleProductVariantDetail(uint(variantID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to fetch product details",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details")
 		return
 	}
 	c.HTML(http.StatusSeeOther, "productVariantDetails.html", gin.H{
@@ -257,21 +208,13 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 func AddProductSpecification(c *gin.Context) {
 	variantID, err := strconv.Atoi(c.PostForm("variant_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product variant ID",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product variant ID")
 		return
 	}
 	headings := c.PostFormArray("key[]")
 	specification := c.PostFormArray("value[]")
 	if len(headings) != len(specification) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Mismatch in headings and specification",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in headings and specification")
 		return
 	}
 	for i := 0; i < len(headings); i++ {
@@ -281,11 +224,7 @@ func AddProductSpecification(c *gin.Context) {
 			SpecificationValue: specification[i],
 		}
 		if err := config.DB.Create(&specification).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": "Internal Server Error",
-				"error":  "Failed to save specification",
-				"code":   http.StatusInternalServerError,
-			})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save specification")
 			return
 		}
 	}
@@ -298,26 +237,34 @@ func DeleteProductVariant(c *gin.Context) {
 
 	variantID := c.Param("id")
 
-	if err := config.DB.First(&variant, "ID = ? AND is_deleted = ?", variantID, false).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Product not found",
-			"code":   http.StatusNotFound,
-		})
+	if err := config.DB.Unscoped().First(&variant, "ID = ?", variantID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Product not found")
+		return
+	}
+	var mainProduct models.ProductDetail
+	if err := config.DB.Unscoped().First(&mainProduct, "ID = ?", variant.ProductID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Product not found")
 		return
 	}
 
-	variant.IsDeleted = true
-	variant.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
-	if err := config.DB.Save(&variant).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to delete product",
-			"code":   http.StatusInternalServerError,
-		})
+	if mainProduct.IsDeleted {
+		helper.RespondWithError(c, http.StatusBadRequest, "Cannot recover because the main product is deleted.")
 		return
 	}
-	redirectURL := "/admin/products/variant/details?product_id=" + strconv.Itoa(int(variant.ProductID))
+	if variant.IsDeleted {
+		variant.IsDeleted = false
+		variant.DeletedAt = gorm.DeletedAt{}
+
+	} else {
+		variant.IsDeleted = true
+		variant.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+	}
+
+	if err := config.DB.Save(&variant).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete or recover product")
+		return
+	}
+	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variant.ID))
 	c.Redirect(http.StatusFound, redirectURL)
 }
 
@@ -327,40 +274,24 @@ func DeleteVariantImage(c *gin.Context) {
 	var variantImage models.ProductVariantsImage
 
 	if err := config.DB.First(&variantImage, "ID = ? AND is_deleted = ?", imageID, false).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Image not found",
-			"code":   http.StatusNotFound,
-		})
+		helper.RespondWithError(c, http.StatusNotFound, "Image not found")
 		return
 	}
 
 	publicID, err := helper.ExtractCloudinaryPublicID(variantImage.ProductVariantsImages)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to extract Cloudinary public ID",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to extract Cloudinary public ID")
 		return
 	}
 
 	cld := config.InitCloudinary()
 	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to delete image from Cloudinary",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary")
 		return
 	}
 
 	if err := config.DB.Unscoped().Delete(&variantImage).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to delete image from database",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from database")
 		return
 	}
 
@@ -373,21 +304,13 @@ func ShowEditProductVariant(c *gin.Context) {
 
 	var productVariant models.ProductVariantDetails
 	if err := config.DB.First(&productVariant, "id = ?", variantID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Product variant not found",
-			"code":   http.StatusNotFound,
-		})
+		helper.RespondWithError(c, http.StatusNotFound, "Product variant not found")
 		return
 	}
 
 	var variantImage models.ProductVariantsImage
 	if err := config.DB.First(&variantImage, "product_variant_id = ? AND is_deleted = ?", variantID, false).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Image not found",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Image not found")
 		return
 	}
 
@@ -415,21 +338,13 @@ func EditProductVariant(c *gin.Context) {
 
 	var existingVariant models.ProductVariantDetails
 	if err := config.DB.First(&existingVariant, variantID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Product variant not found",
-			"code":   http.StatusNotFound,
-		})
+		helper.RespondWithError(c, http.StatusNotFound, "Product variant not found")
 		return
 	}
 
 	var updateData updateProductVariants
 	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid input data",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
 		return
 	}
 
@@ -445,11 +360,7 @@ func EditProductVariant(c *gin.Context) {
 		SalePrice:      updateData.SalePrice,
 		SKU:            updateData.SKU,
 	}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to save data",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save data")
 		return
 	}
 
@@ -458,4 +369,20 @@ func EditProductVariant(c *gin.Context) {
 		"message": "Product updated successfully",
 		"code":    http.StatusOK,
 	})
+}
+func DeleteSpecification(c *gin.Context){
+	specificationID:=c.Param("id")
+	var specification models.ProductSpecification
+	if err:=config.DB.First(&specification,specificationID).Error;err!=nil {
+		helper.RespondWithError(c,http.StatusBadRequest,"Specification not found")
+		return
+	}
+
+	if err:=config.DB.Unscoped().Delete(&specification).Error;err!=nil {
+		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to delete specification")
+		return
+	}
+	
+	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(specification.ProductVariantID))
+	c.Redirect(http.StatusFound, redirectURL)
 }

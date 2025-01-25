@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
-	"github.com/anfastk/E-Commerce-Website/helper"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,16 +21,17 @@ type ProductVariantResponse struct {
 	RegularPrice   float64  `json:"regular_price"`
 	SalePrice      float64  `json:"sale_price"`
 	ProductSummary string   `json:"product_summary"`
+	IsDeleted      bool     `json:"isdeleted"`
 	Images         []string `json:"images"`
 }
 
 func ShowProductsAdmin(c *gin.Context) {
 	var variants []models.ProductVariantDetails
 
-	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
-		Preload("Category", "is_deleted = ? AND status = ?", false, "Active").
+	result := config.DB.Unscoped().
+		Preload("VariantsImages").
+		Preload("Category").
 		Preload("Product").
-		Where("product_variant_details.is_deleted = ?", false).
 		Find(&variants)
 
 	if result.Error != nil {
@@ -64,6 +66,7 @@ func ShowProductsAdmin(c *gin.Context) {
 			SalePrice:      variant.SalePrice,
 			ProductSummary: variant.ProductSummary,
 			Images:         images,
+			IsDeleted:      variant.IsDeleted,
 		})
 	}
 	var formattedResponceDetails []map[string]interface{}
@@ -76,6 +79,7 @@ func ShowProductsAdmin(c *gin.Context) {
 			"SalePrice":      fmt.Sprintf("%.2f", variant.SalePrice),
 			"ProductSummary": variant.ProductSummary,
 			"Images":         variant.Images,
+			"Status":         variant.IsDeleted,
 		}
 		formattedResponceDetails = append(formattedResponceDetails, formattedVariant)
 	}
@@ -308,7 +312,7 @@ func ShowEditMainProduct(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "mainProductUpdate.html", gin.H{
-		"Details": mainProduct,
+		"Details":    mainProduct,
 		"categories": categories,
 	})
 }
@@ -363,5 +367,177 @@ func EditMainProduct(c *gin.Context) {
 		"status":  "OK",
 		"message": "Product updated successfully",
 		"code":    http.StatusOK,
+	})
+}
+
+func DeleteMainProduct(c *gin.Context) {
+
+	productID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid product ID",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	tx := config.DB.Begin()
+
+	var product models.ProductDetail
+	if err := tx.Unscoped().First(&product, productID).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid input data",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	newDeleteStatus := !product.IsDeleted
+	updateData := map[string]interface{}{
+		"is_deleted": newDeleteStatus,
+	}
+	if newDeleteStatus {
+		updateData["deleted_at"] = time.Now()
+	} else {
+		updateData["deleted_at"] = nil
+	}
+
+	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("id = ?", productID).Updates(updateData).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error",
+			"error":  "Failed to update product",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("product_id = ?", productID).Updates(updateData).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error",
+			"error":  "Failed to update product variants",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error",
+			"error":  "Transaction commit failed",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	/* c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Product status updated successfully",
+		"code":    http.StatusOK,
+	})  */
+	redirectURL := "/admin/products/main/details?product_id=" + strconv.FormatUint(productID, 10)
+	c.Redirect(http.StatusFound, redirectURL)
+}
+
+func DeleteDescription(c *gin.Context) {
+	descriptionID := c.Param("id")
+	var description models.ProductDescription
+	if err := config.DB.First(&description, descriptionID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Description not found")
+		return
+	}
+
+	if err := config.DB.Unscoped().Delete(&description).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete description")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Descriptions deleted successfully",
+		"code":    200,
+	})
+}
+
+func UpdateProductDescription(c *gin.Context) {
+	type UpdateDescription struct {
+		DescriptionIDs []string `json:"description_id"`
+		Headings       []string `json:"heading"`
+		Descriptions   []string `json:"description"`
+	}
+
+	var updateData UpdateDescription
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid request payload",
+			"code":   400,
+		})
+		return
+	}
+
+	productID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid product ID",
+			"code":   400,
+		})
+		return
+	}
+
+	if len(updateData.DescriptionIDs) != len(updateData.Headings) ||
+		len(updateData.Headings) != len(updateData.Descriptions) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Mismatch in description IDs, headings, and descriptions",
+			"code":   400,
+		})
+		return
+	}
+
+	for i := 0; i < len(updateData.DescriptionIDs); i++ {
+		descID, err := strconv.Atoi(updateData.DescriptionIDs[i])
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "Bad Request",
+				"error":  "Invalid description ID",
+				"code":   400,
+			})
+			return
+		result := config.DB.Model(&models.ProductDescription{}).
+			Where("id = ? AND product_id = ?", descID, productID).
+			Updates(map[string]interface{}{
+				"heading":     updateData.Headings[i],
+				"description": updateData.Descriptions[i],
+			})
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Internal Server Error",
+				"error":  "Failed to update description",
+				"code":   500,
+			})
+			return
+		}
+
+		if result.RowsAffected == 0 {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status": "Not Found",
+				"error":  "Description not found",
+				"code":   404,
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Descriptions updated successfully",
+		"code":    200,
 	})
 }

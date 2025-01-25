@@ -31,8 +31,8 @@ addSpecBtn.addEventListener("click", () => {
     specificationsList.appendChild(newSpec);
 });
 
- // Add click event listener for all option buttons
- document.querySelectorAll('.options-btn').forEach((btn) => {
+// Add click event listener for all option buttons
+document.querySelectorAll('.options-btn').forEach((btn) => {
     btn.addEventListener('click', function () {
         // Find the sibling dropdown menu
         const dropdown = this.nextElementSibling;
@@ -50,4 +50,50 @@ document.addEventListener('click', function (event) {
             dropdown.classList.add('hidden');
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const openPopupBtn = document.getElementById('openUpdatePopup');
+    const closePopupBtn = document.getElementById('closeUpdatePopup');
+    const popupModal = document.getElementById('updatePopupModal');
+    const updateSpecificationsForm = document.getElementById('updateSpecificationsForm');
+
+    // Open popup
+    openPopupBtn.addEventListener('click', () => {
+        popupModal.classList.remove('hidden');
+    });
+
+    // Close popup
+    closePopupBtn.addEventListener('click', () => {
+        popupModal.classList.add('hidden');
+    });
+
+    // Close popup if clicking outside the modal
+    popupModal.addEventListener('click', (event) => {
+        if (event.target === popupModal) {
+            popupModal.classList.add('hidden');
+        }
+    });
+
+    // Form submission handling
+    updateSpecificationsForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        try {
+            const formData = new FormData(updateSpecificationsForm);
+
+            const response = await fetch(updateSpecificationsForm.action, {
+                method: 'PATCH',
+                body: formData
+            });
+
+            if (response.ok) {
+                popupModal.classList.add('hidden');
+            } else {
+                console.error('Submission failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
 });

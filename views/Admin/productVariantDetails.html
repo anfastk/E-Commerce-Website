@@ -192,10 +192,17 @@
                         </button>
                     </a>
                     <form action="/admin/products/variant/delete/{{.Variant.Id}}" method="post">
+                        {{if .Variant.IsDeleted}}
+                        <button
+                            class="bg-green-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
+                            RECOVER PRODUCT
+                        </button>
+                        {{else}}
                         <button
                             class="bg-red-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
                             DELETE PRODUCT
                         </button>
+                        {{end}}
                     </form>
                     <a href="/admin/products/variant/detail/update/{{.Variant.Id}}">
                         <button
@@ -254,6 +261,11 @@
             <div class="bg-white p-4 sm:p-6 mt-8 rounded shadow">
                 <div style="font-family: rubik;" class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                     <div class="space-y-6">
+                        {{if .Variant.IsDeleted}}
+                        <p class="text-xl font-bold mt-1">Status: <span class="text-red-600">Deleted</span></p>
+                        {{else}}
+                        <p class="text-xl font-bold  mt-1">Status:<span class="text-green-600">Active</span></p>
+                        {{end}}
                         <p class="text-semibold"><span class="font-semibold">Product Name:</span> {{
                             .Variant.ProductName}}</p>
                         <p class="text-semibold"><span class="font-semibold">Product Summary:</span><br>
@@ -360,6 +372,71 @@
                                     <button type="submit"
                                         class="bg-blue-500 text-white p-2 w-32 rounded-lg hover:bg-blue-600">Submit</button>
                                     <button type="button" id="closePopup"
+                                        class="bg-red-500 text-white p-2 w-32 rounded-lg hover:bg-red-600">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <button id="openUpdatePopup"
+                        class="bg-red-600 text-white py-2 px-6 rounded font-bold hover:bg-red-700 transition">
+                        Update/Delete Specifications
+                    </button>
+
+                    <!-- Popup Modal -->
+                    <div id="updatePopupModal"
+                        class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+                        <div
+                            class="w-full max-w-2xl mx-4 p-6 bg-white shadow-lg rounded-lg overflow-y-auto max-h-screen">
+                            <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Update/Delete Product
+                                Specifications</h1>
+
+                            <!-- Form for Updating Product Specifications -->
+                            <form action="/admin/products/variant/update/specification" method="post" class="space-y-4"
+                                id="updateSpecificationsForm">
+                                <input hidden name="variant_id" value="{{.Variant.Id}}" />
+
+                                <!-- Dynamically Populated Specifications -->
+                                <div id="updateSpecificationsList">
+                                    {{if .Variant.Specification}}
+                                    {{range .Variant.Specification}}
+                                    <div class="specification-item flex flex-row gap-4 items-center">
+                                        <div class="flex-1">
+                                            <label for="key-{{.ID}}"
+                                                class="block text-gray-700 font-medium">Specification Heading</label>
+                                            <input type="text" id="key-{{.ID}}" name="key[]"
+                                                value="{{.SpecificationKey}}"
+                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+                                        <div class="flex-1">
+                                            <label for="value-{{.ID}}"
+                                                class="block text-gray-700 font-medium">Specification</label>
+                                            <input type="text" id="value-{{.ID}}" name="value[]"
+                                                value="{{.SpecificationValue}}"
+                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+                                        <form hidden action="/admin/products/variant/specification/delete/{{.ID}}"
+                                            method="post">
+                                        </form>
+
+                                        <form action="/admin/products/variant/specification/delete/{{.ID}}"
+                                            method="post">
+                                            <button type="submit"
+                                                class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {{end}}
+                                    {{else}}
+                                    <p>No specification available for this product.</p>
+                                    {{end}}
+                                </div>
+
+                                <!-- Submit and Close Buttons -->
+                                <div class="flex justify-center space-x-4 mt-4">
+                                    <button type="submit"
+                                        class="bg-blue-500 text-white p-2 w-32 rounded-lg hover:bg-blue-600">Update</button>
+                                    <button type="button" id="closeUpdatePopup"
                                         class="bg-red-500 text-white p-2 w-32 rounded-lg hover:bg-red-600">Close</button>
                                 </div>
                             </form>
