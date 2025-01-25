@@ -123,7 +123,7 @@ function deleteSpecification(specificationId, productId) {
     const prodId = ids[1] || productId;
 
     fetch(`/admin/products/variant/specification/delete/${descId}`, {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         }

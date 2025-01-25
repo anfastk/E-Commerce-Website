@@ -244,51 +244,6 @@ func AddProductDescription(c *gin.Context) {
 	c.Redirect(http.StatusFound, redirectURL)
 }
 
-func DeleteMainProductImage(c *gin.Context) {
-	imageID := c.Param("id")
-	var productImage models.ProductImage
-	if err := config.DB.First(&productImage, imageID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Image not found",
-			"code":   http.StatusNotFound,
-		})
-		return
-	}
-
-	publicID, err := helper.ExtractCloudinaryPublicID(productImage.ProductImages)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to extract Cloudinary public ID",
-			"code":   http.StatusInternalServerError,
-		})
-		return
-	}
-
-	cld := config.InitCloudinary()
-	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to delete image from Cloudinary",
-			"code":   http.StatusInternalServerError,
-		})
-		return
-	}
-
-	if err := config.DB.Unscoped().Delete(&productImage).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"error":  "Failed to delete image from database",
-			"code":   http.StatusInternalServerError,
-		})
-		return
-	}
-
-	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(int(productImage.ProductID))
-	c.Redirect(http.StatusFound, redirectURL)
-}
-
 func ShowEditMainProduct(c *gin.Context) {
 	productID := c.Param("id")
 	var mainProduct models.ProductDetail
@@ -541,4 +496,92 @@ func UpdateProductDescription(c *gin.Context) {
 		"message": "Descriptions updated successfully",
 		"code":    200,
 	})
+}
+func ReplaceMainProductImage(c *gin.Context) {
+    productID, err := strconv.Atoi(c.PostForm("product_id"))
+    if err != nil {
+		fmt.Println("not found")
+
+        c.JSON(http.StatusBadRequest, gin.H{
+            "status": "Bad Request",
+            "error":  "Invalid product ID",
+            "code":   http.StatusBadRequest,
+        })
+        return
+    }
+
+    tx := config.DB.Begin()
+    var productImage models.ProductImage
+    if err := tx.First(&productImage, productID).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusNotFound, gin.H{
+            "status": "Not Found",
+            "error":  "Product image not found",
+            "code":   http.StatusNotFound,
+        })
+        return
+    }
+
+    oldImage := productImage.ProductImages
+
+    form, err := c.FormFile("product_image")
+    if err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusBadRequest, gin.H{
+            "error":   "No file uploaded",
+            "details": err.Error(),
+        })
+        return
+    }
+
+    cld := config.InitCloudinary()
+    file, _ := form.Open()
+    url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products")
+    if uploadErr != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status":  "Internal Server Error",
+            "message": "Failed to upload product image",
+            "code":    http.StatusInternalServerError,
+        })
+        return
+    }
+
+    if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status": "Internal Server Error",
+            "error":  "Failed to update image",
+            "code":   500,
+        })
+        return
+    }
+
+    publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
+    if err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status": "InternalServerError",
+            "error":  "Failed to extract Cloudinary public ID",
+            "code":   http.StatusInternalServerError,
+        })
+        return
+    }
+
+    if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status": "InternalServerError",
+            "error":  "Failed to delete image from Cloudinary",
+            "code":   http.StatusInternalServerError,
+        })
+        return
+    }
+
+    tx.Commit()
+    c.JSON(http.StatusOK, gin.H{
+        "status":   "Success",
+        "filename": url,
+        "code":     http.StatusOK,
+    })
 }

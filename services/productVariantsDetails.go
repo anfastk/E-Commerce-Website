@@ -73,16 +73,17 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 		return VariantsDetails{}, errors.New("images not found")
 	}
 
-	if err := tx.Where("product_id = ? AND is_valid = true", product.ID).First(&offer).Error; err != nil {
-		fmt.Println("No valid offer found:", err)
-		offer = models.ProductOffer{}
-	}
 
 	if err := tx.Where("product_variant_id = ? AND is_deleted = ?", variantID, false).Find(&specification).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("Specification not found")
 	}
 
+	if err := tx.Where("product_id = ? AND is_valid = true", product.ID).First(&offer).Error; err != nil {
+		fmt.Println("No valid offer found:", err)
+		offer = models.ProductOffer{}
+	}
+	
 	tx.Commit()
 	return VariantsDetails{
 		Id:              productVariant.ID,
