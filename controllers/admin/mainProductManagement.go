@@ -509,6 +509,7 @@ func UpdateProductDescription(c *gin.Context) {
 				"code":   400,
 			})
 			return
+		}
 		result := config.DB.Model(&models.ProductDescription{}).
 			Where("id = ? AND product_id = ?", descID, productID).
 			Updates(map[string]interface{}{
