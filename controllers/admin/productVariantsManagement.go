@@ -370,19 +370,101 @@ func EditProductVariant(c *gin.Context) {
 		"code":    http.StatusOK,
 	})
 }
-func DeleteSpecification(c *gin.Context){
-	specificationID:=c.Param("id")
+func DeleteSpecification(c *gin.Context) {
+	specificationID := c.Param("id")
 	var specification models.ProductSpecification
-	if err:=config.DB.First(&specification,specificationID).Error;err!=nil {
-		helper.RespondWithError(c,http.StatusBadRequest,"Specification not found")
+	if err := config.DB.First(&specification, specificationID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Specification not found")
 		return
 	}
 
-	if err:=config.DB.Unscoped().Delete(&specification).Error;err!=nil {
-		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to delete specification")
+	if err := config.DB.Unscoped().Delete(&specification).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete specification")
 		return
 	}
-	
-	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(specification.ProductVariantID))
-	c.Redirect(http.StatusFound, redirectURL)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Specification deleted successfully",
+		"code":    200,
+	})
+}
+
+func UpdateProductSpecification(c *gin.Context) {
+	type UpdateSpecification struct {
+		SpecificationIDs []string `json:"specification_id"`
+		SpecificationKey []string `json:"specification_key"`
+		Specification    []string `json:"specification"`
+	}
+
+	var updateData UpdateSpecification
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid request payload",
+			"code":   400,
+		})
+		return
+	}
+
+	productID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid product ID",
+			"code":   400,
+		})
+		return
+	}
+	if len(updateData.SpecificationIDs) != len(updateData.SpecificationKey) ||
+		len(updateData.SpecificationKey) != len(updateData.Specification) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Mismatch in specification IDs, headings, and specifications",
+			"code":   400,
+		})
+		return
+	}
+
+	for i := 0; i < len(updateData.SpecificationIDs); i++ {
+		descID, err := strconv.Atoi(updateData.SpecificationIDs[i])
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "Bad Request",
+				"error":  "Invalid specification ID",
+				"code":   400,
+			})
+			return
+		}
+		result := config.DB.Model(&models.ProductSpecification{}).
+			Where("id = ? AND Product_variant_id = ?", descID, productID).
+			Updates(map[string]interface{}{
+				"SpecificationKey":   updateData.SpecificationKey[i],
+				"SpecificationValue": updateData.Specification[i],
+			})
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Internal Server Error",
+				"error":  "Failed to update specification",
+				"code":   500,
+			})
+			return
+		}
+
+		if result.RowsAffected == 0 {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status": "Not Found",
+				"error":  "Specification not found",
+				"code":   404,
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Specification updated successfully",
+		"code":    200,
+	})
 }

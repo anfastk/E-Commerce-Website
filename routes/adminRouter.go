@@ -42,6 +42,8 @@ func AdminRoutes(r *gin.Engine) {
 		product.POST("/variant/specification/delete/:id",controllers.DeleteSpecification)
 		product.POST("/variant/description/delete/:id",controllers.DeleteDescription)
 		product.PATCH("/variant/update/description/:id",controllers.UpdateProductDescription)
+		product.PATCH("/variant/update/specification/:id",controllers.UpdateProductSpecification)
+
 
 	}
 	// Admin User Managemant

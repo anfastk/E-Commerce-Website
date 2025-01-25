@@ -467,12 +467,10 @@
                             <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Update/Delete Product
                                 Descriptions</h1>
 
-                            <!-- Form for Updating Product Specifications -->
                             <form action="/admin/products/variant/update/description/{{.Product.Id}}" method="post"
                                 class="space-y-4" id="updateDescriptionsForm">
                                 <input hidden name="variant_id" value="{{.Product.Id}}" />
 
-                                <!-- Dynamically Populated Specifications -->
                                 <div id="updateDescriptionsList">
                                     {{if .Product.Descriptions}}
                                     {{range .Product.Descriptions}}

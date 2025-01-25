@@ -79,21 +79,68 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSpecificationsForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        try {
-            const formData = new FormData(updateSpecificationsForm);
+        // Create FormData object
+        const formData = new FormData(updateSpecificationsForm);
 
+        // Convert FormData to an object
+        const data = {
+            specification_id: formData.getAll('specification_id[]'),
+            specification_key: formData.getAll('specification_key[]'),
+            specification: formData.getAll('specification[]')
+        };
+
+        try {
             const response = await fetch(updateSpecificationsForm.action, {
-                method: 'PATCH',
-                body: formData
+                method: 'PATCH', // Change back to POST
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
             });
+
+            const responseData = await response.json();
 
             if (response.ok) {
                 popupModal.classList.add('hidden');
+                // Optionally, you can add a success message or reload the page
+                window.location.reload();
             } else {
-                console.error('Submission failed');
+                // Handle error
+                console.error('Submission failed', responseData);
+                alert(responseData.error || 'Failed to update specifications');
             }
         } catch (error) {
             console.error('Error:', error);
+            alert('An error occurred while updating specifications');
         }
     });
 });
+
+function deleteSpecification(specificationId, productId) {
+    // Split the IDs if they're passed as a comma-separated string
+    const ids = specificationId.split(',');
+    const descId = ids[0];
+    const prodId = ids[1] || productId;
+
+    fetch(`/admin/products/variant/specification/delete/${descId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            // Remove the specification item from the DOM
+            const specificationItem = document.querySelector(`.Specifications-item[data-desc-id="${descId}"]`);
+            if (specificationItem) {
+                specificationItem.remove();
+            }
+            // Redirect to product details page
+            window.location.href = `/admin/products/variant/detail?variant_id=${prodId}`;
+        } else {
+            // Handle error cases
+            console.error('Failed to delete specification');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
