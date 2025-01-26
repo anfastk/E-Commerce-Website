@@ -70,7 +70,7 @@ func VerifyOtp(c *gin.Context) {
 		return
 	}
 	var otpRecord models.Otp
-	if err := config.DB.Where("email = ? AND otp = ?", otpInput.Email, otpInput.OTP).Order("created_time DESC").First(&otpRecord).Error; err != nil {
+	if err := config.DB.Where("email = ? AND otp = ?", otpInput.Email, otpInput.OTP).Order("created_at DESC").First(&otpRecord).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OTP"})
 		return
 	}

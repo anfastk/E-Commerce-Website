@@ -97,12 +97,28 @@ func AdminLoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("jwtTokensAdmin", token, int((time.Hour * 1).Seconds()), "/", "", false, true)
+	c.SetCookie("jwtTokensAdmin", token, int((time.Hour * 3).Seconds()), "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Login successful",
 		"token":   token,
-		"code":    200,
+		"code":    http.StatusOK,
+	})
+}
+
+func ShowSettings(c * gin.Context){
+	c.HTML(http.StatusOK,"settings.html",nil)
+}
+
+func AdminLogoutHandler(c * gin.Context){
+
+	c.SetCookie("jwtTokensAdmin", "",-1, "/", "", false, true)
+
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Admin logged out successfully",
+		"code":    http.StatusOK,
 	})
 }

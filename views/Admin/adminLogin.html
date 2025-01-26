@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto:wght@400;500&display=swap">
     <style>
-        /* Optional styling for error messages */
         .error-message {
             color: red;
             font-size: 0.9rem;
@@ -32,7 +31,7 @@
                     <img src="/static/images/logos/logo.png" width="200px" height="40px" alt="Laptix">
                 </h1>
                 <h2 class="welcome">Welcome to Laptix Admin Page</h2>
-                <form id="adminLoginForm" method="post">
+                <form id="adminLoginForm" method="post" onsubmit="handleLogin(event)">
                     <div class="input-group">
                         <label for="email">Email</label>
                         <input type="text" id="email" name="email" placeholder="Email" required>
@@ -44,7 +43,7 @@
                         <div id="passwordError" class="error-message"></div>
                     </div>
                     <div class="actions">
-                        <button type="button" id="loginButton" class="btn" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Login</button>
+                        <button type="submit" class="btn" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Login</button>
                     </div>
                 </form>
             </div>
@@ -52,8 +51,8 @@
     </div>
 
     <script>
-        document.getElementById('loginButton').addEventListener('click', async function (event) {
-            event.preventDefault(); // Prevent form submission
+        async function handleLogin(event) {
+            event.preventDefault(); // Prevent the default form submission
 
             const emailField = document.getElementById('email');
             const passwordField = document.getElementById('password');
@@ -88,11 +87,11 @@
                     // Display error messages under respective fields
                     if (result.error.includes("Email")) {
                         emailError.textContent = result.error;
-                        emailField.classList.add('error'); // Highlight error
+                        emailField.classList.add('error');
                     } 
                     if (result.error.includes("Password")) {
                         passwordError.textContent = result.error;
-                        passwordField.classList.add('error'); // Highlight error
+                        passwordField.classList.add('error');
                     }
                 }
             } catch (err) {
@@ -100,7 +99,7 @@
                 emailError.textContent = "An unexpected error occurred";
                 emailField.classList.add('error');
             }
-        });
+        }
     </script>
 </body>
 </html>

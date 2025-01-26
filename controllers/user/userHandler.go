@@ -63,10 +63,11 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.First(&userInput, "email=?", userInput.Email).Error; err == nil {
+	var existingUser models.UserAuth
+	if err := config.DB.Where("email = ?", userInput.Email).First(&existingUser).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"status": "Conflict",
-			"error":  "Email address already exist",
+			"error":  "Email address already exists",
 			"code":   409,
 		})
 		return
@@ -90,7 +91,15 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	session, _ := Store.Get(c.Request, "session")
+	session, err := Store.Get(c.Request, "session")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Failed to create session",
+			"code":   500,
+		})
+		return
+	}
 	session.Values["full_name"] = userInput.FullName
 	session.Values["email"] = userInput.Email
 	session.Values["password"] = hashedPassword

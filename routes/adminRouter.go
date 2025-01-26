@@ -14,6 +14,8 @@ func AdminRoutes(r *gin.Engine) {
 	{
 		admin.GET("/login", controllers.ShowLoginPage)
 		admin.POST("/login", controllers.AdminLoginHandler)
+		admin.GET("/settings",controllers.ShowSettings)
+		admin.POST("/logout",controllers.AdminLogoutHandler)
 	}
 	// Admin Product Managemant
 	product := r.Group("/admin/products")
