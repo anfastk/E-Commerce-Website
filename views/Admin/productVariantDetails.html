@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
         rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
 </head>
 
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
@@ -236,22 +238,69 @@
                                 class="options hidden absolute top-8 right-0 mt-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
                                 <ul>
                                     <li>
-                                        <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
-                                            <button class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer"
-                                                type="submit">Delete</button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <form action="/admin/products/variant/image/delete/{{.ID}}" method="post">
-                                            <button class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer"
-                                                type="submit">Delete</button>
-                                        </form>
+                                        <button id="openUploadPopup"
+                                            class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer">CHANGE</button>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                         <img class="rounded shadow w-full h-auto object-cover" src="{{.ProductVariantsImages}}"
                             alt="Product Image">
+                    </div>
+                    <!-- Image Upload Popup -->
+                    <div id="imageUploadPopup"
+                        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                        <div class="bg-white p-6 rounded-lg w-[500px] max-h-[90%] overflow-y-auto">
+                            <h2 class="text-xl font-bold mb-4">Upload Product Image</h2>
+
+                            <!-- Drag and Drop Area -->
+                            <div id="banner-drop-area"
+                                class="border-dashed border-2 border-gray-300 rounded px-4 py-6 text-center bg-white mb-4 hover:border-blue-500 transition">
+                                <input type="hidden" id="product-id" value="{{.ID}}">
+                                <input id="banner-input" type="file" accept="image/*" class="hidden"
+                                    name="product_image" />
+                                <p class="text-gray-500">
+                                    Drop your image here, or
+                                    <span class="text-blue-500 underline cursor-pointer"
+                                        onclick="document.getElementById('banner-input').click()">
+                                        browse
+                                    </span>
+                                </p>
+                                <p class="text-sm text-gray-500 mt-2">Upload a single image</p>
+                            </div>
+
+                            <!-- Preview Area -->
+                            <div id="banner-preview" class="mt-4 grid grid-cols-1 gap-4"></div>
+
+                            <!-- Buttons -->
+                            <div class="flex justify-end space-x-2 mt-4">
+                                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded"
+                                    onclick="closeUploadPopup()">
+                                    Cancel
+                                </button>
+                                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded"
+                                    onclick="confirmUpload()">
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cropping Modal -->
+                    <div id="cropModal"
+                        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white p-4 rounded-lg">
+                            <div style="width: 400px; height: 400px;">
+                                <img id="cropImage" src="" alt="Image to crop">
+                            </div>
+                            <div class="mt-4 flex justify-end gap-2">
+                                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded"
+                                    onclick="cancelCrop()">Cancel</button>
+                                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded"
+                                    onclick="saveCrop()">Save
+                                    Crop</button>
+                            </div>
+                        </div>
                     </div>
                     {{end}}
                 </div>
@@ -400,9 +449,11 @@
                                     <div class="Specifications-item flex flex-row gap-4 items-center">
                                         <input type="hidden" name="specification_id[]" value="{{.ID}}" />
                                         <div class="flex-1">
-                                            <label for="key-{{.ID}}" class="block text-gray-700 font-medium">Specification
+                                            <label for="key-{{.ID}}"
+                                                class="block text-gray-700 font-medium">Specification
                                                 Heading</label>
-                                            <input type="text" id="key-{{.ID}}" name="specification_key[]" value="{{.SpecificationKey}}"
+                                            <input type="text" id="key-{{.ID}}" name="specification_key[]"
+                                                value="{{.SpecificationKey}}"
                                                 class="w-full p-2 border border-gray-300 rounded-lg" required>
                                         </div>
                                         <div class="flex-1">

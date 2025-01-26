@@ -31,16 +31,6 @@ addSpecBtn.addEventListener("click", () => {
     specificationsList.appendChild(newSpec);
 });
 
-// Add click event listener for all option buttons
-document.querySelectorAll('.options-btn').forEach((btn) => {
-    btn.addEventListener('click', function () {
-        // Find the sibling dropdown menu
-        const dropdown = this.nextElementSibling;
-
-        // Toggle the hidden class
-        dropdown.classList.toggle('hidden');
-    });
-});
 
 // Optional: Close the dropdown when clicking outside
 document.addEventListener('click', function (event) {
@@ -144,3 +134,236 @@ function deleteSpecification(specificationId, productId) {
         console.error('Error:', error);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to all options buttons
+    document.querySelectorAll('.options-btn').forEach((btn) => {
+        btn.addEventListener('click', function () {
+            // Close any previously open dropdowns
+            document.querySelectorAll('.options').forEach(dropdown => {
+                if (dropdown !== this.nextElementSibling) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            // Toggle the current dropdown
+            const dropdown = this.nextElementSibling;
+            dropdown.classList.toggle('hidden');
+        });
+    });
+
+    // Add global click listener to close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        const optionsButtons = document.querySelectorAll('.options-btn');
+        const optionsMenus = document.querySelectorAll('.options');
+        
+        let clickedOnOptionsButton = false;
+        optionsButtons.forEach(btn => {
+            if (btn.contains(event.target)) {
+                clickedOnOptionsButton = true;
+            }
+        });
+
+        if (!clickedOnOptionsButton) {
+            optionsMenus.forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        }
+    });
+
+    // Add event listeners to all "Change" buttons
+    document.querySelectorAll('#openUploadPopup').forEach(button => {
+        button.addEventListener('click', function() {
+            // Find the closest product ID associated with this image
+            const productIdInput = document.getElementById('product-id');
+            const productId = this.closest('.group').closest('div').querySelector('#product-id')?.value || productIdInput?.value;
+            
+            if (productId) {
+                document.getElementById('product-id').value = productId;
+            }
+            
+            document.getElementById('imageUploadPopup').classList.remove('hidden');
+        });
+    });
+
+    // Rest of the existing script remains the same
+    let cropper = null;
+    let currentImageElement = null;
+    let currentFile = null;
+    const CROP_WIDTH = 400;
+    const CROP_HEIGHT = 400;
+
+    // Close Upload Popup
+    function closeUploadPopup() {
+        document.getElementById('imageUploadPopup').classList.add('hidden');
+        document.getElementById('banner-preview').innerHTML = '';
+    }
+
+    function confirmUpload() {
+        const previewImg = document.getElementById('banner-preview').querySelector('img');
+        const productId = document.getElementById('product-id').value;
+        
+        if (!previewImg) {
+            alert('Please upload an image first');
+            return;
+        }
+    
+        // Convert image to file
+        fetch(previewImg.src)
+            .then(res => res.blob())
+            .then(blob => {
+                const formData = new FormData();
+                formData.append('product_image', blob, 'uploaded-image.png');
+                formData.append('image_id', productId);
+    
+                fetch('/admin/products/variant/image/change', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.filename) {
+                            alert('Image uploaded successfully: ');
+                            // Reload the current page
+                            window.location.reload();
+                        } else {
+                            alert('Upload failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Upload error:', error);
+                        alert('Upload failed');
+                    });
+            });
+    }
+
+    // Drag and Drop Functionality
+    function enableDragAndDrop() {
+        const dropArea = document.getElementById('banner-drop-area');
+        const input = document.getElementById('banner-input');
+        const previewContainer = document.getElementById('banner-preview');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFileUpload(files);
+        });
+
+        input.addEventListener('change', (e) => {
+            handleFileUpload(e.target.files);
+        });
+    }
+
+    function handleFileUpload(files) {
+        const previewContainer = document.getElementById('banner-preview');
+        previewContainer.innerHTML = ''; // Clear previous previews
+
+        if (files.length > 1) {
+            alert('Please upload only one image.');
+            return;
+        }
+
+        const file = files[0];
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload only image files.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const preview = document.createElement('div');
+            preview.className = 'relative border rounded p-2';
+            preview.innerHTML = `
+                <img src="${e.target.result}" alt="" class="w-full h-40 object-contain">
+                <div class="absolute top-2 right-2 flex gap-2">
+                    <button type="button" class="bg-blue-500 text-white p-1 rounded" 
+                        onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
+                        Crop
+                    </button>
+                </div>
+            `;
+            previewContainer.appendChild(preview);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function startCrop(imgElement, fileName) {
+        const modal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+
+        currentImageElement = imgElement;
+        currentFile = fileName;
+
+        cropImage.src = imgElement.src;
+        modal.classList.remove('hidden');
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(cropImage, {
+            aspectRatio: CROP_WIDTH / CROP_HEIGHT,
+            viewMode: 1,
+            dragMode: 'move',
+            cropBoxResizable: true,
+            cropBoxMovable: true,
+            minContainerWidth: 400,
+            minContainerHeight: 400,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+            background: false,
+            modal: false,
+            transparent: true
+        });
+    }
+
+    function cancelCrop() {
+        const modal = document.getElementById('cropModal');
+        modal.classList.add('hidden');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+    }
+
+    function saveCrop() {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: CROP_WIDTH,
+            height: CROP_HEIGHT,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+
+        canvas.toBlob((blob) => {
+            const croppedFile = new File([blob], currentFile, { type: 'image/png' });
+            const previewContainer = document.getElementById('banner-preview');
+
+            // Update preview with cropped image
+            const imgPreview = previewContainer.querySelector('img');
+            imgPreview.src = URL.createObjectURL(croppedFile);
+
+            cancelCrop();
+        }, 'image/png', 1.0);
+    }
+
+    // Expose functions to global scope
+    window.closeUploadPopup = closeUploadPopup;
+    window.confirmUpload = confirmUpload;
+    window.startCrop = startCrop;
+    window.cancelCrop = cancelCrop;
+    window.saveCrop = saveCrop;
+
+    // Initialize drag and drop
+    enableDragAndDrop();
+});

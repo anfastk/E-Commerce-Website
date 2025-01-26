@@ -32,7 +32,7 @@ func AdminRoutes(r *gin.Engine) {
 		product.GET("/variant/detail", controllers.ShowSingleProductVariantDetail)
 		product.POST("/variant/submit-specification", controllers.AddProductSpecification)
 		product.POST("/variant/delete/:id", controllers.DeleteProductVariant)
-		product.POST("/variant/image/delete/:id", controllers.DeleteVariantImage)
+		product.POST("/variant/image/change/", controllers.ReplaceVariantProductImage)
 		product.GET("/variant/detail/update/:id", controllers.ShowEditProductVariant)
 		product.PATCH("/variant/detail/update/:id", controllers.EditProductVariant)
 		product.GET("/main/details/update/:id", controllers.ShowEditMainProduct)
