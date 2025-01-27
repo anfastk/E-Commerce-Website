@@ -11,25 +11,26 @@ var RoleUser = "User"
 func UserRouter(r *gin.Engine) {
 
 	auth := r.Group("/auth")
+	auth.Use(middleware.NoCacheMiddleware())
 	{
 		auth.GET("/google/login", controllers.InitiateGoogleAuth)
 		auth.GET("/google/callback", controllers.HandleGoogleCallback)
 	}
+	r.GET("/", middleware.NoCacheMiddleware(), controllers.UserHome)
 	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
-	r.GET("/products/details/:id",middleware.NoCacheMiddleware(),controllers.ShowProductDetail)
+	r.GET("/products/details/:id", middleware.NoCacheMiddleware(), controllers.ShowProductDetail)
 
-	userSignup := r.Group("/user/signup")
-	userSignup.Use(middleware.NoCacheMiddleware())
+	user := r.Group("/user")
+	user.Use(middleware.NoCacheMiddleware())
 	{
-		userSignup.GET("/", controllers.ShowSignup)
-		userSignup.POST("/", controllers.SignUp)
-		userSignup.GET("/otp", controllers.SendOtp)
-		userSignup.POST("/verifyotp", controllers.VerifyOtp)
-		userSignup.GET("/otp/resend", controllers.ResendOTP)
+		user.GET("/signup", controllers.ShowSignup)
+		user.POST("/signup", controllers.SignUp)
+		user.GET("/signup/otp", controllers.SendOtp)
+		user.POST("/signup/verifyotp", controllers.VerifyOtp)
+		user.GET("/signup/otp/resend", controllers.ResendOTP)
+		user.GET("/login", controllers.ShowLogin)
+		user.POST("/login", controllers.UserLoginHandler)
+		user.GET("/logout", controllers.UserLogoutHandler)
 	}
-	userLogin := r.Group("/user/login")
-	userLogin.Use(middleware.NoCacheMiddleware())
-	{
-		userLogin.GET("/", controllers.ShowLogin)
-	}
+
 }

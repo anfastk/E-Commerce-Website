@@ -7,11 +7,12 @@
     <title>E-commerce Homepage</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/userhome.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/userhome.js" defer></script>
     <script src="/static/js/productpage.js" defer></script>
 </head>
 
-<body class="bg-white">
+<body class="bg-gray-50">
     <!-- Header Section -->
     <div class="bg-black py-4 sticky top-0 z-50 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
@@ -75,47 +76,38 @@
     </div>
 
     <!-- Carousel -->
-    <div class="relative w-full h-64  overflow-hidden bg-gray-300 flex items-center justify-center mt-12">
-        <!-- Carousel track -->
-        <div class="flex transition-transform duration-500 ease-in-out" id="carousel-track">
-            {{range .}}
-            <div class="min-w-full h-64 md:h-80 lg:h-96 flex-shrink-0">
-                <img src="{{.URL}}" alt="Slide" class="w-full h-full object-cover" />
+    <div class="relative w-full h-64 overflow-hidden  flex items-center justify-center mt-8">
+        <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out">
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_1_wcxv0j.gif" alt="Slide 1"
+                    class="max-w-full max-h-full object-contain" />
             </div>
-            {{end}}
-        </div>
-
-        <!-- Dots -->
-        <div class="absolute bottom-4 flex space-x-2" id="dots-container">
-            {{range $index, $_ := .}}
-            <span
-                class="h-2 w-2 md:h-3 md:w-3 lg:h-4 lg:w-4 bg-gray-500 rounded-full cursor-pointer {{if eq $index 0}}bg-gray-700{{end}}"
-                data-index="{{$index}}"></span>
-            {{end}}
-        </div>
-    </div>
-
-
-
-    <!-- Content Section -->
-    <div class="flex justify-center mt-12 px-4 sm:px-8 lg:px-0">
-        <div
-            class="bg-gradient-to-r from-gray-700 to-gray-300 text-white rounded-lg shadow-lg w-full max-w-[900px] h-auto sm:h-[300px] p-6 sm:p-8">
-            <div class="flex flex-col sm:flex-row justify-between items-center h-full">
-                <div class="max-w-full sm:max-w-md">
-                    <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4">Laptops And Accessories</h3>
-                    <p class="text-sm sm:text-base leading-relaxed">
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown
-                        printer took a galley of type and scrambled it to make a type specimen book. Lorem Ipsum has
-                        been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-                        galley of type.
-                    </p>
-                </div>
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_7_vey07l.gif" alt="Slide 2"
+                    class="max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984268/Banner_6_lbhpwd.gif" alt="Slide 3"
+                    class="max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984266/Banner_4_wgw1in.jpg" alt="Slide 4"
+                    class="max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984265/Banner_3_daxofx.png" alt="Slide 5"
+                    class="max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984263/Banner_2_whgpma.jpg" alt="Slide 6"
+                    class="max-w-full max-h-full object-contain" />
+            </div>
             </div>
         </div>
     </div>
 
-    <div class="container mx-auto px-4 py-6 mt-16">
+
+    <div class="container mx-auto px-4 py-6 mt-10">
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">LAPTOPS</h1>
@@ -123,40 +115,38 @@
         </div>
 
         <!-- Cards Section -->
-        <div class="flex gap-6 overflow-x-auto scrollbar-hide">
-            <!-- Single Card -->
-            <div class="bg-gray-50 rounded-lg shadow-md w-64 flex-shrink-0">
-                <div class="relative">
-                    <img src="/41yBFguw-SS._SY450_-removebg-preview.png" alt="Laptop Image"
-                        class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 w-full bg-black bg-opacity-60 text-white px-4 py-2">
-                        <h2 class="text-lg font-bold">Lenovo V14 G3 (2024)</h2>
-                        <p class="text-sm">Intel Core i5 12th Gen</p>
+        <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
+            {{range .Laptop}}
+            <a href="/products/details/{{.ID}}">
+                <div class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0">
+                    <div class="relative">
+                        {{if len .Images}}
+                        <img src="{{index .Images 0}}" alt="Product" class="w-full h-48 object-cover">
+                        {{else}}
+                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                            No Image Available
+                        </div>
+                        {{end}}
+                    </div>
+                    <div class="p-2 text-center">
+                        <h2 class="text-lg font-semibold">{{.ProductName}}</h2>
+                        <p class="text-sm text-gray-500">{{.ProductSummary}}</p>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
+                        <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Duplicate cards as needed -->
-            <div class="bg-gray-50 rounded-lg shadow-md w-64 flex-shrink-0">
-                <div class="relative">
-                    <img src="/41yBFguw-SS._SY450_-removebg-preview.png" alt="Laptop Image"
-                        class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 w-full bg-black bg-opacity-60 text-white px-4 py-2">
-                        <h2 class="text-lg font-bold">Another Laptop</h2>
-                        <p class="text-sm">Intel Core i7 13th Gen</p>
-                    </div>
-                </div>
-            </div>
+            </a>
+            {{end}}
         </div>
     </div>
-
 
     <div class="bg-white py-6 shadow-md mt-10">
         <div
             class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-800 space-y-6 md:space-y-0">
             <!-- Item 1 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Fast Delivery">
                 <div>
                     <p class="font-semibold">FASTED DELIVERY</p>
                     <p class="text-sm">Delivery in 24/H</p>
@@ -166,7 +156,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 2 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="24 Hours Return">
                 <div>
                     <p class="font-semibold">24 HOURS RETURN</p>
                     <p class="text-sm">100% money-back guarantee</p>
@@ -176,7 +165,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 3 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Secure Payment">
                 <div>
                     <p class="font-semibold">SECURE PAYMENT</p>
                     <p class="text-sm">Your money is safe</p>
@@ -186,7 +174,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 4 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Support 24/7">
                 <div>
                     <p class="font-semibold">SUPPORT 24/7</p>
                     <p class="text-sm">Live contact/message</p>
@@ -212,9 +199,9 @@
                 </button>
             </div>
             <!-- Image Section -->
-            <div class="lg:w-1/2 w-full flex justify-center">
-                <img src="/71xjB2xmMLL._SY450_.jpg" alt="MSI Titan 18 HX"
-                    class="rounded-lg shadow-md object-cover max-w-full">
+            <div class="lg:w-1/2 w-md flex justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/Msi_Titan_Banner_pxneew.jpg" alt="MSI Titan 18 HX"
+                    class="rounded-lg shadow-md object-cover max-w-md">
             </div>
         </div>
 
@@ -222,7 +209,7 @@
         <div class="bg-white rounded-lg shadow p-6 flex flex-col lg:flex-row items-center pb-20 mt-10">
             <!-- Image Section -->
             <div class="lg:w-1/2 w-full flex justify-center mb-6 lg:mb-0">
-                <img src="/71xjB2xmMLL._SY450_.jpg" alt="ASUS ROG Spatha X"
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984262/Asus_Rog_banner_nu6jba.jpg" alt="ASUS ROG Spatha X"
                     class="rounded-lg shadow-md object-cover max-w-full">
             </div>
             <!-- Text Section -->
@@ -238,120 +225,154 @@
                 </button>
             </div>
         </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col lg:flex-row items-center pb-20 mt-10">
+            <!-- Text Section -->
+            <div class="lg:w-1/2 w-full pr-0 lg:pr-8 mb-6 lg:mb-0">
+                <h1 class="text-3xl lg:text-4xl font-bold mb-4">ROCCAT Vulcan II Max</h1>
+                <p class="text-gray-700 mb-6 leading-relaxed">
+                    ROCCAT Vulcan II Max – Optical-Mechanical PC Gaming Keyboard with Customizable RGB Illuminated Keys
+                    and Palm Rest, Titan II Tactile Linear Switches, Aluminum Plate, 100M Keystroke Durability – Black
+                </p>
+                <button
+                    class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
+                    Add To Cart
+                </button>
+            </div>
+            <!-- Image Section -->
+            <div class="lg:w-1/2 w-full flex justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984266/Roccat_Vuccan_banner_u9nmjv.jpg" alt="MSI Titan 18 HX"
+                    class="rounded-lg shadow-md object-cover max-w-full">
+            </div>
+        </div>
     </div>
 
     <div class="container mx-auto px-4 py-6 border rounded-lg mt-10">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-center md:text-left">Gaming Mouse</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-center md:text-left">MOUSE</h1>
             <button
                 class="bg-black text-white text-base font-medium py-2 px-6 md:px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800 mt-4 md:mt-0">
                 Show More
             </button>
         </div>
         <div class="relative">
-            <!-- Left Arrow -->
-            <button id="scroll-left"
-                class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-black text-white p-2 md:p-3 rounded-full shadow-lg focus:outline-none hover:bg-gray-800 z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    class="w-4 h-4 md:w-6 md:h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
             <!-- Product Cards -->
             <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4">
-                <!-- Mouse Card -->
-                <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
-                    <div class="relative w-full flex justify-center">
+                {{range .Mouse}}
+                <a href="/products/details/{{.ID}}">
+                    <div
+                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
+                        <div class="relative w-full flex justify-center">
+                            <button
+                                class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7" />
+                                </svg>
+                            </button>
+                            {{if len .Images}}
+                            <img src="{{index .Images 0}}" alt="Product" class="rounded-lg shadow-md">
+                            {{else}}
+                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                No Image Available
+                            </div>
+                            {{end}}
+                        </div>
+                        <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}</p>
+                        <div class="text-center">
+                            <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
+                                .RegularPrice}}</span>
+                        </div>
                         <button
-                            class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 15l7-7 7 7" />
-                            </svg>
+                            class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
+                            Add To Cart
                         </button>
-                        <img src="https://via.placeholder.com/150" alt="Mouse 1" class="rounded-lg shadow-md">
                     </div>
-                    <p class="text-center text-sm md:text-base font-semibold mt-4">Xingyawl Ergonomic Wired Gaming</p>
-                    <button
-                        class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                        Add To Cart
-                    </button>
-                </div>
-                <!-- Repeat similar structure for other products -->
-                <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
-                    <div class="relative w-full flex justify-center">
-                        <button
-                            class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 15l7-7 7 7" />
-                            </svg>
-                        </button>
-                        <img src="https://via.placeholder.com/150" alt="Mouse 2" class="rounded-lg shadow-md">
-                    </div>
-                    <p class="text-center text-sm md:text-base font-semibold mt-4">Logitech G502X Lightspeed Plus/Hero
-                    </p>
-                    <button
-                        class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                        Add To Cart
-                    </button>
-                </div>
+                </a>
+                {{end}}
             </div>
-            <!-- Right Arrow -->
-            <button id="scroll-right"
-                class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-black text-white p-2 md:p-3 rounded-full shadow-lg focus:outline-none hover:bg-gray-800 z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    class="w-4 h-4 md:w-6 md:h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
         </div>
     </div>
 
+    <div class="max-w-7xl mx-auto mt-14">
+        <div class="relative h-[350px] rounded-[30px] overflow-hidden">
+            <!-- Background Image -->
+            <div class="absolute inset-0">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984256/zeb_zyu8fg.jpg" alt="Background" class="w-full h-full object-cover" />
+            </div>
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+            <!-- Content -->
+            <div class="relative h-full flex flex-col justify-center px-14">
+                <h1 class="text-white text-5xl font-bold tracking-wide mb-6">
+                    ZEBRONICS
+                </h1>
 
-    <div class="container mx-auto p-6 mt-16">
-        <div class="flex flex-wrap justify-between items-center mb-6">
-            <!-- Section Title -->
-            <h1 class="text-3xl font-bold tracking-wide">KEYBOARDS</h1>
-
-            <!-- Show More Button -->
-            <button class="bg-black text-white px-6 py-2 rounded-full text-sm mt-4 md:mt-0">Show More</button>
-        </div>
-
-        <!-- Frame -->
-        <div class="flex flex-wrap md:flex-nowrap justify-between gap-6">
-            <!-- Frame 1 -->
-            <div class="bg-gray-300 w-full md:w-2/3 h-[200px] md:h-[300px] rounded-lg"></div>
-
-            <!-- Frame 2 -->
-            <div class="bg-gray-700 w-full md:w-1/3 h-[200px] md:h-[300px] rounded-lg"></div>
+                <div class="space-y-2 mb-8">
+                    <p class="text-white text-2xl font-semibold">
+                        Dominate With Precise Audio!
+                    </p>
+                    <p class="text-white text-lg">
+                        Zebronics Blitz C With Dolby Atmos<br>& Type C
+                    </p>
+                </div>
+                <button
+                    class="bg-black text-white w-fit px-10 py-2.5 rounded-full text-lg font-bold hover:bg-gray-900 transition-colors border-2 border-white">
+                    JUST ₹1,299
+                </button>
+            </div>
         </div>
     </div>
 
-    <div
-        class="relative flex flex-col md:flex-row items-center justify-center w-[92%] mx-auto h-auto md:h-[350px] rounded-2xl overflow-hidden shadow-lg mt-14">
-        <!-- Left Section -->
-        <div class="flex flex-col justify-center text-white w-full md:w-2/3 h-auto md:h-full p-6 md:p-8 bg-gray-800">
-            <h1 class="text-2xl md:text-4xl font-bold mb-4">ZEBRONICS</h1>
-            <p class="text-sm md:text-lg font-medium leading-relaxed mb-6">
-                Dominate With Precise Audio! <br />
-                Zebronics Blitz C With Dolby Atmos & Type C
-            </p>
+    <div class="container mx-auto px-4 py-6 border rounded-lg mt-10">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-center md:text-left">KEYBOARDS</h1>
             <button
-                class="bg-transparent border border-white text-white py-2 px-4 md:px-6 rounded-full text-xs md:text-sm font-semibold hover:bg-white hover:text-black transition">
-                JUST ₹ 1,299
+                class="bg-black text-white text-base font-medium py-2 px-6 md:px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800 mt-4 md:mt-0">
+                Show More
             </button>
         </div>
-
-        <!-- Right Section -->
-        <div class="w-full md:w-1/3 h-[200px] md:h-full">
-            <img src="/41yBFguw-SS._SY450_-removebg-preview.png" alt="Zebronics Headphones"
-                class="w-full h-full object-contain md:object-cover" />
+        <div class="relative">
+            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4">
+                {{range .Mouse}}
+                <a href="/products/details/{{.ID}}">
+                    <div
+                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
+                        <div class="relative w-full flex justify-center">
+                            <button
+                                class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7" />
+                                </svg>
+                            </button>
+                            {{if len .Images}}
+                            <img src="{{index .Images 0}}" alt="Product" class="rounded-lg shadow-md">
+                            {{else}}
+                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                No Image Available
+                            </div>
+                            {{end}}
+                        </div>
+                        <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}
+                        </p>
+                        <div class="text-center">
+                            <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
+                                .RegularPrice}}</span>
+                        </div>
+                        <button
+                            class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
+                            Add To Cart
+                        </button>
+                    </div>
+                </a>
+                {{end}}
+            </div>
         </div>
     </div>
-
 
     <div class="flex flex-col items-center justify-center mt-16 ">
         <h1 class="text-lg font-bold tracking-wider text-gray-800 mb-6">CATEGORIES</h1>
@@ -361,22 +382,26 @@
             <div class="flex gap-6 justify-center">
                 <!-- Left Full Height Box -->
                 <div class="flex-shrink-0 bg-gray-400 rounded-lg overflow-hidden w-72 h-96">
-                    <img src="/path-to-your-backend-image-1.jpg" alt="Image 1" class="w-full h-full object-cover" />
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/Categort_Laptop_knl3dr.png" alt="Image 1"
+                        class="w-full h-full object-cover" />
                 </div>
 
                 <!-- Center Split Boxes -->
                 <div class="flex-shrink-0 flex flex-col gap-6 w-72">
                     <div class="bg-gray-400 rounded-lg overflow-hidden h-44">
-                        <img src="/path-to-your-backend-image-2.jpg" alt="Image 2" class="w-full h-full object-cover" />
+                        <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Keyboard_b9rikj.png" alt="Image 2"
+                            class="w-full h-full object-cover" />
                     </div>
                     <div class="bg-gray-400 rounded-lg overflow-hidden h-44">
-                        <img src="/path-to-your-backend-image-3.jpg" alt="Image 3" class="w-full h-full object-cover" />
+                        <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Headset_wrvkcp.png" alt="Image 3"
+                            class="w-full h-full object-cover" />
                     </div>
                 </div>
 
                 <!-- Right Full Height Box -->
                 <div class="flex-shrink-0 bg-gray-400 rounded-lg overflow-hidden w-72 h-96">
-                    <img src="/path-to-your-backend-image-4.jpg" alt="Image 4" class="w-full h-full object-cover" />
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984250/Category_Mouse_sdticp.png" alt="Image 4"
+                        class="w-full h-full object-cover" />
                 </div>
             </div>
         </div>
@@ -387,30 +412,60 @@
         <div class="w-full max-w-full p-4">
             <!-- Title Image -->
             <div class="w-full h-28 rounded overflow-hidden">
-                <img src="https://via.placeholder.com/1920x400" alt="Popular Series Header"
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/PopularSeries_p5rha9.png" alt="Popular Series Header"
                     class="w-full h-full object-cover">
             </div>
             <!-- Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
                 <!-- Card 1 -->
-                <div class="bg-gray-600 h-48 rounded overflow-hidden relative">
-                    <img src="https://via.placeholder.com/150" alt="Series 1" class="w-full h-full object-cover">
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984261/PopularSeries_MI_08_av45ts.png" alt="Series 1"
+                        class="w-full h-full object-cover">
                 </div>
                 <!-- Card 2 -->
-                <div class="bg-gray-600 h-48 rounded overflow-hidden relative">
-                    <img src="https://via.placeholder.com/150" alt="Series 2" class="w-full h-full object-cover">
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984261/PopularSeries_SAMSUNG_09_shyo6j.png" alt="Series 2"
+                        class="w-full h-full object-cover">
                 </div>
                 <!-- Card 3 -->
-                <div class="bg-gray-600 h-48 rounded overflow-hidden relative">
-                    <img src="https://via.placeholder.com/150" alt="Series 3" class="w-full h-full object-cover">
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984260/PopularSeries_ZEBRONICS_07_htfitx.png" alt="Series 3"
+                        class="w-full h-full object-cover">
                 </div>
                 <!-- Card 4 -->
-                <div class="bg-gray-600 h-48 rounded overflow-hidden relative">
-                    <img src="https://via.placeholder.com/150" alt="Series 4" class="w-full h-full object-cover">
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984260/PopularSeries_HP_10_lht7pm.png" alt="Series 4"
+                        class="w-full h-full object-cover">
                 </div>
                 <!-- Card 5 -->
-                <div class="bg-gray-600 h-48 rounded overflow-hidden relative">
-                    <img src="https://via.placeholder.com/150" alt="Series 5" class="w-full h-full object-cover">
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984259/PopularSeries_LENOVO_03_gajbvq.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
+                </div>
+                <!-- Card 6 -->
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984259/PopularSeries_LG_06_x7sgrb.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
+                </div>
+                <!-- Card 7 -->
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984258/PopularSeries_ACER_04_kquf5v.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
+                </div>
+                <!-- Card 8 -->
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984258/PopularSeries_APPLE_05_xyyddx.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
+                </div>
+                <!-- Card 9 -->
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984257/PopularSeries_ASUS_02_duws4b.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
+                </div>
+                <!-- Card 10 -->
+                <div class="h-auto rounded overflow-hidden relative">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984257/PopularSeries_HONOR_01_qbyt3c.png" alt="Series 5"
+                        class="max-w-full max-h-full object-cover">
                 </div>
             </div>
         </div>
@@ -421,7 +476,6 @@
             class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-800 space-y-6 md:space-y-0">
             <!-- Item 1 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Fast Delivery">
                 <div>
                     <p class="font-semibold">FASTED DELIVERY</p>
                     <p class="text-sm">Delivery in 24/H</p>
@@ -431,7 +485,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 2 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="24 Hours Return">
                 <div>
                     <p class="font-semibold">24 HOURS RETURN</p>
                     <p class="text-sm">100% money-back guarantee</p>
@@ -441,7 +494,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 3 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Secure Payment">
                 <div>
                     <p class="font-semibold">SECURE PAYMENT</p>
                     <p class="text-sm">Your money is safe</p>
@@ -451,7 +503,6 @@
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
             <!-- Item 4 -->
             <div class="flex items-center space-x-4">
-                <img src="https://via.placeholder.com/40" alt="Support 24/7">
                 <div>
                     <p class="font-semibold">SUPPORT 24/7</p>
                     <p class="text-sm">Live contact/message</p>
@@ -465,20 +516,36 @@
     <div class="w-full max-w-8xl p-4 my-20">
         <!-- Header -->
         <div class="h-20 mb-6">
-            <img src="https://via.placeholder.com/150" alt="Header Image" class="h-20 w-full object-cover bg-gray-400">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984254/Shop_By_Brand_dqqc7i.png" alt="Header Image" class="h-20 w-full object-cover">
         </div>
 
         <!-- Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- Dynamic Images -->
-            <img src="https://via.placeholder.com/150" alt="Image 1" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 2" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 3" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 4" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 5" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 6" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 7" class="h-32 w-full object-cover bg-gray-400">
-            <img src="https://via.placeholder.com/150" alt="Image 8" class="h-32 w-full object-cover bg-gray-400">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 ml-14">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/ASUS_Logo_udi3xr.webp" alt="Image 1"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/HP_Logo_lpsucb.webp" alt="Image 2"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/ACER_Logo_kxred7.webp" alt="Image 3"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984254/LENOVO_Logo_clukbz.webp" alt="Image 4"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984253/APPLE_Logo_boqmpu.webp" alt="Image 5"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984252/MSI_Logo_wxy3yu.webp" alt="Image 6"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984252/INFINIX_Logo_c3uyzm.webp" alt="Image 7"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/SAMSUNG_Logo_rhq9vh.webp" alt="Image 8"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984250/GIGABYTE_Logo_clsxji.webp" alt="Image 9"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984250/PRIMEBOOK_Logo_useo56.webp" alt="Image 10"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984249/WINGS_Logo_j3qcbm.webp" alt="Image 11"
+                class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg">
+            <div class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-2 border-gray-100">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/ZEBRONICS_Logo_idfogi.png" alt="Image 12" class="pt-3">
+            </div>
         </div>
     </div>
 

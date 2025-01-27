@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,22 +22,21 @@ type GoogleUserInfo struct {
 
 func InitiateGoogleAuth(c *gin.Context) {
 	state := uuid.New().String()
-	
-	session, _ := Store.Get(c.Request, "session")
-	session.Values["oauth_state"] = state
-	session.Save(c.Request, c.Writer)
+
+	c.SetCookie("oauth_state", state, 600, "/", "", false, true)
 
 	url := config.GoogleOAuthConfig.AuthCodeURL(state)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func HandleGoogleCallback(c *gin.Context) {
-	session, _ := Store.Get(c.Request, "session")
-	expectedState, ok := session.Values["oauth_state"].(string)
-	if !ok || c.Query("state") != expectedState {
+	state, err := c.Cookie("oauth_state")
+	if err != nil || c.Query("state") != state {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OAuth state"})
 		return
 	}
+
+	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
 
 	code := c.Query("code")
 	token, err := config.GoogleOAuthConfig.Exchange(c.Request.Context(), code)
@@ -66,27 +67,32 @@ func HandleGoogleCallback(c *gin.Context) {
 
 	var user models.UserAuth
 	result := config.DB.Where("email = ?", googleUser.Email).First(&user)
-	
+
 	if result.Error != nil {
 		user = models.UserAuth{
-			FullName:      googleUser.Name,
-			Email:         googleUser.Email,
-			Password:      "", 
-			GoogleID:      googleUser.Email,
-			ProfilePic:  googleUser.Picture,
-			IsVerified:    googleUser.VerifiedEmail,
+			FullName:   googleUser.Name,
+			Email:      googleUser.Email,
+			Password:   "",
+			GoogleID:   googleUser.Email,
+			ProfilePic: googleUser.Picture,
+			IsVerified: googleUser.VerifiedEmail,
 		}
-		
+
 		if err := config.DB.Create(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 			return
 		}
 	}
-
-	session.Values["user_id"] = user.ID
-	session.Values["email"] = user.Email
-	session.Values["is_logged_in"] = true
-	session.Save(c.Request, c.Writer)
+	jwtToken, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Failed to generate JWT tokens",
+			"code":   "500",
+		})
+		return
+	}
+	c.SetCookie("jwtTokensUser", jwtToken, int((time.Hour * 1).Seconds()), "/", "", false, true)
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 }

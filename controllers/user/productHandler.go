@@ -5,8 +5,22 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 )
+
+func UserHome(c *gin.Context) {
+
+	keyboard, _ := helper.RelatedProducts(2)
+	laptop, _ := helper.RelatedProducts(3)
+	mouse, _ := helper.RelatedProducts(4)
+
+	c.HTML(http.StatusOK, "userHome.html", gin.H{
+		"Keyboard": keyboard,
+		"Laptop":   laptop,
+		"Mouse":    mouse,
+	})
+}
 
 type ProductVariantResponse struct {
 	ID           uint     `json:"id"`
@@ -90,7 +104,7 @@ func ShowProductDetail(c *gin.Context) {
 	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
 		Preload("Category", "is_deleted = ?", false).
 		Preload("Specification", "is_deleted = ?", false).
-		Preload("Product.Descriptions","is_deleted = ?",false).
+		Preload("Product.Descriptions", "is_deleted = ?", false).
 		Where("id = ? AND is_deleted = ?", productID, false).
 		First(&variant)
 
@@ -115,7 +129,7 @@ func ShowProductDetail(c *gin.Context) {
 	var description []DescriptionResponse
 	for _, descrip := range variant.Product.Descriptions {
 		description = append(description, DescriptionResponse{
-			Heading:   descrip.Heading,
+			Heading:     descrip.Heading,
 			Description: descrip.Description,
 		})
 	}
@@ -162,7 +176,7 @@ func ShowProductDetail(c *gin.Context) {
 		Stock:          variant.StockQuantity,
 		Summary:        variant.ProductSummary,
 		Specifications: specs,
-		Description: description,
+		Description:    description,
 	}
 
 	c.HTML(http.StatusFound, "productDetails.html", gin.H{

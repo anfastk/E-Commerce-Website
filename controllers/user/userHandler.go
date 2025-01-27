@@ -113,8 +113,8 @@ func ShowLogin(c *gin.Context) {
 }
 
 type UserInput struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
 }
 
 func UserLoginHandler(c *gin.Context) {
@@ -182,5 +182,17 @@ func UserLoginHandler(c *gin.Context) {
 		"message": "Login successful",
 		"token":   token,
 		"code":    200,
+	})
+}
+
+func UserLogoutHandler(c * gin.Context){
+
+	c.SetCookie("jwtTokensUser", "",-1, "/", "", false, true)
+
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "User logged out successfully",
+		"code":    http.StatusOK,
 	})
 }
