@@ -12,6 +12,11 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
+    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
+        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+          <span id="toast-message"></span>
+        </div>
+      </div>
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -170,14 +175,14 @@
                         <div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Product Name</label>
-                                <input type="text" id="productName" name="productName" value="{{.Details.ProductName}}"
+                                <input type="text" id="productname" name="productname" value="{{.Details.ProductName}}"
                                     class="w-full border border-black rounded px-4 py-2" required>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Category</label>
-                                <select class="w-full border border-black rounded px-4 py-2" id="category"
-                                    name="category" required>
-                                    <option disabled selected>Categories</option>
+                                <select class="w-full border border-black rounded px-4 py-2" id="categoryid"
+                                    name="categoryid" required>
+                                    <option disabled selected  value="{{.ID}}">{{.CategoryName.Name}}</option>
                                     {{range .categories}}
                                     <option value="{{.ID}}">{{.Name}}</option>
                                     {{end}}
@@ -185,7 +190,7 @@
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Brand Name</label>
-                                <input type="text" id="brandName" name="brandName"
+                                <input type="text" id="brandname" name="brandname"
                                     class="w-full border border-black rounded px-4 py-2" value="{{.Details.BrandName}}"
                                     required>
                             </div>
@@ -194,7 +199,7 @@
                         <div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Cash on Delivery Available</label>
-                                <select id="cashOnDelivery" name="cashOnDelivery"
+                                <select id="iscodavailable" name="iscodavailable"
                                     class="w-full border border-black rounded px-4 py-2" required>
                                     <option value="true">YES</option>
                                     <option value="false">NO</option>
@@ -202,7 +207,7 @@
                             </div>
                             <div class="mb-4">
                                 <label class="block text-black mb-2">Return Available</label>
-                                <select id="returnAvailable" name="returnAvailable"
+                                <select id="isreturnable" name="isreturnable"
                                     class="w-full border border-black rounded px-4 py-2" required>
                                     <option value="true">YES</option>
                                     <option value="false">NO</option>
@@ -211,7 +216,7 @@
                         </div>
                     </div>
                     <!-- Hidden input for product ID -->
-                    <input type="hidden" name="productId" id="productId"  value="{{.Details.ID}}">
+                    <input type="hidden" name="productId" id="productId" value="{{.Details.ID}}">
                     <!-- Buttons -->
                     <div class="flex justify-end space-x-4 mt-8">
                         <button type="button" onclick="window.history.back()"
@@ -223,22 +228,45 @@
         </main>
     </div>
     <script>
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            // Set message
+            toastMessage.textContent = message;
+
+            // Set color based on type
+            const toastDiv = toast.firstElementChild;
+            if (type === 'success') {
+                toastDiv.classList.remove('bg-red-500');
+                toastDiv.classList.add('bg-green-500');
+            } else {
+                toastDiv.classList.remove('bg-green-500');
+                toastDiv.classList.add('bg-red-500');
+            }
+
+            // Show toast
+            toast.classList.remove('hidden');
+        }
+
+        // Form submission handler
         document.getElementById('productUpdateForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             // Ensure productId is set before submission
             const productId = document.getElementById('productId').value;
             if (!productId) {
-                alert('Product ID is missing');
+                showToast('Product ID is missing', 'error');
                 return;
             }
 
             const formData = {
-                productName: document.getElementById('productName').value,
-                category: document.getElementById('category').value,
-                brandName: document.getElementById('brandName').value,
-                cashOnDelivery: document.getElementById('cashOnDelivery').value === 'true',
-                returnAvailable: document.getElementById('returnAvailable').value === 'true'
+                productname: document.getElementById('productname').value,
+                categoryid: document.getElementById('categoryid').value,
+                brandname: document.getElementById('brandname').value,
+                iscodavailable: document.getElementById('iscodavailable').value === 'true',
+                isreturnable: document.getElementById('isreturnable').value === 'true'
             };
 
             try {
@@ -250,14 +278,21 @@
                     body: JSON.stringify(formData)
                 });
 
+                const data = await response.json();
+
                 if (response.ok) {
-                    window.location.href = `/admin/products/main/details?product_id=${productId}`;
+                    // Show success message
+                    showToast(data.message || 'Product updated successfully', 'success');
+
+                    // Wait briefly to show the message before redirecting
+                    setTimeout(() => {
+                        window.location.href = `/admin/products/main/details?product_id=${productId}`;
+                    }, 1000);
                 } else {
-                    const errorData = await response.json();
-                    alert('Error updating product: ' + (errorData.message || 'Unknown error occurred'));
+                    showToast(data.message || 'Error updating product', 'error');
                 }
             } catch (error) {
-                alert('Error updating product: ' + error.message);
+                showToast('Error updating product: ' + error.message, 'error');
             }
         });
     </script>

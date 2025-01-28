@@ -18,6 +18,11 @@
 </head>
 
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
+    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
+        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+          <span id="toast-message"></span>
+        </div>
+      </div>
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -199,17 +204,10 @@
                             UPDATE MAIN PRODUCT
                         </button>
                     </a>
-                    <form action="/admin/products/main/details/delete/{{.Product.Id}}" method="post">
-                        {{if .Product.IsDeleted}}
-                        <button
-                            class="bg-green-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">RECOVER
-                            PRODUCT</button>
-                        {{else}}
-                        <button
-                            class="bg-red-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">DELETE
-                            PRODUCT</button>
-                        {{end}}
-                    </form>
+                    <button onclick="handleProductAction('{{.Product.Id}}', '{{.Product.IsDeleted}}')"
+                        class="{{if .Product.IsDeleted}}bg-green-600{{else}}bg-red-600{{end}} text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
+                        {{if .Product.IsDeleted}}RECOVER PRODUCT{{else}}DELETE PRODUCT{{end}}
+                    </button>
                 </div>
             </div>
 
@@ -247,7 +245,7 @@
                             <!-- Drag and Drop Area -->
                             <div id="banner-drop-area"
                                 class="border-dashed border-2 border-gray-300 rounded px-4 py-6 text-center bg-white mb-4 hover:border-blue-500 transition">
-                                <input type="hidden" id="product-id" value="{{(index .Product.Images 0).ProductID}}" >
+                                <input type="hidden" id="product-id" value="{{(index .Product.Images 0).ProductID}}">
                                 <input id="banner-input" type="file" accept="image/*" class="hidden"
                                     name="product_image" />
                                 <p class="text-gray-500">
@@ -568,7 +566,67 @@
             </div>
         </main>
     </div>
+    <script>
+        async function handleProductAction(productId, isDeleted) {
+            // Customize confirmation message based on action
+            const action = isDeleted ? 'recover' : 'delete';
+            const confirmMessage = `Are you sure you want to ${action} this product?`;
 
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/products/main/details/delete/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const actionMessage = isDeleted ? 'recovered' : 'deleted';
+                    showToast(`Product successfully ${actionMessage}`, 'success');
+
+                    // Wait briefly then reload
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    const actionMessage = isDeleted ? 'recovering' : 'deleting';
+                    showToast(`Error ${actionMessage} product`, 'error');
+                }
+            } catch (error) {
+                showToast('An error occurred while updating the product', 'error');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            // Set message
+            toastMessage.textContent = message;
+
+            // Set color based on type
+            const toastDiv = toast.firstElementChild;
+            if (type === 'success') {
+                toastDiv.classList.remove('bg-red-500');
+                toastDiv.classList.add('bg-green-500');
+            } else {
+                toastDiv.classList.remove('bg-green-500');
+                toastDiv.classList.add('bg-red-500');
+            }
+
+            // Show toast
+            toast.classList.remove('hidden');
+
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>

@@ -250,11 +250,22 @@ func ShowEditMainProduct(c *gin.Context) {
 	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
-			"error":  "Product variant not found",
+			"error":  "Product not found",
 			"code":   http.StatusNotFound,
 		})
 		return
 	}
+	var productCategoryName models.Categories
+	if err := config.DB.Where("is_deleted = ? AND status = ? AND id = ?", false, "Active", mainProduct.CategoryID).Find(&productCategoryName).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "Internal Server Error",
+			"message": "Failed to fetch categories",
+			"error":   err.Error(),
+			"code":    500,
+		})
+		return
+	}
+
 	var categories []models.Categories
 	if err := config.DB.Where("is_deleted = ? AND status = ?", false, "Active").Find(&categories).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -267,14 +278,15 @@ func ShowEditMainProduct(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "mainProductUpdate.html", gin.H{
-		"Details":    mainProduct,
-		"categories": categories,
+		"Details":      mainProduct,
+		"CategoryName": productCategoryName,
+		"categories":   categories,
 	})
 }
 
 type updateProduct struct {
 	ProductName    string `json:"productname"`
-	Category       string `json:"category"`
+	CategoryID     string `json:"categoryid"`
 	BrandName      string `json:"brandname"`
 	IsCodAvailable bool   `json:"iscodavailable"`
 	IsReturnable   bool   `json:"isreturnable"`
@@ -297,22 +309,32 @@ func EditMainProduct(c *gin.Context) {
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
-			"error":  "Invalid input data",
+			"error":  err.Error(),
 			"code":   http.StatusBadRequest,
 		})
 		return
 	}
 
-	if err := config.DB.Model(&existingProduct).Updates(updateProduct{
+	categoryID, err := strconv.ParseUint(updateData.CategoryID, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid category ID format",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	if err := config.DB.Model(&existingProduct).Updates(models.ProductDetail{
 		ProductName:    updateData.ProductName,
-		Category:       updateData.Category,
+		CategoryID:     uint(categoryID),
 		BrandName:      updateData.BrandName,
-		IsCodAvailable: updateData.IsCodAvailable,
+		IsCODAvailable: updateData.IsCodAvailable,
 		IsReturnable:   updateData.IsReturnable,
 	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
-			"error":  "Failed to save data",
+			"error":  err.Error(),
 			"code":   http.StatusInternalServerError,
 		})
 		return
@@ -389,13 +411,11 @@ func DeleteMainProduct(c *gin.Context) {
 		return
 	}
 
-	/* c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status":  "Success",
 		"message": "Product status updated successfully",
 		"code":    http.StatusOK,
-	})  */
-	redirectURL := "/admin/products/main/details?product_id=" + strconv.FormatUint(productID, 10)
-	c.Redirect(http.StatusFound, redirectURL)
+	})
 }
 
 func DeleteDescription(c *gin.Context) {
@@ -498,90 +518,90 @@ func UpdateProductDescription(c *gin.Context) {
 	})
 }
 func ReplaceMainProductImage(c *gin.Context) {
-    productID, err := strconv.Atoi(c.PostForm("product_id"))
-    if err != nil {
+	productID, err := strconv.Atoi(c.PostForm("product_id"))
+	if err != nil {
 		fmt.Println("not found")
 
-        c.JSON(http.StatusBadRequest, gin.H{
-            "status": "Bad Request",
-            "error":  "Invalid product ID",
-            "code":   http.StatusBadRequest,
-        })
-        return
-    }
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid product ID",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
 
-    tx := config.DB.Begin()
-    var productImage models.ProductImage
-    if err := tx.First(&productImage, productID).Error; err != nil {
-        tx.Rollback()
-        c.JSON(http.StatusNotFound, gin.H{
-            "status": "Not Found",
-            "error":  "Product image not found",
-            "code":   http.StatusNotFound,
-        })
-        return
-    }
+	tx := config.DB.Begin()
+	var productImage models.ProductImage
+	if err := tx.First(&productImage, productID).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product image not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
 
-    oldImage := productImage.ProductImages
+	oldImage := productImage.ProductImages
 
-    form, err := c.FormFile("product_image")
-    if err != nil {
-        tx.Rollback()
-        c.JSON(http.StatusBadRequest, gin.H{
-            "error":   "No file uploaded",
-            "details": err.Error(),
-        })
-        return
-    }
+	form, err := c.FormFile("product_image")
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "No file uploaded",
+			"details": err.Error(),
+		})
+		return
+	}
 
-    cld := config.InitCloudinary()
-    file, _ := form.Open()
-    url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products")
-    if uploadErr != nil {
-        tx.Rollback()
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status":  "Internal Server Error",
-            "message": "Failed to upload product image",
-            "code":    http.StatusInternalServerError,
-        })
-        return
-    }
+	cld := config.InitCloudinary()
+	file, _ := form.Open()
+	url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products")
+	if uploadErr != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "Internal Server Error",
+			"message": "Failed to upload product image",
+			"code":    http.StatusInternalServerError,
+		})
+		return
+	}
 
-    if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
-        tx.Rollback()
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status": "Internal Server Error",
-            "error":  "Failed to update image",
-            "code":   500,
-        })
-        return
-    }
+	if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Failed to update image",
+			"code":   500,
+		})
+		return
+	}
 
-    publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
-    if err != nil {
-        tx.Rollback()
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status": "InternalServerError",
-            "error":  "Failed to extract Cloudinary public ID",
-            "code":   http.StatusInternalServerError,
-        })
-        return
-    }
+	publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to extract Cloudinary public ID",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
 
-    if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
-        tx.Rollback()
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status": "InternalServerError",
-            "error":  "Failed to delete image from Cloudinary",
-            "code":   http.StatusInternalServerError,
-        })
-        return
-    }
+	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "InternalServerError",
+			"error":  "Failed to delete image from Cloudinary",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
 
-    tx.Commit()
-    c.JSON(http.StatusOK, gin.H{
-        "status":   "Success",
-        "filename": url,
-        "code":     http.StatusOK,
-    })
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{
+		"status":   "Success",
+		"filename": url,
+		"code":     http.StatusOK,
+	})
 }

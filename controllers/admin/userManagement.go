@@ -12,7 +12,7 @@ import (
 
 func ListUsers(c *gin.Context) {
 	var users []models.UserAuth
-	if err := config.DB.Where("is_deleted=?", false).Find(&users).Error; err != nil {
+	if err := config.DB.Unscoped().Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":"InternalServerError",
 			"error": "Could not fetch users",
@@ -28,7 +28,7 @@ func ListUsers(c *gin.Context) {
 func BlockUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.UserAuth
-	if err := config.DB.First(&user, "id = ?", id).Error; err != nil {
+	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"message":  "User not found",
@@ -69,7 +69,7 @@ func DeleteUser(c *gin.Context) {
 
 	var user models.UserAuth
 	
-	if err := config.DB.First(&user, "id = ? AND is_deleted = ?", id, false).Error; err != nil {
+	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"status":"Not Found",
 			"error": "User not found",

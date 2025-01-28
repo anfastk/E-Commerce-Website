@@ -9,6 +9,70 @@ let variantCount = 1;
 // Store files for each variant
 const variantFiles = new Map();
 
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+
+      // Validate required fields
+      const requiredFields = this.querySelectorAll('[required]');
+      let isValid = true;
+      requiredFields.forEach(field => {
+          if (!field.value.trim()) {
+              isValid = false;
+              field.classList.add('border-red-500');
+          } else {
+              field.classList.remove('border-red-500');
+          }
+      });
+
+      if (!isValid) {
+          window.toast.error('Please fill in all required fields');
+          return;
+      }
+
+      // Add variant files to form data
+      if (typeof variantFiles !== 'undefined') {
+          variantFiles.forEach((files, variantIndex) => {
+              files.forEach(file => {
+                  formData.append(`product_images[${variantIndex}][]`, file);
+              });
+          });
+      }
+
+      // Show loading toast
+      window.toast.success('Saving variant details...');
+
+      // Submit the form
+      fetch(this.action, {
+          method: 'POST',
+          body: formData
+      })
+          .then(response => response.json())
+          .then(data => {
+              if (data.code === 200) {
+                  window.toast.success(data.message || 'Variant added successfully!');
+                  setTimeout(() => {
+                      window.location.href = data.redirect || '/admin/products';
+                  }, 1000);
+              } else {
+                  window.toast.error(data.message || 'Error adding variant');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              window.toast.error('Error adding variant. Please try again.');
+          });
+  });
+});
+
+
+
+// Image handling functions
 function handleFileUpload(input, previewContainerId) {
   const previewContainer = document.getElementById(previewContainerId);
   const files = input.files;
@@ -16,8 +80,20 @@ function handleFileUpload(input, previewContainerId) {
   const variantIndex = Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm);
 
   if (previewContainer.children.length + files.length > MAX_IMAGES) {
-    alert(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+    window.toast.error(`You can only upload a maximum of ${MAX_IMAGES} images`, 'error');
     return;
+  }
+
+  // File validation
+  for (let file of files) {
+    if (!file.type.startsWith('image/')) {
+      window.toast.error('Please upload only image files', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      window.toast.error('Image size should not exceed 5MB', 'error');
+      return;
+    }
   }
 
   // Initialize or get the files array for this variant
@@ -52,6 +128,8 @@ function handleFileUpload(input, previewContainerId) {
   input.value = '';
 }
 
+// Keep your existing functions for cropping, drag-and-drop, etc...
+// Just add appropriate toast messages where needed
 
 function removePreview(inputId, previewContainerId, previewElement, variantIndex, fileName) {
   previewElement.remove();
@@ -60,41 +138,9 @@ function removePreview(inputId, previewContainerId, previewElement, variantIndex
   if (fileIndex > -1) {
     filesArray.splice(fileIndex, 1);
     variantFiles.set(variantIndex, filesArray);
+    window.toast.success('Image removed successfully', 'success');
   }
 }
-
-// Add this function to handle form submission
-document.querySelector('form').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const formData = new FormData(this);
-  
-  // Add variant index to identify which images belong to which variant
-  variantFiles.forEach((files, variantIndex) => {
-    files.forEach(file => {
-      // Append files with variant index in the name
-      formData.append(`product_images[${variantIndex}][]`, file);
-    });
-  });
-
-  // Submit the form with fetch
-  fetch(this.action, {
-    method: 'POST',
-    body: formData
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.code === 200) {
-        window.location.href = data.redirect || '/admin/products';
-      } else {
-        alert(data.message || 'Error uploading files');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error uploading files');
-    });
-});
 
 function startCrop(imgElement, fileName) {
   const modal = document.getElementById('cropModal');
@@ -146,34 +192,25 @@ function saveCrop() {
     imageSmoothingQuality: 'high'
   });
 
-  // Convert canvas to blob, maintaining transparency
   canvas.toBlob((blob) => {
-    // Create a new file from the blob
-    const croppedFile = new File([blob], currentFile, { type: 'image/png' }); // Use PNG to preserve transparency
-
-    // Update the variantFiles map to replace the original file with the cropped file
+    const croppedFile = new File([blob], currentFile, { type: 'image/png' });
     const variantForm = currentImageElement.closest('.variant-form');
     const variantIndex = Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm);
     const filesArray = variantFiles.get(variantIndex);
 
-    // Find and replace the original file
     const fileIndex = filesArray.findIndex(file => file.name === currentFile);
     if (fileIndex > -1) {
       filesArray[fileIndex] = croppedFile;
       variantFiles.set(variantIndex, filesArray);
     }
 
-    // Update the preview image
     currentImageElement.src = URL.createObjectURL(croppedFile);
     currentImageElement.style.background = 'transparent';
 
-    // Close the crop modal
     cancelCrop();
-  }, 'image/png', 1.0); // Use PNG format with maximum quality
+    window.toast.success('Image cropped successfully', 'success');
+  }, 'image/png', 1.0);
 }
-
-
-// Rest of your existing code remains the same...
 
 function removePreview(inputId, previewContainerId, previewElement) {
   previewElement.remove();
@@ -182,51 +219,51 @@ function removePreview(inputId, previewContainerId, previewElement) {
 function enableDragAndDrop(dropAreaId, inputId, previewContainerId) {
   const dropArea = document.getElementById(dropAreaId);
   const input = document.getElementById(inputId);
-  
+
   if (!dropArea || !input) {
-      console.error('Required elements not found');
-      return;
+    console.error('Required elements not found');
+    return;
   }
-  
+
   // Enable multiple file selection
   input.setAttribute('multiple', 'multiple');
-  
+
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, preventDefaults, false);
+    dropArea.addEventListener(eventName, preventDefaults, false);
   });
-  
+
   function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
   }
-  
+
   dropArea.addEventListener('dragenter', () => {
-      dropArea.classList.add('border-blue-500');
+    dropArea.classList.add('border-blue-500');
   });
-  
+
   dropArea.addEventListener('dragleave', () => {
-      dropArea.classList.remove('border-blue-500');
+    dropArea.classList.remove('border-blue-500');
   });
-  
+
   dropArea.addEventListener('drop', (e) => {
-      dropArea.classList.remove('border-blue-500');
-      const dt = e.dataTransfer;
-      const files = dt.files;
-      
-      // Create a file input-like object that matches the structure expected by handleFileUpload
-      const fileInputObj = {
-          files: files,
-          id: inputId,
-          closest: function(selector) {
-              return dropArea.closest(selector);
-          }
-      };
-      
-      handleFileUpload(fileInputObj, previewContainerId);
+    dropArea.classList.remove('border-blue-500');
+    const dt = e.dataTransfer;
+    const files = dt.files;
+
+    // Create a file input-like object that matches the structure expected by handleFileUpload
+    const fileInputObj = {
+      files: files,
+      id: inputId,
+      closest: function (selector) {
+        return dropArea.closest(selector);
+      }
+    };
+
+    handleFileUpload(fileInputObj, previewContainerId);
   });
-  
+
   input.addEventListener('change', () => {
-      handleFileUpload(input, previewContainerId);
+    handleFileUpload(input, previewContainerId);
   });
 }
 
@@ -234,38 +271,38 @@ function enableDragAndDrop(dropAreaId, inputId, previewContainerId) {
 function handleFileUpload(input, previewContainerId) {
   const previewContainer = document.getElementById(previewContainerId);
   if (!previewContainer) {
-      console.error('Preview container not found:', previewContainerId);
-      return;
+    console.error('Preview container not found:', previewContainerId);
+    return;
   }
-  
+
   const files = input.files;
   const variantForm = input.closest('.variant-form');
-  const variantIndex = variantForm ? 
-      Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm) : 
-      0;
-  
+  const variantIndex = variantForm ?
+    Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm) :
+    0;
+
   if (previewContainer.children.length + files.length > MAX_IMAGES) {
-      alert(`You can only upload a maximum of ${MAX_IMAGES} images.`);
-      return;
+    alert(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+    return;
   }
 
   // Initialize or get the files array for this variant
   if (!variantFiles.has(variantIndex)) {
-      variantFiles.set(variantIndex, []);
+    variantFiles.set(variantIndex, []);
   }
   const filesArray = variantFiles.get(variantIndex);
 
   Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) {
-          alert('Please upload only image files.');
-          return;
-      }
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload only image files.');
+      return;
+    }
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-          const preview = document.createElement('div');
-          preview.className = 'relative border rounded p-2';
-          preview.innerHTML = `
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const preview = document.createElement('div');
+      preview.className = 'relative border rounded p-2';
+      preview.innerHTML = `
               <img src="${e.target.result}" alt="" class="w-full h-40 object-cover" data-original-file="${file.name}">
               <div class="absolute top-2 right-2 flex gap-2">
                   <button type="button" class="bg-blue-500 text-white p-1 rounded" onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
@@ -276,20 +313,20 @@ function handleFileUpload(input, previewContainerId) {
                   </button>
               </div>
           `;
-          previewContainer.appendChild(preview);
-          filesArray.push(file);
-      };
-      reader.readAsDataURL(file);
+      previewContainer.appendChild(preview);
+      filesArray.push(file);
+    };
+    reader.readAsDataURL(file);
   });
-  
+
   variantFiles.set(variantIndex, filesArray);
   if (input.value) input.value = '';
 }
 
-  function addVariant() {
+function addVariant() {
   variantCount++;
   const container = document.getElementById('variants-container');
-  
+
   // Get the image source from the first variant if it exists
   const firstVariantImage = document.querySelector('.variant-form img');
   const imageSource = firstVariantImage ? firstVariantImage.src : '';
@@ -384,4 +421,3 @@ function handleFileUpload(input, previewContainerId) {
 document.addEventListener('DOMContentLoaded', () => {
   enableDragAndDrop('banner-drop-area', 'banner-input', 'banner-preview');
 });
-
