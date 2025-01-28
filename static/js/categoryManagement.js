@@ -53,6 +53,64 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     console.error("Close button with ID 'close-category-popup' not found.");
   }
+
+  const categoryForm = document.getElementById('categoryForm');
+  if (categoryForm) {
+    categoryForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const formData = new FormData(categoryForm);
+        const response = await fetch('/admin/category/add', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Show success toast first
+          showToast(data.message || 'Category added successfully', 'success');
+
+          // Clear form and close modal
+          categoryForm.reset();
+          toggleModal();
+
+          // Wait for 1 second to show the message before reloading
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          // Show error toast
+          showToast(data.message || 'Error adding category', 'error');
+        }
+      } catch (error) {
+        showToast('An error occurred', 'error');
+      }
+    });
+  }
+
+  // Toast function
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+
+    // Set message
+    toastMessage.textContent = message;
+
+    // Set color based on type
+    const toastDiv = toast.firstElementChild;
+    if (type === 'success') {
+      toastDiv.classList.remove('bg-red-500');
+      toastDiv.classList.add('bg-green-500');
+    } else {
+      toastDiv.classList.remove('bg-green-500');
+      toastDiv.classList.add('bg-red-500');
+    }
+
+    // Show toast
+    toast.classList.remove('hidden');
+  }
 });
 document.addEventListener('DOMContentLoaded', () => {
   // Add event listener for the "Manage Offer" button

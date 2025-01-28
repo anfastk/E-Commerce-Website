@@ -144,7 +144,7 @@ func DeleteCategory(c *gin.Context) {
 		blockCategory.Status = "Active"
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "Ok",
-			"message": "Category recovered",
+			"message": "Category recovered successfully",
 			"code":    200,
 		})
 	} else {
@@ -152,7 +152,7 @@ func DeleteCategory(c *gin.Context) {
 		blockCategory.Status = "Blocked"
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "Ok",
-			"message": "Category deleted",
+			"message": "Category deleted successfully",
 			"code":    200,
 		})
 	}

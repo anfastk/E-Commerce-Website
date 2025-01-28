@@ -159,7 +159,12 @@
         </div>
       </div>
 
-      <!-- Add Category Popup -->
+      <div id="toast" class="fixed hidden top-20  left-[60%] transform -translate-x-1/2  ">
+        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+          <span id="toast-message"></span>
+        </div>
+      </div>
+
       <div id="categoryModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
         <div class="bg-white p-6 rounded-lg w-96">
           <h3 class="text-2xl font-bold mb-4">Add Category</h3>
@@ -174,9 +179,6 @@
           </form>
         </div>
       </div>
-
-
-
 
       <!-- Table -->
       <div class="mt-7 bg-white shadow-md rounded overflow-x-auto ">
@@ -212,9 +214,10 @@
                 </button>
               </td>
               <td class="px-4 py-2">
-                <form action="/admin/category/{{.ID}}/delete" method="post">
-                  <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">{{.Status}}</button>
-                </form>
+                <button onclick="handleDelete('{{.ID}}', '{{.Status}}')"
+                  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                  {{.Status}}
+                </button>
               </td>
               <td class="manage-offer-btn px-4 py-2">
                 <button id="manage-offer-btn" class="bg-cyan-600 text-white px-3 py-1 rounded hover:bg-cyan-500">Manage
@@ -278,6 +281,27 @@
     </main>
   </div>
   <script>
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+
+      // Set message
+      toastMessage.textContent = message;
+
+      // Set color based on type
+      const toastDiv = toast.firstElementChild;
+      if (type === 'success') {
+        toastDiv.classList.remove('bg-red-500');
+        toastDiv.classList.add('bg-green-500');
+      } else {
+        toastDiv.classList.remove('bg-green-500');
+        toastDiv.classList.add('bg-red-500');
+      }
+
+      // Show toast
+      toast.classList.remove('hidden');
+    }
+
     async function handleEditSubmit(event) {
       event.preventDefault();
 
@@ -297,20 +321,26 @@
           })
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          throw new Error('Failed to update category');
+          throw new Error(result.message || 'Failed to update category');
         }
 
-        // On success
-        const result = await response.json();
+        // Show success message
+        showToast(result.message || 'Category updated successfully', 'success');
+
         // Close the popup
         document.getElementById('edit-popup').classList.add('hidden');
-        // Redirect to product detail page
-        window.location.href = `/admin/category/`;
+
+        // Wait for 1 second to show the message before reloading
+        setTimeout(() => {
+          window.location.href = '/admin/category/';
+        }, 1000);
 
       } catch (error) {
         console.error('Error updating category:', error);
-        alert('Failed to update category. Please try again.');
+        showToast(error.message || 'Failed to update category. Please try again.', 'error');
       }
     }
 
@@ -331,6 +361,33 @@
     document.getElementById('close-edit-popup').addEventListener('click', () => {
       document.getElementById('edit-popup').classList.add('hidden');
     });
+
+    async function handleDelete(categoryId, currentStatus) {
+      try {
+        const response = await fetch(`/admin/category/${categoryId}/delete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Show success message
+          showToast(data.message || 'Status updated successfully', 'success');
+
+          // Wait briefly then reload
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          showToast(data.message || 'Error updating status', 'error');
+        }
+      } catch (error) {
+        showToast('An error occurred while updating status', 'error');
+      }
+    }
   </script>
 </body>
 
