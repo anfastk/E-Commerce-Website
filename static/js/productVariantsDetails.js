@@ -2,6 +2,7 @@
 const openPopup = document.getElementById("openPopup");
 const popupModal = document.getElementById("popupModal");
 const closePopup = document.getElementById("closePopup");
+const specificationsForm = document.getElementById("specificationsForm");
 
 openPopup.addEventListener("click", () => {
     popupModal.classList.remove("hidden");
@@ -31,8 +32,41 @@ addSpecBtn.addEventListener("click", () => {
     specificationsList.appendChild(newSpec);
 });
 
+// Form submission handler with toast messages
+specificationsForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-// Optional: Close the dropdown when clicking outside
+    const formData = new FormData(this);
+
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            window.toast.success('Specifications saved successfully!');
+
+            // Clear form and close modal after successful submission
+            setTimeout(() => {
+                specificationsForm.reset();
+                popupModal.classList.add("hidden");
+
+                // Optional: Refresh the page to show updated specifications
+                window.location.reload();
+            }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.toast.error('Failed to save specifications. Please try again.');
+        });
+});
+
+// Close dropdown when clicking outside
 document.addEventListener('click', function (event) {
     const isClickInside = event.target.closest('.group');
     if (!isClickInside) {
@@ -81,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(updateSpecificationsForm.action, {
-                method: 'PATCH', // Change back to POST
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -91,17 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseData = await response.json();
 
             if (response.ok) {
-                popupModal.classList.add('hidden');
-                // Optionally, you can add a success message or reload the page
-                window.location.reload();
+                window.toast.success('Specifications updated successfully!');
+                setTimeout(() => {
+                    popupModal.classList.add('hidden');
+                    window.location.reload();
+                }, 1500);
             } else {
-                // Handle error
+                window.toast.error(responseData.error || 'Failed to update specifications');
                 console.error('Submission failed', responseData);
-                alert(responseData.error || 'Failed to update specifications');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating specifications');
+            window.toast.error('An error occurred while updating specifications');
         }
     });
 });
@@ -117,26 +152,31 @@ function deleteSpecification(specificationId, productId) {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(response => {
-        if (response.ok) {
-            // Remove the specification item from the DOM
-            const specificationItem = document.querySelector(`.Specifications-item[data-desc-id="${descId}"]`);
-            if (specificationItem) {
-                specificationItem.remove();
+    })
+        .then(response => {
+            if (response.ok) {
+                window.toast.success('Specification deleted successfully!');
+                setTimeout(() => {
+                    // Remove the specification item from the DOM
+                    const specificationItem = document.querySelector(`.Specifications-item[data-desc-id="${descId}"]`);
+                    if (specificationItem) {
+                        specificationItem.remove();
+                    }
+                    // Redirect to product details page
+                    window.location.href = `/admin/products/variant/detail?variant_id=${prodId}`;
+                }, 1500);
+            } else {
+                window.toast.error('Failed to delete specification');
+                console.error('Failed to delete specification');
             }
-            // Redirect to product details page
-            window.location.href = `/admin/products/variant/detail?variant_id=${prodId}`;
-        } else {
-            // Handle error cases
-            console.error('Failed to delete specification');
-        }
-    }).catch(error => {
-        console.error('Error:', error);
-    });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.toast.error('An error occurred while deleting specification');
+        });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners to all options buttons
+document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.options-btn').forEach((btn) => {
         btn.addEventListener('click', function () {
             // Close any previously open dropdowns
@@ -153,10 +193,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add global click listener to close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const optionsButtons = document.querySelectorAll('.options-btn');
         const optionsMenus = document.querySelectorAll('.options');
-        
+
         let clickedOnOptionsButton = false;
         optionsButtons.forEach(btn => {
             if (btn.contains(event.target)) {
@@ -173,15 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add event listeners to all "Change" buttons
     document.querySelectorAll('#openUploadPopup').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             // Find the closest product ID associated with this image
             const productIdInput = document.getElementById('product-id');
             const productId = this.closest('.group').closest('div').querySelector('#product-id')?.value || productIdInput?.value;
-            
+
             if (productId) {
                 document.getElementById('product-id').value = productId;
             }
-            
+
             document.getElementById('imageUploadPopup').classList.remove('hidden');
         });
     });
@@ -193,7 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const CROP_WIDTH = 400;
     const CROP_HEIGHT = 400;
 
-    // Close Upload Popup
     function closeUploadPopup() {
         document.getElementById('imageUploadPopup').classList.add('hidden');
         document.getElementById('banner-preview').innerHTML = '';
@@ -202,12 +241,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function confirmUpload() {
         const previewImg = document.getElementById('banner-preview').querySelector('img');
         const productId = document.getElementById('product-id').value;
-        
+
         if (!previewImg) {
-            alert('Please upload an image first');
+            window.toast.error('Please upload an image first');
             return;
         }
-    
+
         // Convert image to file
         fetch(previewImg.src)
             .then(res => res.blob())
@@ -215,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData();
                 formData.append('product_image', blob, 'uploaded-image.png');
                 formData.append('image_id', productId);
-    
+
                 fetch('/admin/products/variant/image/change', {
                     method: 'POST',
                     body: formData
@@ -223,21 +262,124 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.filename) {
-                            alert('Image uploaded successfully: ');
-                            // Reload the current page
-                            window.location.reload();
+                            window.toast.success('Image uploaded successfully');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
                         } else {
-                            alert('Upload failed');
+                            window.toast.error('Upload failed. Please try again.');
                         }
                     })
                     .catch(error => {
                         console.error('Upload error:', error);
-                        alert('Upload failed');
+                        window.toast.error('Upload failed. Please check your connection and try again.');
                     });
             });
     }
 
-    // Drag and Drop Functionality
+    function handleFileUpload(files) {
+        const previewContainer = document.getElementById('banner-preview');
+        previewContainer.innerHTML = '';
+
+        if (files.length > 1) {
+            window.toast.error('Please upload only one image');
+            return;
+        }
+
+        const file = files[0];
+        if (!file.type.startsWith('image/')) {
+            window.toast.error('Please upload only image files');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const preview = document.createElement('div');
+            preview.className = 'relative border rounded p-2';
+            preview.innerHTML = `
+                <img src="${e.target.result}" alt="" class="w-full h-40 object-contain">
+                <div class="absolute top-2 right-2 flex gap-2">
+                    <button type="button" class="bg-blue-500 text-white p-1 rounded" 
+                        onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
+                        Crop
+                    </button>
+                </div>
+            `;
+            previewContainer.appendChild(preview);
+            window.toast.success('Image loaded successfully.');
+        };
+        reader.onerror = function () {
+            window.toast.error('Error reading file. Please try again.');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function startCrop(imgElement, fileName) {
+        const modal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+
+        currentImageElement = imgElement;
+        currentFile = fileName;
+
+        cropImage.src = imgElement.src;
+        modal.classList.remove('hidden');
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        try {
+            cropper = new Cropper(cropImage, {
+                aspectRatio: CROP_WIDTH / CROP_HEIGHT,
+                viewMode: 1,
+                dragMode: 'move',
+                cropBoxResizable: true,
+                cropBoxMovable: true,
+                minContainerWidth: 400,
+                minContainerHeight: 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+                background: false,
+                modal: false,
+                transparent: true
+            });
+        } catch (error) {
+            window.toast.error('Error initializing crop tool. Please try again.');
+            cancelCrop();
+        }
+    }
+
+    function saveCrop() {
+        if (!cropper) {
+            window.toast.error('Crop tool not initialized. Please try again.');
+            return;
+        }
+
+        try {
+            const canvas = cropper.getCroppedCanvas({
+                width: CROP_WIDTH,
+                height: CROP_HEIGHT,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            canvas.toBlob((blob) => {
+                const croppedFile = new File([blob], currentFile, { type: 'image/png' });
+                const previewContainer = document.getElementById('banner-preview');
+
+                // Update preview with cropped image
+                const imgPreview = previewContainer.querySelector('img');
+                imgPreview.src = URL.createObjectURL(croppedFile);
+
+                cancelCrop();
+                window.toast.success('Image cropped successfully');
+            }, 'image/png', 1.0);
+        } catch (error) {
+            window.toast.error('Error cropping image. Please try again.');
+            cancelCrop();
+        }
+    }
+
     function enableDragAndDrop() {
         const dropArea = document.getElementById('banner-drop-area');
         const input = document.getElementById('banner-input');
@@ -263,69 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function handleFileUpload(files) {
-        const previewContainer = document.getElementById('banner-preview');
-        previewContainer.innerHTML = ''; // Clear previous previews
-
-        if (files.length > 1) {
-            alert('Please upload only one image.');
-            return;
-        }
-
-        const file = files[0];
-        if (!file.type.startsWith('image/')) {
-            alert('Please upload only image files.');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const preview = document.createElement('div');
-            preview.className = 'relative border rounded p-2';
-            preview.innerHTML = `
-                <img src="${e.target.result}" alt="" class="w-full h-40 object-contain">
-                <div class="absolute top-2 right-2 flex gap-2">
-                    <button type="button" class="bg-blue-500 text-white p-1 rounded" 
-                        onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
-                        Crop
-                    </button>
-                </div>
-            `;
-            previewContainer.appendChild(preview);
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function startCrop(imgElement, fileName) {
-        const modal = document.getElementById('cropModal');
-        const cropImage = document.getElementById('cropImage');
-
-        currentImageElement = imgElement;
-        currentFile = fileName;
-
-        cropImage.src = imgElement.src;
-        modal.classList.remove('hidden');
-
-        if (cropper) {
-            cropper.destroy();
-        }
-
-        cropper = new Cropper(cropImage, {
-            aspectRatio: CROP_WIDTH / CROP_HEIGHT,
-            viewMode: 1,
-            dragMode: 'move',
-            cropBoxResizable: true,
-            cropBoxMovable: true,
-            minContainerWidth: 400,
-            minContainerHeight: 400,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high',
-            background: false,
-            modal: false,
-            transparent: true
-        });
-    }
-
     function cancelCrop() {
         const modal = document.getElementById('cropModal');
         modal.classList.add('hidden');
@@ -333,28 +412,6 @@ document.addEventListener('DOMContentLoaded', function() {
             cropper.destroy();
             cropper = null;
         }
-    }
-
-    function saveCrop() {
-        if (!cropper) return;
-
-        const canvas = cropper.getCroppedCanvas({
-            width: CROP_WIDTH,
-            height: CROP_HEIGHT,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high'
-        });
-
-        canvas.toBlob((blob) => {
-            const croppedFile = new File([blob], currentFile, { type: 'image/png' });
-            const previewContainer = document.getElementById('banner-preview');
-
-            // Update preview with cropped image
-            const imgPreview = previewContainer.querySelector('img');
-            imgPreview.src = URL.createObjectURL(croppedFile);
-
-            cancelCrop();
-        }, 'image/png', 1.0);
     }
 
     // Expose functions to global scope
@@ -367,3 +424,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize drag and drop
     enableDragAndDrop();
 });
+
+function handleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const isRecovery = form.querySelector('button').textContent.trim() === 'RECOVER PRODUCT';
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            if (isRecovery) {
+                window.toast.success('Product deleted successfully!');
+            } else {
+                window.toast.success('Product recovered successfully!');
+            }
+            // Optionally refresh the page or update UI
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (isRecovery) {
+                window.toast.error('Failed to recover product. Please try again.');
+            } else {
+                window.toast.error('Failed to delete product. Please try again.');
+            }
+        });
+}

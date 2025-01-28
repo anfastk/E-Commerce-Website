@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -14,9 +15,9 @@ func ListUsers(c *gin.Context) {
 	var users []models.UserAuth
 	if err := config.DB.Unscoped().Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":"InternalServerError",
-			"error": "Could not fetch users",
-			"code":500,
+			"status": "InternalServerError",
+			"error":  "Could not fetch users",
+			"code":   500,
 		})
 		return
 	}
@@ -30,9 +31,9 @@ func BlockUser(c *gin.Context) {
 	var user models.UserAuth
 	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"message":  "User not found",
-			"code":   500,
+			"status":  "Not Found",
+			"message": "User not found",
+			"code":    500,
 		})
 		return
 	}
@@ -56,42 +57,55 @@ func BlockUser(c *gin.Context) {
 	}
 	if err := config.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "InternalServerError",
-			"messeage":  "Failed to block user/unblock user",
-			"code": 500,
+			"status":   "InternalServerError",
+			"messeage": "Failed to block user/unblock user",
+			"code":     500,
 		})
 	}
-	
+
 }
 
 func DeleteUser(c *gin.Context) {
-	id := c.Param("id") 
-
+	id := c.Param("id")
 	var user models.UserAuth
-	
+
 	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"status":"Not Found",
-			"error": "User not found",
-			"code":500,
+			"status": "Not Found",
+			"error":  "User not found",
+			"code":   http.StatusNotFound,
 		})
 		return
 	}
 
-	user.IsDeleted = true
-	user.DeletedAt = gorm.DeletedAt{Time: time.Now(),Valid: true}
+	user.IsDeleted = !user.IsDeleted
+	if user.IsDeleted {
+		user.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+	} else {
+		user.DeletedAt = gorm.DeletedAt{}
+	}
+
 	if err := config.DB.Save(&user).Error; err != nil {
+		action := "delete"
+		if !user.IsDeleted {
+			action = "restore"
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status" : "InternalServerError",
-			"error": "Failed to delete user",
-			"code":500,
+			"status": "Internal Server Error",
+			"error":  fmt.Sprintf("Failed to %s user", action),
+			"code":   http.StatusInternalServerError,
 		})
 		return
+	}
+
+	message := "User deleted successfully"
+	if !user.IsDeleted {
+		message = "User restored successfully"
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":"Ok",
-		"message": "User deleted successfully",
-		"code":200,
+		"status":  "OK",
+		"message": message,
+		"code":    http.StatusOK,
 	})
 }

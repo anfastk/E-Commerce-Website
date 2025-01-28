@@ -256,9 +256,12 @@ function confirmUpload() {
     const productId = document.getElementById('product-id').value;
 
     if (!previewImg) {
-        alert('Please upload an image first');
+        window.toast.error('Please upload an image first');
         return;
     }
+
+    // Show loading toast
+    window.toast.success('Uploading image...');
 
     // Convert image to file
     fetch(previewImg.src)
@@ -266,7 +269,7 @@ function confirmUpload() {
         .then(blob => {
             const formData = new FormData();
             formData.append('product_image', blob, 'uploaded-image.png');
-            formData.append('product_id', productId);  // Add this line to send product ID
+            formData.append('product_id', productId);
 
             fetch('/admin/products/main/image/change', {
                 method: 'POST',
@@ -275,15 +278,18 @@ function confirmUpload() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.filename) {
-                        alert('Image uploaded successfully: ' + data.filename);
+                        window.toast.success('Image uploaded successfully');
                         closeUploadPopup();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     } else {
-                        alert('Upload failed');
+                        window.toast.error('Upload failed');
                     }
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
-                    alert('Upload failed');
+                    window.toast.error('Failed to upload image');
                 });
         });
 }
@@ -319,13 +325,13 @@ function handleFileUpload(files) {
     previewContainer.innerHTML = ''; // Clear previous previews
 
     if (files.length > 1) {
-        alert('Please upload only one image.');
+        window.toast.error('Please upload only one image');
         return;
     }
 
     const file = files[0];
     if (!file.type.startsWith('image/')) {
-        alert('Please upload only image files.');
+        window.toast.error('Please upload only image files');
         return;
     }
 
@@ -343,7 +349,13 @@ function handleFileUpload(files) {
                 </div>
             `;
         previewContainer.appendChild(preview);
+        window.toast.success('Image loaded successfully');
     };
+
+    reader.onerror = function () {
+        window.toast.error('Failed to load image');
+    };
+
     reader.readAsDataURL(file);
 }
 
@@ -375,6 +387,8 @@ function startCrop(imgElement, fileName) {
         modal: false,
         transparent: true
     });
+
+    window.toast.success('Crop mode enabled');
 }
 
 function cancelCrop() {
@@ -384,6 +398,7 @@ function cancelCrop() {
         cropper.destroy();
         cropper = null;
     }
+    window.toast.error('Crop cancelled');
 }
 
 function saveCrop() {
@@ -405,6 +420,7 @@ function saveCrop() {
         imgPreview.src = URL.createObjectURL(croppedFile);
 
         cancelCrop();
+        window.toast.success('Image cropped successfully');
     }, 'image/png', 1.0);
 }
 

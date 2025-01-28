@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+	"time"
+
+	"strconv"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func ListCategory(c *gin.Context) {
@@ -27,11 +28,9 @@ func ListCategory(c *gin.Context) {
 
 func AddCategory(c *gin.Context) {
 	c.Request.ParseForm()
-	fmt.Println("Form Data:", c.Request.Form)
 
 	var category models.Categories
 	if err := c.ShouldBind(&category); err != nil {
-		fmt.Println("Error in Binding:", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid input data",
@@ -39,8 +38,6 @@ func AddCategory(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println("Parsed Category:", category)
 
 	if category.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -52,7 +49,6 @@ func AddCategory(c *gin.Context) {
 	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
-		fmt.Println("Error in DB Operation:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Failed to create category",
@@ -70,8 +66,6 @@ func AddCategory(c *gin.Context) {
 
 func EditCategory(c *gin.Context) {
 	categoryID := c.Param("id")
-
-	fmt.Println(categoryID)
 
 	if categoryID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -128,39 +122,102 @@ func EditCategory(c *gin.Context) {
 }
 
 func DeleteCategory(c *gin.Context) {
-	var blockCategory models.Categories
-	id := c.Param("id")
-	fmt.Println(id)
-	if err := config.DB.First(&blockCategory, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not found",
-			"error":  "Category not found",
-			"code":   404,
+	var category models.Categories
+	CategoryID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid product ID",
+			"code":   http.StatusBadRequest,
 		})
 		return
 	}
-	if blockCategory.IsDeleted {
-		blockCategory.IsDeleted = false
-		blockCategory.Status = "Active"
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "Ok",
-			"message": "Category recovered successfully",
-			"code":    200,
+	tx:=config.DB.Begin()
+	// Find the category
+	if err := tx.Unscoped().First(&category, CategoryID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Category not found",
+			"code":   http.StatusNotFound,
 		})
+		return
+	}
+
+	category.IsDeleted = !category.IsDeleted
+    if category.IsDeleted {
+        category.Status = "Blocked"
+    } else {
+        category.Status = "Active"
+    }
+
+    if err := config.DB.Save(&category).Error; err != nil {
+		tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status": "Internal Server Error",
+            "error":  "Failed to update category status",
+            "code":   http.StatusInternalServerError,
+        })
+        return
+    }
+
+
+	var product models.ProductDetail
+	if err := tx.Unscoped().First(&product,"category_id = ?", CategoryID).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Invalid input data",
+			"code":   http.StatusBadRequest,
+		})
+		return
+	}
+
+	newDeleteStatus := !product.IsDeleted
+	updateData := map[string]interface{}{
+		"is_deleted": newDeleteStatus,
+	}
+	if newDeleteStatus {
+		updateData["deleted_at"] = time.Now()
 	} else {
-		blockCategory.IsDeleted = true
-		blockCategory.Status = "Blocked"
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "Ok",
-			"message": "Category deleted successfully",
-			"code":    200,
-		})
+		updateData["deleted_at"] = nil
 	}
-	if err := config.DB.Save(&blockCategory).Error; err != nil {
+
+	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("category_id = ?", CategoryID).Updates(updateData).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Delete or recover failed",
-			"code":   500,
+			"status": "Error",
+			"error":  "Failed to update product",
+			"code":   http.StatusInternalServerError,
 		})
+		return
 	}
+
+	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("category_id = ?", CategoryID).Updates(updateData).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error",
+			"error":  "Failed to update product variants",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error",
+			"error":  "Transaction commit failed",
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+	message := "Category deleted successfully"
+	if !category.IsDeleted {
+		message = "Category recovered successfully"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Ok",
+		"message": message,
+		"code":    http.StatusOK,
+	})
 }

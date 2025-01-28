@@ -375,6 +375,19 @@ func DeleteMainProduct(c *gin.Context) {
 		return
 	}
 
+	var category models.Categories
+	if err := config.DB.Unscoped().First(&category, "ID = ?", product.CategoryID).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
+		return
+	}
+
+	if category.IsDeleted {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusBadRequest, "Cannot recover because the category is deleted.")
+		return
+	}
+
 	newDeleteStatus := !product.IsDeleted
 	updateData := map[string]interface{}{
 		"is_deleted": newDeleteStatus,
@@ -535,7 +548,7 @@ func ReplaceMainProductImage(c *gin.Context) {
 
 	tx := config.DB.Begin()
 	var productImage models.ProductImage
-	if err := tx.First(&productImage, productID).Error; err != nil {
+	if err := tx.First(&productImage,"product_id = ?",productID).Error; err != nil {
 		tx.Rollback()
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",

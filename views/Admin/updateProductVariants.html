@@ -212,6 +212,35 @@
 
             const productId = document.getElementById('product-id').value;
 
+            // Validate required fields
+            const requiredFields = ['product-name', 'product-summary'];
+            const missingFields = requiredFields.filter(field => !document.getElementById(field).value.trim());
+
+            if (missingFields.length > 0) {
+                window.toast.error('Please fill in all required fields');
+                return;
+            }
+
+            // Validate numeric fields
+            const regularPrice = parseFloat(document.getElementById('regular-price').value);
+            const salePrice = parseFloat(document.getElementById('sale-price').value);
+            const stockQuantity = parseInt(document.getElementById('stock-quantity').value, 10);
+
+            if (isNaN(regularPrice) || regularPrice < 0) {
+                window.toast.error('Please enter a valid regular price');
+                return;
+            }
+
+            if (salePrice && (isNaN(salePrice) || salePrice < 0)) {
+                window.toast.error('Please enter a valid sale price');
+                return;
+            }
+
+            if (isNaN(stockQuantity) || stockQuantity < 0) {
+                window.toast.error('Please enter a valid stock quantity');
+                return;
+            }
+
             const formData = {
                 productName: document.getElementById('product-name').value,
                 productSummary: document.getElementById('product-summary').value,
@@ -219,13 +248,15 @@
                 colour: document.getElementById('color').value,
                 ram: document.getElementById('ram').value,
                 storage: document.getElementById('storage').value,
-                regularPrice: parseFloat(document.getElementById('regular-price').value), // Convert to number
-                salePrice: parseFloat(document.getElementById('sale-price').value),     // Convert to number
-                stockQuantity: parseInt(document.getElementById('stock-quantity').value, 10), // Convert to integer
+                regularPrice: regularPrice,
+                salePrice: salePrice,
+                stockQuantity: stockQuantity,
                 sku: document.getElementById('sku').value
             };
 
             try {
+                window.toast.success('Updating product...');
+
                 const response = await fetch(`/admin/products/variant/detail/update/${productId}`, {
                     method: 'PATCH',
                     headers: {
@@ -235,18 +266,29 @@
                 });
 
                 if (response.ok) {
-                    // Redirect to product detail page after successful update
-                    window.location.href = `/admin/products/variant/detail?variant_id=${productId}`;
+                    window.toast.success('Product updated successfully');
+                    // Add delay before redirect to show success message
+                    setTimeout(() => {
+                        window.location.href = `/admin/products/variant/detail?variant_id=${productId}`;
+                    }, 1500);
                 } else {
                     const errorData = await response.json();
-                    alert('Error updating product: ' + (errorData.message || 'Unknown error occurred'));
+                    window.toast.error(errorData.message || 'Failed to update product');
+
+                    // If it's a validation error, show specific messages
+                    if (errorData.validationErrors) {
+                        Object.entries(errorData.validationErrors).forEach(([field, message]) => {
+                            window.toast.error(`${field}: ${message}`);
+                        });
+                    }
                 }
             } catch (error) {
-                alert('Error updating product: ' + error.message);
+                console.error('Update error:', error);
+                window.toast.error('Error updating product. Please check your connection and try again.');
             }
         });
     </script>
+    <script src="/static/js/toast.js"></script>
 </body>
 
 </html>
-

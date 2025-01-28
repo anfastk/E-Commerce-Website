@@ -7,8 +7,6 @@
     <title>Laptix Adimin Product Page</title>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/static/js/nav&sideBar.js" defer></script>
-    <script src="/static/js/productVariantsDetails.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
@@ -193,7 +191,7 @@
                             SHOW ALL VARIANTS
                         </button>
                     </a>
-                    <form action="/admin/products/variant/delete/{{.Variant.Id}}" method="post">
+                    <form action="/admin/products/variant/delete/{{.Variant.Id}}" method="post" onsubmit="handleSubmit(event)">
                         {{if .Variant.IsDeleted}}
                         <button
                             class="bg-green-600 text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
@@ -489,6 +487,9 @@
             </div>
         </main>
     </div>
+    <script src="/static/js/toast.js"></script>
+    <script src="/static/js/nav&sideBar.js" defer></script>
+    <script src="/static/js/productVariantsDetails.js" defer></script>
 </body>
 
 </html>

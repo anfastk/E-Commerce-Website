@@ -228,8 +228,11 @@ func AddProductSpecification(c *gin.Context) {
 			return
 		}
 	}
-	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variantID))
-	c.Redirect(http.StatusFound, redirectURL)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Specification added successfully",
+		"code":    http.StatusOK,
+	})
 }
 
 func DeleteProductVariant(c *gin.Context) {
@@ -264,8 +267,11 @@ func DeleteProductVariant(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete or recover product")
 		return
 	}
-	redirectURL := "/admin/products/variant/detail?variant_id=" + strconv.Itoa(int(variant.ID))
-	c.Redirect(http.StatusFound, redirectURL)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Success",
+		"code":    http.StatusOK,
+	})
 }
 
 func DeleteVariantImage(c *gin.Context) {
