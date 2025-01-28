@@ -46,6 +46,46 @@ closeDescriptionModal.onclick = () => {
     modal.classList.add("hidden");
 };
 
+// Get the form element
+const descriptionForm = document.getElementById("descriptionForm");
+
+// Add submit event listener to the form
+descriptionForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+        const formData = new FormData(descriptionForm);
+
+        const response = await fetch("/admin/products/main/submit-description", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.ok) {
+            window.toast.success("Description added successfully!");
+            setTimeout(() => {
+                window.location.reload();
+            }, 500); modal.classList.add("hidden"); // Close modal on success
+            descriptionForm.reset(); // Reset form
+
+            // Reset the form to just one pair of inputs
+            keyValuePairs.innerHTML = `
+                <div class="flex mb-4 space-x-4">
+                    <input type="text" name="heading[]" placeholder="Enter heading"
+                        class="p-2 border border-gray-300 rounded w-1/3" required>
+                    <textarea name="description[]" placeholder="Enter description"
+                        class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
+                </div>
+            `;
+        } else {
+            window.toast.error("Failed to add description. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error submitting form:", error);
+        window.toast.error("An error occurred. Please try again.");
+    }
+});
+
 // Add a new pair (heading and description)
 const addPairButton = document.getElementById("addPair");
 const keyValuePairs = document.getElementById("keyValuePairs");
@@ -58,7 +98,15 @@ addPairButton.onclick = () => {
         <textarea name="description[]" placeholder="Enter description" class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
     `;
     keyValuePairs.appendChild(newPair);
+    window.toast.success("New description field added");
 };
+
+// Optional: Add error handling for required fields
+descriptionForm.querySelectorAll('input, textarea').forEach(field => {
+    field.addEventListener('invalid', () => {
+        window.toast.error("Please fill in all required fields");
+    });
+});
 
 
 const optionsBtn = document.getElementById("options-btn");
@@ -110,19 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDescriptionsForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Create FormData object
-        const formData = new FormData(updateDescriptionsForm);
-
-        // Convert FormData to an object
-        const data = {
-            description_id: formData.getAll('description_id[]'),
-            heading: formData.getAll('heading[]'),
-            description: formData.getAll('description[]')
-        };
-
         try {
+            // Create FormData object
+            const formData = new FormData(updateDescriptionsForm);
+
+            // Convert FormData to an object
+            const data = {
+                description_id: formData.getAll('description_id[]'),
+                heading: formData.getAll('heading[]'),
+                description: formData.getAll('description[]')
+            };
+
             const response = await fetch(updateDescriptionsForm.action, {
-                method: 'PATCH', // Change back to POST
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -132,17 +180,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseData = await response.json();
 
             if (response.ok) {
+                window.toast.success('Descriptions updated successfully');
                 popupModal.classList.add('hidden');
-                // Optionally, you can add a success message or reload the page
-                window.location.reload();
+                // Reload page after a short delay to allow toast to be seen
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
-                // Handle error
-                console.error('Submission failed', responseData);
-                alert(responseData.error || 'Failed to update descriptions');
+                // Show error message from server or fallback
+                window.toast.error(responseData.error || 'Failed to update descriptions');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating descriptions');
+            window.toast.error('An error occurred while updating descriptions');
         }
     });
 });
@@ -158,22 +208,29 @@ function deleteDescription(descriptionId, productId) {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(response => {
-        if (response.ok) {
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete description');
+            }
+            return response.json();
+        })
+        .then(() => {
+            window.toast.success('Description deleted successfully');
             // Remove the description item from the DOM
             const descriptionItem = document.querySelector(`.Descriptions-item[data-desc-id="${descId}"]`);
             if (descriptionItem) {
                 descriptionItem.remove();
             }
-            // Redirect to product details page
-            window.location.href = `/admin/products/main/details?product_id=${prodId}`;
-        } else {
-            // Handle error cases
-            console.error('Failed to delete description');
-        }
-    }).catch(error => {
-        console.error('Error:', error);
-    });
+            // Redirect after a short delay to allow toast to be seen
+            setTimeout(() => {
+                window.location.href = `/admin/products/main/details?product_id=${prodId}`;
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.toast.error('Failed to delete description');
+        });
 }
 
 
@@ -194,42 +251,42 @@ function closeUploadPopup() {
     document.getElementById('banner-preview').innerHTML = '';
 }
 
-    function confirmUpload() {
-        const previewImg = document.getElementById('banner-preview').querySelector('img');
-        const productId = document.getElementById('product-id').value;
-        
-        if (!previewImg) {
-            alert('Please upload an image first');
-            return;
-        }
-    
-        // Convert image to file
-        fetch(previewImg.src)
-            .then(res => res.blob())
-            .then(blob => {
-                const formData = new FormData();
-                formData.append('product_image', blob, 'uploaded-image.png');
-                formData.append('product_id', productId);  // Add this line to send product ID
-    
-                fetch('/admin/products/main/image/change', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.filename) {
-                            alert('Image uploaded successfully: ' + data.filename);
-                            closeUploadPopup();
-                        } else {
-                            alert('Upload failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Upload error:', error);
-                        alert('Upload failed');
-                    });
-            });
+function confirmUpload() {
+    const previewImg = document.getElementById('banner-preview').querySelector('img');
+    const productId = document.getElementById('product-id').value;
+
+    if (!previewImg) {
+        alert('Please upload an image first');
+        return;
     }
+
+    // Convert image to file
+    fetch(previewImg.src)
+        .then(res => res.blob())
+        .then(blob => {
+            const formData = new FormData();
+            formData.append('product_image', blob, 'uploaded-image.png');
+            formData.append('product_id', productId);  // Add this line to send product ID
+
+            fetch('/admin/products/main/image/change', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.filename) {
+                        alert('Image uploaded successfully: ' + data.filename);
+                        closeUploadPopup();
+                    } else {
+                        alert('Upload failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    alert('Upload failed');
+                });
+        });
+}
 
 // Drag and Drop Functionality
 function enableDragAndDrop() {

@@ -240,8 +240,11 @@ func AddProductDescription(c *gin.Context) {
 			return
 		}
 	}
-	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(int(productID))
-	c.Redirect(http.StatusFound, redirectURL)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Product updated successfully",
+		"code":    http.StatusOK,
+	})
 }
 
 func ShowEditMainProduct(c *gin.Context) {
