@@ -25,7 +25,7 @@ func ShowSignup(c *gin.Context) {
 		})
 
 		if err == nil && token.Valid {
-			c.Redirect(http.StatusSeeOther, "/products")
+			c.Redirect(http.StatusSeeOther, "/")
 			return
 		}
 	}
@@ -108,7 +108,49 @@ func SignUp(c *gin.Context) {
 
 }
 
+func ShowOtpVerifyPage(c *gin.Context) {
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
+	session, _ := Store.Get(c.Request, "session")
+	email, exists := session.Values["email"].(string)
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Bad Request",
+			"error":  "Session expired",
+			"code":   400,
+		})
+		return
+	}
+	c.HTML(http.StatusOK, "OTPEmailVerification.html", gin.H{
+		"email":   email,
+		"message": "OTP sent successfully",
+	})
+}
+
 func ShowLogin(c *gin.Context) {
+
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
 	c.HTML(http.StatusSeeOther, "login.html", nil)
 }
 
@@ -185,10 +227,9 @@ func UserLoginHandler(c *gin.Context) {
 	})
 }
 
-func UserLogoutHandler(c * gin.Context){
+func UserLogoutHandler(c *gin.Context) {
 
-	c.SetCookie("jwtTokensUser", "",-1, "/", "", false, true)
-
+	c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "Success",

@@ -14,7 +14,7 @@ import (
 func ListCategory(c *gin.Context) {
 	var categorys []models.Categories
 
-	if err := config.DB.Find(&categorys).Error; err != nil {
+	if err := config.DB.Order("id ASC").Find(&categorys).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"Status": "InternalServerError",
 			"error":  "Failed to fetch categories",

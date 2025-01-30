@@ -13,7 +13,7 @@ import (
 
 func ListUsers(c *gin.Context) {
 	var users []models.UserAuth
-	if err := config.DB.Unscoped().Find(&users).Error; err != nil {
+	if err := config.DB.Unscoped().Order("id ASC").Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "InternalServerError",
 			"error":  "Could not fetch users",

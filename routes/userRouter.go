@@ -26,11 +26,18 @@ func UserRouter(r *gin.Engine) {
 		user.GET("/signup", controllers.ShowSignup)
 		user.POST("/signup", controllers.SignUp)
 		user.GET("/signup/otp", controllers.SendOtp)
+		user.GET("/signup/verifyotp", controllers.ShowOtpVerifyPage)
 		user.POST("/signup/verifyotp", controllers.VerifyOtp)
-		user.GET("/signup/otp/resend", controllers.ResendOTP)
+		user.POST("/signup/otp/resend", controllers.ResendOTP)
 		user.GET("/login", controllers.ShowLogin)
 		user.POST("/login", controllers.UserLoginHandler)
-		user.GET("/logout", controllers.UserLogoutHandler)
+		user.POST("/logout",middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
 	}
 
+	userProfile:=r.Group("/profile")
+	userProfile.Use(middleware.NoCacheMiddleware())
+	userProfile.Use(middleware.AuthMiddleware(RoleUser))
+	{
+		userProfile.GET("/settings",controllers.ProfileSettings)
+	}
 }

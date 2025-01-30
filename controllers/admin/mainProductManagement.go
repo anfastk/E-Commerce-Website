@@ -298,8 +298,10 @@ type updateProduct struct {
 func EditMainProduct(c *gin.Context) {
 	productID := c.Param("id")
 
+	tx:=config.DB.Begin()
 	var existingProduct models.ProductDetail
-	if err := config.DB.First(&existingProduct, productID).Error; err != nil {
+	if err := tx.First(&existingProduct, productID).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusNotFound, gin.H{
 			"status": "Not Found",
 			"error":  "Product not found",
@@ -310,6 +312,7 @@ func EditMainProduct(c *gin.Context) {
 
 	var updateData updateProduct
 	if err := c.ShouldBindJSON(&updateData); err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  err.Error(),
@@ -320,6 +323,7 @@ func EditMainProduct(c *gin.Context) {
 
 	categoryID, err := strconv.ParseUint(updateData.CategoryID, 10, 32)
 	if err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Bad Request",
 			"error":  "Invalid category ID format",
@@ -328,13 +332,14 @@ func EditMainProduct(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Model(&existingProduct).Updates(models.ProductDetail{
+	if err := tx.Model(&existingProduct).Updates(models.ProductDetail{
 		ProductName:    updateData.ProductName,
 		CategoryID:     uint(categoryID),
 		BrandName:      updateData.BrandName,
 		IsCODAvailable: updateData.IsCodAvailable,
 		IsReturnable:   updateData.IsReturnable,
 	}).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  err.Error(),
@@ -343,6 +348,27 @@ func EditMainProduct(c *gin.Context) {
 		return
 	}
 
+	var variants []models.ProductVariantDetails
+	if err:=tx.Unscoped().Find(&variants,"product_id = ?",existingProduct.ID).Error;err!=nil {
+		tx.Rollback()
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": "Not Found",
+			"error":  "Product variants not found",
+			"code":   http.StatusNotFound,
+		})
+		return
+	}
+
+	if err := tx.Model(&variants).Update("category_id",existingProduct.CategoryID).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  err.Error(),
+			"code":   http.StatusInternalServerError,
+		})
+		return
+	}
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
 		"message": "Product updated successfully",

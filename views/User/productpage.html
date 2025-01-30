@@ -22,8 +22,8 @@
 
                 <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium">
-                    <a href="#" class="hover:text-gray-600">Home</a>
-                    <a href="#" class="hover:text-gray-600">Shop</a>
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                 </nav>
 
@@ -47,13 +47,15 @@
                             <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
                                 stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
                         </svg>
-                    </button>
-                    <button class="hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="#000"
-                                d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
-                        </svg>
-                    </button>
+                    </button><a href="/profile/settings">
+                        <button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="#000"
+                                    d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
+                            </svg>
+                        </button>
+                    </a>
+
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -68,8 +70,8 @@
             <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
-                    <a href="#" class="hover:text-gray-600">Home</a>
-                    <a href="#" class="hover:text-gray-600">Shop</a>
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                 </nav>
             </div>
@@ -79,7 +81,7 @@
     <!-- Breadcrumb and Search Section -->
     <div class="container mx-auto px-4 py-4">
         <nav class="text-sm text-gray-600">
-            <a href="#" class="hover:underline">Home</a> &gt; <span>Products</span>
+            <a href="/" class="hover:underline">Home</a> &gt; <span><a href="/products">Products</a></span>
         </nav>
         <h1 class="text-2xl font-semibold mt-2">Our Collection Of Products</h1>
         <div class="mt-4 flex items-center">

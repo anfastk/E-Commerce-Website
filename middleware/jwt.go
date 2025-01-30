@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -59,8 +60,9 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 		fmt.Println("Token", tokenString)
 
 		if err != nil || tokenString == "" {
-			if requiredRole == "Admin" {
-				c.Redirect(http.StatusSeeOther, "/admin/login")
+			if requiredRole == "Admin" || requiredRole == "User" {
+				redirectPath := fmt.Sprintf("/%s/login", strings.ToLower(requiredRole))
+				c.Redirect(http.StatusSeeOther, redirectPath)
 			} else {
 				c.JSON(http.StatusUnauthorized, gin.H{
 					"status":  "Unauthorized",
@@ -80,8 +82,9 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 
 		if err != nil || !token.Valid {
 			fmt.Println("cookie error:", err)
-			if requiredRole == "Admin" {
-				c.Redirect(http.StatusSeeOther, "/admin/login")
+			if requiredRole == "Admin" || requiredRole == "User" {
+				redirectPath := fmt.Sprintf("/%s/login", strings.ToLower(requiredRole))
+				c.Redirect(http.StatusSeeOther, redirectPath)
 			} else {
 				c.JSON(http.StatusUnauthorized, gin.H{
 					"status":  "Unauthorized",

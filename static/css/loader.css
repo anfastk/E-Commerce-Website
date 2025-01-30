@@ -1,0 +1,60 @@
+/* Loader container that covers the whole page */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 9999;
+}
+
+/* Your existing spinner styles */
+.spinner {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner::before,
+.spinner::after {
+    border: 4.8px solid #7b82d9;
+    border-radius: 50%;
+    position: absolute;
+    content: '';
+    display: block;
+}
+
+.spinner::before {
+    width: 24px;
+    height: 24px;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    animation: spinner-1o3y8q 1.0499999999999998s infinite linear reverse;
+}
+
+.spinner::after {
+    animation: spinner-1o3y8q 0.7s infinite linear;
+    height: 40px;
+    width: 40px;
+    border-right-color: transparent;
+    border-top-color: transparent;
+}
+
+@keyframes spinner-1o3y8q {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Show loader when active */
+.loader-container.active {
+    display: flex;
+}

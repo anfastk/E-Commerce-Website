@@ -3,13 +3,14 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/sessions"
 	"gorm.io/gorm"
 )
@@ -17,6 +18,20 @@ import (
 var Store = sessions.NewCookieStore([]byte("laptixsecretkey"))
 
 func SendOtp(c *gin.Context) {
+
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
+
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
@@ -53,10 +68,7 @@ func SendOtp(c *gin.Context) {
 		})
 		return
 	}
-	c.HTML(http.StatusOK, "OTPEmailVerification.html", gin.H{
-		"email":   email,
-		"message": "OTP sent successfully",
-	})
+	c.Redirect(http.StatusSeeOther, "/user/signup/verifyotp")
 }
 
 func VerifyOtp(c *gin.Context) {
@@ -98,7 +110,11 @@ func VerifyOtp(c *gin.Context) {
 	session.Options.MaxAge = -1
 	session.Save(c.Request, c.Writer)
 
-	c.Redirect(http.StatusFound,"/user/login")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "OTP verified",
+		"code":    http.StatusOK,
+	})
 }
 
 func ResendOTP(c *gin.Context) {
@@ -142,6 +158,9 @@ func ResendOTP(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
 		return
 	}
-	message:="OTP resent successfully."
-	c.Redirect(http.StatusFound,"/user/signup/otp?message="+url.QueryEscape(message))
+	c.JSON(http.StatusOK,gin.H{
+		"status":"Status OK",
+		"message":"OTP resend successfully",
+		"code":http.StatusOK,
+	})
 }

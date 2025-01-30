@@ -16,11 +16,19 @@
             <h1 class="text-3xl font-bold logo-font">LAPTIX</h1>
         </div>
     </header>
+    <!-- Breadcrumb -->
+    <nav class="container mx-auto px-4 py-4">
+        <ol class="flex text-sm text-gray-500">
+            <li><a href="/" class="hover:underline">Home</a></li>
+            <li class="mx-2">&gt;</li>
+            <li class="text-gray-700 font-semibold"><a href="">Login</a></li>
+        </ol>
+    </nav>
 
-    <main class="flex items-center justify-center min-h-screen">
+    <main class="flex items-center justify-center min-h-auto mt-14">
         <div class="w-full max-w-sm bg-white shadow-lg rounded-lg p-6">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
-            <p class="mb-4">Do not have an account? <a href="#" class="text-blue-500 underline">create a new one.</a>
+            <p class="mb-4">Do not have an account? <a href="/user/signup" class="text-blue-500 underline">create a new one.</a>
             </p>
             <form action="/user/login" method="post">
                 <div class="mb-4">
@@ -47,7 +55,7 @@
         </div>
     </main>
 
-    <footer class="bg-black text-white py-6">
+    <footer class="bg-black text-white py-6 mt-28">
         <div class="container mx-auto text-center">
             <h2 class="text-xl font-bold">About us</h2>
             <p class="mt-2">We are the biggest hyperstore in the universe. We got you all cover with our exclusive

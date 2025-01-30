@@ -9,64 +9,64 @@ let variantCount = 1;
 // Store files for each variant
 const variantFiles = new Map();
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const form = document.querySelector('form');
   if (!form) return;
 
   form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      const formData = new FormData(this);
+    const formData = new FormData(this);
 
-      // Validate required fields
-      const requiredFields = this.querySelectorAll('[required]');
-      let isValid = true;
-      requiredFields.forEach(field => {
-          if (!field.value.trim()) {
-              isValid = false;
-              field.classList.add('border-red-500');
-          } else {
-              field.classList.remove('border-red-500');
-          }
+    // Validate required fields
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('border-red-500');
+      } else {
+        field.classList.remove('border-red-500');
+      }
+    });
+
+    if (!isValid) {
+      window.toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Add variant files to form data
+    if (typeof variantFiles !== 'undefined') {
+      variantFiles.forEach((files, variantIndex) => {
+        files.forEach(file => {
+          formData.append(`product_images[${variantIndex}][]`, file);
+        });
       });
-
-      if (!isValid) {
-          window.toast.error('Please fill in all required fields');
-          return;
-      }
-
-      // Add variant files to form data
-      if (typeof variantFiles !== 'undefined') {
-          variantFiles.forEach((files, variantIndex) => {
-              files.forEach(file => {
-                  formData.append(`product_images[${variantIndex}][]`, file);
-              });
-          });
-      }
-
-      // Show loading toast
-      window.toast.success('Saving variant details...');
-
-      // Submit the form
-      fetch(this.action, {
-          method: 'POST',
-          body: formData
+    }
+    
+    showLoader()
+    fetch(this.action, {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.code === 200) {
+          hideLoader()
+          window.toast.success(data.message || 'Variant added successfully!');
+          setTimeout(() => {
+            window.location.href = data.redirect || '/admin/products';
+          }, 1000);
+        } else {
+          hideLoader()
+          window.toast.error(data.message || 'Error adding variant');
+        }
       })
-          .then(response => response.json())
-          .then(data => {
-              if (data.code === 200) {
-                  window.toast.success(data.message || 'Variant added successfully!');
-                  setTimeout(() => {
-                      window.location.href = data.redirect || '/admin/products';
-                  }, 1000);
-              } else {
-                  window.toast.error(data.message || 'Error adding variant');
-              }
-          })
-          .catch(error => {
-              console.error('Error:', error);
-              window.toast.error('Error adding variant. Please try again.');
-          });
+      .catch(error => {
+        hideLoader()
+        console.error('Error:', error);
+        window.toast.error('Error adding variant. Please try again.');
+      });
   });
 });
 

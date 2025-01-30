@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Laptix Adimin Product Page</title>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/loader.css" type="text/css" />
+    <script src="/static/js/loader.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
     <script src="/static/js/addProductVariants.js" defer></script>
-    <!-- Add this in your <head> section -->
-<script src="/static/js/toast.js"></script>
+    <script src="/static/js/toast.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
@@ -99,7 +100,7 @@
                             d="M7.05 6.462a2 2 0 0 0 2.63-1.519l.32-1.72a9 9 0 0 1 3.998 0l.322 1.72a2 2 0 0 0 2.63 1.519l1.649-.58a9 9 0 0 1 2.001 3.46l-1.33 1.14a2 2 0 0 0 0 3.037l1.33 1.139a9 9 0 0 1-2.001 3.46l-1.65-.58a2 2 0 0 0-2.63 1.519L14 20.777a9 9 0 0 1-3.998 0l-.322-1.72a2 2 0 0 0-2.63-1.519l-1.649.58a9 9 0 0 1-2.001-3.46l1.33-1.14a2 2 0 0 0 0-3.036L3.4 9.342a9 9 0 0 1 2-3.46zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6"
                             clip-rule="evenodd" />
                     </svg>
-                    <a href="#" class="text-base font-medium hover:text-blue-500">Settings</a>
+                    <a href="/admin/settings" class="text-base font-medium hover:text-blue-500">Settings</a>
                 </li>
             </ul>
         </nav>
@@ -127,7 +128,10 @@
         </header>
 
         <!-- Breadcrumbs -->
-        <div class=" text-gray-500 mx-5 text-xs mt-2">Home &gt; All Products &gt; Add Product Variants</div>
+        <div class=" text-gray-500 mx-5 text-xs mt-2"><a href="/admin/products">All Products</a> &gt; <a
+                href="/admin/products/variant/detail">Product Variant Details</a> &gt; <a
+                href="/admin/products/main/details">Main Product Details</a> &gt;<a href=""> Add Product Variants</a>
+        </div>
 
         <!-- Content -->
         <main class="mx-5 flex-1 font-roboto-medium">
@@ -220,7 +224,7 @@
                             <div id="banner-drop-area"
                                 class="border-dashed border-2 rounded px-4 py-6 text-center bg-white">
                                 <input id="banner-input" type="file" accept="image/*" class="hidden"
-                                    name="product_images[]" multiple/>
+                                    name="product_images[]" multiple />
                                 <p class="text-gray-500">
                                     Drop your images here, or
                                     <span class="text-blue-500 underline cursor-pointer"
@@ -258,10 +262,9 @@
             </form>
         </main>
     </div>
+    <div class="loader-container">
+        <div class="spinner"></div>
+    </div>
 </body>
 
 </html>
-
-
-
-
