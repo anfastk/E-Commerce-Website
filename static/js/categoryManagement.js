@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Wait for 1 second to show the message before reloading
           setTimeout(() => {
             location.reload();
-          }, 1000);
+          }, 500);
         } else {
           // Show error toast
           showToast(data.message || 'Error adding category', 'error');

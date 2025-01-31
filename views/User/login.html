@@ -7,7 +7,25 @@
     <title>Login - LAPTIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+<style>
+    .toast {
+    position: fixed;
+    top: 90px;
+    left: 42%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+}
 
+.toast.error {
+    background-color: #ff4444; /* Red for errors */
+}
+
+.toast.success {
+    background-color: #00C851; /* Green for success */
+}
+</style>
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -28,9 +46,9 @@
     <main class="flex items-center justify-center min-h-auto mt-14">
         <div class="w-full max-w-sm bg-white shadow-lg rounded-lg p-6">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
-            <p class="mb-4">Do not have an account? <a href="/user/signup" class="text-blue-500 underline">create a new one.</a>
-            </p>
-            <form action="/user/login" method="post">
+            <p class="mb-4">Do not have an account? <a href="/user/signup" class="text-blue-500 underline">create a new
+                    one.</a></p>
+            <form id="loginForm">
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">Enter Your Email</label>
                     <input type="email" id="email" name="email" class="w-full p-2 border border-gray-300 rounded-md"
@@ -38,19 +56,20 @@
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-gray-700">Enter Your Password</label>
-                    <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 rounded-md">
+                    <input type="password" id="password" name="password"
+                        class="w-full p-2 border border-gray-300 rounded-md">
                 </div>
                 <button type="submit" class="w-full bg-black text-white py-2 rounded-md">Login</button>
                 <div class="text-center mt-4">
                     <a href="#" class="text-sm text-blue-500 underline">Forgot Your Password?</a>
                 </div>
                 <div class="mt-4 flex items-center justify-between">
-
                     <button type="button"
                         class="flex items-center w-full py-2 bg-gray-100 border border-gray-300 rounded-md mr-2">
                         <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google logo" class="mr-2">
                         <a href="/auth/google/login">Login with Google </a>
                     </button>
+                </div>
             </form>
         </div>
     </main>
@@ -71,6 +90,70 @@
             <p>&copy; 2025 LAPTIX, Inc.</p>
         </div>
     </footer>
+        <div id="toast-containers"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form values
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Create the payload
+            const payload = {
+                email: email,
+                password: password
+            };
+
+            // Send the request using fetch
+            fetch('/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Ensure the content type is JSON
+                },
+                body: JSON.stringify(payload) // Convert payload to JSON
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.toast.success(data.message || 'Login successful!');
+                        setTimeout(() => {
+                            window.location.href = '/'; // Redirect to home page
+                        }, 1000); // Wait for 1 second before redirecting
+                    } else {
+                        window.toast.error(data.error || 'Login failed. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.toast.error('An error occurred. Please try again.');
+                });
+        });
+         // Function to display toast messages
+         function showToast(message, type = 'error') {
+            const toastContainer = document.getElementById('toast-containers');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000); // Remove toast after 5 seconds
+        }
+
+        // Check for error messages in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get('error');
+
+        if (errorMessage) {
+            // Decode the error message (replace '+' with ' ')
+            const decodedErrorMessage = errorMessage.replace(/\+/g, ' ');
+            showToast(decodedErrorMessage, 'error');
+        }
+    </script>
+    <script src="/static/js/toast.js"></script>
 </body>
 
 </html>

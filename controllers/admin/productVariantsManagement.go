@@ -478,8 +478,6 @@ func UpdateProductSpecification(c *gin.Context) {
 func ReplaceVariantProductImage(c *gin.Context){
 	imageID, err := strconv.Atoi(c.PostForm("image_id"))
     if err != nil {
-		fmt.Println("not found")
-
         c.JSON(http.StatusBadRequest, gin.H{
             "status": "Bad Request",
             "error":  "Invalid product ID",

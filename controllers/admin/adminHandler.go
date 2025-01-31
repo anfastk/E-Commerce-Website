@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -88,7 +87,6 @@ func AdminLoginHandler(c *gin.Context) {
 
 	token, err := middleware.GenerateJWT(admin.ID, admin.Email, RoleAdmin)
 	if err != nil {
-		fmt.Println("Error for generating JWT tokens")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "Internal Server Error",
 			"error":  "Failed to generate JWT tokens",

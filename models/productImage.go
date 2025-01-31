@@ -9,3 +9,4 @@ type ProductImage struct {
 	IsDeleted     bool          `gorm:"default:false"`
 	Product       ProductDetail `gorm:"foreignKey:ProductID"`
 }
+

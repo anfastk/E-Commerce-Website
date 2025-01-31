@@ -155,8 +155,8 @@ func ShowLogin(c *gin.Context) {
 }
 
 type UserInput struct {
-	Email    string `form:"email"`
-	Password string `form:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func UserLoginHandler(c *gin.Context) {
@@ -203,7 +203,7 @@ func UserLoginHandler(c *gin.Context) {
 	if user.Status == "Blocked" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": "Unauthorized",
-			"error":  "Invalid password",
+			"error":  "Your Account Is Blocked",
 			"code":   403,
 		})
 		return

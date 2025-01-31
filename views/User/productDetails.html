@@ -404,7 +404,7 @@
             <h2 class="text-lg lg:text-xl font-bold text-center">Specification</h2>
             {{range .product.Specifications}}
             <p class="text-gray-600  mt-4 text-sm lg:text-base">
-                &#x2022; {{.Value}}
+                {{.Key}} : <span class="text-black">{{.Value}}</span>
             </p>
             {{end}}
         </div>

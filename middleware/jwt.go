@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -57,7 +59,6 @@ func GenerateJWT(userId uint, email string, role string) (string, error) {
 func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie("jwtTokens" + requiredRole)
-		fmt.Println("Token", tokenString)
 
 		if err != nil || tokenString == "" {
 			if requiredRole == "Admin" || requiredRole == "User" {
@@ -76,12 +77,14 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			fmt.Println("Tokenclaims", token.Claims)
 			return JwtSecretKey, nil
 		})
+		var userDetails models.UserAuth
+		if err:=config.DB.First(&userDetails,"id=? AND is_blocked = ?",claims.UserId,false).Error;err!=nil {
+			c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
+		}
 
 		if err != nil || !token.Valid {
-			fmt.Println("cookie error:", err)
 			if requiredRole == "Admin" || requiredRole == "User" {
 				redirectPath := fmt.Sprintf("/%s/login", strings.ToLower(requiredRole))
 				c.Redirect(http.StatusSeeOther, redirectPath)
@@ -97,7 +100,6 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 		}
 
 		if claims.Role != requiredRole {
-			fmt.Println("req", requiredRole, claims.Role)
 			c.JSON(http.StatusForbidden, gin.H{
 				"status": "Forbidden",
 				"error":  "Insufficient permissions",

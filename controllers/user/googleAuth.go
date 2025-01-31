@@ -32,7 +32,7 @@ func InitiateGoogleAuth(c *gin.Context) {
 func HandleGoogleCallback(c *gin.Context) {
 	state, err := c.Cookie("oauth_state")
 	if err != nil || c.Query("state") != state {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OAuth state"})
+		c.Redirect(http.StatusTemporaryRedirect, "/login?error=Invalid+OAuth+state")
 		return
 	}
 
@@ -41,27 +41,27 @@ func HandleGoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	token, err := config.GoogleOAuthConfig.Exchange(c.Request.Context(), code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		c.Redirect(http.StatusTemporaryRedirect, "/login?error=Failed+to+exchange+token")
 		return
 	}
 
 	client := config.GoogleOAuthConfig.Client(c.Request.Context(), token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+get+user+info")
 		return
 	}
 	defer resp.Body.Close()
 
 	userData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user info"})
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+read+user+info")
 		return
 	}
 
 	var googleUser GoogleUserInfo
 	if err := json.Unmarshal(userData, &googleUser); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user info"})
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+parse+user+info")
 		return
 	}
 
@@ -76,22 +76,26 @@ func HandleGoogleCallback(c *gin.Context) {
 			GoogleID:   googleUser.Email,
 			ProfilePic: googleUser.Picture,
 			IsVerified: googleUser.VerifiedEmail,
+			Status:     "Active", // Default status for new users
 		}
 
 		if err := config.DB.Create(&user).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+create+user")
 			return
 		}
 	}
-	jwtToken, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to generate JWT tokens",
-			"code":   "500",
-		})
+
+	if user.Status == "Blocked" {
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Your+account+is+blocked")
 		return
 	}
+
+	jwtToken, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+generate+JWT+token")
+		return
+	}
+
 	c.SetCookie("jwtTokensUser", jwtToken, int((time.Hour * 1).Seconds()), "/", "", false, true)
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")

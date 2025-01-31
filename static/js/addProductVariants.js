@@ -1,7 +1,7 @@
 let cropper = null;
 let currentImageElement = null;
 let currentFile = null;
-const MAX_IMAGES = 2;
+const MIN_IMAGES = 1; // Changed from MAX_IMAGES to MIN_IMAGES
 const CROP_WIDTH = 400;
 const CROP_HEIGHT = 400;
 let variantCount = 1;
@@ -35,16 +35,18 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Add variant files to form data
+    // Add variant files to form data, ensuring the first image is sent first
     if (typeof variantFiles !== 'undefined') {
       variantFiles.forEach((files, variantIndex) => {
-        files.forEach(file => {
+        // Ensure the first image is the main product image
+        files.sort((a, b) => a.name.localeCompare(b.name)); // Sort by name to ensure order
+        files.forEach((file, index) => {
           formData.append(`product_images[${variantIndex}][]`, file);
         });
       });
     }
-    
-    showLoader()
+
+    showLoader();
     fetch(this.action, {
       method: 'POST',
       body: formData
@@ -52,25 +54,23 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(response => response.json())
       .then(data => {
         if (data.code === 200) {
-          hideLoader()
+          hideLoader();
           window.toast.success(data.message || 'Variant added successfully!');
           setTimeout(() => {
             window.location.href = data.redirect || '/admin/products';
           }, 1000);
         } else {
-          hideLoader()
+          hideLoader();
           window.toast.error(data.message || 'Error adding variant');
         }
       })
       .catch(error => {
-        hideLoader()
+        hideLoader();
         console.error('Error:', error);
         window.toast.error('Error adding variant. Please try again.');
       });
   });
 });
-
-
 
 // Image handling functions
 function handleFileUpload(input, previewContainerId) {
@@ -79,8 +79,8 @@ function handleFileUpload(input, previewContainerId) {
   const variantForm = input.closest('.variant-form');
   const variantIndex = Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm);
 
-  if (previewContainer.children.length + files.length > MAX_IMAGES) {
-    window.toast.error(`You can only upload a maximum of ${MAX_IMAGES} images`, 'error');
+  if (files.length < MIN_IMAGES) {
+    window.toast.error(`You must upload at least ${MIN_IMAGES} image`, 'error');
     return;
   }
 
@@ -172,7 +172,6 @@ function startCrop(imgElement, fileName) {
   });
 }
 
-
 function cancelCrop() {
   const modal = document.getElementById('cropModal');
   modal.classList.add('hidden');
@@ -210,10 +209,6 @@ function saveCrop() {
     cancelCrop();
     window.toast.success('Image cropped successfully', 'success');
   }, 'image/png', 1.0);
-}
-
-function removePreview(inputId, previewContainerId, previewElement) {
-  previewElement.remove();
 }
 
 function enableDragAndDrop(dropAreaId, inputId, previewContainerId) {
@@ -265,62 +260,6 @@ function enableDragAndDrop(dropAreaId, inputId, previewContainerId) {
   input.addEventListener('change', () => {
     handleFileUpload(input, previewContainerId);
   });
-}
-
-// Modified handleFileUpload function to handle both drag-drop and file input
-function handleFileUpload(input, previewContainerId) {
-  const previewContainer = document.getElementById(previewContainerId);
-  if (!previewContainer) {
-    console.error('Preview container not found:', previewContainerId);
-    return;
-  }
-
-  const files = input.files;
-  const variantForm = input.closest('.variant-form');
-  const variantIndex = variantForm ?
-    Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm) :
-    0;
-
-  if (previewContainer.children.length + files.length > MAX_IMAGES) {
-    alert(`You can only upload a maximum of ${MAX_IMAGES} images.`);
-    return;
-  }
-
-  // Initialize or get the files array for this variant
-  if (!variantFiles.has(variantIndex)) {
-    variantFiles.set(variantIndex, []);
-  }
-  const filesArray = variantFiles.get(variantIndex);
-
-  Array.from(files).forEach((file) => {
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload only image files.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const preview = document.createElement('div');
-      preview.className = 'relative border rounded p-2';
-      preview.innerHTML = `
-              <img src="${e.target.result}" alt="" class="w-full h-40 object-cover" data-original-file="${file.name}">
-              <div class="absolute top-2 right-2 flex gap-2">
-                  <button type="button" class="bg-blue-500 text-white p-1 rounded" onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
-                      Crop
-                  </button>
-                  <button type="button" class="bg-red-500 text-white p-1 rounded" onclick="removePreview('${input.id}', '${previewContainerId}', this.parentElement.parentElement, ${variantIndex}, '${file.name}')">
-                      ×
-                  </button>
-              </div>
-          `;
-      previewContainer.appendChild(preview);
-      filesArray.push(file);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  variantFiles.set(variantIndex, filesArray);
-  if (input.value) input.value = '';
 }
 
 function addVariant() {
@@ -405,7 +344,7 @@ function addVariant() {
                     <span class="text-blue-500 underline cursor-pointer"
                         onclick="document.getElementById('banner-input-${variantCount}').click()">browse</span>
                 </p>
-                <p class="text-sm text-gray-500 mt-2">Upload up to 6 images</p>
+                <p class="text-sm text-gray-500 mt-2">Upload at least ${MIN_IMAGES} image</p>
             </div>
             <div id="banner-preview-${variantCount}" class="mt-4 grid grid-cols-3 gap-4"></div>
         </div>

@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -80,7 +79,6 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 	}
 
 	if err := tx.Where("product_id = ? AND is_valid = true", product.ID).First(&offer).Error; err != nil {
-		fmt.Println("No valid offer found:", err)
 		offer = models.ProductOffer{}
 	}
 	
@@ -141,7 +139,6 @@ func ShowMultipleProductVariants(productID uint) ([]VariantsDetails, error) {
 	}
 
 	if err := tx.Where("product_id = ? AND is_valid = true", product.ID).First(&offers).Error; err != nil {
-		fmt.Println("No valid offer found:", err)
 		offers = models.ProductOffer{}
 	}
 

@@ -196,66 +196,53 @@
                                 </ul>
                             </div>
                         </div>
-
-                        <div class="p-4 flex items-start">
-                            <!-- Product Image -->
-                            <a href="/admin/products/variant/detail?variant_id={{.ID}}">
+                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
+                            <div class="p-4 flex items-start">
+                                <div class="h-24 w-24">
+                                    <!-- Product Image -->
                                 {{if len .Images}}
                                 <img src="{{index .Images 0}}" alt="Adidas Ultra Boost"
-                                    class="w-24 h-24 object-cover rounded-lg">
+                                    class="w-full h-full object-contain rounded-lg">
                                 {{else}}
                                 <img src="https://via.placeholder.com/150  " alt="Default Image"
                                     class="w-24 h-24 object-cover rounded-lg">
                                 {{end}}
-                            </a>
+                                </div>
 
 
-                            <!-- Product Title and Price -->
-                            <div class="ml-4 flex-1">
-                                <h2 class="text-lg font-semibold text-gray-800">{{.ProductName}}</h2>
-                                <p class="text-sm text-gray-500">{{.CategoryName}}</p>
-                                <p class="text-xl font-bold text-gray-900 mt-1">₹
-                                    {{.SalePrice}}</p>
-                                {{if .Status}}
-                                <p class="text-xl font-bold mt-1">Status: <span class="text-red-600 ">Deleted</span>
-                                </span></p>
-                                {{else}}
-                                <p class="text-xl font-bold mt-1">Status: <span class="text-green-600 ">Active</span>
-                                </span></p>
-                                {{end}}
+                                <!-- Product Title and Price -->
+                                <div class="ml-4 flex-1">
+                                    <h2 class="text-lg font-semibold text-gray-800">{{.ProductName}}</h2>
+                                    <p class="text-sm text-gray-500">{{.CategoryName}}</p>
+                                    <p class="text-xl font-bold text-gray-900 mt-1">₹
+                                        {{.SalePrice}}</p>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Summary -->
-                        <div class="px-4 mt-4">
-                            <h3 class="text-sm font-semibold text-gray-800">Summary</h3>
-                            <p class="text-sm text-gray-600">{{.ProductSummary}}</p>
-                        </div>
-
-                        <!-- Sales and Remaining Products -->
-                        <div class="px-4 my-5">
-                            <div
-                                class="flex justify-between items-center text-sm font-semibold text-gray-800 border-t pt-2">
-                                <span>Sales</span>
-                                <span class="flex items-center text-orange-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" class="w-4 h-4 mr-1">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                    </svg>
-                                    1269
-                                </span>
+                        </a>
+                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
+                            <!-- Summary -->
+                            <div class="px-4 mt-4">
+                                <h3 class="text-sm font-semibold text-gray-800">Summary</h3>
+                                <p class="text-sm text-gray-600">{{.ProductSummary}}</p>
                             </div>
-                            <div class="flex justify-between items-center text-sm font-semibold text-gray-800 mt-2">
-                                <span>Remaining Products</span>
-                                <span class="flex items-center">
-                                    <div class="w-24 h-1 bg-gray-200 mr-2 relative">
-                                        <div class="w-1/2 h-full bg-orange-500"></div>
-                                    </div>
-                                    1269
-                                </span>
+
+                            <!-- Sales and Remaining Products -->
+                            <div class="px-4 my-5">
+                                <div
+                                    class="flex justify-between items-center text-sm font-semibold text-gray-800 border-t pt-2">
+                                </div>
+                                <div class="flex justify-between items-center text-sm font-semibold text-gray-800 mt-2">
+                                    {{if .Status}}
+                                    <p class="text-xl font-bold mt-1">Status: <span class="text-red-600 ">Deleted</span>
+                                        </span></p>
+                                    {{else}}
+                                    <p class="text-xl font-bold mt-1">Status: <span
+                                            class="text-green-600 ">Active</span>
+                                        </span></p>
+                                    {{end}}
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {{end}}
 
