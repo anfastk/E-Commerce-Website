@@ -38,23 +38,33 @@ func BlockUser(c *gin.Context) {
 		return
 	}
 
-	if user.IsBlocked {
-		user.IsBlocked = false
-		user.Status = "Active"
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "Success",
-			"message": "User's account unblocked",
-			"code":    200,
+	if user.IsDeleted {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  "Bad Request",
+			"message": "Can't unblock the user. The user's account is deleted.",
+			"code":    http.StatusBadRequest,
 		})
+		return
 	} else {
-		user.IsBlocked = true
-		user.Status = "Blocked"
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "Success",
-			"message": "User's account blocked",
-			"code":    200,
-		})
+		if user.IsBlocked {
+			user.IsBlocked = false
+			user.Status = "Active"
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "Success",
+				"message": "User's account unblocked",
+				"code":    200,
+			})
+		} else {
+			user.IsBlocked = true
+			user.Status = "Blocked"
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "Success",
+				"message": "User's account blocked",
+				"code":    200,
+			})
+		}
 	}
+
 	if err := config.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":   "InternalServerError",
@@ -80,8 +90,12 @@ func DeleteUser(c *gin.Context) {
 
 	user.IsDeleted = !user.IsDeleted
 	if user.IsDeleted {
+		user.Status = "Deleted"
+		user.IsBlocked = true
 		user.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
 	} else {
+		user.Status = "Active"
+		user.IsBlocked = false
 		user.DeletedAt = gorm.DeletedAt{}
 	}
 

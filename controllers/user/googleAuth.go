@@ -66,7 +66,7 @@ func HandleGoogleCallback(c *gin.Context) {
 	}
 
 	var user models.UserAuth
-	result := config.DB.Where("email = ?", googleUser.Email).First(&user)
+	result := config.DB.Unscoped().Where("email = ?", googleUser.Email).First(&user)
 
 	if result.Error != nil {
 		user = models.UserAuth{
@@ -85,11 +85,10 @@ func HandleGoogleCallback(c *gin.Context) {
 		}
 	}
 
-	if user.Status == "Blocked" {
-		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Your+account+is+blocked")
+	if user.IsBlocked || user.IsDeleted {
+		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Your+Account+Is+Blocked+Or+Deleted")
 		return
 	}
-
 	jwtToken, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
 	if err != nil {
 		c.Redirect(http.StatusTemporaryRedirect, "/user/login?error=Failed+to+generate+JWT+token")

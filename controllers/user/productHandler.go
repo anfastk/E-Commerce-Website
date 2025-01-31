@@ -142,6 +142,7 @@ func ShowProductDetail(c *gin.Context) {
 
 	type RelatedProductsResponce struct {
 		ID             uint     `json:"id"`
+		ProductName    string   `json:"product_name"`
 		ProductSummary string   `json:"product_summary"`
 		SalePrice      float64  `json:"sale_price "`
 		Images         []string `json:"images"`
@@ -155,6 +156,7 @@ func ShowProductDetail(c *gin.Context) {
 		}
 		relatedProductsResponce = append(relatedProductsResponce, RelatedProductsResponce{
 			ID:             product.ID,
+			ProductName:    product.ProductName,
 			ProductSummary: product.ProductSummary,
 			SalePrice:      product.SalePrice,
 			Images:         images,

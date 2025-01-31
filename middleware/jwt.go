@@ -79,9 +79,11 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return JwtSecretKey, nil
 		})
-		var userDetails models.UserAuth
-		if err:=config.DB.First(&userDetails,"id=? AND is_blocked = ?",claims.UserId,false).Error;err!=nil {
-			c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
+		if requiredRole == "User" {
+			var userDetails models.UserAuth
+			if err := config.DB.First(&userDetails, "id=? AND is_blocked = ?", claims.UserId, false).Error; err != nil {
+				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
+			}
 		}
 
 		if err != nil || !token.Valid {

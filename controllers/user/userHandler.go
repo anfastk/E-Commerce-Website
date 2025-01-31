@@ -181,7 +181,7 @@ func UserLoginHandler(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	if err := config.DB.Unscoped().Where("email = ?", input.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"status": "Unauthorized",
@@ -190,6 +190,14 @@ func UserLoginHandler(c *gin.Context) {
 			})
 			return
 		}
+	}
+	if user.IsDeleted{
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "Unauthorized",
+			"error":  "Your Account Is Deleted",
+			"code":   401,
+		})
+		return
 	}
 	if !CheckPasswordHash(input.Password, user.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{
