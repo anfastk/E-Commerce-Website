@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ProfileSettings(c *gin.Context){
+func Settings(c *gin.Context){
 	userID := c.MustGet("userid").(uint)
 	
 	var userDetails models.UserAuth
