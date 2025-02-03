@@ -14,6 +14,6 @@ type UserAddress struct {
 	City      string `gorm:"size:100" json:"user_city"`
 	PinCode   string `json:"user_pincode"`
 	UserID    uint
-	IsDefault bool `gorm:"default:false"`
-	UserAuth  UserAuth
+	IsDefault bool     `gorm:"default:false"`
+	UserAuth  UserAuth `gorm:"foreignKey:UserID"`
 }

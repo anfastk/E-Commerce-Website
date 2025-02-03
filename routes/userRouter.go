@@ -40,6 +40,12 @@ func UserRouter(r *gin.Engine) {
 	{
 		userProfile.GET("/",controllers.ProfileDetails)
 		userProfile.PATCH("/",controllers.ProfileUpdate)
+		userProfile.GET("/manage/address",controllers.ManageAddress)
+		userProfile.GET("/add/address",controllers.ShowAddAddress)
+		userProfile.POST("/add/address",controllers.AddAddress)
+		userProfile.GET("/edit/address/:id",controllers.ShowEditAddress)
+		userProfile.POST("/edit/address",controllers.EditAddress)
+		userProfile.POST("/delete/address/:id",controllers.DeleteAddress)
 		userProfile.GET("/settings",controllers.Settings)
 	}
 }
