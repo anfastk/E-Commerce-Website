@@ -38,6 +38,8 @@ func UserRouter(r *gin.Engine) {
 	userProfile.Use(middleware.NoCacheMiddleware())
 	userProfile.Use(middleware.AuthMiddleware(RoleUser))
 	{
+		userProfile.GET("/",controllers.ProfileDetails)
+		userProfile.PATCH("/",controllers.ProfileUpdate)
 		userProfile.GET("/settings",controllers.Settings)
 	}
 }
