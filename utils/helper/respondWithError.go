@@ -8,8 +8,8 @@ import (
 
 func RespondWithError(c *gin.Context, status int, message string) {
 	c.JSON(status, gin.H{
-		"status": http.StatusText(status),
-		"error":  message,
-		"code":   status,
+		"status":  http.StatusText(status),
+		"message": message,
+		"code":    status,
 	})
 }

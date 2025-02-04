@@ -250,5 +250,5 @@ func DeleteAddress(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete address")
 		return
 	}
-	helper.RespondWithError(c, http.StatusOK, "Address deleted successfully")
+	c.Redirect(http.StatusSeeOther,"/profile/manage/address")
 }

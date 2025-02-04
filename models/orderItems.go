@@ -18,7 +18,7 @@ type OrderItem struct {
 	DeliveryDate     time.Time
 	ReturnableStatus bool `gorm:"default:true"`
 	ReturnDate       time.Time
-	OrderDetail      Order
-	UserAuth         UserAuth
-	ProductDetail    ProductDetail
+	OrderDetail      Order         `gorm:"foreignKey:OrderID;references:ID"`
+	UserAuth         UserAuth      `gorm:"foreignKey:UserID;references:ID"`
+	ProductDetail    ProductDetail `gorm:"foreignKey:ProductID;references:ID"`
 }

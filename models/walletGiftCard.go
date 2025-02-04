@@ -20,8 +20,8 @@ type WalletGiftCard struct {
 	Status          string `gorm:"default:'Active'"`
 	RedeemedUserID  uint
 	RedeemedAt      time.Time
-	TransactionType string `gorm:"size:50"`
-	TransactionID   string `gorm:"size:100"`
-	UserAuth        UserAuth
-	WalletDetail    Wallet
+	TransactionType string   `gorm:"size:50"`
+	TransactionID   string   `gorm:"size:100"`
+	UserAuth        UserAuth `gorm:"foreignKey:UserID"`
+	WalletDetail    Wallet   `gorm:"foreignKey:WalletID"`
 }

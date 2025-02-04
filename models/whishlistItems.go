@@ -8,5 +8,5 @@ type WishlistItem struct {
 	gorm.Model
 	WishlistID    uint
 	ProductID     uint
-	ProductDetail ProductDetail
+	ProductDetail ProductDetail `gorm:"foreignkey:ProductID"`
 }

@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type Wishlist struct {
 	gorm.Model
-	UserID   uint
-	UserAuth UserAuth
+	UserID   uint     `gorm:"not null"`
+	UserAuth UserAuth `gorm:"foreignkey:UserID"`
 }

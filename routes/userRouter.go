@@ -48,4 +48,15 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/delete/address/:id",controllers.DeleteAddress)
 		userProfile.GET("/settings",controllers.Settings)
 	}
+
+	cart:=r.Group("/cart")
+	cart.Use(middleware.NoCacheMiddleware())
+	cart.Use(middleware.AuthMiddleware(RoleUser))
+	{
+		cart.GET("/",controllers.ShowCart)
+		cart.POST("/add/:id",controllers.AddToCart)
+		cart.POST("/update/quantity/:id",controllers.CartItemUpdate)
+		cart.POST("/delete/:id",controllers.DeleteCartItems)
+	}
+
 }

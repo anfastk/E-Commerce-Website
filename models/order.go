@@ -17,9 +17,9 @@ type Order struct {
 	ShippingCharge float64 `gorm:"type:numeric(10,2)"`
 	Tax            float64
 	OrderDate      time.Time
-	OrderStatus    string `gorm:"default:'Pending'"`
-	CartDetail     Cart
-	UserAuth       UserAuth
-	UserAddress    UserAddress
-	CouponDetail   Coupon
+	OrderStatus    string      `gorm:"default:'Pending'"`
+	CartDetail     Cart        `gorm:"foreignKey:CartID;references:ID"`
+	UserAuth       UserAuth    `gorm:"foreignKey:UserID;references:ID"`
+	UserAddress    UserAddress `gorm:"foreignKey:AddressID;references:ID"`
+	CouponDetail   Coupon      `gorm:"foreignKey:CouponID;references:ID"`
 }
