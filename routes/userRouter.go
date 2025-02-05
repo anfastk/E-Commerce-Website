@@ -31,32 +31,33 @@ func UserRouter(r *gin.Engine) {
 		user.POST("/signup/otp/resend", controllers.ResendOTP)
 		user.GET("/login", controllers.ShowLogin)
 		user.POST("/login", controllers.UserLoginHandler)
-		user.POST("/logout",middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
+		user.POST("/logout", middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
 	}
 
-	userProfile:=r.Group("/profile")
+	userProfile := r.Group("/profile")
 	userProfile.Use(middleware.NoCacheMiddleware())
 	userProfile.Use(middleware.AuthMiddleware(RoleUser))
 	{
-		userProfile.GET("/",controllers.ProfileDetails)
-		userProfile.PATCH("/",controllers.ProfileUpdate)
-		userProfile.GET("/manage/address",controllers.ManageAddress)
-		userProfile.GET("/add/address",controllers.ShowAddAddress)
-		userProfile.POST("/add/address",controllers.AddAddress)
-		userProfile.GET("/edit/address/:id",controllers.ShowEditAddress)
-		userProfile.POST("/edit/address",controllers.EditAddress)
-		userProfile.POST("/delete/address/:id",controllers.DeleteAddress)
-		userProfile.GET("/settings",controllers.Settings)
+		userProfile.GET("/", controllers.ProfileDetails)
+		userProfile.PATCH("/", controllers.ProfileUpdate)
+		userProfile.GET("/manage/address", controllers.ManageAddress)
+		userProfile.GET("/add/address", controllers.ShowAddAddress)
+		userProfile.POST("/add/address", controllers.AddAddress)
+		userProfile.GET("/edit/address/:id", controllers.ShowEditAddress)
+		userProfile.POST("/edit/address", controllers.EditAddress)
+		userProfile.POST("/delete/address/:id", controllers.DeleteAddress)
+		userProfile.GET("/settings", controllers.Settings)
 	}
 
-	cart:=r.Group("/cart")
+	cart := r.Group("/cart")
 	cart.Use(middleware.NoCacheMiddleware())
 	cart.Use(middleware.AuthMiddleware(RoleUser))
 	{
-		cart.GET("/",controllers.ShowCart)
-		cart.POST("/add/:id",controllers.AddToCart)
-		cart.POST("/update/quantity/:id",controllers.CartItemUpdate)
-		cart.POST("/delete/:id",controllers.DeleteCartItems)
+		cart.GET("/", controllers.ShowCart)
+		cart.GET("/total", controllers.ShowCartTotal)
+		cart.POST("/add/:id", controllers.AddToCart)
+		cart.POST("/update/quantity/:id", controllers.CartItemUpdate)
+		cart.POST("/delete/:id", controllers.DeleteCartItems)
 	}
 
 }

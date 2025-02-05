@@ -204,10 +204,37 @@ func CartItemUpdate(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "OK",
-		"message": "Quantity updated",
-		"code":    http.StatusOK,
+		"status":   "OK",
+		"message":  "Quantity updated",
+		"code":     http.StatusOK,
 		"quantity": cartItems.Quantity,
+	})
+}
+
+func ShowCartTotal(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	var total float64
+	var cart models.Cart
+	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong")
+		return
+	}
+	var cartItems []models.CartItem
+	if err := config.DB.
+		Preload("ProductVariant").
+		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong")
+		return
+	}
+	for _, items := range cartItems {
+		total += items.ProductVariant.SalePrice * float64(items.Quantity)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Total fetch success",
+		"Count":   len(cartItems),
+		"Total":   total,
+		"code":    http.StatusOK,
 	})
 }
 

@@ -85,133 +85,139 @@
             <span class="text-gray-400">></span>
             <span class="font-medium">CART</span>
         </div>
+        <div class="cart-container" style="display: none;">
+            <!-- Cart Header -->
+            {{if len .CartItem}}
+            <h1 class="text-2xl font-bold mb-8 cart-title">Shopping Cart ({{.Count}})</h1>
 
-        <!-- Cart Header -->
-        {{if len .CartItem}}
-        <h1 class="text-2xl font-bold mb-8">Shopping Cart ( 6 )</h1>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Cart Items -->
+                <div class="md:col-span-2 space-y-4">
+                    <!-- Cart Item -->
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <!-- Cart Items -->
-            <div class="md:col-span-2 space-y-4">
-                <!-- Cart Item -->
-
-                {{range .CartItem}}
-                <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row gap-6" data-cart-item="{{.ID}}">
-                    {{if len .ProductVariant.VariantsImages}}
-                    <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
-                        alt="{{.ProductVariant.ProductName}}" class="w-24 h-24 object-contain">
-                    {{end}}
-                    <div class="flex-grow">
-                        <a href="/products/details/{{.ProductVariant.ID}}">
-                            <h3 class="font-bold mb-2">{{ .ProductVariant.Category.Name }}</h3>
-                            <p class="text-sm text-gray-600 mb-4">{{ .ProductVariant.ProductSummary }}</p>
-                        </a>
-                        <div class="flex items-center justify-between">
+                    {{range .CartItem}}
+                    <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row gap-6"
+                        data-cart-item="{{.ID}}">
+                        {{if len .ProductVariant.VariantsImages}}
+                        <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                            alt="{{.ProductVariant.ProductName}}" class="w-24 h-24 object-contain">
+                        {{end}}
+                        <div class="flex-grow">
                             <a href="/products/details/{{.ProductVariant.ID}}">
-                                <div class="flex items-center gap-4">
-                                    <p class="line-through text-gray-400">&#8377;{{ .ProductVariant.RegularPrice}}</p>
-                                    <p class="font-bold">&#8377;{{ .ProductVariant.SalePrice}}</p>
-                                </div>
+                                <h3 class="font-bold mb-2">{{ .ProductVariant.Category.Name }}</h3>
+                                <p class="text-sm text-gray-600 mb-4">{{ .ProductVariant.ProductSummary }}</p>
                             </a>
-                            <div class="flex items-center gap-4">
-                                <div class="flex items-center border rounded">
-                                    <button class="px-3 py-1 hover:bg-gray-100"
-                                        onclick="updateQuantity(`{{.ID}}`, 'decrease')">-</button>
-                                    <span class="px-3 py-1 border-x quantity-display">{{.Quantity}}</span>
-                                    <button class="px-3 py-1 hover:bg-gray-100"
-                                        onclick="updateQuantity(`{{.ID}}`, 'increase')">+</button>
+                            <div class="flex items-center justify-between">
+                                <a href="/products/details/{{.ProductVariant.ID}}">
+                                    <div class="flex items-center gap-4">
+                                        <p class="line-through text-gray-400">&#8377;{{ .ProductVariant.RegularPrice}}
+                                        </p>
+                                        <p class="font-bold">&#8377;{{ .ProductVariant.SalePrice}}</p>
+                                    </div>
+                                </a>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center border rounded">
+                                        <button class="px-3 py-1 hover:bg-gray-100"
+                                            onclick="updateQuantity(`{{.ID}}`, 'decrease')">-</button>
+                                        <span class="px-3 py-1 border-x quantity-display">{{.Quantity}}</span>
+                                        <button class="px-3 py-1 hover:bg-gray-100"
+                                            onclick="updateQuantity(`{{.ID}}`, 'increase')">+</button>
+                                    </div>
+                                    <button class="text-red-500" onclick="deleteCartItem(`{{.ID}}`)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <button class="text-red-500" onclick="deleteCartItem(`{{.ID}}`)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
                             </div>
                         </div>
                     </div>
+                    {{end}}
+                    {{end}}
+                    <!-- Repeat the cart item structure two more times -->
+                    <!-- For brevity, I'm not including the repeated items but they would be identical -->
+                </div>
+
+                <!-- Cart Total -->
+                {{if len .CartItem}}
+                <!-- Replace your existing cart total section with this -->
+                <div class="md:col-span-1">
+                    <div class="bg-gray-200 p-6 rounded-lg">
+                        <h2 class="text-lg font-bold mb-4">Cart Total</h2>
+                        <div class="flex justify-between mb-4">
+                            <span>SUBTOTAL</span>
+                            <span class="subtotal-amount">₹{{.Total}}</span>
+                        </div>
+                        <div class="flex justify-between mb-8">
+                            <span class="font-bold">TOTAL</span>
+                            <span class="total-amount font-bold">₹{{.Total}}</span>
+                        </div>
+                        <button
+                            class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
+                            PROCEED TO CHECKOUT
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 {{end}}
-                {{end}}
-                <!-- Repeat the cart item structure two more times -->
-                <!-- For brevity, I'm not including the repeated items but they would be identical -->
             </div>
+        </div>
+    </div>
 
-            <!-- Cart Total -->
-            {{if len .CartItem}}
-            <div class="md:col-span-1">
-                <div class="bg-gray-200 p-6 rounded-lg">
-                    <h2 class="text-lg font-bold mb-4">Cart Total</h2>
-                    <div class="flex justify-between mb-4">
-                        <span>SUBTOTAL</span>
-                        <span>$400</span>
+    <div class="empty-cart-view" style="display: none;">
+        <div class=" flex items-center justify-center">
+            <div class="text-center p-8">
+                <!-- Cart Icon with floating items -->
+                <div class="relative inline-block mb-8">
+                    <!-- Main laptop/cart container -->
+                    <div class="w-48 h-32 bg-gray-200 rounded-lg shadow-md relative">
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
                     </div>
-                    <div class="flex justify-between mb-8">
-                        <span class="font-bold">TOTAL</span>
-                        <span class="font-bold">$400</span>
+
+                    <!-- Floating items -->
+                    <div class="absolute -top-4 -left-4 w-6 h-6 bg-blue-500 rounded-md animate-bounce"></div>
+                    <div class="absolute -top-2 right-0 w-6 h-6 bg-yellow-500 rounded-md animate-bounce delay-100">
                     </div>
-                    <button class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
-                        PROCEED TO CHECKOUT
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                    <div class="absolute top-0 -right-8 w-6 h-6 bg-red-500 rounded-md animate-bounce delay-200">
+                    </div>
+                    <div class="absolute bottom-0 -left-8 w-6 h-6 bg-green-500 rounded-md animate-bounce delay-300">
+                    </div>
+                </div>
+
+                <!-- Text content -->
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Your cart is empty!</h2>
+                <p class="text-gray-600 mb-6">Add items to it now.</p>
+
+                <!-- Shop now button -->
+                <a href="/products">
+                    <button class="bg-blue-500 text-white px-8 py-3 rounded-md hover:bg-blue-600 transition-colors">
+                        Shop now
                     </button>
-                </div>
+                </a>
             </div>
-            {{end}}
         </div>
     </div>
-    {{if len .CartItem}}
-    {{else}}
-    <div class=" flex items-center justify-center">
-        <div class="text-center p-8">
-            <!-- Cart Icon with floating items -->
-            <div class="relative inline-block mb-8">
-                <!-- Main laptop/cart container -->
-                <div class="w-48 h-32 bg-gray-200 rounded-lg shadow-md relative">
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                    </div>
-                </div>
 
-                <!-- Floating items -->
-                <div class="absolute -top-4 -left-4 w-6 h-6 bg-blue-500 rounded-md animate-bounce"></div>
-                <div class="absolute -top-2 right-0 w-6 h-6 bg-yellow-500 rounded-md animate-bounce delay-100">
-                </div>
-                <div class="absolute top-0 -right-8 w-6 h-6 bg-red-500 rounded-md animate-bounce delay-200">
-                </div>
-                <div class="absolute bottom-0 -left-8 w-6 h-6 bg-green-500 rounded-md animate-bounce delay-300">
-                </div>
-            </div>
-
-            <!-- Text content -->
-            <h2 class="text-2xl font-semibold text-gray-800 mb-2">Your cart is empty!</h2>
-            <p class="text-gray-600 mb-6">Add items to it now.</p>
-
-            <!-- Shop now button -->
-            <a href="/products">
-                <button class="bg-blue-500 text-white px-8 py-3 rounded-md hover:bg-blue-600 transition-colors">
-                    Shop now
-                </button>
-            </a>
-        </div>
-    </div>
-    {{end}}
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-semibold text-gray-800 mb-8">You May Also Like</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Product Card 1 -->
             {{range .Suggestion}}
-            <a href="/products/details/{{.ID}}">
-                <div class="bg-white shadow-lg rounded-lg p-4 relative group">
+            <div class="bg-white shadow-lg rounded-lg p-4 relative group">
+                <a href="/products/details/{{.ID}}">
                     <span
                         class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
                     <div class="relative">
@@ -227,28 +233,31 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="mt-4">
+                </a>
+                <div class="mt-4">
+                    <a href="/products/details/{{.ID}}">
+
                         <h3 class="text-gray-800 font-medium mb-2">{{.ProductName}}</h3>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="line-through text-gray-500">&#8377; {{printf "%.2f" .RegularPrice}}</span>
+                                <span class="line-through text-gray-500">&#8377; {{printf "%.2f"
+                                    .RegularPrice}}</span>
                                 <span class="font-bold text-gray-900">&#8377; {{printf "%.2f" .SalePrice}}</span>
                             </div>
-                            <form action="/cart/add/{{.ID}}" method="post">
-                                <button class="text-gray-600 hover:text-gray-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    </a>
+                    <!-- Replace your existing add to cart button with this -->
+                    <button onclick="addToCart('{{.ID}}'); return false;" class="text-gray-600 hover:text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </button>
                 </div>
-            </a>
-            {{end}}
+            </div>
         </div>
+        {{end}}
+    </div>
     </div>
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
@@ -317,6 +326,78 @@
     </footer>
     <!-- Frontend HTML (Add this script section at the bottom of your page) -->
     <script>
+        function updateCartTotalAndCount() {
+            fetch('/cart/total')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "OK") {
+                        // Update subtotal and total amount displays
+                        const subtotalElement = document.querySelector('.subtotal-amount');
+                        const totalElement = document.querySelector('.total-amount');
+                        if (subtotalElement && totalElement) {
+                            subtotalElement.textContent = `₹${data.Total.toFixed(2)}`;
+                            totalElement.textContent = `₹${data.Total.toFixed(2)}`;
+                        }
+
+                        // Update cart title
+                        const cartTitle = document.querySelector('.cart-title');
+                        if (cartTitle) {
+                            cartTitle.textContent = `Shopping Cart (${data.Count})`;
+                        }
+
+                        // Toggle visibility based on cart count
+                        const cartContainer = document.querySelector('.cart-container');
+                        const emptyCartView = document.querySelector('.empty-cart-view');
+
+                        if (data.Count === 0) {
+                            if (cartContainer) cartContainer.style.display = 'none';
+                            if (emptyCartView) emptyCartView.style.display = 'block';
+                        } else {
+                            if (cartContainer) cartContainer.style.display = 'block';
+                            if (emptyCartView) emptyCartView.style.display = 'none';
+                        }
+
+                        // Update cart items section if needed
+                        updateCartItemsSection(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating cart total:', error);
+                });
+        }
+
+
+        // Function to add item to cart
+        function addToCart(productId) {
+            fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "OK") {
+                        // Update cart totals after adding item
+                        updateCartTotalAndCount();
+
+                        window.location.reload()
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred while adding the item to cart');
+                });
+        }
+        function updateCartItemsSection(data) {
+            if (data.Count === 0) {
+                // Clear the cart items container
+                const cartItemsContainer = document.querySelector('.cart-container .md\\:col-span-2');
+                if (cartItemsContainer) {
+                    cartItemsContainer.innerHTML = '';
+                }
+            }
+        }
+        // Function to update quantity
         function updateQuantity(itemId, action) {
             fetch(`/cart/update/quantity/${itemId}`, {
                 method: 'POST',
@@ -333,52 +414,51 @@
                 })
                 .then(data => {
                     if (data.status === "OK") {
-                        // Find the specific cart item and update its quantity
                         const cartItem = document.querySelector(`[data-cart-item="${itemId}"]`);
                         if (cartItem) {
                             const quantityDisplay = cartItem.querySelector('.quantity-display');
                             if (quantityDisplay) {
-                                // Update with the new quantity from the server
                                 quantityDisplay.textContent = data.quantity;
 
-                                // If quantity is 0, remove the item
                                 if (data.quantity === 0) {
                                     cartItem.remove();
                                 }
                             }
                         }
+                        // Update cart totals after quantity change
+                        updateCartTotalAndCount();
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    if (error.message) {
-                        alert(error.message);
-                    } else {
-                        alert('An error occurred while updating the quantity');
-                    }
                 });
         }
 
+        // Function to delete cart item
         function deleteCartItem(itemId) {
             fetch(`/cart/delete/${itemId}`, {
                 method: 'POST',
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === "OK") {
+                    if (data.status === "Status OK") {
                         const cartItem = document.querySelector(`[data-cart-item="${itemId}"]`);
                         if (cartItem) {
                             cartItem.remove();
                         }
+                        // Update cart totals after deletion
+                        updateCartTotalAndCount();
                     } else {
-                        alert(data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the item');
                 });
+
         }
+
+        // Update cart totals on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateCartTotalAndCount();
+        });
     </script>
 </body>
 
