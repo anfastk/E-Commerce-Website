@@ -8,6 +8,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
@@ -42,56 +43,32 @@ func AdminLoginHandler(c *gin.Context) {
 	var input AdminInput
 
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Binding the data",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data")
 		return
 	}
 
 	if input.Email == "" || input.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Email and Password are required",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Email and Password are required")
 		return
 	}
 
 	if err := config.DB.Where("email = ?", input.Email).First(&admin).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status": "Unauthorized",
-				"error":  "Invalid Email",
-				"code":   401,
-			})
+			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid Email")
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": "Internal Server Error",
-				"error":  "Database query failed",
-				"code":   500,
-			})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Database query failed")
 		}
 		return
 	}
 
 	if admin.Password != input.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status": "Unauthorized",
-			"error":  "Invalid Password",
-			"code":   401,
-		})
+		helper.RespondWithError(c, http.StatusUnauthorized, "Invalid Password")
 		return
 	}
 
 	token, err := middleware.GenerateJWT(admin.ID, admin.Email, RoleAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to generate JWT tokens",
-			"code":   "500",
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to generate JWT tokens")
 		return
 	}
 
@@ -104,6 +81,7 @@ func AdminLoginHandler(c *gin.Context) {
 		"code":    http.StatusOK,
 	})
 }
+
 
 func ShowSettings(c * gin.Context){
 	c.HTML(http.StatusOK,"settings.html",nil)

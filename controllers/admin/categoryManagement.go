@@ -2,27 +2,24 @@ package controllers
 
 import (
 	"net/http"
-	"time"
-
 	"strconv"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 )
 
 func ListCategory(c *gin.Context) {
-	var categorys []models.Categories
+	var categories []models.Categories
 
-	if err := config.DB.Order("id ASC").Find(&categorys).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Status": "InternalServerError",
-			"error":  "Failed to fetch categories",
-		})
+	if err := config.DB.Order("id ASC").Find(&categories).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories")
 		return
 	}
 	c.HTML(http.StatusOK, "categoryManagement.html", gin.H{
-		"categories": categorys,
+		"categories": categories,
 	})
 }
 
@@ -31,29 +28,17 @@ func AddCategory(c *gin.Context) {
 
 	var category models.Categories
 	if err := c.ShouldBind(&category); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid input data",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
 		return
 	}
 
 	if category.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Category name is required",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required")
 		return
 	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to create category",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category")
 		return
 	}
 
@@ -68,49 +53,29 @@ func EditCategory(c *gin.Context) {
 	categoryID := c.Param("id")
 
 	if categoryID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Category ID is missing",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Category ID is missing")
 		return
 	}
 
 	if _, err := strconv.ParseInt(categoryID, 10, 64); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid Category ID",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Category ID")
 		return
 	}
 
 	var category models.Categories
 
 	if err := config.DB.First(&category, categoryID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Category not found",
-			"code":   404,
-		})
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
 		return
 	}
 
 	if err := c.Bind(&category); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Failed to bind form data",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to bind form data")
 		return
 	}
 
 	if err := config.DB.Model(&category).Where("id = ?", categoryID).Updates(category).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to update category",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category")
 		return
 	}
 
@@ -123,52 +88,38 @@ func EditCategory(c *gin.Context) {
 
 func DeleteCategory(c *gin.Context) {
 	var category models.Categories
-	CategoryID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	categoryID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product ID",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID")
 		return
 	}
-	tx:=config.DB.Begin()
+
+	tx := config.DB.Begin()
+
 	// Find the category
-	if err := tx.Unscoped().First(&category, CategoryID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status": "Not Found",
-			"error":  "Category not found",
-			"code":   http.StatusNotFound,
-		})
+	if err := tx.Unscoped().First(&category, categoryID).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
 		return
 	}
 
 	category.IsDeleted = !category.IsDeleted
-    if category.IsDeleted {
-        category.Status = "Blocked"
-    } else {
-        category.Status = "Active"
-    }
+	if category.IsDeleted {
+		category.Status = "Blocked"
+	} else {
+		category.Status = "Active"
+	}
 
-    if err := config.DB.Save(&category).Error; err != nil {
+	if err := tx.Save(&category).Error; err != nil {
 		tx.Rollback()
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status": "Internal Server Error",
-            "error":  "Failed to update category status",
-            "code":   http.StatusInternalServerError,
-        })
-        return
-    }
-
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category status")
+		return
+	}
 
 	var product models.ProductDetail
-	if err := tx.Unscoped().First(&product,"category_id = ?", CategoryID).Error; err != nil {
+	if err := tx.Unscoped().First(&product, "category_id = ?", categoryID).Error; err != nil {
 		tx.Rollback()
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid input data",
-			"code":   http.StatusBadRequest,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
 		return
 	}
 
@@ -182,41 +133,30 @@ func DeleteCategory(c *gin.Context) {
 		updateData["deleted_at"] = nil
 	}
 
-	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("category_id = ?", CategoryID).Updates(updateData).Error; err != nil {
+	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Error",
-			"error":  "Failed to update product",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product")
 		return
 	}
 
-	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("category_id = ?", CategoryID).Updates(updateData).Error; err != nil {
+	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Error",
-			"error":  "Failed to update product variants",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants")
 		return
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Error",
-			"error":  "Transaction commit failed",
-			"code":   http.StatusInternalServerError,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed")
 		return
 	}
+
 	message := "Category deleted successfully"
 	if !category.IsDeleted {
 		message = "Category recovered successfully"
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Ok",
+		"status":  "OK",
 		"message": message,
 		"code":    http.StatusOK,
 	})

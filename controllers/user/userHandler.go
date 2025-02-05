@@ -47,58 +47,38 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 func SignUp(c *gin.Context) {
-	//	var user models.UserAuth
 	var userInput struct {
-		FullName        string `form:"full_name" `
-		Email           string `form:"email" `
-		Password        string `form:"password" `
-		ConfirmPassword string `form:"confirm_password" `
+		FullName        string `form:"full_name"`
+		Email           string `form:"email"`
+		Password        string `form:"password"`
+		ConfirmPassword string `form:"confirm_password"`
 	}
 
 	if err := c.ShouldBind(&userInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  err.Error(),
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	var existingUser models.UserAuth
 	if err := config.DB.Where("email = ?", userInput.Email).First(&existingUser).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"status": "Conflict",
-			"error":  "Email address already exists",
-			"code":   409,
-		})
+		helper.RespondWithError(c, http.StatusConflict, "Email address already exists")
 		return
 	}
 
 	if userInput.Password != userInput.ConfirmPassword {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Passwords do not match",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Passwords do not match")
 		return
 	}
+
 	hashedPassword, err := HashPassword(userInput.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to process password",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password")
 		return
 	}
 
 	session, err := Store.Get(c.Request, "session")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to create session",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session")
 		return
 	}
 	session.Values["full_name"] = userInput.FullName
@@ -106,7 +86,6 @@ func SignUp(c *gin.Context) {
 	session.Values["password"] = hashedPassword
 	session.Save(c.Request, c.Writer)
 	c.Redirect(http.StatusSeeOther, "/user/signup/otp")
-
 }
 
 func ShowOtpVerifyPage(c *gin.Context) {
@@ -125,11 +104,7 @@ func ShowOtpVerifyPage(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Session expired",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired")
 		return
 	}
 	c.HTML(http.StatusOK, "OTPEmailVerification.html", gin.H{
@@ -139,7 +114,6 @@ func ShowOtpVerifyPage(c *gin.Context) {
 }
 
 func ShowLogin(c *gin.Context) {
-
 	tokenString, err := c.Cookie("jwtTokensUser")
 	if err == nil && tokenString != "" {
 		claims := &middleware.Claims{}
@@ -165,66 +139,38 @@ func UserLoginHandler(c *gin.Context) {
 	var input UserInput
 
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Binding the data",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data")
 		return
 	}
 
 	if input.Email == "" || input.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Email and Password are required",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Email and Password are required")
 		return
 	}
 
 	if err := config.DB.Unscoped().Where("email = ?", input.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status": "Unauthorized",
-				"error":  "Invalid Email",
-				"code":   401,
-			})
+			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid Email")
 			return
 		}
 	}
 	if user.IsDeleted {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status": "Unauthorized",
-			"error":  "Your Account Is Deleted",
-			"code":   401,
-		})
+		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Deleted")
 		return
 	}
 	if !CheckPasswordHash(input.Password, user.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid password",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid password")
 		return
 	}
 
 	if user.Status == "Blocked" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status": "Unauthorized",
-			"error":  "Your Account Is Blocked",
-			"code":   403,
-		})
+		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Blocked")
 		return
 	}
 
 	token, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to generate JWT tokens",
-			"code":   "500",
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to generate JWT tokens")
 		return
 	}
 	c.SetCookie("jwtTokensUser", token, int((time.Hour * 1).Seconds()), "/", "", false, true)
@@ -237,9 +183,7 @@ func UserLoginHandler(c *gin.Context) {
 }
 
 func UserLogoutHandler(c *gin.Context) {
-
 	c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
-
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "Success",
 		"message": "User logged out successfully",
