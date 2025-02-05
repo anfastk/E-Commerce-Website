@@ -8,6 +8,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -191,7 +192,7 @@ func UserLoginHandler(c *gin.Context) {
 			return
 		}
 	}
-	if user.IsDeleted{
+	if user.IsDeleted {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status": "Unauthorized",
 			"error":  "Your Account Is Deleted",
@@ -244,4 +245,94 @@ func UserLogoutHandler(c *gin.Context) {
 		"message": "User logged out successfully",
 		"code":    http.StatusOK,
 	})
+}
+
+func ForgotPasswordEmail(c *gin.Context) {
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
+	c.HTML(http.StatusSeeOther, "forgotPasswordEmail.html", nil)
+}
+
+func ForgotUserEmail(c *gin.Context) {
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
+	userEmail := c.PostForm("email")
+	if userEmail == "" {
+		helper.RespondWithError(c, http.StatusBadRequest, "Enter email")
+		return
+	}
+	var existingUser models.UserAuth
+	if err := config.DB.Where("email = ?", userEmail).First(&existingUser).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		return
+	}
+	c.HTML(http.StatusOK, "resetPassword.html", gin.H{
+		"status": "OK",
+		"Email":  userEmail,
+		"code":   http.StatusOK,
+	})
+}
+
+func PasswordReset(c *gin.Context) {
+	tokenString, err := c.Cookie("jwtTokensUser")
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.JwtSecretKey, nil
+		})
+
+		if err == nil && token.Valid {
+			c.Redirect(http.StatusSeeOther, "/")
+			return
+		}
+	}
+	userEmail := c.PostForm("email")
+	password := c.PostForm("password")
+	conformPassword := c.PostForm("conform_password")
+	if password == "" || conformPassword == "" {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		return
+	}
+
+	if password != conformPassword {
+		helper.RespondWithError(c, http.StatusBadRequest, "Password not match")
+		return
+	}
+
+	var existingUser models.UserAuth
+	if err := config.DB.Where("email = ?", userEmail).First(&existingUser).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		return
+	}
+
+	session, err := Store.Get(c.Request, "session")
+	if err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session")
+		return
+	}
+	hashedPassword, err := HashPassword(conformPassword)
+	session.Values["email"] = userEmail
+	session.Values["password"] = hashedPassword
+	session.Save(c.Request, c.Writer)
+	c.Redirect(http.StatusSeeOther, "/user/signup/otp")
 }

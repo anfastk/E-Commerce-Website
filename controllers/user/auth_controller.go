@@ -9,6 +9,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/sessions"
@@ -18,7 +19,6 @@ import (
 var Store = sessions.NewCookieStore([]byte("laptixsecretkey"))
 
 func SendOtp(c *gin.Context) {
-
 	tokenString, err := c.Cookie("jwtTokensUser")
 	if err == nil && tokenString != "" {
 		claims := &middleware.Claims{}
@@ -35,11 +35,7 @@ func SendOtp(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Session expired",
-			"code":   400,
-		})
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired")
 		return
 	}
 
@@ -52,20 +48,12 @@ func SendOtp(c *gin.Context) {
 	otpRecord.ExpireTime = expiry
 
 	if err := config.DB.Create(&otpRecord).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to store OTP",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to store OTP")
 		return
 	}
 
 	if err := utils.SendOTPToEmail(email, otp); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": "Internal Server Error",
-			"error":  "Failed to send OTP",
-			"code":   500,
-		})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP")
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/user/signup/verifyotp")
@@ -78,33 +66,50 @@ func VerifyOtp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&otpInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helper.RespondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
 	var otpRecord models.Otp
 	if err := config.DB.Where("email = ? AND otp = ?", otpInput.Email, otpInput.OTP).Order("created_at DESC").First(&otpRecord).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OTP"})
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid OTP")
 		return
 	}
 
 	if time.Now().After(otpRecord.ExpireTime) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "OTP has expired"})
+		helper.RespondWithError(c, http.StatusBadRequest, "OTP has expired")
 		return
 	}
 
 	session, _ := Store.Get(c.Request, "session")
-	fullName, _ := session.Values["full_name"].(string)
-	hashedPassword, _ := session.Values["password"].(string)
+	var userAuth models.UserAuth
+	if err := config.DB.First(&userAuth, "email = ?", otpInput.Email).Error; err != nil {
+		session, _ := Store.Get(c.Request, "session")
+		fullName, _ := session.Values["full_name"].(string)
+		hashedPassword, _ := session.Values["password"].(string)
 
-	user := models.UserAuth{
-		FullName: fullName,
-		Email:    otpInput.Email,
-		Password: hashedPassword,
-	}
+		userAuth := models.UserAuth{
+			FullName: fullName,
+			Email:    otpInput.Email,
+			Password: hashedPassword,
+		}
 
-	if err := config.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
-		return
+		if err := config.DB.Create(&userAuth).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user")
+			return
+		}
+	} else {
+		session, _ := Store.Get(c.Request, "session")
+		hashedPassword, _ := session.Values["password"].(string)
+
+		userAuth.Password = hashedPassword
+
+		if err := config.DB.Model(&userAuth).
+			Where("id = ?", userAuth.ID).
+			Updates(map[string]interface{}{"password": hashedPassword}).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password")
+			return
+		}
 	}
 
 	session.Options.MaxAge = -1
@@ -121,7 +126,7 @@ func ResendOTP(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Session expired. Please restart the signup process."})
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired. Please restart the signup process.")
 		return
 	}
 
@@ -138,29 +143,30 @@ func ResendOTP(c *gin.Context) {
 				ExpireTime: expiry,
 			}
 			if err := config.DB.Create(&otpRecord).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create OTP record"})
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create OTP record")
 				return
 			}
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve OTP record"})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve OTP record")
 			return
 		}
 	} else {
 		otpRecord.OTP = otp
 		otpRecord.ExpireTime = expiry
 		if err := config.DB.Save(&otpRecord).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update OTP record"})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update OTP record")
 			return
 		}
 	}
 
 	if err := utils.SendOTPToEmail(email, otp); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP")
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{
-		"status":"Status OK",
-		"message":"OTP resend successfully",
-		"code":http.StatusOK,
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Status OK",
+		"message": "OTP resend successfully",
+		"code":    http.StatusOK,
 	})
 }

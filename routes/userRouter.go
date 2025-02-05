@@ -31,6 +31,9 @@ func UserRouter(r *gin.Engine) {
 		user.POST("/signup/otp/resend", controllers.ResendOTP)
 		user.GET("/login", controllers.ShowLogin)
 		user.POST("/login", controllers.UserLoginHandler)
+		user.GET("/forgot/password",controllers.ForgotPasswordEmail)
+		user.POST("/forgot/password",controllers.ForgotUserEmail)
+		user.POST("/reset/password",controllers.PasswordReset)
 		user.POST("/logout", middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
 	}
 
@@ -47,6 +50,8 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/edit/address", controllers.EditAddress)
 		userProfile.POST("/delete/address/:id", controllers.DeleteAddress)
 		userProfile.GET("/settings", controllers.Settings)
+		userProfile.GET("/change/password",controllers.ShowChangePassword)
+		userProfile.POST("/change/password",controllers.ChangePassword)
 	}
 
 	cart := r.Group("/cart")

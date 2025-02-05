@@ -250,5 +250,64 @@ func DeleteAddress(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete address")
 		return
 	}
-	c.Redirect(http.StatusSeeOther,"/profile/manage/address")
+	c.Redirect(http.StatusSeeOther, "/profile/manage/address")
+}
+
+func ShowChangePassword(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	var userAuth models.UserAuth
+	if err := config.DB.First(&userAuth, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		return
+	}
+	c.HTML(http.StatusOK, "profileChangePassword.html", gin.H{
+		"status": "OK",
+		"User":   userAuth,
+		"code":   http.StatusOK,
+	})
+}
+
+func ChangePassword(c *gin.Context) {
+	userID := c.PostForm("user_id")
+	currentPassword := c.PostForm("current_password")
+	password := c.PostForm("password")
+	conformPassword := c.PostForm("conform_password")
+	if currentPassword == "" || password == "" || conformPassword == "" {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		return
+	}
+	var userAuth models.UserAuth
+	if err := config.DB.First(&userAuth, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		return
+	}
+	if userAuth.Password != "" {
+		if !CheckPasswordHash(currentPassword, userAuth.Password) {
+			helper.RespondWithError(c, http.StatusBadRequest, "Enter correct current password")
+			return
+		}
+	}
+	if password != conformPassword {
+		helper.RespondWithError(c, http.StatusBadRequest, "Password not match")
+		return
+	}
+	hashedPassowrd, err := HashPassword(conformPassword)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password")
+		return
+	}
+	userAuth = models.UserAuth{
+		Password: hashedPassowrd,
+	}
+	if err := config.DB.Model(&userAuth).
+		Where("id = ?", userID).
+		Updates(userAuth).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Password Changed successfully",
+		"code":    http.StatusOK,
+	})
 }
