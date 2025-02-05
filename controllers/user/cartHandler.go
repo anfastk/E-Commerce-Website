@@ -23,8 +23,7 @@ func ShowCart(c *gin.Context) {
 		}
 	}
 	var cartItems []models.CartItem
-	if err := config.DB.Preload("ProductDetail").
-		Preload("ProductVariant").
+	if err := config.DB.Preload("ProductVariant").
 		Preload("ProductVariant.VariantsImages").
 		Preload("ProductVariant.Specification").
 		Preload("ProductVariant.Category").
@@ -32,11 +31,17 @@ func ShowCart(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Product Not Found")
 		return
 	}
-	for i := range cartItems {
-		if cartItems[i].ProductVariant.StockQuantity < 3 {
-			if cartItems[i].Quantity >= 3 {
-				cartItems[i].Quantity = cartItems[i].ProductVariant.StockQuantity
-				if createErr := config.DB.Model(&cartItems[i]).Updates(cartItems[i]).Error; createErr != nil {
+	var activeCartItems []models.CartItem
+	for _, item := range cartItems {
+		if item.ProductVariant.ID != 0 {
+			activeCartItems = append(activeCartItems, item)
+		}
+	}
+	for i := range activeCartItems {
+		if activeCartItems[i].ProductVariant.StockQuantity < 3 {
+			if activeCartItems[i].Quantity >= 3 {
+				activeCartItems[i].Quantity = activeCartItems[i].ProductVariant.StockQuantity
+				if createErr := config.DB.Model(&activeCartItems[i]).Updates(activeCartItems[i]).Error; createErr != nil {
 					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed")
 					return
 				}
@@ -91,7 +96,7 @@ func ShowCart(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		"Suggestion": suggest,
-		"CartItem":   cartItems,
+		"CartItem":   activeCartItems,
 	})
 }
 
@@ -171,7 +176,7 @@ func CartItemUpdate(c *gin.Context) {
 			return
 		}
 
-		if product.StockQuantity >= 3 {
+		if cartItems.Quantity < product.StockQuantity {
 
 			if cartItems.Quantity < 3 {
 				cartItems.Quantity = qty + 1
@@ -229,13 +234,40 @@ func ShowCartTotal(c *gin.Context) {
 	for _, items := range cartItems {
 		total += items.ProductVariant.SalePrice * float64(items.Quantity)
 	}
+	count:=CartCount(c)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
 		"message": "Total fetch success",
-		"Count":   len(cartItems),
+		"Count":   count,
 		"Total":   total,
 		"code":    http.StatusOK,
 	})
+}
+func CartCount(c *gin.Context)(int){
+	userID := c.MustGet("userid").(uint)
+	var count int
+	var cart models.Cart
+	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong")
+		return 0
+	}
+	var cartItems []models.CartItem
+	if err := config.DB.Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong")
+		return 0
+	}
+	var productIDs []uint
+	for _, cartItem := range cartItems {
+		productIDs = append(productIDs, cartItem.ProductID)
+	}
+	var product []models.ProductVariantDetails
+	if err := config.DB.Find(&product, "id IN ?", productIDs).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong")
+		return 0
+	}
+	count=len(product)
+
+	return count
 }
 
 func DeleteCartItems(c *gin.Context) {
