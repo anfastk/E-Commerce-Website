@@ -55,30 +55,30 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&userInput); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, err.Error())
+		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data", "Binding the data", "")
 		return
 	}
 
 	var existingUser models.UserAuth
 	if err := config.DB.Where("email = ?", userInput.Email).First(&existingUser).Error; err == nil {
-		helper.RespondWithError(c, http.StatusConflict, "Email address already exists")
+		helper.RespondWithError(c, http.StatusConflict, "Email address already exists", "Email address already exists", "")
 		return
 	}
 
 	if userInput.Password != userInput.ConfirmPassword {
-		helper.RespondWithError(c, http.StatusBadRequest, "Passwords do not match")
+		helper.RespondWithError(c, http.StatusBadRequest, "Passwords do not match", "Passwords do not match", "")
 		return
 	}
 
 	hashedPassword, err := HashPassword(userInput.Password)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password", "Failed to process password", "")
 		return
 	}
 
 	session, err := Store.Get(c.Request, "session")
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session", "Failed to create session", "")
 		return
 	}
 	session.Values["full_name"] = userInput.FullName
@@ -104,7 +104,7 @@ func ShowOtpVerifyPage(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Session expired")
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired", "Session expired", "")
 		return
 	}
 	c.HTML(http.StatusOK, "OTPEmailVerification.html", gin.H{
@@ -139,38 +139,38 @@ func UserLoginHandler(c *gin.Context) {
 	var input UserInput
 
 	if err := c.ShouldBind(&input); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data", "Binding the data", "")
 		return
 	}
 
 	if input.Email == "" || input.Password == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Email and Password are required")
+		helper.RespondWithError(c, http.StatusBadRequest, "Email and Password are required", "Email and Password are required", "")
 		return
 	}
 
 	if err := config.DB.Unscoped().Where("email = ?", input.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid Email")
+			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid Email", "Invalid Email", "")
 			return
 		}
 	}
 	if user.IsDeleted {
-		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Deleted")
+		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Deleted", "Your Account Is Deleted", "")
 		return
 	}
 	if !CheckPasswordHash(input.Password, user.Password) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid password")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid password", "Invalid password", "")
 		return
 	}
 
 	if user.Status == "Blocked" {
-		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Blocked")
+		helper.RespondWithError(c, http.StatusUnauthorized, "Your Account Is Blocked", "Your Account Is Blocked", "")
 		return
 	}
 
 	token, err := middleware.GenerateJWT(user.ID, user.Email, RoleUser)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to generate JWT tokens")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to generate JWT tokens", "Failed to generate JWT tokens", "")
 		return
 	}
 	c.SetCookie("jwtTokensUser", token, int((time.Hour * 1).Seconds()), "/", "", false, true)
@@ -222,12 +222,12 @@ func ForgotUserEmail(c *gin.Context) {
 	}
 	userEmail := c.PostForm("email")
 	if userEmail == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Enter email")
+		helper.RespondWithError(c, http.StatusBadRequest, "Enter email", "Enter email", "")
 		return
 	}
 	var existingUser models.UserAuth
 	if err := config.DB.Where("email = ?", userEmail).First(&existingUser).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 	c.HTML(http.StatusOK, "resetPassword.html", gin.H{
@@ -254,24 +254,24 @@ func PasswordReset(c *gin.Context) {
 	password := c.PostForm("password")
 	conformPassword := c.PostForm("conform_password")
 	if password == "" || conformPassword == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
 	}
 
 	if password != conformPassword {
-		helper.RespondWithError(c, http.StatusBadRequest, "Password not match")
+		helper.RespondWithError(c, http.StatusBadRequest, "Password not match", "Password not match", "")
 		return
 	}
 
 	var existingUser models.UserAuth
 	if err := config.DB.Where("email = ?", userEmail).First(&existingUser).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 
 	session, err := Store.Get(c.Request, "session")
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create session", "Failed to create session", "")
 		return
 	}
 	hashedPassword, err := HashPassword(conformPassword)

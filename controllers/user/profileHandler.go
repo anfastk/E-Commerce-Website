@@ -17,7 +17,7 @@ func ProfileDetails(c *gin.Context) {
 		Where("id = ? AND is_blocked = ?", userID, false).
 		First(&authDetails).
 		Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 	c.HTML(http.StatusOK, "profile.html", gin.H{
@@ -36,12 +36,12 @@ func ProfileUpdate(c *gin.Context) {
 		Pincode  string `json:"zipcode"`
 	}
 	if err := c.ShouldBindJSON(&userUpdate); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data", "Invalid data", "")
 		return
 	}
 	userID, err := strconv.ParseUint(userUpdate.Id, 10, 64)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user_id")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user_id", "Invalid user_id", "")
 		return
 	}
 
@@ -55,7 +55,7 @@ func ProfileUpdate(c *gin.Context) {
 		"email":     userUpdate.Email,
 	}).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Failed to update user")
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to update user", "Failed to update user", "")
 		return
 	}
 
@@ -71,7 +71,7 @@ func ProfileUpdate(c *gin.Context) {
 		}
 		if err := tx.Create(&profile).Error; err != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user", "Failed to create user", "")
 			return
 		}
 	} else {
@@ -82,13 +82,13 @@ func ProfileUpdate(c *gin.Context) {
 			"pincode": userUpdate.Pincode,
 		}).Error; err != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update user")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update user", "Failed to update user", "")
 			return
 		}
 	}
 
 	tx.Commit()
-	helper.RespondWithError(c, http.StatusOK, "User updated successfully")
+	helper.RespondWithError(c, http.StatusOK, "User updated successfully", "User updated successfully", "")
 }
 
 func Settings(c *gin.Context) {
@@ -104,6 +104,7 @@ func Settings(c *gin.Context) {
 		"User": userDetails,
 	})
 }
+
 func ManageAddress(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
@@ -112,7 +113,7 @@ func ManageAddress(c *gin.Context) {
 		Where("id = ? AND is_blocked = ?", userID, false).
 		First(&authDetails).
 		Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 
@@ -126,7 +127,7 @@ func ShowAddAddress(c *gin.Context) {
 
 	var userauth models.UserAuth
 	if err := config.DB.Find(&userauth, "id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 	c.HTML(http.StatusOK, "addNewAddress.html", gin.H{
@@ -150,7 +151,7 @@ func AddAddress(c *gin.Context) {
 	var address models.UserAddress
 
 	if err := c.ShouldBindJSON(&addAddress); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Invalid Data", "")
 		return
 	}
 
@@ -167,10 +168,10 @@ func AddAddress(c *gin.Context) {
 		UserID:    userID,
 	}
 	if err := config.DB.Create(&address).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "User create failed")
+		helper.RespondWithError(c, http.StatusInternalServerError, "User create failed", "User create failed", "")
 		return
 	}
-	helper.RespondWithError(c, http.StatusOK, "User create successfully")
+	helper.RespondWithError(c, http.StatusOK, "User create successfully", "User create successfully", "")
 }
 
 func ShowEditAddress(c *gin.Context) {
@@ -178,13 +179,13 @@ func ShowEditAddress(c *gin.Context) {
 	id := c.Param("id")
 	var userauth models.UserAuth
 	if err := config.DB.Find(&userauth, "id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 
 	var userAddress models.UserAddress
 	if err := config.DB.First(&userAddress, "id = ? AND user_id = ?", id, userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Address not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
 		return
 	}
 	c.HTML(http.StatusOK, "editAddress.html", gin.H{
@@ -210,12 +211,12 @@ func EditAddress(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&UpdateAddress); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "invalid data")
+		helper.RespondWithError(c, http.StatusBadRequest, "invalid data", "invalid data", "")
 		return
 	}
 	ID, err := strconv.ParseUint(UpdateAddress.Id, 10, 64)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "invalid id")
+		helper.RespondWithError(c, http.StatusBadRequest, "invalid id", "invalid id", "")
 		return
 	}
 	var address models.UserAddress
@@ -231,10 +232,10 @@ func EditAddress(c *gin.Context) {
 		"city":       UpdateAddress.City,
 		"pin_code":   UpdateAddress.PinCode,
 	}).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update address")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update address", "Failed to update address", "")
 		return
 	}
-	helper.RespondWithError(c, http.StatusOK, "User updated successfully")
+	helper.RespondWithError(c, http.StatusOK, "User updated successfully", "User updated successfully", "")
 }
 
 func DeleteAddress(c *gin.Context) {
@@ -242,12 +243,12 @@ func DeleteAddress(c *gin.Context) {
 
 	var address models.UserAddress
 	if err := config.DB.First(&address, id).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Address not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
 		return
 	}
 
 	if err := config.DB.Unscoped().Delete(&address).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete address")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete address", "Failed to delete address", "")
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/profile/manage/address")
@@ -257,7 +258,7 @@ func ShowChangePassword(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 	var userAuth models.UserAuth
 	if err := config.DB.First(&userAuth, userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 	c.HTML(http.StatusOK, "profileChangePassword.html", gin.H{
@@ -273,27 +274,27 @@ func ChangePassword(c *gin.Context) {
 	password := c.PostForm("password")
 	conformPassword := c.PostForm("conform_password")
 	if currentPassword == "" || password == "" || conformPassword == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
 	}
 	var userAuth models.UserAuth
 	if err := config.DB.First(&userAuth, userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "User not found")
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 	if userAuth.Password != "" {
 		if !CheckPasswordHash(currentPassword, userAuth.Password) {
-			helper.RespondWithError(c, http.StatusBadRequest, "Enter correct current password")
+			helper.RespondWithError(c, http.StatusBadRequest, "Enter correct current password", "Enter correct current password", "")
 			return
 		}
 	}
 	if password != conformPassword {
-		helper.RespondWithError(c, http.StatusBadRequest, "Password not match")
+		helper.RespondWithError(c, http.StatusBadRequest, "Password not match", "Password not match", "")
 		return
 	}
 	hashedPassowrd, err := HashPassword(conformPassword)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process password", "Failed to process password", "")
 		return
 	}
 	userAuth = models.UserAuth{
@@ -302,7 +303,7 @@ func ChangePassword(c *gin.Context) {
 	if err := config.DB.Model(&userAuth).
 		Where("id = ?", userID).
 		Updates(userAuth).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password", "Failed to change password", "")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

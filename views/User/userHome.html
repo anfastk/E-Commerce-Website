@@ -126,7 +126,7 @@
         <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
             {{range .Laptop}}
             <a href="/products/details/{{.ID}}">
-                <div class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0">
+                <div class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2">
                     <div class="relative h-48">
                         {{if len .Images}}
                         <img src="{{index .Images 0}}" alt="Product" class="w-full h-full object-contain">
@@ -142,6 +142,15 @@
                     <div class="text-center">
                         <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
                         <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
+                    </div>
+                    <div class="flex flex-1 justify-center p-4">
+                        
+                        <form action="/cart/add/{{.ID}}" method="post">
+                            <button
+                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
+                                Add To Cart
+                            </button>
+                        </form>
                     </div>
                 </div>
             </a>
@@ -202,10 +211,13 @@
                         NVMe
                         SSD/Windows 11 Home/NVIDIA GeForce RTX 4080, Core Black/3.6Kg), A14VHG-207IN
                     </p>
-                    <button
-                        class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
-                        Add To Cart
-                    </button>
+                    <form action="/cart/add/1" method="post">
+                        <button
+                            class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
+                            Add To Cart
+                        </button>
+                    </form>
+
                 </div>
                 <!-- Image Section -->
                 <div class="lg:w-1/2 w-md flex justify-center">
@@ -231,10 +243,13 @@
                         on a
                         full charge.
                     </p>
-                    <button
-                        class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
-                        Add To Cart
-                    </button>
+                    <form action="/cart/add/2" method="post">
+                        <button
+                            class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
+                            Add To Cart
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </a>
@@ -249,10 +264,13 @@
                         and Palm Rest, Titan II Tactile Linear Switches, Aluminum Plate, 100M Keystroke Durability –
                         Black
                     </p>
-                    <button
-                        class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
-                        Add To Cart
-                    </button>
+                    <form action="/cart/add/3" method="post">
+                        <button
+                            class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">
+                            Add To Cart
+                        </button>
+                    </form>
+
                 </div>
                 <!-- Image Section -->
                 <div class="lg:w-1/2 w-full flex justify-center">
@@ -273,7 +291,7 @@
         </div>
         <div class="relative">
             <!-- Product Cards -->
-            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4">
+            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4 pb-6">
                 {{range .Mouse}}
                 <a href="/products/details/{{.ID}}">
                     <div
@@ -298,13 +316,15 @@
                         <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}</p>
                         <div class="text-center">
                             <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
-                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
-                                .RegularPrice}}</span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
                         </div>
-                        <button
-                            class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                            Add To Cart
-                        </button>
+                        <form action="/cart/add/{{.ID}}" method="post">
+                            <button
+                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
+                                Add To Cart
+                            </button>
+                        </form>
+
                     </div>
                 </a>
                 {{end}}
@@ -357,7 +377,7 @@
                 {{range .Keyboard}}
                 <a href="/products/details/{{.ID}}">
                     <div
-                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
+                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0 mb-4">
                         <div class="relative w-full flex justify-center">
                             <button
                                 class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
@@ -382,10 +402,13 @@
                             <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
                                 .RegularPrice}}</span>
                         </div>
-                        <button
-                            class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                            Add To Cart
-                        </button>
+                        <form action="/cart/add/{{.ID}}" method="post">
+                            <button
+                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
+                                Add To Cart
+                            </button>
+                        </form>
+
                     </div>
                 </a>
                 {{end}}

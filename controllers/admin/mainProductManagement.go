@@ -35,7 +35,7 @@ func ShowProductsAdmin(c *gin.Context) {
 		Find(&variants)
 
 	if result.Error != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")
 		return
 	}
 
@@ -92,7 +92,7 @@ func ShowProductsAdmin(c *gin.Context) {
 func ShowAddMainProduct(c *gin.Context) {
 	var categories []models.Categories
 	if err := config.DB.Where("is_deleted = ? AND status = ?", false, "Active").Find(&categories).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
 		return
 	}
 
@@ -106,7 +106,7 @@ func AddMainProductDetails(c *gin.Context) {
 	categoryID, err := strconv.ParseInt(c.PostForm("category"), 10, 64)
 	if err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Invalid category ID")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Invalid category ID", "Invalid category ID", "")
 		return
 	}
 	product := models.ProductDetail{
@@ -118,7 +118,7 @@ func AddMainProductDetails(c *gin.Context) {
 	}
 	if err := tx.Create(&product).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product", "Failed to save product", "")
 		return
 	}
 	cld := config.InitCloudinary()
@@ -133,7 +133,7 @@ func AddMainProductDetails(c *gin.Context) {
 			url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "products")
 			if err != nil {
 				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
 				return
 			}
 			image := models.ProductImage{
@@ -141,7 +141,7 @@ func AddMainProductDetails(c *gin.Context) {
 				ProductID:     product.ID,
 			}
 			if err := tx.Create(&image).Error; err != nil {
-				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
 				return
 			}
 		}
@@ -154,13 +154,13 @@ func AddMainProductDetails(c *gin.Context) {
 func ShowMainProductDetails(c *gin.Context) {
 	productID, err := strconv.Atoi(c.Query("product_id"))
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
 		return
 	}
 
 	productDetails, err := services.ShowMainProductsDetails(uint(productID))
 	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details", "Failed to fetch product details", "")
 		return
 	}
 
@@ -172,13 +172,13 @@ func ShowMainProductDetails(c *gin.Context) {
 func AddProductDescription(c *gin.Context) {
 	productID, err := strconv.Atoi(c.PostForm("product_id"))
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
 		return
 	}
 	headings := c.PostFormArray("heading[]")
 	descriptions := c.PostFormArray("description[]")
 	if len(headings) != len(descriptions) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in headings and descriptions")
+		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in headings and descriptions", "Mismatch in headings and descriptions", "")
 		return
 	}
 	for i := 0; i < len(headings); i++ {
@@ -188,7 +188,7 @@ func AddProductDescription(c *gin.Context) {
 			Description: descriptions[i],
 		}
 		if err := config.DB.Create(&description).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save description")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save description", "Failed to save description", "")
 			return
 		}
 	}
@@ -203,18 +203,18 @@ func ShowEditMainProduct(c *gin.Context) {
 	productID := c.Param("id")
 	var mainProduct models.ProductDetail
 	if err := config.DB.First(&mainProduct, productID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusNotFound, "Product not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Product not found", "Product not found", "")
 		return
 	}
 	var productCategoryName models.Categories
 	if err := config.DB.Where("is_deleted = ? AND status = ? AND id = ?", false, "Active", mainProduct.CategoryID).Find(&productCategoryName).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
 		return
 	}
 
 	var categories []models.Categories
 	if err := config.DB.Where("is_deleted = ? AND status = ?", false, "Active").Find(&categories).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
 		return
 	}
 
@@ -240,21 +240,21 @@ func EditMainProduct(c *gin.Context) {
 	var existingProduct models.ProductDetail
 	if err := tx.First(&existingProduct, productID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Product not found", "Product not found", "")
 		return
 	}
 
 	var updateData updateProduct
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, err.Error())
+		helper.RespondWithError(c, http.StatusBadRequest, err.Error(), err.Error(), "")
 		return
 	}
 
 	categoryID, err := strconv.ParseUint(updateData.CategoryID, 10, 32)
 	if err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID format")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID format", "Invalid category ID format", "")
 		return
 	}
 
@@ -266,20 +266,20 @@ func EditMainProduct(c *gin.Context) {
 		IsReturnable:   updateData.IsReturnable,
 	}).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, err.Error())
+		helper.RespondWithError(c, http.StatusInternalServerError, err.Error(), err.Error(), "")
 		return
 	}
 
 	var variants []models.ProductVariantDetails
 	if err := tx.Unscoped().Find(&variants, "product_id = ?", existingProduct.ID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product variants not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Product variants not found", "Product variants not found", "")
 		return
 	}
 
 	if err := tx.Model(&variants).Update("category_id", existingProduct.CategoryID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, err.Error())
+		helper.RespondWithError(c, http.StatusInternalServerError, err.Error(), err.Error(), "")
 		return
 	}
 	tx.Commit()
@@ -293,7 +293,7 @@ func EditMainProduct(c *gin.Context) {
 func DeleteMainProduct(c *gin.Context) {
 	productID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
 		return
 	}
 
@@ -302,20 +302,20 @@ func DeleteMainProduct(c *gin.Context) {
 	var product models.ProductDetail
 	if err := tx.Unscoped().First(&product, productID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
 	}
 
 	var category models.Categories
 	if err := config.DB.Unscoped().First(&category, "ID = ?", product.CategoryID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found", "Category not found", "")
 		return
 	}
 
 	if category.IsDeleted {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Cannot recover because the category is deleted.")
+		helper.RespondWithError(c, http.StatusBadRequest, "Cannot recover because the category is deleted.", "Cannot recover because the category is deleted.", "")
 		return
 	}
 
@@ -331,18 +331,18 @@ func DeleteMainProduct(c *gin.Context) {
 
 	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("id = ?", productID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product", "Failed to update product", "")
 		return
 	}
 
 	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("product_id = ?", productID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants", "Failed to update product variants", "")
 		return
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed", "Transaction commit failed", "")
 		return
 	}
 
@@ -357,12 +357,12 @@ func DeleteDescription(c *gin.Context) {
 	descriptionID := c.Param("id")
 	var description models.ProductDescription
 	if err := config.DB.First(&description, descriptionID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Description not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Description not found", "Description not found", "")
 		return
 	}
 
 	if err := config.DB.Unscoped().Delete(&description).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete description")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete description", "Failed to delete description", "")
 		return
 	}
 
@@ -382,26 +382,26 @@ func UpdateProductDescription(c *gin.Context) {
 
 	var updateData UpdateDescription
 	if err := c.ShouldBindJSON(&updateData); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Invalid request payload", "")
 		return
 	}
 
 	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
 		return
 	}
 
 	if len(updateData.DescriptionIDs) != len(updateData.Headings) ||
 		len(updateData.Headings) != len(updateData.Descriptions) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in description IDs, headings, and descriptions")
+		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in description IDs, headings, and descriptions", "Mismatch in description IDs, headings, and descriptions", "")
 		return
 	}
 
 	for i := 0; i < len(updateData.DescriptionIDs); i++ {
 		descID, err := strconv.Atoi(updateData.DescriptionIDs[i])
 		if err != nil {
-			helper.RespondWithError(c, http.StatusBadRequest, "Invalid description ID")
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid description ID", "Invalid description ID", "")
 			return
 		}
 		result := config.DB.Model(&models.ProductDescription{}).
@@ -412,12 +412,12 @@ func UpdateProductDescription(c *gin.Context) {
 			})
 
 		if result.Error != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update description")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update description", "Failed to update description", "")
 			return
 		}
 
 		if result.RowsAffected == 0 {
-			helper.RespondWithError(c, http.StatusNotFound, "Description not found")
+			helper.RespondWithError(c, http.StatusNotFound, "Description not found", "Description not found", "")
 			return
 		}
 	}
@@ -429,66 +429,61 @@ func UpdateProductDescription(c *gin.Context) {
 	})
 }
 func ReplaceMainProductImage(c *gin.Context) {
-	productID, err := strconv.Atoi(c.PostForm("product_id"))
-	if err != nil {
+    productID, err := strconv.Atoi(c.PostForm("product_id"))
+    if err != nil {
+        helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
+        return
+    }
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "Bad Request",
-			"error":  "Invalid product ID",
-			"code":   http.StatusBadRequest,
-		})
-		return
-	}
+    tx := config.DB.Begin()
+    var productImage models.ProductImage
+    if err := tx.First(&productImage, "product_id = ?", productID).Error; err != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusNotFound, "Product image not found", "Product image not found", "")
+        return
+    }
 
-	tx := config.DB.Begin()
-	var productImage models.ProductImage
-	if err := tx.First(&productImage,"product_id = ?",productID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusNotFound,"Product image not found")
-		return
-	}
+    oldImage := productImage.ProductImages
 
-	oldImage := productImage.ProductImages
+    form, err := c.FormFile("product_image")
+    if err != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusBadRequest, "No file uploaded", "No file uploaded", "")
+        return
+    }
 
-	form, err := c.FormFile("product_image")
-	if err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusBadRequest,"No file uploaded")
-		return
-	}
+    cld := config.InitCloudinary()
+    file, _ := form.Open()
+    url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products")
+    if uploadErr != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
+        return
+    }
 
-	cld := config.InitCloudinary()
-	file, _ := form.Open()
-	url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products")
-	if uploadErr != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to upload product image")
-		return
-	}
+    if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update image", "Failed to update image", "")
+        return
+    }
 
-	if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to update image")
-		return
-	}
+    publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
+    if err != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to extract Cloudinary public ID", "Failed to extract Cloudinary public ID", "")
+        return
+    }
 
-	publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
-	if err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to extract Cloudinary public ID")
-		return
-	}
+    if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+        tx.Rollback()
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary", "Failed to delete image from Cloudinary", "")
+        return
+    }
 
-	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c,http.StatusInternalServerError,"Failed to delete image from Cloudinary")
-		return
-	}
-
-	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{
-		"status":   "Success",
-		"filename": url,
-		"code":     http.StatusOK,
-	})
+    tx.Commit()
+    c.JSON(http.StatusOK, gin.H{
+        "status":   "Success",
+        "filename": url,
+        "code":     http.StatusOK,
+    })
 }

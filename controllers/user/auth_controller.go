@@ -35,7 +35,7 @@ func SendOtp(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Session expired")
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired", "Session expired", "")
 		return
 	}
 
@@ -48,12 +48,12 @@ func SendOtp(c *gin.Context) {
 	otpRecord.ExpireTime = expiry
 
 	if err := config.DB.Create(&otpRecord).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to store OTP")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to store OTP", "Failed to store OTP", "")
 		return
 	}
 
 	if err := utils.SendOTPToEmail(email, otp); err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP", "Failed to send OTP", "")
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/user/signup/verifyotp")
@@ -66,18 +66,18 @@ func VerifyOtp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&otpInput); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, err.Error())
+		helper.RespondWithError(c, http.StatusBadRequest, err.Error(), err.Error(), "")
 		return
 	}
 
 	var otpRecord models.Otp
 	if err := config.DB.Where("email = ? AND otp = ?", otpInput.Email, otpInput.OTP).Order("created_at DESC").First(&otpRecord).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid OTP")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid OTP", "Invalid OTP", "")
 		return
 	}
 
 	if time.Now().After(otpRecord.ExpireTime) {
-		helper.RespondWithError(c, http.StatusBadRequest, "OTP has expired")
+		helper.RespondWithError(c, http.StatusBadRequest, "OTP has expired", "OTP has expired", "")
 		return
 	}
 
@@ -95,7 +95,7 @@ func VerifyOtp(c *gin.Context) {
 		}
 
 		if err := config.DB.Create(&userAuth).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user", "Failed to create user", "")
 			return
 		}
 	} else {
@@ -107,7 +107,7 @@ func VerifyOtp(c *gin.Context) {
 		if err := config.DB.Model(&userAuth).
 			Where("id = ?", userAuth.ID).
 			Updates(map[string]interface{}{"password": hashedPassword}).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to change password", "Failed to change password", "")
 			return
 		}
 	}
@@ -126,7 +126,7 @@ func ResendOTP(c *gin.Context) {
 	session, _ := Store.Get(c.Request, "session")
 	email, exists := session.Values["email"].(string)
 	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Session expired. Please restart the signup process.")
+		helper.RespondWithError(c, http.StatusBadRequest, "Session expired", "Session expired. Please restart the signup process.", "")
 		return
 	}
 
@@ -143,24 +143,24 @@ func ResendOTP(c *gin.Context) {
 				ExpireTime: expiry,
 			}
 			if err := config.DB.Create(&otpRecord).Error; err != nil {
-				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create OTP record")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create OTP record", "Failed to create OTP record", "")
 				return
 			}
 		} else {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve OTP record")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve OTP record", "Failed to retrieve OTP record", "")
 			return
 		}
 	} else {
 		otpRecord.OTP = otp
 		otpRecord.ExpireTime = expiry
 		if err := config.DB.Save(&otpRecord).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update OTP record")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update OTP record", "Failed to update OTP record", "")
 			return
 		}
 	}
 
 	if err := utils.SendOTPToEmail(email, otp); err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send OTP", "Failed to send OTP", "")
 		return
 	}
 

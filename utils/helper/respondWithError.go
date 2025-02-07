@@ -6,10 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RespondWithError(c *gin.Context, status int, message string) {
+func RespondWithError(c *gin.Context, status int, error string, message string, redirect string) {
 	c.JSON(status, gin.H{
-		"status":  http.StatusText(status),
-		"message": message,
-		"code":    status,
+		"status":   http.StatusText(status),
+		"error":    error,
+		"message":  message,
+		"code":     status,
+		"redirect": redirect,
 	})
 }

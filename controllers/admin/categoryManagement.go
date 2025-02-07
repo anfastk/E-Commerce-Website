@@ -15,7 +15,7 @@ func ListCategory(c *gin.Context) {
 	var categories []models.Categories
 
 	if err := config.DB.Order("id ASC").Find(&categories).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
 		return
 	}
 	c.HTML(http.StatusOK, "categoryManagement.html", gin.H{
@@ -28,17 +28,17 @@ func AddCategory(c *gin.Context) {
 
 	var category models.Categories
 	if err := c.ShouldBind(&category); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
 	}
 
 	if category.Name == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required")
+		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
 		return
 	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category", "Failed to create category", "")
 		return
 	}
 
@@ -53,29 +53,29 @@ func EditCategory(c *gin.Context) {
 	categoryID := c.Param("id")
 
 	if categoryID == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Category ID is missing")
+		helper.RespondWithError(c, http.StatusBadRequest, "Category ID is missing", "Category ID is missing", "")
 		return
 	}
 
 	if _, err := strconv.ParseInt(categoryID, 10, 64); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Category ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Category ID", "Invalid Category ID", "")
 		return
 	}
 
 	var category models.Categories
 
 	if err := config.DB.First(&category, categoryID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found", "Category not found", "")
 		return
 	}
 
 	if err := c.Bind(&category); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Failed to bind form data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to bind form data", "Failed to bind form data", "")
 		return
 	}
 
 	if err := config.DB.Model(&category).Where("id = ?", categoryID).Updates(category).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category", "Failed to update category", "")
 		return
 	}
 
@@ -90,7 +90,7 @@ func DeleteCategory(c *gin.Context) {
 	var category models.Categories
 	categoryID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID", "Invalid category ID", "")
 		return
 	}
 
@@ -99,7 +99,7 @@ func DeleteCategory(c *gin.Context) {
 	// Find the category
 	if err := tx.Unscoped().First(&category, categoryID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Category not found")
+		helper.RespondWithError(c, http.StatusNotFound, "Category not found", "Category not found", "")
 		return
 	}
 
@@ -112,14 +112,14 @@ func DeleteCategory(c *gin.Context) {
 
 	if err := tx.Save(&category).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category status")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category status", "Failed to update category status", "")
 		return
 	}
 
 	var product models.ProductDetail
 	if err := tx.Unscoped().First(&product, "category_id = ?", categoryID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
 	}
 
@@ -135,18 +135,18 @@ func DeleteCategory(c *gin.Context) {
 
 	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product", "Failed to update product", "")
 		return
 	}
 
 	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants", "Failed to update product variants", "")
 		return
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed", "Transaction commit failed", "")
 		return
 	}
 
