@@ -244,11 +244,25 @@
                     <span class="text-yellow-400 text-lg">&#9733; &#9733; &#9733; &#9733; &#9734;</span>
                     <span class="ml-0 sm:ml-2 text-gray-600 text-sm">4.7 Star Rating (21,671 User feedback)</span>
                 </div>
-                <p class="text-sm text-green-600 mb-1">Availability: <span class="font-semibold">{{if gt .product.Stock
-                        0}}In Stock{{else}}Out of Stock{{end}}</span></p>
+                <p class="text-sm mb-1 font-bold">{{if gt .product.Stock
+                    0}}<span class="bold text-green-500">In Stock</span>{{else}}<span class="text-red-500">Out
+                        of Stock</span>{{end}}</p>
 
+                {{if gt .product.Stock 0}}
+                <p class="text-sm mb-1 font-semibold">
+                    
+                    {{if gt .product.Stock 10}}
+                    <span>
+                        Stock Left: <span  class="text-green-500">{{.product.Stock}}</span>
+                    </span>
+                    {{else}}
+                    <span class="text-red-500">
+                        Only {{.product.Stock}} product left
+                    </span>
+                    {{end}}
+                </p>
+                {{end}}
                 <p class="text-sm text-gray-600 mb-2">
-                    Brand: <span class="font-semibold"></span> &nbsp;&nbsp;
                     Category: <span class="font-semibold"> {{.product.CategoryName}}</span>
                 </p>
                 <p class="text-xl md:text-2xl font-bold text-gray-900 mb-2">

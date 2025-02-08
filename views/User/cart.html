@@ -151,15 +151,17 @@
                             <span class="font-bold">TOTAL</span>
                             <span class="total-amount font-bold">₹{{.Total}}</span>
                         </div>
-                        <button
-                            class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
-                            PROCEED TO CHECKOUT
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </button>
+                        <a href="/cart/checkout">
+                            <button
+                                class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
+                                PROCEED TO CHECKOUT
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </button>
+                        </a>
                     </div>
                 </div>
                 {{end}}

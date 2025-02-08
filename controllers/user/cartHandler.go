@@ -19,7 +19,7 @@ func ShowCart(c *gin.Context) {
 		}
 		if createErr := config.DB.Create(&cart).Error; createErr != nil {
 			config.DB.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed","Cart creation Failed","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed", "Cart creation Failed", "")
 		}
 	}
 	var cartItems []models.CartItem
@@ -27,7 +27,7 @@ func ShowCart(c *gin.Context) {
 		Preload("ProductVariant.VariantsImages").
 		Preload("ProductVariant.Category").
 		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found","Product Not Found","")
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product Not Found", "")
 		return
 	}
 	var activeCartItems []models.CartItem
@@ -43,7 +43,7 @@ func ShowCart(c *gin.Context) {
 				if createErr := config.DB.Model(&activeCartItems[i]).Updates(map[string]interface{}{
 					"quantity": activeCartItems[i].Quantity,
 				}).Error; createErr != nil {
-					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed","Add to Cart Failed","")
+					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 					return
 				}
 			}
@@ -63,19 +63,19 @@ func ShowCart(c *gin.Context) {
 	var suggestionProduct []models.ProductVariantDetails
 	if len(productIDs) == 0 {
 		result := config.DB.Limit(4).
-			Preload("VariantsImages", "is_deleted = ?", false).
-			Where("is_deleted = ?", false).
+			Preload("VariantsImages", "is_deleted = ? ", false).
+			Where("is_deleted = ? AND stock_quantity != ?", false, 0).
 			Find(&suggestionProduct)
 		if result.Error != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch ","product variants","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch ", "product variants", "")
 			return
 		}
 	} else {
 		result := config.DB.Limit(4).Preload("VariantsImages", "is_deleted = ?", false).
-			Where("is_deleted = ? AND id NOT IN ?", false, productIDs).
+			Where("is_deleted = ? AND id NOT IN ? AND stock_quantity != ?", false, productIDs, 0).
 			Find(&suggestionProduct)
 		if result.Error != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants","Failed to fetch product variants","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")
 			return
 		}
 	}
@@ -112,24 +112,30 @@ func AddToCart(c *gin.Context) {
 		}
 		if createErr := tx.Create(&cart).Error; createErr != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed","Cart creation Failed","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed", "Cart creation Failed", "")
 		}
+	}
+	count := CartCount(c)
+	if count >= 4 {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "You have reached the maximum limit for this product in your cart.", "You have reached the maximum limit for this product in your cart.", "")
+		return
 	}
 	productID, iderr := strconv.Atoi(c.Param("id"))
 	if iderr != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Product Id Not Found","Product Id Not Found","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Product Id Not Found", "Product Id Not Found", "")
 		return
 	}
 	var product models.ProductVariantDetails
 	if err := tx.First(&product, productID).Error; err != nil {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found ","Product Not Found ","")
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found ", "Product Not Found ", "")
 		return
 	}
 	if product.StockQuantity == 0 {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusConflict, "Product Out Of Stock","Product Out Of Stock","")
+		helper.RespondWithError(c, http.StatusConflict, "Product Out Of Stock", "Product Out Of Stock", "")
 		return
 	}
 
@@ -143,7 +149,7 @@ func AddToCart(c *gin.Context) {
 		}
 		if createErr := tx.Create(&cartItems).Error; createErr != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed","Add to Cart Failed","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 			return
 		}
 	} else {
@@ -151,26 +157,26 @@ func AddToCart(c *gin.Context) {
 		cartItems.Quantity = qty + 1
 		if updateErr := tx.Model(&cartItems).Updates(cartItems).Error; updateErr != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed","Add to Cart Failed","")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 			return
 		}
 	}
 	tx.Commit()
-	helper.RespondWithError(c, http.StatusOK, "Add to Cart Success","Add to Cart Success","")
+	helper.RespondWithError(c, http.StatusOK, "Add to Cart Success", "Add to Cart Success", "")
 }
 
 func CartItemUpdate(c *gin.Context) {
 	itemID := c.Param("id")
 	var cartItems models.CartItem
 	if err := config.DB.First(&cartItems, itemID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found","Product Not Found","")
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product Not Found", "")
 	}
 
 	var requestBody struct {
 		Action string `json:"action"`
 	}
 	if err := c.BindJSON(&requestBody); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request body","Invalid request body","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request body", "Invalid request body", "")
 		return
 	}
 
@@ -178,7 +184,7 @@ func CartItemUpdate(c *gin.Context) {
 	if requestBody.Action == "increase" {
 		var product models.ProductVariantDetails
 		if err := config.DB.First(&product, cartItems.ProductVariantID).Error; err != nil {
-			helper.RespondWithError(c, http.StatusNotFound, "Product not found","Product not found","")
+			helper.RespondWithError(c, http.StatusNotFound, "Product not found", "Product not found", "")
 			return
 		}
 
@@ -187,29 +193,29 @@ func CartItemUpdate(c *gin.Context) {
 			if cartItems.Quantity < 3 {
 				cartItems.Quantity = qty + 1
 				if createErr := config.DB.Model(&cartItems).Updates(cartItems).Error; createErr != nil {
-					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed","Add to Cart Failed","")
+					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 					return
 				}
 			} else {
-				helper.RespondWithError(c, http.StatusBadRequest, "Maximum quantity exceeded","Maximum quantity exceeded","")
+				helper.RespondWithError(c, http.StatusBadRequest, "Maximum quantity exceeded", "Maximum quantity exceeded", "")
 				return
 			}
 
 		} else {
-			helper.RespondWithError(c, http.StatusBadRequest, "Not enough stock available","Not enough stock available","")
+			helper.RespondWithError(c, http.StatusBadRequest, "Not enough stock available", "Not enough stock available", "")
 			return
 		}
 
 	} else {
 		cartItems.Quantity = qty - 1
-		if cartItems.Quantity == 0 {
+		if cartItems.Quantity <= 0 {
 			if err := config.DB.Unscoped().Delete(&cartItems).Error; err != nil {
-				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete item","Failed to delete item","")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete item", "Failed to delete item", "")
 				return
 			}
 		} else {
 			if createErr := config.DB.Model(&cartItems).Updates(cartItems).Error; createErr != nil {
-				helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed","Add to Cart Failed","")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 				return
 			}
 		}
@@ -227,14 +233,14 @@ func ShowCartTotal(c *gin.Context) {
 	var total float64
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong","Something went wrong","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
 		return
 	}
 	var cartItems []models.CartItem
 	if err := config.DB.
 		Preload("ProductVariant").
 		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong","Something went wrong","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
 		return
 	}
 	for _, items := range cartItems {
@@ -254,12 +260,12 @@ func CartCount(c *gin.Context) int {
 	var count int
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong","Something went wrong","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
 		return 0
 	}
 	var cartItems []models.CartItem
 	if err := config.DB.Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong","Something went wrong","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
 		return 0
 	}
 	var productIDs []uint
@@ -268,7 +274,7 @@ func CartCount(c *gin.Context) int {
 	}
 	var product []models.ProductVariantDetails
 	if err := config.DB.Find(&product, "id IN ?", productIDs).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong","Something went wrong","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
 		return 0
 	}
 	count = len(product)
@@ -281,11 +287,11 @@ func DeleteCartItems(c *gin.Context) {
 
 	var cartItem models.CartItem
 	if err := config.DB.First(&cartItem, itemID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Inavlid request","Inavlid request","")
+		helper.RespondWithError(c, http.StatusBadRequest, "Inavlid request", "Inavlid request", "")
 	}
 
 	if err := config.DB.Unscoped().Delete(&cartItem).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete item","Failed to delete item","")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete item", "Failed to delete item", "")
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "Status OK",

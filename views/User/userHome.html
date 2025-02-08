@@ -28,13 +28,15 @@
 
                 <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
-                    <button class="hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2.5"
-                                d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
-                        </svg>
-                    </button>
+                    <a href="/products">
+                        <button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
+                            </svg>
+                        </button>
+                    </a>
                     <a href="/cart">
                         <button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
@@ -144,7 +146,7 @@
                         <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
                     </div>
                     <div class="flex flex-1 justify-center p-4">
-                        
+
                         <form action="/cart/add/{{.ID}}" method="post">
                             <button
                                 class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
@@ -291,7 +293,8 @@
         </div>
         <div class="relative">
             <!-- Product Cards -->
-            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4 pb-6">
+            <div id="product-scroll"
+                class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4 pb-6">
                 {{range .Mouse}}
                 <a href="/products/details/{{.ID}}">
                     <div
@@ -316,7 +319,8 @@
                         <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}</p>
                         <div class="text-center">
                             <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
-                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
+                                .RegularPrice}}</span>
                         </div>
                         <form action="/cart/add/{{.ID}}" method="post">
                             <button

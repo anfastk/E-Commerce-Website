@@ -109,16 +109,19 @@ func ManageAddress(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
 	var authDetails models.UserAuth
-	if err := config.DB.Preload("UserAddress", "user_id = ?", userID).
-		Where("id = ? AND is_blocked = ?", userID, false).
-		First(&authDetails).
-		Error; err != nil {
+	if err := config.DB.First(&authDetails, userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
+	var address []models.UserAddress
+	if err := config.DB.Order("updated_at DESC").Find(&address, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
 		return
 	}
 
 	c.HTML(http.StatusOK, "profileManageAddress.html", gin.H{
 		"User": authDetails,
+		"Address":address,
 	})
 }
 
@@ -168,10 +171,14 @@ func AddAddress(c *gin.Context) {
 		UserID:    userID,
 	}
 	if err := config.DB.Create(&address).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "User create failed", "User create failed", "")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Address create failed", "Address create failed", "")
 		return
 	}
-	helper.RespondWithError(c, http.StatusOK, "User create successfully", "User create successfully", "")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Address Added Successfully",
+		"code":    http.StatusOK,
+	})
 }
 
 func ShowEditAddress(c *gin.Context) {
@@ -235,7 +242,34 @@ func EditAddress(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update address", "Failed to update address", "")
 		return
 	}
-	helper.RespondWithError(c, http.StatusOK, "User updated successfully", "User updated successfully", "")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Address Edited Successfully",
+		"code":    http.StatusOK,
+	})
+}
+
+func SetAsDefaultAddress(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	addressID := c.Param("id")
+	tx := config.DB.Begin()
+	if err := tx.Model(&models.UserAddress{}).Where("user_id = ?", userID).Update("is_default", false).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to Update Address", "Failed to Update Address", "")
+		return
+	}
+	if err := tx.Model(&models.UserAddress{}).Where("user_id = ? AND id = ?", userID, addressID).Update("is_default", true).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed To Update Default Address", "Failed To Update Default Address", "")
+		return
+	}
+	tx.Commit()
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Default address updated successfully",
+		"code":    http.StatusOK,
+	})
 }
 
 func DeleteAddress(c *gin.Context) {
@@ -251,7 +285,11 @@ func DeleteAddress(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete address", "Failed to delete address", "")
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/profile/manage/address")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": "Address Deleted Successfully",
+		"code":    http.StatusOK,
+	})
 }
 
 func ShowChangePassword(c *gin.Context) {

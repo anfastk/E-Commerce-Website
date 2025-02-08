@@ -15,17 +15,66 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
         }
 
         .modal.active {
             display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .address-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .address-card:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .address-card.selected {
+            background-color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-buttons {
+            position: relative;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
 
 <body class="bg-gray-50">
-    <div class="bg-black py-4 sticky top-0 z-50 ">
+    <div class="bg-black py-4 sticky top-0 z-30 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
@@ -115,68 +164,48 @@
 
                 <!-- Address Cards -->
                 <div class="space-y-4 mb-8">
-                    <!-- Address 1 -->
-                    <div class="border rounded-lg p-4">
+                    {{range .Address}}
+                    <div class="address-card border rounded-lg p-4" onclick="handleCardClick(this, event)">
                         <div class="flex items-start gap-4">
-                            <input type="radio" name="address" checked class="mt-1">
+                            <input type="radio" name="address_card" class="mt-1 cursor-pointer" {{if
+                                .IsDefault}}checked{{end}} onclick="event.stopPropagation()">
                             <div class="flex-grow">
-                                <h3 class="font-medium">Robert Fox</h3>
-                                <p class="text-sm text-gray-600">4517 Washington Ave.Manchester, Kentucky 39495</p>
+                                <h3 class="font-medium">{{.FirstName}} {{.LastName}}</h3>
+                                <p class="text-sm text-gray-600">{{.Address}} <br> {{.City}} , {{.State}} {{.PinCode}}
+                                    <br> {{.Country}}
+                                </p>
+                                <p class="text-sm text-gray-600">LandMark : {{.Landmark}}</p>
                             </div>
                         </div>
-                        <div class="flex gap-4 mt-4 ml-8">
-                            <button class="text-gray-600 flex items-center gap-1 hover:text-gray-800">
+                        <div class="action-buttons flex gap-4 mt-4 ml-8" onclick="event.stopPropagation()">
+                            <!-- Edit Button -->
+                            <button
+                                onclick="openEditModal('{{.ID}}', '{{.FirstName}}', '{{.LastName}}', '{{.Landmark}}', '{{.Address}}', '{{.Country}}', '{{.State}}', '{{.City}}', '{{.PinCode}}', '{{.Mobile}}')"
+                                class="text-gray-600 flex items-center gap-1 hover:text-gray-800">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                                 Edit
                             </button>
-                            <button class="text-red-400 flex items-center gap-1 hover:text-red-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Delete
-                            </button>
+                            <form action="/profile/delete/address/{{.ID}}" method="post">
+                                <button class="text-red-400 flex items-center gap-1 hover:text-red-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Delete
+                                </button>
+                            </form>
                         </div>
                     </div>
-
-                    <!-- Address 2 -->
-                    <div class="border rounded-lg p-4">
-                        <div class="flex items-start gap-4">
-                            <input type="radio" name="address" class="mt-1">
-                            <div class="flex-grow">
-                                <h3 class="font-medium">Robert Fox</h3>
-                                <p class="text-sm text-gray-600">4517 Washington Ave.Manchester, Kentucky 39495</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4 mt-4 ml-8">
-                            <button class="text-gray-600 flex items-center gap-1 hover:text-gray-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                                Edit
-                            </button>
-                            <button class="text-red-400 flex items-center gap-1 hover:text-red-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Delete
-                            </button>
-                        </div>
-                    </div>
+                    {{end}}
                 </div>
-                <button onclick="document.getElementById('addressModal').classList.add('active')"
-                    class="w-full border-2 border-black py-3 rounded-lg">ADD NEW ADDRESS</button>
 
-                <!-- Address Modal -->
-                <div id="addressModal" class="modal items-center justify-center">
-                    <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
-                        <!-- Close button -->
-                        <button onclick="document.getElementById('addressModal').classList.remove('active')"
+                <!-- Single Modal -->
+                <div id="editAddressModal" class="modal z-40">
+                    <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
+                        <button onclick="closeModal('editAddressModal')"
                             class="absolute right-4 top-4 text-gray-500 hover:text-gray-700">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -184,64 +213,132 @@
                             </svg>
                         </button>
 
-                        <h2 class="text-xl font-bold mb-6">SHIPPING ADDRESS</h2>
+                        <h2 class="text-xl font-bold mb-6">EDIT SHIPPING ADDRESS</h2>
 
-                        <form class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
+                        <form id="editAddressForm" class="space-y-4" onsubmit="handleEditAddress(event)">
+                            <!-- Form fields for Edit Address - Same structure but with pre-filled values -->
+                            <input type="hidden" id="id" name="id">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">First Name</label>
-                                    <input type="text" value="Kevin" class="w-full border rounded-lg px-3 py-2">
+                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2">
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Last Name</label>
-                                    <input type="text" value="Kevin" class="w-full border rounded-lg px-3 py-2">
+                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">LandMark</label>
-                                <input type="text" class="w-full border rounded-lg px-3 py-2">
+                                <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2">
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Address</label>
-                                <input type="text" value="Road No. 13/x, House no. 1320/C, Flat No. 5D"
-                                    class="w-full border rounded-lg px-3 py-2">
+                                <input type="text" name="address" class="w-full border rounded-lg px-3 py-2">
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Country</label>
-                                <select class="w-full border rounded-lg px-3 py-2 bg-white">
-                                    <option>Bangladesh</option>
-                                </select>
+                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white">
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Region/State</label>
-                                <select class="w-full border rounded-lg px-3 py-2 bg-white">
-                                    <option>Select...</option>
-                                </select>
+                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white">
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">City</label>
-                                    <select class="w-full border rounded-lg px-3 py-2 bg-white">
-                                        <option>Dhaka</option>
-                                    </select>
+                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white">
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Zip Code</label>
-                                    <input type="text" value="1207" class="w-full border rounded-lg px-3 py-2">
+                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Phone Number</label>
-                                <input type="tel" value="+1-202-555-0118" class="w-full border rounded-lg px-3 py-2">
+                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2">
                             </div>
 
-                            <button type="button" class="w-full bg-black text-white py-3 rounded-lg mt-6">SAVE</button>
+                            <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">UPDATE
+                                ADDRESS</button>
+                        </form>
+                    </div>
+                </div>
+
+                <button onclick="openModal('addAddressModal')" class="w-full border-2 border-black py-3 rounded-lg">
+                    ADD NEW ADDRESS
+                </button>
+
+                <!-- Address Modal -->
+                <div id="addAddressModal" class="modal z-50">
+                    <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
+                        <button onclick="closeModal('addAddressModal')"
+                            class="absolute right-4 top-4 text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <h2 class="text-xl font-bold mb-6">ADD NEW ADDRESS</h2>
+
+                        <form id="addAddressForm" class="space-y-4" onsubmit="handleAddAddress(event)">
+                            <!-- Form fields for Add Address -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm mb-1">First Name</label>
+                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Last Name</label>
+                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1">LandMark</label>
+                                <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1">Address</label>
+                                <input type="text" name="address" class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1">Country</label>
+                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1">Region/State</label>
+                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm mb-1">City</label>
+                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Zip Code</label>
+                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm mb-1">Phone Number</label>
+                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2">
+                            </div>
+
+                            <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">SAVE
+                                ADDRESS</button>
                         </form>
                     </div>
                 </div>
@@ -249,72 +346,65 @@
 
             <!-- Right Column - Order Summary -->
             <div class="md:col-span-1">
-                <div class="bg-gray-200 p-6 rounded-lg">
+                <div class="bg-white shadow-lg p-6 rounded-lg">
                     <h2 class="text-lg font-bold mb-6">Order Summary</h2>
 
                     <!-- Product Items -->
                     <div class="space-y-4 mb-6">
                         <!-- Product 1 -->
+                        {{range .CartItem}}
                         <div class="flex gap-4">
-                            <img src="/api/placeholder/60/60" alt="Camera" class="w-16 h-16 object-cover rounded">
+                            <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                                alt="Camera" class="w-16 h-16 object-contain rounded">
                             <div>
-                                <p class="text-sm">Canon EOS 1500D DSLR Camera Body+ 18-...</p>
+                                <p class="text-sm">{{ .ProductVariant.ProductName }}</p>
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-sm">1 ×</span>
-                                    <span class="font-medium">$70</span>
+                                    <span class="text-sm">{{.Quantity}} ×</span>
+                                    <span class="font-medium">&#8377; {{ .ProductVariant.SalePrice}}</span>
+                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{ .ProductVariant.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Product 2 -->
-                        <div class="flex gap-4">
-                            <img src="/api/placeholder/60/60" alt="Headphones" class="w-16 h-16 object-cover rounded">
-                            <div>
-                                <p class="text-sm">Wired Over-Ear Gaming Headphones with LI...</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-sm">3 ×</span>
-                                    <span class="font-medium">$250</span>
-                                </div>
-                            </div>
-                        </div>
+                        {{end}}
                     </div>
 
                     <!-- Summary Details -->
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between">
                             <span>Sub-total</span>
-                            <span>$320</span>
+                            <span>&#8377; {{.SubTotal}}</span>
                         </div>
 
                         <!-- Coupon Input -->
                         <div class="flex gap-2 mb-4">
-                            <input type="text" placeholder="Coupon Code" class="flex-grow px-3 py-2 rounded">
+                            <input type="text" placeholder="Coupon Code"
+                                class="flex-grow px-3 py-2 rounded bg-gray-200">
                             <button class="bg-black text-white px-4 py-2 rounded">APPLY</button>
                         </div>
 
                         <div class="flex justify-between text-gray-600">
                             <span>Coupon Discount</span>
-                            <span>-$24</span>
+                            <span>-&#8377; 24</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
-                            <span>Free</span>
+                            <span>{{if .Shipping}} {{.Shipping}} {{else}} Free {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Tax</span>
-                            <span>$61.99</span>
+                            <span>&#8377; {{.Tax}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Product Discount</span>
-                            <span>-$24</span>
+                            <span>&#8377; {{.ProductDiscount}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
-                            <span>-$48</span>
+                            <span>&#8377; {{.TotalDiscount}}</span>
                         </div>
                         <div class="flex justify-between font-bold pt-4 border-t">
                             <span>Total</span>
-                            <span>$357.99 USD</span>
+                            <span>&#8377; {{.Total}}</span>
                         </div>
                     </div>
 
@@ -330,143 +420,8 @@
             </div>
         </div>
     </div>
-    <div class="container mx-auto px-4 py-8">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-8">You May Also Like</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Product Card 1 -->
-            <div class="bg-gray-100 rounded-lg p-4 relative group">
-                <span class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
-                <div class="relative">
-                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1738314551/ProductVariants/sbavs54ooqvz7schnctg.jpg"
-                        alt="Gaming Mouse" class="w-full h-auto">
-                    <button
-                        class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-gray-800 font-medium mb-2">Xingyawl Ergonomic Wired Gaming Mouse</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="line-through text-gray-500">₹38,600</span>
-                            <span class="font-bold text-gray-900">₹35,090</span>
-                        </div>
-                        <button class="text-gray-600 hover:text-gray-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Product Card 2 -->
-            <div class="bg-gray-100 rounded-lg p-4 relative group">
-                <span class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
-                <div class="relative">
-                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1738314551/ProductVariants/sbavs54ooqvz7schnctg.jpg"
-                        alt="Gaming Mouse" class="w-full h-auto">
-                    <button
-                        class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-gray-800 font-medium mb-2">Xingyawl Ergonomic Wired Gaming Mouse</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="line-through text-gray-500">₹38,600</span>
-                            <span class="font-bold text-gray-900">₹35,090</span>
-                        </div>
-                        <button class="text-gray-600 hover:text-gray-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product Card 3 -->
-            <div class="bg-gray-100 rounded-lg p-4 relative group">
-                <span class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
-                <div class="relative">
-                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1738314551/ProductVariants/sbavs54ooqvz7schnctg.jpg"
-                        alt="Gaming Mouse" class="w-full h-auto">
-                    <button
-                        class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-gray-800 font-medium mb-2">Xingyawl Ergonomic Wired Gaming Mouse</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="line-through text-gray-500">₹38,600</span>
-                            <span class="font-bold text-gray-900">₹35,090</span>
-                        </div>
-                        <button class="text-gray-600 hover:text-gray-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product Card 4 -->
-            <div class="bg-gray-100 rounded-lg p-4 relative group">
-                <span class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
-                <div class="relative">
-                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1738314551/ProductVariants/sbavs54ooqvz7schnctg.jpg"
-                        alt="Gaming Mouse" class="w-full h-auto">
-                    <button
-                        class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-gray-800 font-medium mb-2">Xingyawl Ergonomic Wired Gaming Mouse</h3>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="line-through text-gray-500">₹38,600</span>
-                            <span class="font-bold text-gray-900">₹35,090</span>
-                        </div>
-                        <button class="text-gray-600 hover:text-gray-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
         <div class="container mx-auto px-4">
@@ -533,12 +488,119 @@
         </div>
     </footer>
     <script>
-        // Close modal when clicking outside
-        document.getElementById('addressModal').addEventListener('click', function (e) {
-            if (e.target === this) {
-                this.classList.remove('active');
+        function handleCardClick(card, event) {
+            // Don't handle click if it's coming from buttons
+            if (event.target.closest('.action-buttons')) {
+                return;
             }
+
+            // Find the radio button within this card
+            const radio = card.querySelector('input[type="radio"]');
+
+            // Unselect all other cards
+            document.querySelectorAll('.address-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+
+            // Select this card
+            card.classList.add('selected');
+
+            // Check the radio button
+            radio.checked = true;
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
         });
+
+        async function handleAddAddress(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/profile/add/address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal('addAddressModal');
+                    window.location.reload()
+                } else {
+                    throw new Error('Failed to add address');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error
+            }
+        }
+
+        function openEditModal(id, firstName, lastName, landmark, address, country, state, city, pinCode, mobile) {
+            document.getElementById('id').value = id;
+            document.querySelector('input[name="firstName"]').value = firstName;
+            document.querySelector('input[name="lastName"]').value = lastName;
+            document.querySelector('input[name="landmark"]').value = landmark;
+            document.querySelector('input[name="address"]').value = address;
+            document.querySelector('input[name="country"]').value = country;
+            document.querySelector('input[name="state"]').value = state;
+            document.querySelector('input[name="city"]').value = city;
+            document.querySelector('input[name="zipCode"]').value = pinCode;
+            document.querySelector('input[name="phoneNumber"]').value = mobile;
+            openModal('editAddressModal');
+        }
+
+        async function handleEditAddress(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const response = await fetch('/profile/edit/address', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    closeModal('editAddressModal');
+                    window.location.reload()
+                } else {
+                    throw new Error('Failed to update address');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error
+            }
+        }
+
     </script>
 </body>
 

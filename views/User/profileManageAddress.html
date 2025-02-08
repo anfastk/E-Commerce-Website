@@ -196,7 +196,7 @@
                     <!-- Address Cards -->
                     <div class="space-y-4">
                         <!-- Repeat this card structure 4 times -->
-                         {{range .User.UserAddress}}
+                         {{range .Address}}
                         <div class="bg-white rounded-lg shadow-sm p-4">
                             <div class="flex justify-between items-start">
                                 <div class="space-y-2">
@@ -230,7 +230,14 @@
                                             Delete
                                         </button>
                                     </form>
-                                    <a href="#" class="text-blue-600 text-sm">Set as Default</a>
+                                    {{if .IsDefault}}
+                                    {{else}}
+                                    <form action="/profile/address/{{.ID}}/default"  method="post">
+                                        <button type="submit" class="text-blue-600 text-sm">
+                                            Set as Default
+                                        </button>
+                                    </form>
+                                    {{end}}
                                 </div>
                             </div>
                         </div>

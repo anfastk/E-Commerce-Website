@@ -31,9 +31,9 @@ func UserRouter(r *gin.Engine) {
 		user.POST("/signup/otp/resend", controllers.ResendOTP)
 		user.GET("/login", controllers.ShowLogin)
 		user.POST("/login", controllers.UserLoginHandler)
-		user.GET("/forgot/password",controllers.ForgotPasswordEmail)
-		user.POST("/forgot/password",controllers.ForgotUserEmail)
-		user.POST("/reset/password",controllers.PasswordReset)
+		user.GET("/forgot/password", controllers.ForgotPasswordEmail)
+		user.POST("/forgot/password", controllers.ForgotUserEmail)
+		user.POST("/reset/password", controllers.PasswordReset)
 		user.POST("/logout", middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
 	}
 
@@ -47,11 +47,12 @@ func UserRouter(r *gin.Engine) {
 		userProfile.GET("/add/address", controllers.ShowAddAddress)
 		userProfile.POST("/add/address", controllers.AddAddress)
 		userProfile.GET("/edit/address/:id", controllers.ShowEditAddress)
-		userProfile.POST("/edit/address", controllers.EditAddress)
+		userProfile.PATCH("/edit/address", controllers.EditAddress)
+		userProfile.POST("/address/:id/default",controllers.SetAsDefaultAddress)
 		userProfile.POST("/delete/address/:id", controllers.DeleteAddress)
 		userProfile.GET("/settings", controllers.Settings)
-		userProfile.GET("/change/password",controllers.ShowChangePassword)
-		userProfile.POST("/change/password",controllers.ChangePassword)
+		userProfile.GET("/change/password", controllers.ShowChangePassword)
+		userProfile.POST("/change/password", controllers.ChangePassword)
 	}
 
 	cart := r.Group("/cart")
@@ -63,6 +64,7 @@ func UserRouter(r *gin.Engine) {
 		cart.POST("/add/:id", controllers.AddToCart)
 		cart.POST("/update/quantity/:id", controllers.CartItemUpdate)
 		cart.POST("/delete/:id", controllers.DeleteCartItems)
+		cart.GET("/checkout", controllers.ShowCheckoutPage)
 	}
 
 }
