@@ -48,11 +48,14 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/add/address", controllers.AddAddress)
 		userProfile.GET("/edit/address/:id", controllers.ShowEditAddress)
 		userProfile.PATCH("/edit/address", controllers.EditAddress)
-		userProfile.POST("/address/:id/default",controllers.SetAsDefaultAddress)
+		userProfile.POST("/address/:id/default", controllers.SetAsDefaultAddress)
 		userProfile.POST("/delete/address/:id", controllers.DeleteAddress)
 		userProfile.GET("/settings", controllers.Settings)
 		userProfile.GET("/change/password", controllers.ShowChangePassword)
 		userProfile.POST("/change/password", controllers.ChangePassword)
+		userProfile.GET("/order/details", controllers.OrderDetails)
+		userProfile.GET("/order/details/track/:id", controllers.TrackingPage)
+		userProfile.POST("/order/details/track/:id/cancel", controllers.CancelOrder)
 	}
 
 	cart := r.Group("/cart")
@@ -64,7 +67,15 @@ func UserRouter(r *gin.Engine) {
 		cart.POST("/add/:id", controllers.AddToCart)
 		cart.POST("/update/quantity/:id", controllers.CartItemUpdate)
 		cart.POST("/delete/:id", controllers.DeleteCartItems)
-		cart.GET("/checkout", controllers.ShowCheckoutPage)
+
 	}
 
+	checkout := r.Group("/checkout")
+	checkout.Use(middleware.NoCacheMiddleware())
+	checkout.Use(middleware.AuthMiddleware(RoleUser))
+	{
+		checkout.GET("/", controllers.ShowCheckoutPage)
+		checkout.POST("/payment", controllers.PaymentPage)
+		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
+	}
 }

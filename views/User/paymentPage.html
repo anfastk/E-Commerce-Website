@@ -83,33 +83,38 @@
             <!-- Left Section -->
             <div class="md:col-span-2">
                 <!-- Delivery Address -->
+                <!-- Delivery Address Section -->
                 <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <h2 class="text-lg font-semibold mb-2">Delivering to Anfas</h2>
+                    <h2 class="text-lg font-semibold mb-2">Delivering to {{.Address.FirstName}} {{.Address.LastName}}
+                    </h2>
                     <p class="text-gray-600 text-sm">
-                        veegee, Kozhikode Balussery Road, thadhambattuthazhom, Kozhikode,<br>
-                        KERALA, 673010, India
+                        {{.Address.Address}}, {{.Address.City}},<br>
+                        {{.Address.State}}, {{.Address.PinCode}}, {{.Address.Country}}
                     </p>
+                    <!-- Add a hidden input field for the address ID -->
+                    <input type="hidden" id="addressId" value="{{.Address.ID}}">
                 </div>
 
                 <!-- Payment Method -->
                 <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
                     <h2 class="text-lg font-semibold mb-4">Payment method</h2>
-                    
+
                     <!-- Wallet Balance -->
                     <div class="mb-6">
                         <div class="flex items-start gap-2 mb-4">
-                            <input type="radio" class="mt-1" name="payment" disabled>
+                            <input type="radio" class="mt-1" name="payment" value="Wallet" id="walletPayment">
                             <div class="flex-1">
                                 <p class="font-medium">Wallet Balance ₹ 0.00 Unavailable</p>
                                 <div class="flex items-center gap-1 text-sm text-blue-600">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z"></path>
+                                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z">
+                                        </path>
                                     </svg>
                                     Insufficient balance.
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Code Input -->
                         <div class="flex gap-2">
                             <input type="text" placeholder="Enter Code" class="flex-1 border rounded px-3 py-2 text-sm">
@@ -122,12 +127,12 @@
                         <h3 class="font-medium">Another payment method</h3>
                         <div class="space-y-3">
                             <label class="flex items-center gap-2">
-                                <input type="radio" name="payment">
-                                <span>Other Payment Options</span>
+                                <input type="radio" name="payment" id="codPayment" value="COD">
+                                <span>Cash on Delivery/Pay on Delivery</span>
                             </label>
                             <label class="flex items-center gap-2">
-                                <input type="radio" name="payment">
-                                <span>Cash on Delivery/Pay on Delivery</span>
+                                <input type="radio" name="payment" id="otherPayment" value="Other">
+                                <span>Other Payment Options</span>
                             </label>
                         </div>
                     </div>
@@ -136,82 +141,96 @@
                 <!-- Delivery Info -->
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h2 class="font-semibold">Arriving 27 Dec 2024</h2>
-                            <p class="text-sm text-gray-600">If you order in the next 13 hours and 17 minutes <span class="text-blue-600">Details</span></p>
+                        <div id="delivery-info">
+                            <h2 id="delivery-date" class="font-semibold"></h2>
+                            <p id="order-time-left" class="text-sm text-gray-600"></p>
                         </div>
-                        <a href="#" class="text-blue-600 text-sm">Review Order</a>
+
                     </div>
-                    <div class="flex gap-4">
-                        <img src="/api/placeholder/80/80" alt="Laptop Stand" class="w-20 h-20 object-cover">
-                        <p class="text-sm">ZEBRONICS Aluminium Alloy Laptop Stand, Compatible with 9-15.6 inch Laptop, 7 Angles Adjustable, Anti-Slip Silicon Rubber Pads, Foldable, Velvet Pouch Inside, Zeb-NS2000 (Dark Grey)</p>
+                    {{range .CartItem}}
+                    <div class="flex items-center gap-4 p-4  rounded-lg border border-gray-200 mt-1">
+                        <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages }}"
+                            alt="Laptop Stand" class="w-20 h-20 object-contain">
+                        <div class="flex flex-col">
+                            <p class="text-sm font-medium">{{ .ProductVariant.ProductSummary }}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-sm">{{ .Quantity }} ×</span>
+                                <span class="font-medium text-sm">&#8377; {{ .ProductVariant.SalePrice }}</span>
+                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
+                                    .ProductVariant.RegularPrice }}</span>
+                            </div>
+                        </div>
                     </div>
+                    {{end}}
                 </div>
             </div>
 
             <!-- Right Section - Order Summary -->
             <div class="bg-white p-6 rounded-lg shadow-sm h-fit">
                 <h2 class="text-lg font-semibold mb-4 bg-gray-200 p-2">Order Summary</h2>
-                
+
                 <!-- Items -->
                 <div class="space-y-4 mb-6">
+                    {{range .CartItem}}
                     <div class="flex gap-4">
-                        <img src="/api/placeholder/60/60" alt="Camera" class="w-16 h-16 object-cover">
+                        <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}" alt="Camera"
+                            class="w-16 h-16 object-contain">
                         <div>
-                            <p class="text-sm">Canon EOS 1500D DSLR Camera Body+ 18...</p>
-                            <p class="text-sm">1 x $70</p>
+                            <p class="text-sm">{{ .ProductVariant.ProductName }}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-sm">{{.Quantity}} ×</span>
+                                <span class="font-medium">&#8377; {{ .ProductVariant.SalePrice}}</span>
+                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
+                                    .ProductVariant.RegularPrice}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <img src="/api/placeholder/60/60" alt="Headphones" class="w-16 h-16 object-cover">
-                        <div>
-                            <p class="text-sm">Wired Over-Ear Gaming Headphones with U...</p>
-                            <p class="text-sm">3 x $250</p>
-                        </div>
-                    </div>
+                    {{end}}
                 </div>
 
                 <!-- Price Breakdown -->
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span>Sub-total</span>
-                        <span>$320</span>
+                        <span>&#8377; {{.SubTotal}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Wallet</span>
-                        <span>-$24</span>
+                        <span>-&#8377;00</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Coupon Discount</span>
-                        <span>-$24</span>
+                        <span>-&#8377;00</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Shipping</span>
-                        <span>Free</span>
+                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free {{end}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Tax</span>
-                        <span>$61.99</span>
+                        <span>&#8377; {{.Tax}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Product Discount</span>
-                        <span>-$24</span>
+                        <span>&#8377; {{.ProductDiscount}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Total Discount</span>
-                        <span>-$48</span>
+                        <span>&#8377; {{.TotalDiscount}}</span>
                     </div>
                 </div>
 
                 <div class="border-t mt-4 pt-4">
                     <div class="flex justify-between font-semibold mb-4">
                         <span>Total</span>
-                        <span>$357.99 USD</span>
+                        <span>&#8377; {{.Total}}</span>
                     </div>
-                    <button class="w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2">
+                    <button id="proceedToPay"
+                        class="w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2">
                         PROCEED TO PAY
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
                         </svg>
                     </button>
                 </div>
@@ -285,6 +304,69 @@
             </div>
         </div>
     </footer>
+    <script>
+        document.getElementById('proceedToPay').addEventListener('click', function () {
+            let selectedPaymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            let addressId = document.getElementById('addressId').value;
+
+            fetch('/checkout/payment/proceed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    paymentMethod: selectedPaymentMethod,
+                    addressId: addressId,
+                }),
+            })
+                .then(response => response.text()) // Expecting an HTML response
+                .then(html => {
+                    document.open();
+                    document.write(html); // Replace the current page with the new HTML
+                    document.close();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the payment.');
+                });
+        });
+
+        function updateDeliveryDate() {
+            let now = new Date();
+            let orderTime = new Date(now);
+            let deliveryDate = new Date(orderTime);
+
+            // 3 days add cheyyuka
+            deliveryDate.setDate(orderTime.getDate() + 3);
+
+            // Midnight check (12:00 AM aayal next day update cheyyuka)
+            if (now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 59) {
+                deliveryDate.setDate(deliveryDate.getDate() + 1);
+            }
+
+            // Date format set cheyyuka
+            const options = { day: "2-digit", month: "short", year: "numeric" };
+            let formattedDeliveryDate = deliveryDate.toLocaleDateString("en-US", options);
+
+            // Remaining time calculate cheyyuka
+            let midnight = new Date(now);
+            midnight.setHours(23, 59, 59, 999);
+            let timeLeft = midnight - now;
+            let hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+            let minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            let secondsLeft = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // HTML update cheyyuka
+            document.getElementById("delivery-date").innerText = `Arriving ${formattedDeliveryDate}`;
+            document.getElementById("order-time-left").innerText = `If you order in the next ${hoursLeft} hours, ${minutesLeft} minutes, and ${secondsLeft} seconds`;
+        }
+
+        // Function call cheyyuka
+        updateDeliveryDate();
+
+        // Live update every second
+        setInterval(updateDeliveryDate, 1000);
+    </script>
 </body>
 
 </html>

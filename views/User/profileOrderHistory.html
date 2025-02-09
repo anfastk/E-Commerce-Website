@@ -184,77 +184,68 @@
             </div>
 
             <!-- Main Content -->
-            <div class="max-w-full bg-white rounded-lg border border-gray-200">
-                <!-- Title -->
-                <h2 class="text-lg font-normal px-4 py-4">ORDER DETAILS</h2>
-                
-                <!-- Table Header -->
-                <div class="w-full">
-                    <div class="grid grid-cols-12 gap-2 bg-gray-50 px-4 py-3 border-y border-light">
-                        <div class="col-span-1 text-gray-600">ID</div>
-                        <div class="col-span-4 text-gray-600">PRODUCTS</div>
-                        <div class="col-span-2 text-gray-600">STATUS</div>
-                        <div class="col-span-2 text-gray-600">PAYMENT</div>
-                        <div class="col-span-3 text-gray-600">SUB-TOTAL</div>
-                    </div>
-            
-                    <!-- Order 1 -->
-                    <div class="grid grid-cols-12 gap-2 px-4 py-6 border-b border-light">
-                        <div class="col-span-1">1</div>
-                        <div class="col-span-4">
-                            <div class="flex gap-6 items-start">
-                                <img src="https://via.placeholder.com/100" alt="Product" class="w-20 h-20 object-cover">
-                                <div>
-                                    <h3 class="font-medium">I PHONE 15 PRO MAX</h3>
-                                    <p class="text-gray-600 text-sm mt-0.5">PHONE</p>
-                                    <p class="text-gray-500 text-sm mt-1">Order ID : RWDS-MDJDB-MKNH</p>
-                                    <p class="text-gray-500 text-sm">Deliverd on : 23 Jan, 2021, 7:30 pm</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-green-500 font-medium">DELIVERD</span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-green-500 font-medium">SUCCESS</span>
-                        </div>
-                        <div class="col-span-3 flex justify-between items-start">
-                            <span class="font-medium">$899</span>
-                            <button class="bg-black text-white px-5 py-2 rounded">
-                                TRACK ORDER →
-                            </button>
-                        </div>
-                    </div>
-            
-                    <!-- Order 2 -->
-                    <div class="grid grid-cols-12 gap-2 px-4 py-6">
-                        <div class="col-span-1">2</div>
-                        <div class="col-span-4">
-                            <div class="flex gap-6 items-start">
-                                <img src="https://via.placeholder.com/100" alt="Product" class="w-20 h-20 object-cover">
-                                <div>
-                                    <h3 class="font-medium">I PHONE 15 PRO MAX</h3>
-                                    <p class="text-gray-600 text-sm mt-0.5">PHONE</p>
-                                    <p class="text-gray-500 text-sm mt-1">Order ID : RWDS-MDJDB-MKNH</p>
-                                    <p class="text-gray-500 text-sm">Order expected arrival 23 Jan, 2021</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-orange-500 font-medium">PENDING</span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-orange-500 font-medium">PENDING</span>
-                        </div>
-                        <div class="col-span-3 flex justify-between items-start">
-                            <span class="font-medium">$899</span>
-                            <button class="bg-black text-white px-5 py-2 rounded">
-                                TRACK ORDER →
-                            </button>
-                        </div>
+            <div class="flex-1">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-xl font-bold mb-6">ORDER HISTORY</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[800px]">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">ID</th>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">ORDER</th>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">STATUS</th>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">DATE</th>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">TOTAL</th>
+                                    <th class="py-3 px-4 text-left text-sm font-medium text-gray-500">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="py-4 px-4">#ORD-001</td>
+                                    <td class="py-4 px-4">
+                                        <img src="/api/placeholder/32/32" alt="Product" class="w-8 h-8">
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="text-orange-500">IN PROGRESS</span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-600">Dec 30, 2019 07:52</td>
+                                    <td class="py-4 px-4">$80 (5 Products)</td>
+                                    <td class="py-4 px-4">
+                                        <a href="#" class="text-blue-500 hover:text-blue-700 flex items-center gap-1">
+                                            View Details
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-4">#ORD-002</td>
+                                    <td class="py-4 px-4">
+                                        <img src="/api/placeholder/32/32" alt="Product" class="w-8 h-8">
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <span class="text-green-500">COMPLETED</span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-600">Dec 7, 2019 23:26</td>
+                                    <td class="py-4 px-4">$70 (4 Products)</td>
+                                    <td class="py-4 px-4">
+                                        <a href="#" class="text-blue-500 hover:text-blue-700 flex items-center gap-1">
+                                            View Details
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <!-- Repeat similar rows for other orders -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
     <!-- Footer Section -->

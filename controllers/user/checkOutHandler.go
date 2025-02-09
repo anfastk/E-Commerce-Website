@@ -39,22 +39,13 @@ func ShowCheckoutPage(c *gin.Context) {
 		return
 	}
 
-	var activeCartItems []models.CartItem
 	for _, item := range cartItems {
-		if item.ProductVariant.StockQuantity == 0 && item.Quantity == 0 {
+		if item.ProductVariant.StockQuantity <item.Quantity {
 			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/cart")
 			return
 		}
-		activeCartItems = append(activeCartItems, item)
 	}
-	for i := range activeCartItems {
-		if activeCartItems[i].ProductVariant.StockQuantity < 3 {
-			if activeCartItems[i].ProductVariant.StockQuantity < activeCartItems[i].Quantity {
-				helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/cart")
-				return
-			}
-		}
-	}
+	
 	for _, items := range cartItems {
 		regularPrice += items.ProductVariant.RegularPrice * float64(items.Quantity)
 		salePrice += items.ProductVariant.SalePrice * float64(items.Quantity)
@@ -80,7 +71,7 @@ func ShowCheckoutPage(c *gin.Context) {
 		"status":          "OK",
 		"message":         "Checkout fetch success",
 		"Address":         address,
-		"CartItem":        activeCartItems,
+		"CartItem":        cartItems,
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
 		"Tax":             tax,

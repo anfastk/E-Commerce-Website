@@ -154,48 +154,48 @@
         <div class="grid md:grid-cols-2 gap-12">
             <!-- Product Image -->
             <div class="bg-white p-8 rounded-lg shadow-lg">
-                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1738231421/ProductVariants/tixuj8ngry8bgwubbmpj.jpg"
-                    alt="MacBook Pro" class="w-full rounded-lg">
+                <img src="{{ (index .OrderItem.ProductVariantDetails.VariantsImages 0).ProductVariantsImages  }}"
+                    alt="" class="w-full rounded-lg object-contain">
             </div>
 
             <!-- Order Details -->
             <div class="bg-white p-8 rounded-lg shadow-lg space-y-6">
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <h3 class="font-semibold mb-2">Delivering Address</h3>
-                    <p class="text-gray-600">Vemuri Kothikode Balussery Road, thazhambattuthazham,<br>
-                        Kozhikode,<br>
-                        KERALA, 673010, India</p>
+                    <p class="text-gray-600">{{.Order.ShippingAddress.Address}},<br>
+                        {{.Order.ShippingAddress.City}},<br>
+                        {{.Order.ShippingAddress.State}}, {{.Order.ShippingAddress.PinCode}}, {{.Order.ShippingAddress.Country}}</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="font-semibold">Order Date</h3>
-                        <p class="text-gray-600">10 January 2025</p>
+                        <p class="text-gray-600">{{.Orderdate}}</p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold">Payment Method</h3>
-                        <p class="text-gray-600">Cash On Delivery</p>
+                        <p class="text-gray-600">{{.Payment.PaymentMethod}}</p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold">Delivery Date</h3>
-                        <p class="text-gray-600">15 January 2025</p>
+                        <p class="text-gray-600">{{.Deliverydate}}</p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold">Return Policy</h3>
-                        <p class="text-gray-600">7 Days After Delivery till 22 January 2025</p>
+                        <p class="text-gray-600">7 Days After Delivery till<!--  22 January 2025 --></p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold">Return Date</h3>
-                        <p class="text-gray-600">22 January 2025</p>
+                        <p class="text-gray-600">{{.Returndate}}</p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold">Coupon Applied</h3>
-                        <p class="text-gray-600">10 % discount applied</p>
+                        <p class="text-gray-600"><!-- 10 % discount applied --></p>
                     </div>
                 </div>
             </div>
@@ -206,42 +206,44 @@
             <div class="max-w-2xl mx-auto space-y-3">
                 <div class="flex justify-between">
                     <span>Product Sub-total</span>
-                    <span>$320</span>
+                    <span>&#8377; {{.Orderitems.ProductVariantDetails.SalePrice}}</span>
                 </div>
-                <div class="flex justify-between text-gray-600">
+                <!-- <div class="flex justify-between text-gray-600">
                     <span>Wallet</span>
                     <span>-$24</span>
-                </div>
-                <div class="flex justify-between text-gray-600">
+                </div> -->
+                <!-- <div class="flex justify-between text-gray-600">
                     <span>Coupon Discount</span>
                     <span>-$24</span>
-                </div>
+                </div> -->
                 <div class="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span>{{if .Order.ShippingCharge}} {{.Order.ShippingCharge}} {{else}} Free {{end}}</span>
                 </div>
                 <div class="flex justify-between text-gray-600">
                     <span>Tax</span>
-                    <span>$61.99</span>
+                    <span>&#8377; {{.Order.Tax}}</span>
                 </div>
-                <div class="flex justify-between text-gray-600">
+                <!-- <div class="flex justify-between text-gray-600">
                     <span>Product Discount</span>
-                    <span>-$24</span>
+                    <span>&#8377; -$24</span>
                 </div>
                 <div class="flex justify-between text-gray-600">
                     <span>Total Discount</span>
-                    <span>-$48</span>
-                </div>
+                    <span>&#8377; -$48</span>
+                </div> -->
                 <div class="flex justify-between font-semibold text-lg pt-4 border-t">
                     <span>Total</span>
-                    <span>$357.99 USD</span>
+                    <span>&#8377; {{.Payment.PaymentAmount}}</span>
                 </div>
             </div>
         </div>
 
         <!-- Cancel Order Button -->
-        <div class="mt-8 flex justify-end">
-            <button class="bg-gray-900 text-white px-6 py-2 rounded-lg">Cancel Order</button>
+        <div class="mt-8  flex justify-end">
+            <form action="/profile/order/details/track/{{.Order.ID}}/cancel" method="post">
+                <button type="submit" class="bg-gray-900 text-white px-6 py-2 rounded-lg">Cancel Order</button>
+            </form>
         </div>
     </div>
     </div>
