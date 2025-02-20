@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -148,14 +150,13 @@ func ProceedToPayment(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "Some items are out of stock. Please update your cart.", "/cart")
 			return
 		}
-		if items.ProductVariant.StockQuantity < items.ProductVariant.StockQuantity {
+		if items.ProductVariant.StockQuantity < items.Quantity {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "Some items are out of stock. Please update your cart.", "/cart")
 			return
 		}
 		items.ProductVariant.StockQuantity -= items.Quantity
 		tx.Save(&items.ProductVariant)
-		regularPrice += items.ProductVariant.RegularPrice * float64(items.Quantity)
 		salePrice += items.ProductVariant.SalePrice * float64(items.Quantity)
 	}
 	tax = (salePrice * 18) / 100
@@ -164,6 +165,20 @@ func ProceedToPayment(c *gin.Context) {
 		shippingCharge = 0
 	}
 	total = salePrice + tax
+	currentTime := time.Now()
+	var order models.Order
+	order = models.Order{
+		UserID:         userDetails.ID,
+		OrderAmount:    total,
+		ShippingCharge: float64(shippingCharge),
+		Tax:            tax,
+		OrderDate:      currentTime,
+	}
+	if err := tx.Create(&order).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
+		return
+	}
 	var address models.UserAddress
 	if err := tx.First(&address, "user_id = ? AND id = ?", userDetails.ID, paymentRequest.AddressID).Error; err != nil {
 		tx.Rollback()
@@ -173,6 +188,7 @@ func ProceedToPayment(c *gin.Context) {
 	var shippingAddress models.ShippingAddress
 	shippingAddress = models.ShippingAddress{
 		UserID:    address.UserID,
+		OrderID:   order.ID,
 		FirstName: address.FirstName,
 		LastName:  address.LastName,
 		Mobile:    address.Mobile,
@@ -188,68 +204,93 @@ func ProceedToPayment(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create address", "Something Went Wrong", "/checkout")
 		return
 	}
-	currentTime := time.Now()
-	var order models.Order
-	order = models.Order{
-		UserID:         userDetails.ID,
-		AddressID:      shippingAddress.ID,
-		OrderAmount:    total,
-		ShippingCharge: float64(shippingCharge),
-		Tax:            tax,
-		OrderDate:      currentTime,
-	}
-	if err := tx.Create(&order).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
-		return
-	}
+
 	for _, item := range cartItems {
+		orderUID := generateOrderID()
+		regularPrice = item.ProductVariant.RegularPrice * float64(item.Quantity)
+		salePrice = item.ProductVariant.SalePrice * float64(item.Quantity)
+		tax = (salePrice * 18) / 100
+		if salePrice > 1000 {
+			shippingCharge = 0
+		}
+		total = salePrice + tax
+		var firstImage string
+
+		var firstVariantImage models.ProductVariantsImage
+		err := config.DB.Where("product_variant_id = ?", item.ProductVariant.ID).Order("id ASC").First(&firstVariantImage).Error
+
+		if err == nil {
+			firstImage = firstVariantImage.ProductVariantsImages
+		}
+		var mainProduct models.ProductDetail
+		if err := tx.First(&mainProduct, "id = ?", item.ProductVariant.ProductID).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch main product", "Something Went Wrong", "/checkout")
+			return
+		}
+		cID := mainProduct.CategoryID
+		var category models.Categories
+		if err := tx.First(&category, "id = ?", cID).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch category", "Something Went Wrong", "/checkout")
+			return
+		}
+
 		orderItems := models.OrderItem{
-			OrderID:          order.ID,
-			UserID:           userDetails.ID,
-			ProductVariantID: item.ProductVariantID,
-			Quantity:         item.Quantity,
-			Subtotal:         float64(item.Quantity) * item.ProductVariant.SalePrice,
-			DeliveryDate:     currentTime.AddDate(0, 0, 3),
+			OrderID:              order.ID,
+			UserID:               userDetails.ID,
+			OrderUID:             orderUID,
+			ProductName:          item.ProductVariant.ProductName,
+			ProductSummary:       item.ProductVariant.ProductSummary,
+			ProductCategory:      category.Name,
+			/* CouponDiscount: , */
+			ProductImage:         firstImage,
+			ProductRegularPrice:  item.ProductVariant.RegularPrice,
+			ProductSalePrice:     item.ProductVariant.SalePrice,
+			ProductVariantID:     item.ProductVariantID,
+			Quantity:             item.Quantity,
+			SubTotal:             regularPrice,
+			ShippingCharge:       float64(shippingCharge),
+			Tax:                  tax,
+			Total:                total,
+			ExpectedDeliveryDate: currentTime.AddDate(0, 0, 7),
 		}
 		if err := tx.Create(&orderItems).Error; err != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
 			return
 		}
-	}
-	paymentStatus := false
-	switch paymentRequest.PaymentMethod {
-	case "COD":
-		if err := CODPayment(c, tx, userDetails.ID, order.ID, order.OrderAmount, "Cash On Delivery"); err != nil {
+		if err := tx.First(&orderItems, "id = ? AND order_id=? AND product_variant_id = ?", orderItems.ID, order.ID, item.ProductVariantID).Error; err != nil {
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Payment failed", "Something Went Wrong", "/checkout")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "/profile/order/details")
 			return
 		}
-		paymentStatus = true
-		/* 	case "Wallet":
-		   	case "Others": */
-	default:
-		helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Payment Method", "Invalid Payment Method", "/checkout")
-		return
-	}
-	if paymentStatus {
-		order = models.Order{
-			OrderStatus: "Confirmed",
-		}
-		if err := tx.Model(&order).Where("user_id = ? AND address_id = ?", userDetails.ID, shippingAddress.ID).Updates(order).Error; err != nil {
-			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Order Status Update Failed", "Order Status Update Failed", "/checkout")
-			return
-		}
-		for _, item := range cartItems {
-			if err := tx.Unscoped().Where("id = ?", item.ID).Delete(&models.CartItem{}).Error; err != nil {
+		paymentStatus := false
+		switch paymentRequest.PaymentMethod {
+		case "COD":
+			if err := CODPayment(c, tx, userDetails.ID, orderItems.ID, orderItems.Total, "Cash On Delivery"); err != nil {
 				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Database Error", "Unable to delete cart items", "/cart")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Payment failed", "Something Went Wrong", "/checkout")
 				return
 			}
+			paymentStatus = true
+			/* 	case "Wallet":
+			   	case "Others": */
+		default:
+			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Payment Method", "Invalid Payment Method", "/checkout")
+			return
 		}
+		if paymentStatus {
+			for _, item := range cartItems {
+				if err := tx.Unscoped().Where("id = ?", item.ID).Delete(&models.CartItem{}).Error; err != nil {
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusInternalServerError, "Database Error", "Unable to delete cart items", "/cart")
+					return
+				}
+			}
 
+		}
 	}
+
 	tx.Commit()
 	c.HTML(http.StatusOK, "orderSuccess.html", gin.H{
 		"status":  "OK",
@@ -258,11 +299,20 @@ func ProceedToPayment(c *gin.Context) {
 	})
 }
 
+func generateOrderID() string {
+	rand.Seed(time.Now().UnixNano())
+	section1 := rand.Intn(900) + 100
+	section2 := rand.Intn(9000000) + 1000000
+	section3 := time.Now().UnixNano() % 10000000
+
+	return fmt.Sprintf("#%d-%d-%07d", section1, section2, section3)
+}
+
 func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId uint, paymentAmount float64, method string) error {
 	var paymentDetail models.PaymentDetail
 	paymentDetail = models.PaymentDetail{
 		UserID:        userId,
-		OrderID:       orderId,
+		OrderItemID:   orderId,
 		PaymentStatus: "Pending",
 		PaymentAmount: paymentAmount,
 		PaymentMethod: method,

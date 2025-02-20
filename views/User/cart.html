@@ -168,6 +168,7 @@
             </div>
         </div>
     </div>
+    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
 
     <div class="empty-cart-view" style="display: none;">
         <div class=" flex items-center justify-center">
@@ -377,16 +378,40 @@
                         // Update cart totals after adding item
                         updateCartTotalAndCount();
 
-                        window.location.reload()
+                        // Show success toast message
+                        showToast("Item added to cart!", "bg-green-500");
+
+                        // Optional: Remove page reload if not necessary
+                         window.location.reload();
                     } else {
-                        showError(data.message);
+                        showToast(data.message || "Failed to add item", "bg-red-500");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showError('An error occurred while adding the item to cart');
+                    showToast('An error occurred while adding the item to cart', "bg-red-500");
                 });
         }
+
+        // Toast notification function
+        function showToast(message, bgColor) {
+            let toast = document.getElementById("toast");
+
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "toast";
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
+            toast.classList.remove("hidden");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
+
         function updateCartItemsSection(data) {
             if (data.Count === 0) {
                 // Clear the cart items container

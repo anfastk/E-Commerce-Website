@@ -78,6 +78,8 @@
             </div>
         </header>
     </div>
+    <div id="errorToast" class="hidden fixed bottom-5 right-5 bg-red-500 text-white px-4 py-2 rounded shadow-lg"></div>
+
     <div class="container mx-auto p-4 md:p-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Left Section -->
@@ -195,16 +197,12 @@
                         <span>&#8377; {{.SubTotal}}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>Wallet</span>
-                        <span>-&#8377;00</span>
-                    </div>
-                    <div class="flex justify-between">
                         <span>Coupon Discount</span>
                         <span>-&#8377;00</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Shipping</span>
-                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free {{end}}</span>
+                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Tax</span>
@@ -306,30 +304,49 @@
     </footer>
     <script>
         document.getElementById('proceedToPay').addEventListener('click', function () {
-            let selectedPaymentMethod = document.querySelector('input[name="payment"]:checked').value;
-            let addressId = document.getElementById('addressId').value;
+            let selectedPayment = document.querySelector('input[name="payment"]:checked');
+            let addressIdElement = document.getElementById('addressId');
+
+            if (!selectedPayment || !addressIdElement || !addressIdElement.value) {
+                showErrorToast("Missing payment method or address.");
+                return;
+            }
+
+            let selectedPaymentMethod = selectedPayment.value;
+            let addressId = addressIdElement.value;
 
             fetch('/checkout/payment/proceed', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    paymentMethod: selectedPaymentMethod,
-                    addressId: addressId,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
             })
-                .then(response => response.text()) // Expecting an HTML response
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
+                    }
+                    return response.text();
+                })
                 .then(html => {
                     document.open();
-                    document.write(html); // Replace the current page with the new HTML
+                    document.write(html);
                     document.close();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while processing the payment.');
+                    showErrorToast(error.message || "An error occurred while processing the payment.");
                 });
         });
+
+        // Function to show error toast
+        function showErrorToast(message) {
+            let toast = document.getElementById("errorToast");
+            toast.textContent = message;
+            toast.classList.remove("hidden");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
 
         function updateDeliveryDate() {
             let now = new Date();

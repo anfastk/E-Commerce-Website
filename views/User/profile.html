@@ -118,7 +118,7 @@
                             </svg>
                             Personal Information
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/order/details" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,7 +158,8 @@
                             </svg>
                             Order History
                         </a>
-                        <a href="/profile/manage/address" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/manage/address"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -168,7 +169,8 @@
                             </svg>
                             Manage Address
                         </a>
-                        <a href="/profile/settings" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/settings"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -318,6 +320,9 @@
             </div>
         </div>
     </footer>
+    <!-- Toast container -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
+
     <script>
         document.getElementById('profileForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -344,17 +349,28 @@
                 });
 
                 if (response.ok) {
-                    const result = await response.json();
-                    alert('Profile updated successfully!');
+                    showToast('Profile updated successfully!', 'bg-green-500');
                 } else {
                     throw new Error('Failed to update profile');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to update profile. Please try again.');
+                showToast('Failed to update profile. Please try again.', 'bg-red-500');
             }
         });
+
+        function showToast(message, bgColor) {
+            let toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
+            toast.classList.remove("hidden");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
     </script>
+
 </body>
 
 </html>

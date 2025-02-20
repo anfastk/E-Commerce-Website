@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Tracking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -79,173 +80,239 @@
         </header>
     </div>
     <!-- Download Invoice Button -->
-    <div class="flex justify-end mb-2 max-w-7xl mx-auto pt-6">
-        <button class="bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download Invoice
-        </button>
-    </div>
-    <div class="p-2 md:p-8">
-        <!-- Progress Bar -->
-        <div class="relative">
-            <!-- Progress Line -->
-            <div class="h-1 bg-gray-200 absolute w-full top-7"></div>
-            <div class="h-1 bg-green-500 absolute w-1/3 top-7"></div>
-
-            <!-- Steps Container -->
-            <div class="flex justify-between relative">
-                <!-- Order Placed -->
-                <div class="text-center">
-                    <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <span class="text-sm">Order Placed</span>
+    <div class="container mx-auto p-6">
+        <!-- Order Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-wrap justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Order ID {{.OrderItem.OrderUID}}</h1>
+                    {{if .IsPaid}}<p class="text-green-500 font-semibold mt-1">Payment Completed</p>{{else}} <p
+                        class="text-orange-500 font-semibold mt-1">Payment Pending</p>{{end}}
                 </div>
-
-                <!-- Packaging -->
-                <div class="text-center">
-                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                        </svg>
-                    </div>
-                    <span class="text-sm">Packaging</span>
-                </div>
-
-                <!-- On The Road -->
-                <div class="text-center">
-                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                    </div>
-                    <span class="text-sm">On The Road</span>
-                </div>
-
-                <!-- Delivered -->
-                <div class="text-center">
-                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                        </svg>
-                    </div>
-                    <span class="text-sm">Delivered</span>
+                <div class="space-x-2 mt-2 sm:mt-0">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        <i class="fas fa-download mr-2"></i>Download Invoice
+                    </button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                        <i class="fas fa-times mr-2"></i>Cancel Order
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto">
-        <div class="grid md:grid-cols-2 gap-12">
-            <!-- Product Image -->
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <img src="{{ (index .OrderItem.ProductVariantDetails.VariantsImages 0).ProductVariantsImages  }}"
-                    alt="" class="w-full rounded-lg object-contain">
-            </div>
-
-            <!-- Order Details -->
-            <div class="bg-white p-8 rounded-lg shadow-lg space-y-6">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold mb-2">Delivering Address</h3>
-                    <p class="text-gray-600">{{.Order.ShippingAddress.Address}},<br>
-                        {{.Order.ShippingAddress.City}},<br>
-                        {{.Order.ShippingAddress.State}}, {{.Order.ShippingAddress.PinCode}}, {{.Order.ShippingAddress.Country}}</p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold">Order Date</h3>
-                        <p class="text-gray-600">{{.Orderdate}}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">Payment Method</h3>
-                        <p class="text-gray-600">{{.Payment.PaymentMethod}}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">Delivery Date</h3>
-                        <p class="text-gray-600">{{.Deliverydate}}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">Return Policy</h3>
-                        <p class="text-gray-600">7 Days After Delivery till<!--  22 January 2025 --></p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">Return Date</h3>
-                        <p class="text-gray-600">{{.Returndate}}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold">Coupon Applied</h3>
-                        <p class="text-gray-600"><!-- 10 % discount applied --></p>
-                    </div>
-                </div>
+            <div class="text-sm text-gray-600">
+                <p>Order Date: <span class="format-date" data-date="{{.OrderDate}}" data-format="long"></span></p>
+                </p>
+                <p>Expected Delivery: <span class="format-date" data-date="{{.ExpectedDeliveryDate}}"
+                        data-format="long"></span></p>
+                </p>
+                <p>Return Period Ends: <span class="format-date" data-date="{{.ReturnDate}}" data-format="long"></span>
+                </p>
+                </p>
             </div>
         </div>
 
-        <!-- Price Details -->
-        <div class="mt-8 bg-white p-8 rounded-lg shadow-lg">
-            <div class="max-w-2xl mx-auto space-y-3">
-                <div class="flex justify-between">
-                    <span>Product Sub-total</span>
-                    <span>&#8377; {{.Orderitems.ProductVariantDetails.SalePrice}}</span>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Progress and Products -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Improved Tracking Progress -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-8">Order Status</h2>
+                    <div class="relative">
+                        <!-- Progress Line -->
+                        <div class="absolute top-4 left-0 h-1 bg-gray-200 w-full">
+                            <div class="h-full bg-green-500 w-2/3"></div>
+                        </div>
+
+                        <!-- Progress Steps -->
+                        <div class="relative flex justify-between">
+                            <!-- Order Placed -->
+                            <div class="relative flex flex-col items-center">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <div class="mt-4 w-32 text-center">
+                                    <p class="font-medium text-green-600">Order Placed</p>
+                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                            data-date="{{.OrderDate}}" data-format="datetime"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Processing -->
+                            <div class="relative flex flex-col items-center">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <div class="mt-4 w-32 text-center">
+                                    <p class="font-medium text-green-600">Shipped</p>
+                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                            data-date="{{.ShippedDate}}" data-format="datetime"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Shipped -->
+                            <div class="relative flex flex-col items-center">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10">
+                                    <i class="fas fa-box text-white text-sm"></i>
+                                </div>
+                                <div class="mt-4 w-32 text-center">
+                                    <p class="font-medium text-green-600">Out Of Delivery</p>
+                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                            data-date="{{.OutOfDeliveryDate}}" data-format="datetime"></span></p>
+                                </div>
+                            </div>
+
+                            <!-- Delivered -->
+                            <div class="relative flex flex-col items-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center z-10">
+                                    <i class="fas fa-home text-gray-500 text-sm"></i>
+                                </div>
+                                <div class="mt-4 w-32 text-center">
+                                    <p class="font-medium text-gray-400">Delivered</p>
+                                    <p class="text-xs text-gray-500 mt-1">Expected <span class="format-date"
+                                            data-date="{{.ExpectedDeliveryDate}}" data-format="short"></span></p>
+                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                            data-date="{{.DeliveryDate}}" data-format="datetime"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- <div class="flex justify-between text-gray-600">
-                    <span>Wallet</span>
-                    <span>-$24</span>
-                </div> -->
-                <!-- <div class="flex justify-between text-gray-600">
-                    <span>Coupon Discount</span>
-                    <span>-$24</span>
-                </div> -->
-                <div class="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span>{{if .Order.ShippingCharge}} {{.Order.ShippingCharge}} {{else}} Free {{end}}</span>
+
+                <!-- Products -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Order Items</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition">
+                            <div class="flex items-center flex-1">
+                                <img src="{{ (index .OrderItem.ProductVariantDetails.VariantsImages 0).ProductVariantsImages  }}"
+                                    alt="Product" class="w-20 h-20 object-contain rounded" />
+                                <div class="ml-4">
+                                    <h3 class="font-medium">{{.OrderItem.ProductVariantDetails.ProductName}}</h3>
+                                    <p class="text-gray-600">Quantity: {{.OrderItem.Quantity}}</p>
+                                    <div class="flex space-x-2 mt-2">
+                                        <button class="text-red-600 text-sm hover:text-red-700 flex items-center">
+                                            <i class="fas fa-times mr-1"></i>Cancel Item
+                                        </button>
+                                        <span class="text-gray-300">|</span>
+                                        <button class="text-blue-600 text-sm hover:text-blue-700 flex items-center">
+                                            <i class="fas fa-exchange-alt mr-1"></i>Return Item
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="font-medium">&#8377; {{printf "%.2f" .OrderItem.Total}}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-between text-gray-600">
-                    <span>Tax</span>
-                    <span>&#8377; {{.Order.Tax}}</span>
+            </div>
+
+            <!-- Right Column - Payment, Address, Summary -->
+            <div class="space-y-6">
+                <div data-is-paid="{{.IsPaid}}">
+                    <div id="paymentCompleted" class="bg-white rounded-lg shadow-md p-6" style="display: none;">
+                        <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <p class="text-green-800 font-medium">Payment Completed</p>
+                                <p class="text-sm text-green-600 mt-1">Paid on Feb 20, 2025 at 10:30 AM</p>
+                            </div>
+
+                            <!-- Payment Method Used -->
+                            <div class="flex items-center p-3 border rounded-lg">
+                                <i class="fab fa-cc-visa text-2xl text-blue-600 mr-2"></i>
+                                <div class="flex-1">
+                                    <p class="font-medium">Visa card ending in 4242</p>
+                                    <p class="text-sm text-gray-500">Transaction ID: TXN123456789</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Paid</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Payment Section -->
+                    <div id="paymentPending" class="bg-white rounded-lg shadow-md p-6" style="display: none;">
+                        <h2 class="text-xl font-semibold mb-4">Complete Payment</h2>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                                <p class="text-orange-800 font-medium">Payment Pending</p>
+                                <p class="text-sm text-orange-600 mt-1">Please complete your payment to process the
+                                    order
+                                </p>
+                            </div>
+
+                            <!-- Payment Methods -->
+                            <div class="space-y-2">
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="payment" class="mr-3" />
+                                    <i class="fab fa-cc-visa text-2xl text-blue-600 mr-2"></i>
+                                    <span>Credit/Debit Card</span>
+                                </label>
+
+                                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="payment" class="mr-3" />
+                                    <i class="fab fa-paypal text-2xl text-blue-800 mr-2"></i>
+                                    <span>PayPal</span>
+                                </label>
+
+                                <button class="w-full bg-blue-600 text-white py-3 rounded-lg mt-4 hover:bg-blue-700">
+                                    Pay Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- <div class="flex justify-between text-gray-600">
-                    <span>Product Discount</span>
-                    <span>&#8377; -$24</span>
+                <!-- Shipping Address -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Shipping Address</h2>
+                    <div class="text-gray-700">
+                        <p class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</p>
+                        <p>{{.Address.Address}}</p>
+                        <p>{{.Address.City}}</p>
+                        <p>{{.Address.State}}, {{.Address.PinCode}}</p>
+                        <p>{{.Address.Country}}</p>
+                        <p>Phone: {{.Address.Mobile}}</p>
+                    </div>
                 </div>
-                <div class="flex justify-between text-gray-600">
-                    <span>Total Discount</span>
-                    <span>&#8377; -$48</span>
-                </div> -->
-                <div class="flex justify-between font-semibold text-lg pt-4 border-t">
-                    <span>Total</span>
-                    <span>&#8377; {{.Payment.PaymentAmount}}</span>
+
+                <!-- Price Summary -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Price Details</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal</span>
+                            <span>&#8377; {{printf "%.2f" .OrderItem.SubTotal}}</span>
+                        </div>
+                        <div class="flex justify-between text-green-600 bg-green-50 p-2 rounded">
+                            <span class="flex items-center">
+                                <i class="fas fa-tag mr-2"></i>
+                                Coupon (SAVE20)
+                            </span>
+                            <span>-00</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Shipping</span>
+                            <span>{{if .OrderItem.ShippingCharge}}&#8377; {{printf "%.2f" .OrderItem.ShippingCharge }} {{else}} <span class="text-green-600">Free </span> <span class="line-through text-sm">&#8377;100</span>{{end}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax</span>
+                            <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Product Discount</span>
+                            <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                        </div>
+
+                        <div class="flex justify-between text-gray-600">
+                            <span>Total Discount</span>
+                            <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
+                        </div>
+                        <div class="flex justify-between font-semibold text-lg pt-3 border-t">
+                            <span>Total</span>
+                            <span>&#8377; {{printf "%.2f" .OrderItem.Total}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Cancel Order Button -->
-        <div class="mt-8  flex justify-end">
-            <form action="/profile/order/details/track/{{.Order.ID}}/cancel" method="post">
-                <button type="submit" class="bg-gray-900 text-white px-6 py-2 rounded-lg">Cancel Order</button>
-            </form>
-        </div>
-    </div>
     </div>
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
@@ -312,6 +379,59 @@
             </div>
         </div>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the payment status from the data attribute
+            const isPaid = document.querySelector('[data-is-paid]').dataset.isPaid === 'true';
+
+            // Get both payment divs
+            const completedDiv = document.getElementById('paymentCompleted');
+            const pendingDiv = document.getElementById('paymentPending');
+
+            // Show/hide appropriate div based on payment status
+            if (isPaid) {
+                completedDiv.style.display = 'block';
+                pendingDiv.style.display = 'none';
+            } else {
+                completedDiv.style.display = 'none';
+                pendingDiv.style.display = 'block';
+            }
+        });
+
+        function formatDates() {
+            document.querySelectorAll(".format-date").forEach((element) => {
+                let rawDate = element.dataset.date.trim(); // Get raw date
+                let formatType = element.dataset.format;  // Get format type
+
+                if (!rawDate || !formatType) return;
+
+                // ✅ Convert backend date format to a valid ISO format
+                let formattedRawDate = rawDate.replace(" ", "T"); // Replace space with 'T' for ISO
+                let date = new Date(formattedRawDate); // Parse to Date object
+
+                if (isNaN(date.getTime())) {
+                    element.innerHTML = "Invalid Date"; // Handle parsing failure
+                    return;
+                }
+
+                // Define different formats
+                let formattedDate;
+                if (formatType === "long") {
+                    formattedDate = date.toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' }); // February 27, 2025
+                } else if (formatType === "datetime") {
+                    formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`; // 27 Feb, 10:33 AM
+                } else if (formatType === "short") {
+                    formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}`; // 27 Feb
+                }
+
+                element.innerHTML = formattedDate;
+            });
+        }
+
+        // Run function when page loads
+        document.addEventListener("DOMContentLoaded", formatDates);
+
+    </script>
 </body>
 
 </html>

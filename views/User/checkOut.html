@@ -390,7 +390,7 @@
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
-                            <span>{{if .Shipping}} {{.Shipping}} {{else}} Free {{end}}</span>
+                            <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Tax</span>
@@ -489,6 +489,8 @@
             </div>
         </div>
     </footer>
+    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
+
     <script>
         function handleCardClick(card, event) {
             // Don't handle click if it's coming from buttons
@@ -610,17 +612,16 @@
             // Get selected address ID
             const selectedAddress = document.querySelector('input[name="address_card"]:checked');
             if (!selectedAddress) {
-                alert('Please select a shipping address');
+                showToast('Please select a shipping address', "bg-red-500");
                 return;
             }
+
             const addressId = selectedAddress.value;
 
             try {
                 const response = await fetch('/checkout/payment', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ addressId }),
                 });
 
@@ -631,14 +632,32 @@
                     document.close();
                 } else {
                     const result = await response.json();
-                    console.log(result.message)
-                    throw new Error(result.message||'Payment proceeding failed');
+                    throw new Error(result.message || 'Payment proceeding failed');
                 }
             } catch (error) {
                 console.error(error);
-                alert(error||'Error proceeding to payment');
+                showToast(error.message || 'Error proceeding to payment', "bg-red-500");
             }
         });
+
+        // Toast notification function
+        function showToast(message, bgColor) {
+            let toast = document.getElementById("toast");
+
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "toast";
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
+            toast.classList.remove("hidden");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
     </script>
 </body>
 

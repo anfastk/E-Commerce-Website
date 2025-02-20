@@ -13,37 +13,79 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.querySelector('form');
   if (!form) return;
 
+  // Helper function to show field error
+  const showFieldError = (field, message) => {
+    field.classList.add('border-red-500');
+    // Add error message below the field
+    const existingError = field.nextElementSibling?.classList.contains('error-message');
+    if (!existingError) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+      errorDiv.textContent = message;
+      field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
+  };
+
+  // Helper function to clear field error
+  const clearFieldError = (field) => {
+    field.classList.remove('border-red-500');
+    const errorMessage = field.nextElementSibling;
+    if (errorMessage?.classList.contains('error-message')) {
+      errorMessage.remove();
+    }
+  };
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
     const formData = new FormData(this);
+    let isValid = true;
+    let errorMessages = [];
+
+    // Clear all previous errors
+    form.querySelectorAll('.error-message').forEach(error => error.remove());
+    form.querySelectorAll('.border-red-500').forEach(field => field.classList.remove('border-red-500'));
 
     // Validate required fields
     const requiredFields = this.querySelectorAll('[required]');
-    let isValid = true;
     requiredFields.forEach(field => {
       if (!field.value.trim()) {
         isValid = false;
-        field.classList.add('border-red-500');
+        const fieldName = field.getAttribute('name') || field.getAttribute('id') || 'Field';
+        showFieldError(field, `${fieldName} is required`);
+        errorMessages.push(`${fieldName} is required`);
       } else {
-        field.classList.remove('border-red-500');
+        clearFieldError(field);
+      }
+    });
+
+    // Validate numeric fields
+    const priceFields = this.querySelectorAll('[id^="regular-price-"], [id^="discounted-price-"], [id^="stock-quantity-"]');
+    priceFields.forEach(field => {
+      const value = parseFloat(field.value);
+      const fieldName = field.getAttribute('name') || field.getAttribute('id') || 'Field';
+      
+      if (field.value.trim() === '') {
+        return; // Skip empty fields, they'll be caught by required validation if needed
+      }
+
+      if (isNaN(value)) {
+        isValid = false;
+        showFieldError(field, `${fieldName} must be a valid number`);
+        errorMessages.push(`${fieldName} must be a valid number`);
+      } else if (value < 0) {
+        isValid = false;
+        showFieldError(field, `${fieldName} cannot be negative`);
+        errorMessages.push(`${fieldName} cannot be negative`);
+      } else {
+        clearFieldError(field);
       }
     });
 
     if (!isValid) {
-      window.toast.error('Please fill in all required fields');
+      // Show toast with all error messages
+      window.toast.error('Please fix the following errors:\n' + errorMessages.join('\n'));
       return;
-    }
-
-    // Add variant files to form data, ensuring the first image is sent first
-    if (typeof variantFiles !== 'undefined') {
-      variantFiles.forEach((files, variantIndex) => {
-        // Ensure the first image is the main product image
-        files.sort((a, b) => a.name.localeCompare(b.name)); // Sort by name to ensure order
-        files.forEach((file, index) => {
-          formData.append(`product_images[${variantIndex}][]`, file);
-        });
-      });
     }
 
     showLoader();
@@ -53,14 +95,13 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(response => response.json())
       .then(data => {
+        hideLoader();
         if (data.code === 200) {
-          hideLoader();
           window.toast.success(data.message || 'Variant added successfully!');
           setTimeout(() => {
             window.location.href = data.redirect || '/admin/products';
           }, 1000);
         } else {
-          hideLoader();
           window.toast.error(data.message || 'Error adding variant');
         }
       })
@@ -69,6 +110,28 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Error:', error);
         window.toast.error('Error adding variant. Please try again.');
       });
+  });
+
+  // Add real-time validation for numeric fields
+  const numericFields = form.querySelectorAll('[id^="regular-price-"], [id^="discounted-price-"], [id^="stock-quantity-"]');
+  numericFields.forEach(field => {
+    field.addEventListener('input', function() {
+      const value = parseFloat(this.value);
+      const fieldName = this.getAttribute('name') || this.getAttribute('id') || 'Field';
+      
+      if (this.value.trim() === '') {
+        clearFieldError(this);
+        return;
+      }
+
+      if (isNaN(value)) {
+        showFieldError(this, `${fieldName} must be a valid number`);
+      } else if (value < 0) {
+        showFieldError(this, `${fieldName} cannot be negative`);
+      } else {
+        clearFieldError(this);
+      }
+    });
   });
 });
 

@@ -147,7 +147,7 @@
                     </div>
                     <div class="flex flex-1 justify-center p-4">
 
-                        <form action="/cart/add/{{.ID}}" method="post">
+                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
                             <button
                                 class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
                                 Add To Cart
@@ -322,7 +322,7 @@
                             <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
                                 .RegularPrice}}</span>
                         </div>
-                        <form action="/cart/add/{{.ID}}" method="post">
+                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
                             <button
                                 class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
                                 Add To Cart
@@ -406,7 +406,7 @@
                             <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
                                 .RegularPrice}}</span>
                         </div>
-                        <form action="/cart/add/{{.ID}}" method="post">
+                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
                             <button
                                 class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
                                 Add To Cart
@@ -682,7 +682,45 @@
                 <p>&copy; 2025 LAPTIX, Inc</p>
             </div>
         </div>
+        <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
+
     </footer>
+    <script>
+        document.querySelectorAll('.cart-form').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent normal form submission
+
+                let formData = new FormData(this);
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        showToast("Item added to cart!", "bg-green-500");
+                    } else {
+                        throw new Error("Failed to add item");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    showToast("Error adding item to cart!", "bg-red-500");
+                }
+            });
+        });
+
+        function showToast(message, bgColor) {
+            let toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
+            toast.classList.remove("hidden");
+
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>
