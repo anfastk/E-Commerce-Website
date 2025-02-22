@@ -354,7 +354,7 @@
             let deliveryDate = new Date(orderTime);
 
             // 3 days add cheyyuka
-            deliveryDate.setDate(orderTime.getDate() + 3);
+            deliveryDate.setDate(orderTime.getDate() + 7);
 
             // Midnight check (12:00 AM aayal next day update cheyyuka)
             if (now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 59) {

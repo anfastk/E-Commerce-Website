@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -356,21 +357,25 @@ func OrderDetails(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
 	type OrderResponse struct {
-		Slno           int     `json:"slno"`
-		ID             uint    `json:"id"`
-		FirstName      string  `json:"firstname"`
-		LastName       string  `json:"lastname"`
-		OrderUID       string  `json:"orderid"`
-		Image          string  `json:"image"`
-		Quantity       uint    `json:"quantity"`
-		ProductSummary string  `json:"productsummary"`
-		CategoryName   string  `json:"categoryname"`
-		OrderStatus    string  `json:"orderststus"`
-		PaymentStatus  string  `json:"paymentststus"`
-		SubTotal       float64 `json:"subtotal"`
-		OrderDate      string  `json:"orderdate"`
-		DeliveryDate   string  `json:"deliverydate"`
-		ReturnDate     string  `json:"returndate"`
+		Slno                 int     `json:"slno"`
+		ID                   uint    `json:"id"`
+		ProductId            uint    `json:"productid"`
+		FirstName            string  `json:"firstname"`
+		LastName             string  `json:"lastname"`
+		OrderUID             string  `json:"orderid"`
+		Image                string  `json:"image"`
+		Quantity             uint    `json:"quantity"`
+		ProductSummary       string  `json:"productsummary"`
+		CategoryName         string  `json:"categoryname"`
+		OrderStatus          string  `json:"orderststus"`
+		PaymentStatus        string  `json:"paymentststus"`
+		SubTotal             float64 `json:"subtotal"`
+		OrderDate            string  `json:"orderdate"`
+		DeliveryDate         string  `json:"deliverydate"`
+		ReturnDate           string  `json:"returndate"`
+		ReturnableDate       string  `json:"returnabledate"`
+		CancelDate           string  `json:"canceldate"`
+		ExpectedDeliveryDate string  `json:"expecteddeliverydate"`
 	}
 
 	var userauth models.UserAuth
@@ -413,22 +418,27 @@ func OrderDetails(c *gin.Context) {
 		formattedOrderDate := item.CreatedAt.Format("2 January 2006")
 		formattedReturnDate := item.ReturnDate.Format("2 January 2006")
 		formattedDeliveryDate := item.DeliveryDate.Format("2 January 2006")
+		formattedCancelDate := item.CancelDate.Format("2 January 2006")
+		formattedExpectedDeliveryDate := item.ExpectedDeliveryDate.Format("2 January 2006")
 		orderResponse := OrderResponse{
-			Slno:           i + 1,
-			ID:             item.ID,
-			FirstName:      shippingAddress.FirstName,
-			LastName:       shippingAddress.LastName,
-			OrderUID:       item.OrderUID,
-			Quantity:       uint(item.Quantity),
-			Image:          item.ProductImage,
-			ProductSummary: item.ProductSummary,
-			CategoryName:   item.ProductCategory,
-			OrderStatus:    strings.ToUpper(item.OrderStatus),
-			PaymentStatus:  strings.ToUpper(payment.PaymentStatus),
-			SubTotal:       item.Total,
-			OrderDate:      formattedOrderDate,
-			DeliveryDate:   formattedDeliveryDate,
-			ReturnDate:     formattedReturnDate,
+			Slno:                 i + 1,
+			ID:                   item.ID,
+			ProductId:            item.ProductVariantID,
+			FirstName:            shippingAddress.FirstName,
+			LastName:             shippingAddress.LastName,
+			OrderUID:             item.OrderUID,
+			Quantity:             uint(item.Quantity),
+			Image:                item.ProductImage,
+			ProductSummary:       item.ProductSummary,
+			CategoryName:         item.ProductCategory,
+			OrderStatus:          item.OrderStatus,
+			PaymentStatus:        strings.ToUpper(payment.PaymentStatus),
+			SubTotal:             item.Total,
+			OrderDate:            formattedOrderDate,
+			DeliveryDate:         formattedDeliveryDate,
+			ReturnDate:           formattedReturnDate,
+			CancelDate:           formattedCancelDate,
+			ExpectedDeliveryDate: formattedExpectedDeliveryDate,
 		}
 		orderResponses = append(orderResponses, orderResponse)
 	}
@@ -471,8 +481,12 @@ func TrackingPage(c *gin.Context) {
 		return
 	}
 	isPaid := false
-	if payment.PaymentStatus == "Completed" {
+	if payment.PaymentStatus == "Paid" {
 		isPaid = true
+	}
+	isDelivered := false
+	if orderItems.OrderStatus == "Delivered" {
+		isDelivered = true
 	}
 	productDiscount := (orderItems.ProductRegularPrice - orderItems.ProductSalePrice) * float64(orderItems.Quantity)
 	totalDiscount := productDiscount + orderItems.CouponDiscount
@@ -488,6 +502,7 @@ func TrackingPage(c *gin.Context) {
 		"OrderItem":            orderItems,
 		"Payment":              payment,
 		"IsPaid":               isPaid,
+		"IsDelivered":          isDelivered,
 		"ProductDiscount":      productDiscount,
 		"TotalDiscount":        totalDiscount,
 		"OrderDate":            orderItems.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
@@ -496,63 +511,75 @@ func TrackingPage(c *gin.Context) {
 		"ShippedDate":          orderItems.ShippedDate.Format("2006-01-02T15:04:05.000-07:00"),
 		"OutOfDeliveryDate":    orderItems.OutOfDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
 		"DeliveryDate":         orderItems.DeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"CancelDate":           orderItems.CancelDate.Format("2006-01-02T15:04:05.000-07:00"),
 	})
 }
 
 func CancelOrder(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
-	orderID := c.Param("id")
-
-	tx := config.DB.Begin()
-
-	var order models.Order
-	if err := tx.First(&order, "user_id = ? AND id = ?", userID, orderID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
+	orderItemID := c.Param("id")
+	var inputReason struct {
+		Reason string ` json:"cancelReason" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&inputReason); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Reason Not Found", "Reason is required", "")
 		return
 	}
 
-	var orderItems []models.OrderItem
-	if err := tx.First(&orderItems, "order_id = ? AND user_id = ?", order.ID, userID).Error; err != nil {
+	tx := config.DB.Begin()
+
+	var orderItems models.OrderItem
+	if err := tx.First(&orderItems, "id = ? AND user_id = ?", orderItemID, userID).Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Order Items Not Found", "Something Went Wrong", "")
 		return
 	}
 
-	if err := tx.Model(&orderItems).Where("user_id = ? AND order_id = ?", userID, orderID).
-		Update("order_status", "CANCELLED").Error; err != nil {
+	var order models.Order
+	if err := tx.First(&order, "user_id = ? AND id = ?", userID, orderItems.OrderID).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
+		return
+	}
+
+	if err := tx.Model(&orderItems).Where("user_id = ? AND order_id = ?", userID, order.ID).
+		Updates(map[string]interface{}{
+			"order_status":           "Cancelled",
+			"reason":                 inputReason.Reason,
+			"cancel_date":            time.Now(),
+			"expected_delivery_date": time.Now(),
+			"return_date":            time.Now(),
+		}).Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Order Status Update Failed", "Order Status Update Failed", "/checkout")
 		return
 	}
 
 	var payment models.PaymentDetail
-	if err := tx.First(&payment, "order_item_id = ? AND user_id = ?", order.ID, userID).Error; err != nil {
+	if err := tx.First(&payment, "order_item_id = ? AND user_id = ?", orderItems.ID, userID).Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Payment Details Not Found", "Something Went Wrong", "")
 		return
 	}
 
-	if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", userID, orderID).
-		Update("payment_status", "CANCELLED").Error; err != nil {
+	if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", userID, orderItems.ID).
+		Update("payment_status", "Cancelled").Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Payment Status Update Failed", "Payment Status Update Failed", "/checkout")
 		return
 	}
 
-	for _, item := range orderItems {
-		var product models.ProductVariantDetails
-		if err := tx.First(&product, item.ProductVariantID).Error; err != nil {
-			tx.Rollback()
-			helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Something Went Wrong", "")
-			return
-		}
-		if err := tx.Model(&product).Where("id = ?", item.ProductVariantID).
-			Update("stock_quantity", product.StockQuantity+item.Quantity).Error; err != nil {
-			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Stock Reverse Failed", "Stock Update Failed", "/checkout")
-			return
-		}
+	var product models.ProductVariantDetails
+	if err := tx.First(&product, orderItems.ProductVariantID).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Something Went Wrong", "")
+		return
+	}
+	if err := tx.Model(&product).Where("id = ?", orderItems.ProductVariantID).
+		Update("stock_quantity", product.StockQuantity+orderItems.Quantity).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Stock Reverse Failed", "Stock Update Failed", "/checkout")
+		return
 	}
 
 	tx.Commit()

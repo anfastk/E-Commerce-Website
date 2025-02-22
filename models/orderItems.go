@@ -28,10 +28,12 @@ type OrderItem struct {
 	ExpectedDeliveryDate  time.Time             `gorm:"not null"`
 	ReturnableStatus      bool                  `gorm:"default:true"`
 	OrderUID              string                `gorm:"unique,not null" json:"orderuid"`
+	Reason				  string
 	ReturnDate            time.Time             
 	DeliveryDate          time.Time             
 	ShippedDate           time.Time             
-	OutOfDeliveryDate     time.Time             
+	OutOfDeliveryDate     time.Time 
+	CancelDate            time.Time
 	UserAuth              UserAuth              `gorm:"foreignKey:UserID;references:ID"`
 	ProductVariantDetails ProductVariantDetails `gorm:"foreignKey:ProductVariantID;references:ID"`
 }

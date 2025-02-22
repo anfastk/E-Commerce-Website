@@ -195,7 +195,11 @@
                         {{range .data}}
                         <div class="p-4 border-b border-gray-300 mb-2  bg-white shadow-md rounded-lg">
                             <!-- Order Header -->
-                            <div class="flex justify-between text-sm mb-4 bg-gray-200 p-4 -mx-4 -mt-4">
+                            <div class="flex justify-between text-sm mb-4 p-4 -mx-4 -mt-4 
+    {{if eq .OrderStatus `Pending`}} bg-orange-200 
+    {{else if or (eq .OrderStatus `Cancelled`) (eq .OrderStatus `Returned`) (eq .OrderStatus `Failed`)}} bg-red-200 
+    {{else if or (eq .OrderStatus `Shipped`) (eq .OrderStatus `Out For Delivery`) (eq .OrderStatus `Delivered`) (eq .OrderStatus `Confirmed`)}} bg-green-200 
+    {{end}}">
                                 <div class="space-x-8 flex">
                                     <div class="text-gray-600">
                                         ORDER PLACED
@@ -221,7 +225,8 @@
                                         ORDER ID {{.OrderUID}}
                                     </div>
                                     <div class="flex space-x-2">
-                                        <a href="/profile/order/details/track/{{.ID}}" class="text-blue-600 hover:underline">View order details</a>
+                                        <a href="/profile/order/details/track/{{.ID}}"
+                                            class="text-blue-600 hover:underline">View order details</a>
                                         <span class="text-gray-400">|</span>
                                         <a href="#" class="text-blue-600 hover:underline">Invoice</a>
                                     </div>
@@ -230,20 +235,39 @@
 
                             <!-- Rest of the content remains the same -->
                             <div class="mt-4">
-                                <div class="text-lg font-bold">Delivered {{.DeliveryDate}}</div>
+                                {{if eq .OrderStatus "Delivered"}}
+                                <div class=" text-lg font-bold">Delivered {{.DeliveryDate}}</div>
+                                {{else if eq .OrderStatus "Returned"}}
+                                <div class="text-lg font-bold">Returned on {{.ReturnDate}}</div>
+                                {{else if eq .OrderStatus "Cancelled"}}
+                                <div class="text-lg font-bold">Cancelled on {{.CancelDate}}</div>
+                                {{else}}
+                                <div class="text-lg font-bold">Expected Delivered Date {{.ExpectedDeliveryDate}}</div>
+                                {{end}}
+                                <!-- Status -->
+                                {{if or (eq .OrderStatus "Cancelled") (eq .OrderStatus "Returned")}}
+                                <div class="rounded-lg text-red-600 font-medium mb-2">{{.OrderStatus }}</div>
+                                {{else if eq .OrderStatus "Pending"}}
+                                <div class="text-orange-600 font-medium mb-2">{{.OrderStatus }}</div>
+                                {{else}}
                                 <div class="text-green-600 font-medium mb-2">{{.OrderStatus }}</div>
-
+                                {{end}}
                                 <div class="flex mt-4 items-start">
                                     <img src="{{.Image}}" alt="Product" class="w-24 h-24 object-contain">
                                     <div class="ml-4 flex-grow">
                                         <div class="flex justify-between items-start">
                                             <div>
-                                                <a href="#"
+                                                <a href="/products/details/{{.ProductId}}"
                                                     class="text-black hover:underline  line-clamp-2 max-w-[825px]">
                                                     {{.ProductSummary}}
                                                 </a>
+                                                {{if eq .OrderStatus "Delivered"}}
                                                 <div class="text-sm text-gray-600 mt-1">Return window closed on
                                                     {{.ReturnDate}}</div>
+                                                {{else}}
+                                                <div class="text-sm text-gray-600 mt-1">Expected Delivery date
+                                                    {{.ExpectedDeliveryDate}}</div>
+                                                {{end}}
                                             </div>
                                         </div>
                                     </div>
@@ -295,10 +319,10 @@
                             </h2>
 
                             <!-- Button -->
-                            <button
+                            <a href="/products"
                                 class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-2 rounded-md transition-colors duration-200">
                                 Start Shopping
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

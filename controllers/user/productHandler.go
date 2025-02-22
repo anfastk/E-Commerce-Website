@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -10,7 +11,7 @@ import (
 )
 
 func UserHome(c *gin.Context) {
-
+	
 	keyboard, _ := helper.RelatedProducts(2)
 	laptop, _ := helper.RelatedProducts(3)
 	mouse, _ := helper.RelatedProducts(4)
@@ -31,11 +32,24 @@ type ProductVariantResponse struct {
 }
 
 func ShowProducts(c *gin.Context) {
+	var Brand []string
+	var Category []string
+
+	if err := config.DB.Model(&models.ProductDetail{}).Distinct("brand_name").Pluck("brand_name", &Brand).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch brand name", "Something Went Wrong", "")
+		return
+	}
+	if err := config.DB.Model(&models.Categories{}).Pluck("name", &Category).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch category name", "Something Went Wrong", "")
+		return
+	}
 
 	var variants []models.ProductVariantDetails
 
 	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
-		Where("is_deleted = ?", false).
+		Preload("Category").
+		Preload("Product").
+		Where("is_deleted = ? AND stock_quantity>0", false).
 		Find(&variants)
 
 	if result.Error != nil {
@@ -62,8 +76,118 @@ func ShowProducts(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusFound, "productpage.html", gin.H{
+		"status":   true,
+		"message":  "Product variants fetched successfully",
+		"data":     response,
+		"Brand":    Brand,
+		"Category": Category,
+	})
+}
+
+type FilterRequest struct {
+	Search            string   `json:"search"`
+	Sort              string   `json:"sort"`
+	Categories        []string `json:"categories"`
+	PriceRanges       []string `json:"priceRanges"`
+	Discounts         []int    `json:"discounts"`
+	Brands            []string `json:"brands"`
+	IncludeOutOfStock bool     `json:"includeOutOfStock"`
+}
+
+func FilterProducts(c *gin.Context) {
+	var filter FilterRequest
+	if err := c.ShouldBindJSON(&filter); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid filter parameters", err.Error(), "")
+		return
+	}
+
+	query := config.DB.Model(&models.ProductVariantDetails{}).
+		Preload("VariantsImages", "is_deleted = ?", false).
+		Preload("Category").
+		Preload("Product").
+		Where("product_variant_details.is_deleted = ?", false)
+
+	// Always join product_details since we might need it for brand filtering or searching
+	query = query.Joins("JOIN product_details ON product_variant_details.product_id = product_details.id")
+
+	if filter.Search != "" {
+		searchTerm := "%" + filter.Search + "%"
+		query = query.Joins("JOIN categories ON product_variant_details.category_id = categories.id").
+			Where("product_variant_details.product_name ILIKE ? OR product_details.brand_name ILIKE ? OR categories.name ILIKE ?",
+				searchTerm, searchTerm, searchTerm)
+	} else if len(filter.Categories) > 0 {
+		// Only join categories if we haven't already joined it for search
+		query = query.Joins("JOIN categories ON product_variant_details.category_id = categories.id").
+			Where("categories.name IN ?", filter.Categories)
+	}
+
+	if len(filter.Brands) > 0 {
+		query = query.Where("product_details.brand_name IN ?", filter.Brands)
+	}
+
+	if len(filter.PriceRanges) > 0 {
+		priceConditions := []string{}
+		for _, pr := range filter.PriceRanges {
+			switch pr {
+			case "1":
+				priceConditions = append(priceConditions, "(product_variant_details.sale_price BETWEEN 1000 AND 50000)")
+			case "2":
+				priceConditions = append(priceConditions, "(product_variant_details.sale_price BETWEEN 50000 AND 100000)")
+			case "3":
+				priceConditions = append(priceConditions, "(product_variant_details.sale_price BETWEEN 100000 AND 500000)")
+			}
+		}
+		if len(priceConditions) > 0 {
+			query = query.Where(strings.Join(priceConditions, " OR "))
+		}
+	}
+
+	if len(filter.Discounts) > 0 {
+		query = query.Where("((product_variant_details.regular_price - product_variant_details.sale_price) / product_variant_details.regular_price * 100) >= ?",
+			filter.Discounts[len(filter.Discounts)-1])
+	}
+
+	if !filter.IncludeOutOfStock {
+		query = query.Where("product_variant_details.stock_quantity > 0")
+	}
+
+	switch filter.Sort {
+	/* case "popularity":
+	query = query.Order("sales_count DESC") */
+	case "price-low":
+		query = query.Order("product_variant_details.sale_price ASC")
+	case "price-high":
+		query = query.Order("product_variant_details.sale_price DESC")
+	case "newest":
+		query = query.Order("product_variant_details.created_at DESC")
+	default:
+		query = query.Order("product_variant_details.created_at DESC")
+	}
+
+	var variants []models.ProductVariantDetails
+	if err := query.Find(&variants).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch products", err.Error(), "")
+		return
+	}
+
+	var response []ProductVariantResponse
+	for _, variant := range variants {
+		var images []string
+		for _, img := range variant.VariantsImages {
+			images = append(images, img.ProductVariantsImages)
+		}
+
+		response = append(response, ProductVariantResponse{
+			ID:           variant.ID,
+			ProductName:  variant.ProductName,
+			RegularPrice: variant.RegularPrice,
+			SalePrice:    variant.SalePrice,
+			Images:       images,
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
 		"status":  true,
-		"message": "Product variants fetched successfully",
+		"message": "Products filtered successfully",
 		"data":    response,
 	})
 }

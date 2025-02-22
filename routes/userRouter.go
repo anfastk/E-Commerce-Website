@@ -19,6 +19,7 @@ func UserRouter(r *gin.Engine) {
 	r.GET("/", middleware.NoCacheMiddleware(), controllers.UserHome)
 	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
 	r.GET("/products/details/:id", middleware.NoCacheMiddleware(), controllers.ShowProductDetail)
+	r.POST("/products/filter", controllers.FilterProducts)
 
 	user := r.Group("/user")
 	user.Use(middleware.NoCacheMiddleware())

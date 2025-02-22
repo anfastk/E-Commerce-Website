@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laptix Adimin Product Page</title>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/nav&sideBar.js" defer></script>
+    <script src="/static/js/productpage.js" defer></script>
+</head>
+
+<body class="bg-white min-h-screen flex flex-col lg:flex-row">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+        <div class="py-6 px-4 flex items-center justify-start space-x-4">
+            <!-- Hamburger Menu for Small Screens inside Sidebar -->
+            <button class="lg:hidden text-white" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
+        </div>
+        <nav class="flex-1 ">
+            <ul>
+                <li class="py-3 px-4 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Dashboard</a>
+                </li>
+                <li class="py-3 px-4  flex items-center space-x-2">
+                    <!-- All Products Button with Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
+                        fill="currentColour">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
+                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                    </svg>
+                    <a href="/admin/products" class="text-base font-medium  ">All Products</a>
+                </li>
+                <li class="py-3 px-4 bg-blue-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="black" fill-rule="evenodd"
+                            d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
+                            clip-rule="evenodd" />
+                        <path fill="black"
+                            d="M15.75 2.824c0-.184.193-.301.336-.186q.182.147.323.342l3.013 4.197c.068.096-.006.22-.124.22H16a.25.25 0 0 1-.25-.25z" />
+                    </svg>
+                    <a href="/admin/orderlist" class="text-base font-medium text-black">Order List</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M12 12.75c3.942 0 7.987 2.563 8.249 7.712a.75.75 0 0 1-.71.787c-2.08.106-11.713.171-15.077 0a.75.75 0 0 1-.711-.787C4.013 15.314 8.058 12.75 12 12.75m0-9a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 0 0 0-7.5" />
+                    </svg>
+                    <a href="/admin/users" class="text-base font-medium hover:text-blue-500">User Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2" />
+                    </svg>
+                    <a href="/admin/category" class="text-base font-medium hover:text-blue-500">Category Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M14.8 8L16 9.2L9.2 16L8 14.8zM4 4h16c1.11 0 2 .89 2 2v4a2 2 0 1 0 0 4v4c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4c1.11 0 2-.89 2-2a2 2 0 0 0-2-2V6a2 2 0 0 1 2-2m0 2v2.54a3.994 3.994 0 0 1 0 6.92V18h16v-2.54a3.994 3.994 0 0 1 0-6.92V6zm5.5 2c.83 0 1.5.67 1.5 1.5S10.33 11 9.5 11S8 10.33 8 9.5S8.67 8 9.5 8m5 5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Coupon Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
+                        <path fill="currentColor"
+                            d="M30 6V4h-3V2h-2v2h-1c-1.103 0-2 .898-2 2v2c0 1.103.897 2 2 2h4v2h-6v2h3v2h2v-2h1c1.103 0 2-.897 2-2v-2c0-1.102-.897-2-2-2h-4V6zm-6 14v2h2.586L23 25.586l-2.292-2.293a1 1 0 0 0-.706-.293H20a1 1 0 0 0-.706.293L14 28.586L15.414 30l4.587-4.586l2.292 2.293a1 1 0 0 0 1.414 0L28 23.414V26h2v-6zM4 30H2v-5c0-3.86 3.14-7 7-7h6c1.989 0 3.89.85 5.217 2.333l-1.49 1.334A5 5 0 0 0 15 20H9c-2.757 0-5 2.243-5 5zm8-14a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-12a5 5 0 1 1 0 10a5 5 0 0 1 0-10" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Sales</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M7.05 6.462a2 2 0 0 0 2.63-1.519l.32-1.72a9 9 0 0 1 3.998 0l.322 1.72a2 2 0 0 0 2.63 1.519l1.649-.58a9 9 0 0 1 2.001 3.46l-1.33 1.14a2 2 0 0 0 0 3.037l1.33 1.139a9 9 0 0 1-2.001 3.46l-1.65-.58a2 2 0 0 0-2.63 1.519L14 20.777a9 9 0 0 1-3.998 0l-.322-1.72a2 2 0 0 0-2.63-1.519l-1.649.58a9 9 0 0 1-2.001-3.46l1.33-1.14a2 2 0 0 0 0-3.036L3.4 9.342a9 9 0 0 1 2-3.46zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <a href="/admin/settings" class="text-base font-medium hover:text-blue-500">Settings</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Breadcrumbs -->
+
+        <!-- Content -->
+        <div class="max-w-7xl p-6">
+            <!-- Breadcrumb -->
+            <div class="text-sm mb-6">
+                <span class="text-gray-600">Home > User > Order Details</span>
+            </div>
+
+
+
+            <!-- Order ID and Date -->
+            <div class="flex items-center gap-4 mb-6">
+                <h1 class="text-2xl font-bold">Order ID: {{.OrderItem.OrderUID}}</h1>
+                <span id="statusElement" data-status="{{.OrderItem.OrderStatus}}"
+                    class="px-3 py-1 rounded text-sm font-medium">{{.OrderItem.OrderStatus}}
+                </span>
+            </div>
+            <div class="flex items-center text-gray-600 my-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="#000"
+                        d="M10.5 7.25a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-1 5.5a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0 3.5a1 1 0 1 1-2 0a1 1 0 0 1 2 0m2.5-2.5a1 1 0 1 0 0-2a1 1 0 0 0 0 2m1 2.5a1 1 0 1 1-2 0a1 1 0 0 1 2 0m2.5-2.5a1 1 0 1 0 0-2a1 1 0 0 0 0 2" />
+                    <path fill="#000" fill-rule="evenodd"
+                        d="M8 3.5a.5.5 0 0 1 .5.5v1h7V4a.5.5 0 0 1 1 0v1.003q.367.003.654.026c.365.03.685.093.981.243a2.5 2.5 0 0 1 1.092 1.093c.151.296.214.616.244.98c.029.355.029.792.029 1.334v7.642c0 .542 0 .98-.029 1.333c-.03.365-.093.685-.244.981a2.5 2.5 0 0 1-1.092 1.092c-.296.151-.616.214-.98.244c-.355.029-.792.029-1.333.029H8.179c-.542 0-.98 0-1.333-.029c-.365-.03-.685-.093-.981-.244a2.5 2.5 0 0 1-1.093-1.092c-.15-.296-.213-.616-.243-.98C4.5 17.3 4.5 16.862 4.5 16.32V8.68c0-.475 0-.868.02-1.197l.009-.136c.03-.365.093-.685.243-.981a2.5 2.5 0 0 1 1.093-1.093c.296-.15.616-.213.98-.243q.289-.023.655-.026V4a.5.5 0 0 1 .5-.5m-.5 3v-.497a9 9 0 0 0-.573.023c-.302.024-.476.07-.608.137a1.5 1.5 0 0 0-.656.656c-.067.132-.113.306-.137.608C5.5 7.736 5.5 8.132 5.5 8.7v.55h13V8.7c0-.568 0-.964-.026-1.273c-.024-.302-.07-.476-.137-.608a1.5 1.5 0 0 0-.656-.656c-.132-.067-.306-.113-.608-.137a9 9 0 0 0-.573-.023V6.5a.5.5 0 0 1-1 0V6h-7v.5a.5.5 0 0 1-1 0m11 3.75h-13v6.05c0 .568 0 .965.026 1.273c.024.302.07.476.137.608a1.5 1.5 0 0 0 .656.656c.132.067.306.113.608.137C7.236 19 7.632 19 8.2 19h7.6c.568 0 .965 0 1.273-.026c.302-.024.476-.07.608-.137a1.5 1.5 0 0 0 .656-.656c.067-.132.113-.306.137-.608c.026-.308.026-.705.026-1.273z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span class="ml-2">Order Date : {{.OrderDate}}</span>
+            </div>
+
+            <!-- Info Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Customer Card -->
+                <div class="bg-white p-6 rounded-lg border shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-600 p-2 rounded-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <h2 class="font-medium text-lg">Customer</h2>
+                    </div>
+                    <div class="space-y-2 text-gray-700">
+                        <p>Full Name: <span class="font-medium">{{.User.FullName}}</span></p>
+                        <p>Email: <span class="font-medium">{{.User.Email}}</span></p>
+                        <p>Phone: <span class="font-medium">{{.Address.Mobile}}</span></p>
+                    </div>
+                </div>
+
+                <!-- Deliver to Card -->
+                <div class="bg-white p-6 rounded-lg border shadow-sm">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-600 p-2 rounded-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="font-medium text-lg">Deliver to</h2>
+                    </div>
+                    <div class="space-y-2 text-gray-700">
+                        <p>Address: <span class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</span></p>
+                        <p>{{.Address.Address}}</p>
+                        <p>{{.Address.City}}</p>
+                        <p>{{.Address.State}}, {{.Address.PinCode}}</p>
+                        <p>{{.Address.Country}}</p>
+                        <p>Phone: {{.Address.Mobile}}</p>
+                    </div>
+                </div>
+
+                <!-- Payment Info Card -->
+                <div class="bg-white p-6 rounded-lg border shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-600 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                            </div>
+                            <h2 class="font-medium text-lg">Payment Info</h2>
+                        </div>
+                        {{if eq .Payment.PaymentStatus "Pending"}}
+                        <span
+                            class="bg-orange-100 text-orange-600 px-3 py-1 rounded text-sm font-medium">{{.Payment.PaymentStatus}}</span>
+                        {{else if or (eq .Payment.PaymentStatus "Cancelled") (eq .Payment.PaymentStatus "Refunded") (eq .Payment.PaymentStatus "Failed")}}
+                        <span
+                            class="bg-red-100 text-red-600 px-3 py-1 rounded text-sm font-medium">{{.Payment.PaymentStatus}}</span>
+                        {{else}}
+                        <span
+                            class="bg-green-100 text-green-600 px-3 py-1 rounded text-sm font-medium">{{.Payment.PaymentStatus}}</span>
+                        {{end}}
+                    </div>
+                    <div class="space-y-2 text-gray-700">
+                        <p>Master Card <span class="font-medium">{{.Payment.PaymentMethod}}</span></p>
+                        <p>Business name: <span class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</span>
+                        </p>
+                        <p>Phone: <span class="font-medium">{{.Address.Mobile}}</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status Section -->
+
+            <div class="bg-white p-6 rounded-lg border shadow-sm mb-8" data-order-id="{{.OrderItem.ID}}"
+                data-payment-method="{{.Payment.PaymentMethod}}">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-600 p-2 rounded-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                        <h2 class="font-medium text-lg">Order Status</h2>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Order ID : <span class="font-medium" id="orderNumber"> {{.OrderItem.OrderUID}}</span>
+                    </div>
+                </div>
+
+                <!-- Current Status Display -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="text-sm text-gray-600">Current Status</div>
+                    <div class="font-medium text-lg" id="currentStatus">{{.OrderItem.OrderStatus}}</div>
+                </div>
+
+                <!-- Status Update Form -->
+                <form id="statusUpdateForm" class="space-y-6">
+                    <!-- Status Selection -->
+                    <div class="flex flex-col gap-2">
+                        <label for="orderStatus" class="text-sm font-medium text-gray-700">Update Status</label>
+                        <select id="orderStatus"
+                            class="border rounded-md px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>Select New Status</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Out for Delivery">Out for Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Return">Return</option>
+                            <option value="Cancel">Cancel</option>
+                        </select>
+                    </div>
+
+                    <!-- Cancel Reason Container -->
+                    <div id="cancelReasonContainer" class="hidden space-y-4">
+                        <div class="flex flex-col gap-2">
+                            <label for="cancelReason" class="text-sm font-medium text-gray-700">Cancellation
+                                Reason</label>
+                            <select id="cancelReason"
+                                class="border rounded-md px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="" disabled selected>Select Cancel Reason</option>
+                                <option value="wrong_item">Wrong Item Ordered</option>
+                                <option value="changed_mind">Changed Mind</option>
+                                <option value="delivery_delay">Delivery Delay</option>
+                                <option value="price_issue">Price Issue</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div id="otherReasonContainer" class="hidden">
+                            <label for="otherReasonText" class="text-sm font-medium text-gray-700">Specify
+                                Reason</label>
+                            <textarea id="otherReasonText"
+                                class="mt-1 w-full border rounded-md px-4 py-3 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Please specify your reason for cancellation..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Payment Collection Section (for COD) -->
+                    <div id="codPaymentSection" class="hidden p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <h3 class="font-medium text-yellow-800">Cash on Delivery Payment</h3>
+                                <p class="text-sm text-yellow-700 mt-1">Please confirm that you have collected the
+                                    payment from the customer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                        class="w-full bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                        <span>Update Status</span>
+                        <!-- Loading Spinner (hidden by default) -->
+                        <svg id="loadingSpinner" class="animate-spin h-5 w-5 text-white hidden"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Status Update Toast Message (hidden by default) -->
+                <div id="statusUpdateToast"
+                    class="hidden fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+                    Status updated successfully!
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="bg-white rounded-lg border shadow-sm">
+                <div class="p-6 border-b">
+                    <h2 class="font-medium text-lg">Products</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left p-4 font-medium text-gray-600">Product Name</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Order ID</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Quantity</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Unit Price</th>
+                                <th class="text-center p-4 font-medium text-gray-600">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t">
+                                <td class="p-4">
+                                    <div class="flex items-center gap-4">
+                                        <img src="{{.OrderItem.ProductImage}}" alt="Adidas ultra boost"
+                                            class="w-16 h-16 object-contain rounded-md">
+                                        <span class="font-medium">{{.OrderItem.ProductName}}</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 text-gray-600">{{.OrderItem.OrderUID}}</td>
+                                <td class="p-4 text-gray-600">&#10240;&#x2800;{{.OrderItem.Quantity}}</td>
+                                <td class="p-4 text-gray-600">&#8377; {{printf "%.2f" .OrderItem.ProductRegularPrice}}
+                                </td>
+                                <td class="p-4 text-center font-medium">&#8377; {{printf "%.2f" .OrderItem.SubTotal}}
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 border-t">
+                    <div class="flex justify-end">
+                        <div class="w-72 space-y-4">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Subtotal</span>
+                                <span>&#8377; {{printf "%.2f" .OrderItem.SubTotal}}</span>
+                            </div>
+
+                            <div class="flex justify-between text-gray-600">
+                                <span>Tax (18%)</span>
+                                <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Product Discount</span>
+                                <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Shipping </span>
+                                <span>{{if .OrderItem.ShippingCharge}}&#8377; {{printf "%.2f" .OrderItem.ShippingCharge
+                                    }} {{else}} <span class="text-green-600">Free </span> <span
+                                        class="line-through text-sm">&#8377;100</span>{{end}}</span>
+
+                            </div>
+                            <div class="flex justify-between text-green-600 ">
+                                <span class="flex items-center">
+                                    Coupon (SAVE20)
+                                </span>
+                                <span>-00</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Total Discount</span>
+                                <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
+                            </div>
+                            <div class="border-t pt-4 mt-2"></div>
+                            <div class="flex justify-between font-bold text-xl">
+                                <span>Total</span>
+                                <span>&#8377; {{printf "%.2f" .OrderItem.Total}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const statusElement = document.getElementById("statusElement");
+            const status = statusElement.dataset.status;
+
+            if (status === "Pending" || status === "Shipped" || status === "Confirmed") {
+                statusElement.classList.add("bg-orange-100", "text-orange-600");
+            } else if (status === "Cancelled" || status === "Returned") {
+                statusElement.classList.add("bg-red-100", "text-red-800");
+            } else if (status === "Out For Delivery" || status === "Delivered") {
+                statusElement.classList.add("bg-green-100", "text-green-800");
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure we get the order ID reliably
+            const orderIdElement = document.querySelector('[data-order-id]');
+            let orderId;
+
+            if (orderIdElement) {
+                orderId = orderIdElement.dataset.orderId;
+            } else {
+                orderId = new URLSearchParams(window.location.search).get('id');
+            }
+
+            if (!orderId) {
+                console.error('Order ID not found from URL or data attribute');
+                showToast('Order ID not found. Please check the URL or page data.', true);
+                return;
+            }
+
+            console.log('Order ID found:', orderId);
+
+            const paymentMethod = document.querySelector('[data-payment-method]')?.dataset.paymentMethod;
+
+            // Define the status flow rules
+            const statusFlow = {
+                'Pending': ['Confirmed', 'Cancel'],
+                'Confirmed': ['Shipped', 'Cancel'],
+                'Shipped': ['Out for Delivery', 'Cancel'],
+                'Out For Delivery': ['Delivered', 'Cancel'],
+                'Delivered': ['Return'],
+                'Returned': [],
+                'Cancelled': []
+            };
+
+            // Form elements
+            const form = document.getElementById('statusUpdateForm');
+            const statusSelect = document.getElementById('orderStatus');
+            const currentStatusElement = document.getElementById('currentStatus');
+            const cancelReasonContainer = document.getElementById('cancelReasonContainer');
+            const cancelReasonSelect = document.getElementById('cancelReason');
+            const otherReasonText = document.getElementById('otherReasonText');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const statusUpdateToast = document.getElementById('statusUpdateToast');
+
+            // Store orderId in a hidden input field
+            let hiddenInput = form.querySelector('input[name="orderId"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'orderId';
+                form.appendChild(hiddenInput);
+            }
+            hiddenInput.value = orderId;
+
+            // Function to update available status options
+            function updateStatusOptions() {
+                const currentStatus = currentStatusElement.textContent.trim();
+                const allowedNextStatuses = statusFlow[currentStatus] || [];
+
+                // Clear existing options
+                statusSelect.innerHTML = '<option value="" disabled selected>Select New Status</option>';
+
+                // Add only allowed next statuses
+                allowedNextStatuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusSelect.appendChild(option);
+                });
+
+                // Disable the select if no next statuses are available
+                statusSelect.disabled = allowedNextStatuses.length === 0;
+
+                // Update submit button state
+                submitButton.disabled = allowedNextStatuses.length === 0;
+
+                // Show message if no further status changes are allowed
+                if (allowedNextStatuses.length === 0) {
+                    showToast('No further status changes are allowed for this order', true);
+                }
+            }
+
+            // Status change handler
+            statusSelect.addEventListener('change', function () {
+                if (this.value === 'Cancel') {
+                    cancelReasonContainer.classList.remove('hidden');
+                } else {
+                    cancelReasonContainer.classList.add('hidden');
+                    // Reset cancel reason fields when status is changed
+                    cancelReasonSelect.value = '';
+                    otherReasonText.value = '';
+                }
+
+                // Show COD payment confirmation section if relevant
+                const codSection = document.getElementById('codPaymentSection');
+                if (this.value === 'Delivered' && paymentMethod === 'Cash On Delivery') {
+                    codSection.classList.remove('hidden');
+                } else {
+                    codSection.classList.add('hidden');
+                }
+            });
+
+            // Cancel reason change handler
+            cancelReasonSelect.addEventListener('change', function () {
+                const otherReasonContainer = document.getElementById('otherReasonContainer');
+                if (this.value === 'other') {
+                    otherReasonContainer.classList.remove('hidden');
+                } else {
+                    otherReasonContainer.classList.add('hidden');
+                    otherReasonText.value = '';
+                }
+            });
+
+            // Show toast message function
+            function showToast(message, isError = false) {
+                statusUpdateToast.textContent = message;
+                statusUpdateToast.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+                statusUpdateToast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+                statusUpdateToast.classList.remove('hidden');
+
+                setTimeout(() => {
+                    statusUpdateToast.classList.add('hidden');
+                }, 3000);
+            }
+
+            // Form submission handler
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent form from submitting normally
+
+                // Get order ID from hidden field
+                const orderId = this.querySelector('input[name="orderId"]').value;
+
+                if (!orderId) {
+                    showToast('Order ID not found. Please refresh the page.', true);
+                    return;
+                }
+
+                const status = statusSelect.value;
+                const currentStatus = currentStatusElement.textContent.trim();
+
+                if (!status) {
+                    showToast('Please select a status', true);
+                    return;
+                }
+
+                // Validate status flow
+                const allowedNextStatuses = statusFlow[currentStatus] || [];
+                if (!allowedNextStatuses.includes(status)) {
+                    showToast(`Cannot update status from ${currentStatus} to ${status}`, true);
+                    return;
+                }
+
+                // Check for COD payment confirmation
+                if (status === 'Delivered' && paymentMethod === 'Cash On Delivery') {
+                    const paymentConfirmed = confirm('Has the customer paid the cash on delivery amount?');
+                    if (!paymentConfirmed) {
+                        showToast('Please collect payment before marking as delivered', true);
+                        return;
+                    }
+                }
+
+                // Prepare the data for API
+                const data = {
+                    orderId: orderId,
+                    status: status,
+                    previousStatus: currentStatus
+                };
+
+                // Add cancel reason if status is cancel
+                if (status === 'Cancel') {
+                    const cancelReason = cancelReasonSelect.value;
+                    if (!cancelReason) {
+                        showToast('Please select a cancellation reason', true);
+                        return;
+                    }
+                    data.cancelReason = cancelReason;
+
+                    if (cancelReason === 'other') {
+                        const otherReason = otherReasonText.value.trim();
+                        if (!otherReason) {
+                            showToast('Please specify the cancellation reason', true);
+                            return;
+                        }
+                        data.otherReason = otherReason;
+                    }
+                }
+
+                try {
+                    // Show loading state
+                    submitButton.disabled = true;
+                    loadingSpinner.classList.remove('hidden');
+                    submitButton.querySelector('span').textContent = 'Updating...';
+
+                    console.log('Sending data to server:', data);
+
+                    // Make API call
+                    const response = await fetch('/admin/orderlist/details/status/update', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update order status');
+                    }
+
+                    // Show success message based on status
+                    let successMessage;
+                    if (status === 'Delivered') {
+                        successMessage = 'Order has been marked as delivered successfully!';
+                    } else if (status === 'Cancel') {
+                        successMessage = 'Order has been cancelled successfully!';
+                    } else {
+                        successMessage = `Order status has been updated to ${status} successfully!`;
+                    }
+
+                    showToast(successMessage);
+
+                    // Refresh the page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Error updating order status:', error);
+                    showToast('Failed to update order status. Please try again.', true);
+                } finally {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    loadingSpinner.classList.add('hidden');
+                    submitButton.querySelector('span').textContent = 'Update Status';
+                }
+            });
+
+            // Initialize status options
+            updateStatusOptions();
+        });
+
+        // Global showToast function for use before DOM is fully loaded
+        function showToast(message, isError = false) {
+            const statusUpdateToast = document.getElementById('statusUpdateToast');
+            if (!statusUpdateToast) return;
+
+            statusUpdateToast.textContent = message;
+            statusUpdateToast.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+            statusUpdateToast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            statusUpdateToast.classList.remove('hidden');
+
+            setTimeout(() => {
+                statusUpdateToast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

@@ -66,4 +66,12 @@ func AdminRoutes(r *gin.Engine) {
 		category.POST("/add", controllers.AddCategory)
 		category.POST("/:id/delete", controllers.DeleteCategory)
 	}
+	OrderList:=r.Group("/admin/orderlist")
+	OrderList.Use(middleware.AuthMiddleware(RoleAdmin))
+	OrderList.Use(middleware.NoCacheMiddleware())
+	{
+		OrderList.GET("/", controllers.ShowOrderManagent)
+		OrderList.GET("/details/:id", controllers.ShowOrderDetailManagement)
+		OrderList.PATCH("/details/status/update",controllers.ChangeOrderStatus)
+	}
 }

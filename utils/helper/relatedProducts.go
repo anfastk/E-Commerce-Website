@@ -17,7 +17,7 @@ type productsResponse struct {
 func RelatedProducts(categoryID uint) ([]productsResponse, error) {
 	var products []models.ProductVariantDetails
 	if err := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
-		Where("category_id = ? AND is_deleted = ?", categoryID, false).
+		Where("category_id = ? AND is_deleted = ? AND stock_quantity>0", categoryID, false).
 		Limit(20).
 		Find(&products).Error; err != nil {
 		return nil, err

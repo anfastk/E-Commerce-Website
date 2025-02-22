@@ -2,16 +2,21 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laptix Adimin Product Page</title>
-    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Main Product Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/nav&sideBar.js" defer></script>
-    <script src="/static/js/productpage.js" defer></script>
+
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
+    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
+        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+            <span id="toast-message"></span>
+        </div>
+    </div>
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -36,25 +41,26 @@
                     </svg>
                     <a href="#" class="text-base font-medium hover:text-blue-500">Dashboard</a>
                 </li>
-                <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
+                <li class="py-3 px-4  flex items-center space-x-2">
                     <!-- All Products Button with Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
-                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
-                            stroke-width="32" rx="28.87" ry="28.87" />
-                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
+                        fill="currentColour">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
                             stroke-width="32" d="M144 80h224m-256 48h288" />
                     </svg>
-                    <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
+                    <a href="/admin/products" class="text-base font-medium  ">All Products</a>
                 </li>
-                <li class="py-3 px-4 flex items-center">
+                <li class="py-3 px-4 bg-blue-600 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
-                        <path fill="currentColor" fill-rule="evenodd"
+                        <path fill="black" fill-rule="evenodd"
                             d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
                             clip-rule="evenodd" />
-                        <path fill="currentColor"
+                        <path fill="black"
                             d="M15.75 2.824c0-.184.193-.301.336-.186q.182.147.323.342l3.013 4.197c.068.096-.006.22-.124.22H16a.25.25 0 0 1-.25-.25z" />
                     </svg>
-                    <a href="/admin/orderlist" class="text-base font-medium hover:text-blue-500">Order List</a>
+                    <a href="/admin/orderlist" class="text-base font-medium text-black">Order List</a>
                 </li>
                 <li class="py-3 px-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
@@ -96,11 +102,10 @@
             </ul>
         </nav>
     </aside>
-
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
         <!-- Top Navigation -->
-        <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-50">
+        <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-10 ">
             <!-- Hamburger Menu for Small Screens (Main Header) -->
             <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -151,106 +156,149 @@
                 </div>
         </header>
 
-        <!-- Breadcrumbs -->
-        <div class="mt-2 text-gray-500 mx-5 text-xs"><a href="">All Products</a></div>
-
-        <!-- Content -->
-        <main class="mx-5 flex-1">
-
-            <div class="bg-gray-100  py-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">All Products</h2>
-                    <a href=" /admin/products/main/add">
-                        <button class="bg-black text-white px-4 py-2 rounded">ADD NEW PRODUCT</button>
-                    </a>
-                </div>
-                <div class="mt-4 flex items-center">
-                    <select id="categories" class="px-4 py-2 rounded focus:outline-none bg-gray-100 ">
-                        <option value="all">All Categories</option>
-                        <option value="category1">Category 1</option>
-                        <option value="category2">Category 2</option>
-                        <option value="category3">Category 3</option>
-                    </select>
+        <div class="container mx-auto px-4 py-6 max-w-6xl">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-xl font-bold text-gray-800">Orders List</h1>
+                <div class="text-sm text-gray-600">
+                    <a href="/admin/orderlist" class="hover:underline">Home</a> &gt; <span>Order List</span>
                 </div>
             </div>
 
-            <div class="mt-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Product Card -->
-                    {{range .data}}
-                    <div class="w-auto h-auto bg-white rounded-lg shadow-md overflow-hidden relative">
-                        <!-- Three-dot Menu Button -->
-                        <div class="absolute top-4 right-4 flex items-center">
-                            <button class="menuButton p-2 rounded-full hover:bg-gray-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                    <path fill="currentColor"
-                                        d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3" />
-                                </svg>
-                            </button>
-                            <div
-                                class="menuOptions absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg hidden sticky top-0">
-                                <ul class="text-sm text-gray-700">
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 1</li>
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 2</li>
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 3</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
-                            <div class="p-4 flex items-start">
-                                <div class="h-24 w-24">
-                                    <!-- Product Image -->
-                                {{if len .Images}}
-                                <img src="{{index .Images 0}}" alt="Adidas Ultra Boost"
-                                    class="w-full h-full object-contain rounded-lg">
-                                {{else}}
-                                <img src="https://via.placeholder.com/150  " alt="Default Image"
-                                    class="w-24 h-24 object-cover rounded-lg">
-                                {{end}}
-                                </div>
+            <!-- Orders Card -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold text-gray-800">Recent Purchases</h2>
 
+                </div>
 
-                                <!-- Product Title and Price -->
-                                <div class="ml-4 flex-1">
-                                    <h2 class="text-lg font-semibold text-gray-800">{{.ProductName}}</h2>
-                                    <p class="text-sm text-gray-500">{{.CategoryName}}</p>
-                                    <p class="text-xl font-bold text-gray-900 mt-1">₹
-                                        {{.SalePrice}}</p>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
-                            <!-- Summary -->
-                            <div class="px-4 mt-4">
-                                <h3 class="text-sm font-semibold text-gray-800">Summary</h3>
-                                <p class="text-sm text-gray-600">{{.ProductSummary}}</p>
-                            </div>
+                <!-- Table -->
+                <div class="overflow-x-auto cursor-pointer">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 
-                            <!-- Sales and Remaining Products -->
-                            <div class="px-4 my-5">
-                                <div
-                                    class="flex justify-between items-center text-sm font-semibold text-gray-800 border-t pt-2">
-                                </div>
-                                <div class="flex justify-between items-center text-sm font-semibold text-gray-800 mt-2">
-                                    {{if .Status}}
-                                    <p class="text-xl font-bold mt-1">Status: <span class="text-red-600 ">Deleted</span>
-                                        </span></p>
-                                    {{else}}
-                                    <p class="text-xl font-bold mt-1">Status: <span
-                                            class="text-green-600 ">Active</span>
-                                        </span></p>
-                                    {{end}}
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    {{end}}
-
-                    <!-- Additional Product Cards Can Be Added Here -->
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Product
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Order ID
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Payment Method
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Customer Name
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Order Row 1 -->
+                            {{range .data}}
+                            <tr class="hover:bg-gray-100">
+                                <td class="px-1 py-1 whitespace-nowrap">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        <div class="flex items-center">
+                                            <img src="{{.ProductImage}}" alt="{{.ProductName}}"
+                                                class="h-20 w-20 flex items-center justify-center  font-medium mr-2 object-contain">
+                                        </div>
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        {{.ProductName}}
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        {{.OrderID}}
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        {{.OrderDate}}
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        {{.PaymentMethod}}
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        <div class="flex items-center">
+                                            <img src="{{.ProfilePic}}" alt="{{.UserName}}"
+                                                class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-medium mr-2 object-contain">
+                                            <span class="text-sm text-gray-700">{{.UserName}}</span>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        <span
+                                            class="status-badge px-3 py-1 inline-flex items-center text-xs font-medium rounded-full"
+                                            data-status="{{.Status}}">
+                                            <span class="dot h-2 w-2 mr-1 rounded-full"></span>
+                                            {{.Status}}
+                                        </span>
+                                    </a>
+                                </td>
+                                <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        &#8377;{{.Amount}}
+                                    </a>
+                                </td>
+                            </tr>
+                            {{end}}
+                            <!-- Additional rows would continue here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select all elements with class "status-badge"
+            const statusElements = document.querySelectorAll(".status-badge");
+
+            statusElements.forEach(function (statusElement) {
+                const status = statusElement.dataset.status;
+                const dotElement = statusElement.querySelector(".dot");
+
+                // Apply classes based on status
+                if (status === "Pending" || status === "Shipped" || status === "Confirmed") {
+                    statusElement.classList.add("bg-orange-100", "text-orange-800");
+                    dotElement.classList.add("bg-orange-500");
+                } else if (status === "Cancelled" || status === "Returned") {
+                    statusElement.classList.add("bg-red-100", "text-red-800");
+                    dotElement.classList.add("bg-red-500");
+                } else if (status === "Delivered") {
+                    statusElement.classList.add("bg-green-100", "text-green-800");
+                    dotElement.classList.add("bg-green-500");
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

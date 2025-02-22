@@ -102,27 +102,76 @@
     <div class="container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
         <!-- Sidebar (Hidden on Small Screens) -->
         <aside class="hidden lg:block w-full lg:w-1/4 bg-white rounded-lg shadow-md p-6 max-h-fit">
-            <h2 class="text-xl font-semibold mb-4">Sort by</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Sort by</h2>
+                <button id="clearFilterBtn" onclick="clearFilters()"
+                    class="hidden text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    Clear All Filters
+                </button>
+            </div>
+
             <ul class="space-y-2">
-                <li><input type="checkbox" /> Relevance</li>
-                <li><input type="checkbox" /> Popularity</li>
-                <li><input type="checkbox" /> Price – Low to High</li>
-                <li><input type="checkbox" /> Price – High to Low</li>
-                <li><input type="checkbox" /> Newest First</li>
+                <li><input type="radio" name="sort" value="relevance" id="relevance" onchange="checkFilters()" /> <label
+                        for="relevance">Relevance</label></li>
+                <!-- <li><input type="radio" name="sort" value="popularity" id="popularity" onchange="checkFilters()" />
+                    <label for="popularity">Popularity</label> -->
+                </li>
+                <li><input type="radio" name="sort" value="price-low" id="price-low" onchange="checkFilters()" /> <label
+                        for="price-low">Price – Low to High</label></li>
+                <li><input type="radio" name="sort" value="price-high" id="price-high" onchange="checkFilters()" />
+                    <label for="price-high">Price – High to Low</label>
+                </li>
+                <li><input type="radio" name="sort" value="newest" id="newest" onchange="checkFilters()" /> <label
+                        for="newest">Newest First</label></li>
             </ul>
 
             <h2 class="text-xl font-semibold mt-6 mb-4">Categories</h2>
             <ul class="space-y-2">
-                <li><input type="checkbox" /> Lorem Ipsum (3)</li>
-                <li><input type="checkbox" /> Lorem Ipsum (3)</li>
-                <li><input type="checkbox" /> Lorem Ipsum (3)</li>
+                {{range .Category}}
+                <li><input type="checkbox" id="cat-{{.}}" onchange="checkFilters()" /> <label
+                        for="cat-{{.}}">{{.}}</label></li>
+                {{end}}
             </ul>
 
             <h2 class="text-xl font-semibold mt-6 mb-4">Price Range</h2>
             <ul class="space-y-2">
-                <li><input type="checkbox" /> $20.00 - $50.00</li>
-                <li><input type="checkbox" /> $20.00 - $50.00</li>
-                <li><input type="checkbox" /> $50.00 - $100.00</li>
+                <li><input type="checkbox" id="price-1" onchange="checkFilters()" /> <label for="price-1">&#8377;1000 -
+                        &#8377;50000+</label></li>
+                <li><input type="checkbox" id="price-2" onchange="checkFilters()" /> <label for="price-2">&#8377;50000 -
+                        &#8377;100000+</label></li>
+                <li><input type="checkbox" id="price-3" onchange="checkFilters()" /> <label for="price-3">&#8377;100000
+                        -
+                        &#8377;500000+</label></li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-6 mb-4">Discount</h2>
+            <ul class="space-y-2">
+                <li><input type="checkbox" id="disc-10" onchange="checkFilters()" /> <label for="disc-10">10% Off or
+                        more</label></li>
+                <li><input type="checkbox" id="disc-25" onchange="checkFilters()" /> <label for="disc-25">25% Off or
+                        more</label></li>
+                <li><input type="checkbox" id="disc-35" onchange="checkFilters()" /> <label for="disc-35">35% Off or
+                        more</label></li>
+                <li><input type="checkbox" id="disc-50" onchange="checkFilters()" /> <label for="disc-50">50% Off or
+                        more</label></li>
+                <li><input type="checkbox" id="disc-60" onchange="checkFilters()" /> <label for="disc-60">60% Off or
+                        more</label></li>
+                <li><input type="checkbox" id="disc-75" onchange="checkFilters()" /> <label for="disc-75">75% Off or
+                        more</label></li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-6 mb-4">Availability</h2>
+            <ul class="space-y-2">
+                <li><input type="checkbox" id="stock" onchange="checkFilters()" /> <label for="stock">Include Out of
+                        Stock</label></li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-6 mb-4">Brand Name</h2>
+            <ul class="space-y-2">
+                {{range .Brand}}
+                <li><input type="checkbox" id="brand-{{.}}" onchange="checkFilters()" /> <label
+                        for="brand-{{.}}">{{.}}</label></li>
+                {{end}}
             </ul>
         </aside>
 
@@ -351,7 +400,189 @@
                 toast.classList.add("hidden");
             }, 3000);
         }
-    </script>
+
+        // Frontend filtering and search implementation
+        let currentFilters = {
+            search: '',
+            sort: '',
+            categories: [],
+            priceRanges: [],
+            discounts: [],
+            brands: [],
+            includeOutOfStock: false
+        };
+
+        // Debounce function implementation
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Debounced version of applyFilters for search
+        const debouncedSearch = debounce(applyFilters, 300);
+
+        // Update search input to trigger filtering with debounce
+        document.querySelector('input[type="text"]').addEventListener('input', (e) => {
+            currentFilters.search = e.target.value;
+            debouncedSearch(); // Use debounced version for search
+        });
+
+        // Update filters when checkboxes/radio buttons change
+        function checkFilters() {
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+
+            // Update sort
+            const selectedSort = document.querySelector('input[name="sort"]:checked');
+            currentFilters.sort = selectedSort ? selectedSort.value : '';
+
+            // Update categories
+            currentFilters.categories = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
+                .map(cb => cb.id.replace('cat-', ''));
+
+            // Update price ranges
+            currentFilters.priceRanges = Array.from(document.querySelectorAll('input[id^="price-"]:checked'))
+                .map(cb => cb.id.replace('price-', ''));
+
+            // Update discounts
+            currentFilters.discounts = Array.from(document.querySelectorAll('input[id^="disc-"]:checked'))
+                .map(cb => parseInt(cb.id.replace('disc-', '')));
+
+            // Update brands
+            currentFilters.brands = Array.from(document.querySelectorAll('input[id^="brand-"]:checked'))
+                .map(cb => cb.id.replace('brand-', ''));
+
+            // Update stock status
+            currentFilters.includeOutOfStock = document.getElementById('stock').checked;
+
+            // Show/hide clear filters button
+            const anyFilterSelected = Object.values(currentFilters).some(val =>
+                Array.isArray(val) ? val.length > 0 : Boolean(val)
+            );
+            clearFilterBtn.classList.toggle('hidden', !anyFilterSelected);
+
+            applyFilters(); // Use regular version for other filters
+        }
+
+        function clearFilters() {
+            // Reset all filters
+            currentFilters = {
+                search: '',
+                sort: '',
+                categories: [],
+                priceRanges: [],
+                discounts: [],
+                brands: [],
+                includeOutOfStock: false
+            };
+
+            // Clear form elements
+            document.querySelector('input[type="text"]').value = '';
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+
+            // Hide clear button
+            document.getElementById('clearFilterBtn').classList.add('hidden');
+
+            // Reload the page to show default products
+            window.location.reload();
+        }
+
+        async function applyFilters() {
+            try {
+                const response = await fetch('/products/filter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentFilters)
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch filtered products');
+
+                const data = await response.json();
+                updateProductDisplay(data.data);
+            } catch (error) {
+                console.error('Error applying filters:', error);
+            }
+        }
+
+        function updateProductDisplay(products) {
+            if (!Array.isArray(products)) {
+                console.error('Products is not an array:', products);
+                return;
+            }
+
+            const productGrid = document.querySelector('.flex-grow.grid');
+            if (!productGrid) {
+                console.error('Could not find product grid element');
+                return;
+            }
+            const productHTML = products.map(product => {
+                // Safely access properties with default values
+                const id = product?.id;
+                const name = product?.product_name;
+                const regularPrice = product?.regular_price || 0;
+                const salePrice = product?.sale_price || 0;
+                const image = product?.images[0]
+
+                return `
+            <a href="/products/details/${id}">
+                <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[400px]">
+                    <button
+                        class="absolute top-2 right-2 text-gray-500 hover:text-black transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                    </button>
+
+                    <div class="rounded-lg w-full h-2/3 flex items-center justify-center">
+                        ${image
+                        ? `<img src="${image}" alt="${name}" class="w-full h-full object-contain">`
+                        : `<img src="" alt="Default Image" class="w-full h-full object-contain">`
+                    }
+                    </div>
+
+                    <h2 class="mt-4 text-gray-800 font-semibold text-base text-center">${name}</h2>
+                    <div class="mt-2 text-center">
+                        <span class="line-through text-gray-400 text-sm">₹${Number(regularPrice).toFixed(2)}</span>
+                        <span class="text-black font-bold text-lg ml-2">₹${Number(salePrice).toFixed(2)}</span>
+                    </div>
+
+                    <form action="/cart/add/${id}" method="post" class="cart-form">
+                        <button type="submit"
+                            class="absolute bottom-4 left-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span>Add to Cart</span>
+                        </button>
+                    </form>
+                </div>
+            </a>
+        `;
+            }).join('');
+
+            productGrid.innerHTML = productHTML;
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add input event listener to search box with debouncing
+            const searchInput = document.querySelector('input[type="text"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    currentFilters.search = e.target.value;
+                    debouncedSearch(); // Use debounced version for search
+                });
+            }
+        });
     </script>
 
 </body>
