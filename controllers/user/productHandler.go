@@ -107,7 +107,6 @@ func FilterProducts(c *gin.Context) {
 		Preload("Product").
 		Where("product_variant_details.is_deleted = ?", false)
 
-	// Always join product_details since we might need it for brand filtering or searching
 	query = query.Joins("JOIN product_details ON product_variant_details.product_id = product_details.id")
 
 	if filter.Search != "" {
@@ -116,7 +115,6 @@ func FilterProducts(c *gin.Context) {
 			Where("product_variant_details.product_name ILIKE ? OR product_details.brand_name ILIKE ? OR categories.name ILIKE ?",
 				searchTerm, searchTerm, searchTerm)
 	} else if len(filter.Categories) > 0 {
-		// Only join categories if we haven't already joined it for search
 		query = query.Joins("JOIN categories ON product_variant_details.category_id = categories.id").
 			Where("categories.name IN ?", filter.Categories)
 	}
