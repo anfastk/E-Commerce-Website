@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -92,7 +93,7 @@ func VerifyOtp(c *gin.Context) {
 			FullName: fullName,
 			Email:    otpInput.Email,
 			Password: hashedPassword,
-			ProfilePic: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740382811/e3b0c44298fc1Default_c149afbf4c8996fb92427aImagee41e4649b934ca4959Profile91b7852b855_e79sta.jpg",
+			ProfilePic: os.Getenv("DEFAULT_PROFILE_PIC"),
 		}
 
 		if err := config.DB.Create(&userAuth).Error; err != nil {

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -122,7 +123,7 @@ func ProfileImageUpdate(c *gin.Context) {
 	userDetails.ProfilePic = cloudinaryURL
 	config.DB.Save(&userDetails)
 
-	defaultAvathar := "https://res.cloudinary.com/dghzlcoco/image/upload/v1740382811/e3b0c44298fc1Default_c149afbf4c8996fb92427aImagee41e4649b934ca4959Profile91b7852b855_e79sta.jpg"
+	defaultAvathar := os.Getenv("DEFAULT_PROFILE_PIC")
 	if currentAvathar != defaultAvathar {
 		publicID, err := helper.ExtractCloudinaryPublicID(currentAvathar)
 		if err != nil {
