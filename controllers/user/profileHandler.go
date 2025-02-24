@@ -8,6 +8,7 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 )
@@ -91,6 +92,57 @@ func ProfileUpdate(c *gin.Context) {
 
 	tx.Commit()
 	helper.RespondWithError(c, http.StatusOK, "User updated successfully", "User updated successfully", "")
+}
+
+func ProfileImageUpdate(c *gin.Context) {
+	userID := c.MustGet("userid")
+	tx := config.DB.Begin()
+	file, fileHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid file", "Invalid file choosen", "")
+		return
+	}
+	cld := config.InitCloudinary()
+
+	cloudinaryURL, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProfilePicture", "")
+	if err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload failed"})
+		return
+	}
+
+	var userDetails models.UserAuth
+	if userErr := tx.First(&userDetails, "id = ?", userID).Error; userErr != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
+	currentAvathar := userDetails.ProfilePic
+	userDetails.ProfilePic = cloudinaryURL
+	config.DB.Save(&userDetails)
+
+	defaultAvathar := "https://res.cloudinary.com/dghzlcoco/image/upload/v1740382811/e3b0c44298fc1Default_c149afbf4c8996fb92427aImagee41e4649b934ca4959Profile91b7852b855_e79sta.jpg"
+	if currentAvathar != defaultAvathar {
+		publicID, err := helper.ExtractCloudinaryPublicID(currentAvathar)
+		if err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to extract Cloudinary public ID", "Failed to extract Cloudinary public ID", "")
+			return
+		}
+		if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary", "Failed to delete image from Cloudinary", "")
+			return
+		}
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Profile image updated",
+		"code":    http.StatusOK,
+	})
 }
 
 func Settings(c *gin.Context) {
@@ -379,12 +431,12 @@ func OrderDetails(c *gin.Context) {
 	}
 
 	var userauth models.UserAuth
-	if err := config.DB.Find(&userauth, "id = ?", userID).Error; err != nil {
+	if err := config.DB.First(&userauth, "id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
-	var order models.Order
-	if err := config.DB.First(&order, "user_id = ?", userID).Error; err != nil {
+	var order []models.Order
+	if err := config.DB.Order("created_at DESC").Find(&order, "user_id = ?", userID).Error; err != nil {
 		c.HTML(http.StatusOK, "profileOrderDetails.html", gin.H{
 			"status":  "success",
 			"message": "No orders found",
@@ -393,54 +445,52 @@ func OrderDetails(c *gin.Context) {
 		})
 		return
 	}
-
-	var orderItems []models.OrderItem
-	if err := config.DB.Order("created_at DESC").Preload("ProductVariantDetails").
-		Preload("ProductVariantDetails.VariantsImages").
-		Preload("ProductVariantDetails.Category").
-		Find(&orderItems, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
-		return
-	}
-	var shippingAddress models.ShippingAddress
-	if err := config.DB.First(&shippingAddress, "user_id = ? AND order_id = ?", userauth.ID, order.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Address Not found", "Something Went Wrong", "")
-		return
-	}
-
 	var orderResponses []OrderResponse
-	for i, item := range orderItems {
-		var payment models.PaymentDetail
-		if err := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, item.ID).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Payment details Not found", "Something Went Wrong", "")
+	for _, order := range order {
+		var orderItems []models.OrderItem
+		if ordErr := config.DB.Order("created_at DESC").
+			Find(&orderItems, "user_id = ? AND order_id = ?", userID, order.ID).Error; ordErr != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
 			return
 		}
-		formattedOrderDate := item.CreatedAt.Format("2 January 2006")
-		formattedReturnDate := item.ReturnDate.Format("2 January 2006")
-		formattedDeliveryDate := item.DeliveryDate.Format("2 January 2006")
-		formattedCancelDate := item.CancelDate.Format("2 January 2006")
-		formattedExpectedDeliveryDate := item.ExpectedDeliveryDate.Format("2 January 2006")
-		orderResponse := OrderResponse{
-			Slno:                 i + 1,
-			ID:                   item.ID,
-			ProductId:            item.ProductVariantID,
-			FirstName:            shippingAddress.FirstName,
-			LastName:             shippingAddress.LastName,
-			OrderUID:             item.OrderUID,
-			Quantity:             uint(item.Quantity),
-			Image:                item.ProductImage,
-			ProductSummary:       item.ProductSummary,
-			CategoryName:         item.ProductCategory,
-			OrderStatus:          item.OrderStatus,
-			PaymentStatus:        strings.ToUpper(payment.PaymentStatus),
-			SubTotal:             item.Total,
-			OrderDate:            formattedOrderDate,
-			DeliveryDate:         formattedDeliveryDate,
-			ReturnDate:           formattedReturnDate,
-			CancelDate:           formattedCancelDate,
-			ExpectedDeliveryDate: formattedExpectedDeliveryDate,
+		var shippingAddress models.ShippingAddress
+		if addErr := config.DB.First(&shippingAddress, "user_id = ? AND order_id = ?", userauth.ID, order.ID).Error; addErr != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Address Not found", "Something Went Wrong", "")
+			return
 		}
-		orderResponses = append(orderResponses, orderResponse)
+		for i, item := range orderItems {
+			var payment models.PaymentDetail
+			if payErr := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, item.ID).Error; payErr != nil {
+				helper.RespondWithError(c, http.StatusInternalServerError, "Payment details Not found", "Something Went Wrong", "")
+				return
+			}
+			formattedOrderDate := item.CreatedAt.Format("2 January 2006")
+			formattedReturnDate := item.ReturnDate.Format("2 January 2006")
+			formattedDeliveryDate := item.DeliveryDate.Format("2 January 2006")
+			formattedCancelDate := item.CancelDate.Format("2 January 2006")
+			formattedExpectedDeliveryDate := item.ExpectedDeliveryDate.Format("2 January 2006")
+			orderResponse := OrderResponse{
+				Slno:                 i + 1,
+				ID:                   item.ID,
+				ProductId:            item.ProductVariantID,
+				FirstName:            shippingAddress.FirstName,
+				LastName:             shippingAddress.LastName,
+				OrderUID:             item.OrderUID,
+				Quantity:             uint(item.Quantity),
+				Image:                item.ProductImage,
+				ProductSummary:       item.ProductSummary,
+				CategoryName:         item.ProductCategory,
+				OrderStatus:          item.OrderStatus,
+				PaymentStatus:        strings.ToUpper(payment.PaymentStatus),
+				SubTotal:             item.Total,
+				OrderDate:            formattedOrderDate,
+				DeliveryDate:         formattedDeliveryDate,
+				ReturnDate:           formattedReturnDate,
+				CancelDate:           formattedCancelDate,
+				ExpectedDeliveryDate: formattedExpectedDeliveryDate,
+			}
+			orderResponses = append(orderResponses, orderResponse)
+		}
 	}
 
 	c.HTML(http.StatusOK, "profileOrderDetails.html", gin.H{
@@ -587,5 +637,52 @@ func CancelOrder(c *gin.Context) {
 		"status":  "success",
 		"message": "Order cancelled successfully",
 		"code":    http.StatusOK,
+	})
+}
+
+func OrderHistory(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+
+	type OrderHistoryResponse struct {
+		ID          uint    `json:"id"`
+		OrderUID    string  `json:"orderid"`
+		ProductName string  `json:"productname"`
+		Image       string  `json:"image"`
+		Quantity    uint    `json:"quantity"`
+		OrderStatus string  `json:"orderststus"`
+		Total       float64 `json:"total"`
+		OrderDate   string  `json:"orderdate"`
+	}
+
+	var userauth models.UserAuth
+	if err := config.DB.First(&userauth, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
+
+	var orderItems []models.OrderItem
+	if err := config.DB.Order("created_at DESC").Find(&orderItems, "user_id = ?", userID).Error; err != nil{
+		helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
+		return
+	}
+	var orderHistoryResponse []OrderHistoryResponse
+	for _, item := range orderItems {
+		historyResponce := OrderHistoryResponse{
+			ID:          item.ID,
+			OrderUID:    item.OrderUID,
+			ProductName: item.ProductName,
+			Image:       item.ProductImage,
+			Quantity:    uint(item.Quantity),
+			OrderStatus: item.OrderStatus,
+			Total:       item.Total,
+			OrderDate:   item.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
+		}
+		orderHistoryResponse = append(orderHistoryResponse, historyResponce)
+	}
+	c.HTML(http.StatusOK, "profileOrderHistory.html", gin.H{
+		"status":  "success",
+		"message": "Order details fetched successfully",
+		"User":    userauth,
+		"Order":   orderHistoryResponse,
 	})
 }

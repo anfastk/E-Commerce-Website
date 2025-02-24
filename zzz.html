@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="relative w-32 h-32 group">
+        <!-- Profile Image Container -->
+        <div class="w-full h-full rounded-full overflow-hidden">
+            <img id="profileImage" src="/api/placeholder/128/128" alt="Profile"
+                class="w-full h-full object-cover" />
+        </div>
+
+        <!-- Hover Overlay -->
+        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <label for="imageInput" class="cursor-pointer">
+                <div class="text-white text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="text-sm">Change Photo</span>
+                </div>
+            </label>
+        </div>
+
+        <!-- Hidden File Input -->
+        <input type="file" id="imageInput" class="hidden" accept="image/*">
+    </div>
+
+    <!-- Cropper Modal -->
+    <div id="cropperModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-4 rounded-lg max-w-lg w-full mx-4">
+            <div class="relative">
+                <img id="cropperImage" class="max-w-full">
+            </div>
+            <div class="mt-4 flex justify-end gap-2">
+                <button onclick="cancelCrop()" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button onclick="cropImage()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cropper;
+        const modal = document.getElementById('cropperModal');
+        const imageInput = document.getElementById('imageInput');
+        const cropperImage = document.getElementById('cropperImage');
+        const profileImage = document.getElementById('profileImage');
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    cropperImage.src = e.target.result;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    
+                    cropper = new Cropper(cropperImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                    });
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        function cancelCrop() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            imageInput.value = '';
+        }
+
+        function cropImage() {
+            const canvas = cropper.getCroppedCanvas();
+            canvas.toBlob((blob) => {
+                // Create FormData to send to server
+                const formData = new FormData();
+                formData.append('userId', 'YOUR_USER_ID'); // Replace with actual user ID
+                formData.append('image', blob, 'profile.jpg');
+
+                // Update preview
+                profileImage.src = canvas.toDataURL();
+                
+                // Here you would typically send formData to your server
+                // fetch('/api/update-profile-image', {
+                //     method: 'POST',
+                //     body: formData
+                // });
+
+                // Close modal
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                imageInput.value = '';
+            }, 'image/jpeg');
+        }
+    </script>
+        <script src="https://cdn.tailwindcss.com"></script>
+
+</body>
+</html>

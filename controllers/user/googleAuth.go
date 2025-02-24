@@ -9,6 +9,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -67,6 +68,7 @@ func HandleGoogleCallback(c *gin.Context) {
 
 	var user models.UserAuth
 	result := config.DB.Unscoped().Where("email = ?", googleUser.Email).First(&user)
+	cloudinaryURL, err := utils.UploadImageToCloudinary(nil, nil, config.InitCloudinary(), "ProfilePicture", googleUser.Picture)
 
 	if result.Error != nil {
 		user = models.UserAuth{
@@ -74,9 +76,9 @@ func HandleGoogleCallback(c *gin.Context) {
 			Email:      googleUser.Email,
 			Password:   "",
 			GoogleID:   googleUser.Email,
-			ProfilePic: googleUser.Picture,
+			ProfilePic: cloudinaryURL,
 			IsVerified: googleUser.VerifiedEmail,
-			Status:     "Active", // Default status for new users
+			Status:     "Active",
 		}
 
 		if err := config.DB.Create(&user).Error; err != nil {

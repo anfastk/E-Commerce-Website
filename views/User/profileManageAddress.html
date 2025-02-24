@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth fade-in and fade-out effect */
+        #toast {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -118,7 +124,8 @@
                             </svg>
                             Personal Information
                         </a>
-                        <a href="/profile/order/details" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/order/details"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -134,7 +141,7 @@
                             </svg>
                             Wishlist
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/cart" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -150,7 +157,8 @@
                             </svg>
                             Wallet
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/order/history"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -252,7 +260,8 @@
 
                                     {{if .IsDefault}}
                                     {{else}}
-                                    <form action="/profile/address/{{.ID}}/default" method="post">
+                                    <form id="defaultAddressForm" action="/profile/address/{{.ID}}/default"
+                                        method="post">
                                         <button type="submit" class="text-blue-600 text-sm">
                                             Set as Default
                                         </button>
@@ -268,6 +277,10 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="toast"
+        class="hidden fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 opacity-0">
+        Address set as default successfully!
     </div>
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
@@ -364,6 +377,40 @@
             setTimeout(() => {
                 toast.classList.add("hidden");
             }, 3000);
+        }
+        document.getElementById("defaultAddressForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const url = form.action;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest" // Helps backend detect AJAX request
+                }
+            })
+                .then(response => response.text()) // Change to .json() if your backend returns JSON
+                .then(data => {
+                    showToast("Address set as default successfully!", "green");
+                    setTimeout(() => location.reload(), 1500); // Reload after toast is shown
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    showToast("Failed to set default address.", "red");
+                });
+        });
+
+        function showToast(message, color) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.remove("hidden", "opacity-0");
+            toast.style.backgroundColor = color === "green" ? "#16a34a" : "#dc2626"; // Green for success, red for error
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0");
+                setTimeout(() => toast.classList.add("hidden"), 500); // Hide completely after fade-out
+            }, 2000);
         }
     </script>
 </body>

@@ -15,19 +15,29 @@ var (
 	ErrDeleteFailed = errors.New("delete from Cloudinary failed")
 )
 
-func UploadImageToCloudinary(file multipart.File, fileHeader *multipart.FileHeader, cld *cloudinary.Cloudinary, folder string) (string, error) {
-	if file == nil || fileHeader == nil || cld == nil {
-		return "", ErrInvalidFile
-	}
-	ctx := context.Background()
+func UploadImageToCloudinary(file multipart.File, fileHeader *multipart.FileHeader, cld *cloudinary.Cloudinary, folder string, imageURL string) (string, error) {
+    ctx := context.Background()
 
-	uploadParams, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
-		Folder: folder,
-	})
-	if err != nil {
-		return "", errors.Join(ErrUploadFailed, err)
-	}
-	return uploadParams.SecureURL, nil
+    var uploadParams *uploader.UploadResult
+    var err error
+
+    if imageURL != "" {
+        uploadParams, err = cld.Upload.Upload(ctx, imageURL, uploader.UploadParams{
+            Folder: folder,
+        })
+    } else if file != nil && fileHeader != nil {
+        uploadParams, err = cld.Upload.Upload(ctx, file, uploader.UploadParams{
+            Folder: folder,
+        })
+    } else {
+        return "", errors.New("invalid file or URL")
+    }
+
+    if err != nil {
+        return "", errors.New("upload failed: " + err.Error())
+    }
+
+    return uploadParams.SecureURL, nil
 }
 
 func DeleteCloudinaryImage(cld *cloudinary.Cloudinary, publicID string, c *gin.Context) error {

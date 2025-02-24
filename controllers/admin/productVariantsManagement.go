@@ -104,7 +104,7 @@ func AddProductVariants(c *gin.Context) {
 					file, _ := fileHeader.Open()
 					defer file.Close()
 
-					url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProductVariants")
+					url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProductVariants","")
 					if err != nil {
 						tx.Rollback()
 						helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Upload Error", "")
@@ -478,7 +478,7 @@ func ReplaceVariantProductImage(c *gin.Context) {
 
 	cld := config.InitCloudinary()
 	file, _ := form.Open()
-	url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "ProductVariants")
+	url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "ProductVariants","")
 	if uploadErr != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Replace Image Failed", "")

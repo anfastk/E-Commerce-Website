@@ -44,6 +44,7 @@ func UserRouter(r *gin.Engine) {
 	{
 		userProfile.GET("/", controllers.ProfileDetails)
 		userProfile.PATCH("/", controllers.ProfileUpdate)
+		userProfile.PATCH("/avathar/update", controllers.ProfileImageUpdate)
 		userProfile.GET("/manage/address", controllers.ManageAddress)
 		userProfile.GET("/add/address", controllers.ShowAddAddress)
 		userProfile.POST("/add/address", controllers.AddAddress)
@@ -57,6 +58,7 @@ func UserRouter(r *gin.Engine) {
 		userProfile.GET("/order/details", controllers.OrderDetails)
 		userProfile.GET("/order/details/track/:id", controllers.TrackingPage)
 		userProfile.POST("/order/details/track/:id/cancel", controllers.CancelOrder)
+		userProfile.GET("/order/history", controllers.OrderHistory)
 	}
 
 	cart := r.Group("/cart")

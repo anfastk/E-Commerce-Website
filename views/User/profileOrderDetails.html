@@ -134,7 +134,7 @@
                             </svg>
                             Wishlist
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/cart" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -150,7 +150,7 @@
                             </svg>
                             Wallet
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/order/history" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -198,7 +198,8 @@
                             <div class="flex justify-between text-sm mb-4 p-4 -mx-4 -mt-4 
     {{if eq .OrderStatus `Pending`}} bg-orange-200 
     {{else if or (eq .OrderStatus `Cancelled`) (eq .OrderStatus `Returned`) (eq .OrderStatus `Failed`)}} bg-red-200 
-    {{else if or (eq .OrderStatus `Shipped`) (eq .OrderStatus `Out For Delivery`) (eq .OrderStatus `Delivered`) (eq .OrderStatus `Confirmed`)}} bg-green-200 
+    {{else if or (eq .OrderStatus `Shipped`) (eq .OrderStatus `Out For Delivery`) (eq .OrderStatus `Confirmed`)}} bg-blue-200 
+    {{else if eq .OrderStatus `Delivered` }} bg-green-200 
     {{end}}">
                                 <div class="space-x-8 flex">
                                     <div class="text-gray-600">
@@ -249,8 +250,10 @@
                                 <div class="rounded-lg text-red-600 font-medium mb-2">{{.OrderStatus }}</div>
                                 {{else if eq .OrderStatus "Pending"}}
                                 <div class="text-orange-600 font-medium mb-2">{{.OrderStatus }}</div>
-                                {{else}}
+                                {{else if eq .OrderStatus "Delivered"}}
                                 <div class="text-green-600 font-medium mb-2">{{.OrderStatus }}</div>
+                                {{else}}
+                                <div class="text-blue-600 font-medium mb-2">{{.OrderStatus }}</div>
                                 {{end}}
                                 <div class="flex mt-4 items-start">
                                     <img src="{{.Image}}" alt="Product" class="w-24 h-24 object-contain">
