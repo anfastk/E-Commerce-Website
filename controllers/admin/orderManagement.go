@@ -112,8 +112,8 @@ func ShowOrderDetailManagement(c *gin.Context) {
 		return
 	}
 	productDiscount := (orderItemDetails.ProductRegularPrice - orderItemDetails.ProductSalePrice) * float64(orderItemDetails.Quantity)
-	totalDiscount := productDiscount + orderItemDetails.CouponDiscount
-	if orderItemDetails.ShippingCharge == 0 {
+	totalDiscount := productDiscount + orderDetails.CouponDiscount
+	if orderDetails.ShippingCharge == 0 {
 		totalDiscount += 100
 	}
 	c.HTML(http.StatusOK, "orderDetailsManagement.html", gin.H{

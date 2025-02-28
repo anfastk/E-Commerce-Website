@@ -229,20 +229,18 @@ func ProceedToPayment(c *gin.Context) {
 			return
 		}
 
-		// Save initial payment records for each order item
 		razorpayOrderID, ok := razorpayOrder["id"].(string)
 		if !ok {
 			log.Println("Failed to extract order ID from Razorpay response:", razorpayOrder)
 			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
 			return
 		}
-		razorPayOrderID = razorpayOrderID
+		RazorPayOrderID = razorpayOrderID
 
-		// Return payment information to the frontend
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
-			"amount":   total * 100, // Amount in paise
+			"amount":   total * 100, 
 			"currency": "INR",
 			"key_id":   config.RAZORPAY_KEY_ID,
 			"prefill": gin.H{
@@ -257,11 +255,95 @@ func ProceedToPayment(c *gin.Context) {
 		})
 
 	default:
-		helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Payment Method", "Invalid Payment Method", "/checkout")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Payment Method", "Invalid Payment Method", "/checkout")
 		return
 	}
 }
 
+func PayNow(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+
+	var PayNowRequest struct {
+		Method      string `json:"method"`
+		OrderItemID string `json:"orderId"`
+		AddressID   string `json:"addressId"`
+	}
+
+	if err := c.ShouldBind(&PayNowRequest); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Request Not Found", "/profile/order/details")
+		return
+	}
+
+	var userDetails models.UserAuth
+
+	if err := config.DB.First(&userDetails, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/cart")
+		return
+	}
+
+	if PayNowRequest.Method == "" || PayNowRequest.OrderItemID == "" {
+		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Request Not Found", "/profile/order/details")
+		return
+	}
+	switch PayNowRequest.Method {
+	case "Razorpay":
+		var orderItems models.OrderItem
+		if err := config.DB.First(&orderItems, PayNowRequest.OrderItemID).Error; err != nil {
+			helper.RespondWithError(c, http.StatusNotFound, "Order Item Not Fount", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+		var order models.Order
+		if err := config.DB.First(&order, orderItems.OrderID).Error; err != nil {
+			helper.RespondWithError(c, http.StatusNotFound, "Order Not Fount", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+		addressId, adErr := strconv.Atoi(PayNowRequest.AddressID)
+		if adErr != nil {
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid Address", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+		var address models.ShippingAddress
+		if err := config.DB.First(&address, "id = ?", addressId).Error; err != nil {
+			helper.RespondWithError(c, http.StatusNotFound, "Address Not Found", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+
+		razorpayOrder, err := CreateRazorpayOrder(c, order.OrderTotalAmount)
+		if err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create Razorpay order", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+
+		razorpayOrderID, ok := razorpayOrder["id"].(string)
+		if !ok {
+			log.Println("Failed to extract order ID from Razorpay response:", razorpayOrder)
+			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
+			return
+		}
+		fmt.Println(address.Mobile, address.Address)
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "OK",
+			"order_id": razorpayOrderID,
+			"amount":   order.OrderTotalAmount * 100, 
+			"currency": "INR",
+			"key_id":   config.RAZORPAY_KEY_ID,
+			"prefill": gin.H{
+				"name":    userDetails.FullName,
+				"email":   userDetails.Email,
+				"contact": address.Mobile,
+			},
+			"notes": gin.H{
+				"address": address.Address,
+				"user_id": userDetails.ID,
+			},
+		})
+
+	default:
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Payment Method", "Invalid Payment Method", "/profile/order/details")
+		return
+	}
+
+}
 
 func generateOrderID() string {
 	rand.Seed(time.Now().UnixNano())
@@ -377,7 +459,6 @@ func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.Res
 			ProductVariantID:     item.ProductVariantID,
 			Quantity:             item.Quantity,
 			SubTotal:             regularPrice,
-			ShippingCharge:       float64(shippingCharge),
 			Tax:                  tax,
 			Total:                total,
 			OrderStatus:          "Pending",
@@ -442,7 +523,7 @@ func FetchCartItemByCartID(c *gin.Context, cartID uint) []models.CartItem {
 }
 
 func FetchAddressByIDAndUserID(c *gin.Context, userID uint, addressID string) *models.UserAddress {
-	addressId, adErr := strconv.Atoi(paymentRequest.AddressID)
+	addressId, adErr := strconv.Atoi(addressID)
 	if adErr != nil {
 		fmt.Println("Invalid Address:", adErr)
 		return nil

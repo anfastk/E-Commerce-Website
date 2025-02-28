@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -117,153 +118,6 @@
 
         .apply-btn:focus:not(:active)::after {
             animation: ripple 1s ease-out;
-        }
-
-        /* Toast notification styles */
-        /* Toast Container Styles */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Base Toast Styles */
-        .toast {
-            min-width: 300px;
-            max-width: 400px;
-            background-color: white;
-            color: #333;
-            border-radius: 8px;
-            padding: 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transform: translateX(120%);
-            opacity: 0;
-            visibility: hidden;
-            transition: transform 0.4s ease, opacity 0.3s ease, visibility 0.3s;
-            overflow: hidden;
-        }
-
-        /* Toast Content */
-        .toast-content {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            gap: 12px;
-        }
-
-        /* Toast Icon */
-        .toast-icon {
-            flex-shrink: 0;
-            font-size: 24px;
-        }
-
-        .toast-icon-success,
-        .toast-icon-error {
-            display: none;
-        }
-
-        /* Toast Message */
-        .toast-message {
-            flex-grow: 1;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* Toast Type Styles */
-        .toast-success {
-            border-left: 4px solid #4CAF50;
-        }
-
-        .toast-error {
-            border-left: 4px solid #F44336;
-        }
-
-        .toast-success .toast-icon-success {
-            display: block;
-            color: #4CAF50;
-        }
-
-        .toast-error .toast-icon-error {
-            display: block;
-            color: #F44336;
-        }
-
-        /* Toast Animation - Show */
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Progress Bar */
-        .toast-progress {
-            height: 4px;
-            width: 100%;
-            background: #f0f0f0;
-            position: relative;
-        }
-
-        .toast-progress::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(to right, #e0e0e0, #c0c0c0);
-            animation: toast-progress 3s linear forwards;
-            transform-origin: left;
-        }
-
-        .toast-success .toast-progress::after {
-            background: linear-gradient(to right, #A5D6A7, #4CAF50);
-        }
-
-        .toast-error .toast-progress::after {
-            background: linear-gradient(to right, #EF9A9A, #F44336);
-        }
-
-        @keyframes toast-progress {
-            0% {
-                transform: scaleX(1);
-            }
-
-            100% {
-                transform: scaleX(0);
-            }
-        }
-
-        /* Optional: Add a bounce effect */
-        .toast.show {
-            animation: toast-bounce 0.6s ease;
-        }
-
-        @keyframes toast-bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateX(0);
-            }
-
-            40% {
-                transform: translateX(-10px);
-            }
-
-            60% {
-                transform: translateX(-5px);
-            }
-        }
-
-        /* Multiple toasts stacking */
-        .toast+.toast {
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -525,7 +379,7 @@
         <div id="toast" class="toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
                 <div class="toast-icon mr-2">
-                    <i class="toast-icon-success fas fa-check-circle text-green-500"></i>
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
                     <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
                 </div>
                 <div class="toast-message text-gray-800">This is a toast message</div>
@@ -601,15 +455,7 @@
     </footer>
     <script>
         // Function to show error toast
-        function showErrorToast(message) {
-            let toast = document.getElementById("errorToast");
-            toast.textContent = message;
-            toast.classList.remove("hidden");
-
-            setTimeout(() => {
-                toast.classList.add("hidden");
-            }, 3000);
-        }
+        
 
         function updateDeliveryDate() {
             let now = new Date();
@@ -712,56 +558,46 @@
                     this.classList.remove('active');
                 }, 300);
             });
-        });
+        }); 
+        
+        // Process payment function
+        document.getElementById('proceedToPay').addEventListener('click', function () {
+            let addressIdElement = document.getElementById('addressId');
 
-        // Toast notification functions
-        function showToast(message, type) {
-            const toastContainer = document.querySelector('.toast-container');
-            const toastTemplate = document.getElementById('toast');
-            const toast = toastTemplate.cloneNode(true);
-
-            // Set unique ID
-            const toastId = 'toast-' + Date.now();
-            toast.id = toastId;
-
-            // Set message
-            toast.querySelector('.toast-message').textContent = message;
-
-            // Set type class
-            toast.className = 'toast';
-
-            if (type === 'error') {
-                toast.classList.add('toast-error');
-            } else if (type === 'success') {
-                toast.classList.add('toast-success');
+            if (!selectedPaymentMethod || !addressIdElement || !addressIdElement.value) {
+                showErrorToast("Missing payment method or address.");
+                return;
             }
 
-            // Add to container
-            toastContainer.appendChild(toast);
+            let addressId = addressIdElement.value;
 
-            // Show with slight delay for proper animation
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
 
-            // Remove after animation completes
-            setTimeout(() => {
-                toast.classList.remove('show');
+            fetch('/checkout/payment/proceed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
+                    }
+                    return response.json(); // Expecting JSON response
+                })
+                .then(data => {
+                        initializeRazorpay(data);                    
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast(error.message || "An error occurred while processing the payment.");
 
-                // Remove from DOM after hide animation
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 3000);
-        }
-
-        function showErrorToast(message) {
-            showToast(message, 'error');
-        }
-
-        function showSuccessToast(message) {
-            showToast(message, 'success');
-        }
+                    // Reset button state
+                    this.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                    this.disabled = false;
+                });
+        });
 
         // Initialize Razorpay handler
         function initializeRazorpay(data) {
@@ -866,52 +702,9 @@
                     payButton.disabled = false;
                 });
         }
-
-        // Process payment function
-        document.getElementById('proceedToPay').addEventListener('click', function () {
-            let addressIdElement = document.getElementById('addressId');
-
-            if (!selectedPaymentMethod || !addressIdElement || !addressIdElement.value) {
-                showErrorToast("Missing payment method or address.");
-                return;
-            }
-
-            let addressId = addressIdElement.value;
-
-            // Show loading state
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-            this.disabled = true;
-
-            fetch('/checkout/payment/proceed', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
-                    }
-                    return response.json(); // Expecting JSON response
-                })
-                .then(data => {
-                    if (data.redirect) {
-                        // Redirect to the given URL
-                        window.location.href = data.redirect;
-                    } else {
-                        // Initialize Razorpay if needed
-                        initializeRazorpay(data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorToast(error.message || "An error occurred while processing the payment.");
-
-                    // Reset button state
-                    this.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
-                    this.disabled = false;
-                });
-        });
     </script>
+    <script src="/static/js/toastMain.js"></script>
+
 </body>
 
 </html>

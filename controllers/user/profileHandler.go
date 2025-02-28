@@ -506,16 +506,24 @@ func TrackingPage(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 	orderID := c.Param("id")
 
+	var orderItem models.OrderItem
+	if err := config.DB.Preload("ProductVariantDetails").
+		Preload("ProductVariantDetails.VariantsImages").
+		First(&orderItem, "id = ? AND user_id = ?", orderID, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
+		return
+	}
+
 	var order models.Order
-	if err := config.DB.First(&order, "user_id = ?", userID).Error; err != nil {
+	if err := config.DB.First(&order, "user_id = ? AND id = ?", userID, orderItem.OrderID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Order Not found", "Something Went Wrong", "")
 		return
 	}
 
-	var orderItems models.OrderItem
+	var allOrderItems []models.OrderItem
 	if err := config.DB.Preload("ProductVariantDetails").
 		Preload("ProductVariantDetails.VariantsImages").
-		First(&orderItems, "id = ? AND user_id = ?", orderID, userID).Error; err != nil {
+		Find(&allOrderItems, "id != ? AND user_id = ? AND order_id = ?", orderID, userID, order.ID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
 		return
 	}
@@ -527,7 +535,7 @@ func TrackingPage(c *gin.Context) {
 	}
 
 	var payment models.PaymentDetail
-	if err := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, orderItems.ID).Error; err != nil {
+	if err := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, orderItem.ID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Payment details Not found", "Something Went Wrong", "")
 		return
 	}
@@ -536,33 +544,51 @@ func TrackingPage(c *gin.Context) {
 		isPaid = true
 	}
 	isDelivered := false
-	if orderItems.OrderStatus == "Delivered" {
+	if orderItem.OrderStatus == "Delivered" {
 		isDelivered = true
 	}
-	productDiscount := (orderItems.ProductRegularPrice - orderItems.ProductSalePrice) * float64(orderItems.Quantity)
-	totalDiscount := productDiscount + orderItems.CouponDiscount
-	if orderItems.ShippingCharge == 0 {
-		totalDiscount += 100
+	productDiscount := (orderItem.ProductRegularPrice - orderItem.ProductSalePrice) * float64(orderItem.Quantity)
+	totalDiscount := productDiscount + order.CouponDiscount
+	
+	var (
+		allSubTotal             float64
+		allSalePrice            float64
+		allProductDiscount      float64
+		allProductTotalDiscount float64
+		shipCharge              float64
+	)
+	for _, allItems := range allOrderItems {
+		allSubTotal += allItems.ProductRegularPrice
+		allSalePrice += allItems.ProductSalePrice
 	}
+	allProductDiscount = (allSubTotal - allSalePrice)
+	if order.ShippingCharge == 0.0 {
+		shipCharge = 100
+	}
+	allProductTotalDiscount = allProductDiscount + order.ShippingCharge + shipCharge
 
 	c.HTML(http.StatusOK, "trackOrder.html", gin.H{
-		"status":               "success",
-		"message":              "Order details fetched successfully",
-		"Order":                order,
-		"Address":              shippingAddress,
-		"OrderItem":            orderItems,
-		"Payment":              payment,
-		"IsPaid":               isPaid,
-		"IsDelivered":          isDelivered,
-		"ProductDiscount":      productDiscount,
-		"TotalDiscount":        totalDiscount,
-		"OrderDate":            orderItems.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
-		"ExpectedDeliveryDate": orderItems.ExpectedDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"ReturnDate":           orderItems.ReturnDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"ShippedDate":          orderItems.ShippedDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"OutOfDeliveryDate":    orderItems.OutOfDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"DeliveryDate":         orderItems.DeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"CancelDate":           orderItems.CancelDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"status":                  "success",
+		"message":                 "Order details fetched successfully",
+		"Order":                   order,
+		"Address":                 shippingAddress,
+		"OrderItem":               orderItem,
+		"Payment":                 payment,
+		"IsPaid":                  isPaid,
+		"IsDelivered":             isDelivered,
+		"ProductDiscount":         productDiscount,
+		"TotalDiscount":           totalDiscount,
+		"OrderDate":               orderItem.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
+		"ExpectedDeliveryDate":    orderItem.ExpectedDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"ReturnDate":              orderItem.ReturnDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"ShippedDate":             orderItem.ShippedDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"OutOfDeliveryDate":       orderItem.OutOfDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"DeliveryDate":            orderItem.DeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"CancelDate":              orderItem.CancelDate.Format("2006-01-02T15:04:05.000-07:00"),
+		"AllProduct":              allOrderItems,
+		"AllSubTotal":             allSubTotal,
+		"AllProductDiscount":      allProductDiscount,
+		"AllProductTotalDiscount": allProductTotalDiscount,
 	})
 }
 

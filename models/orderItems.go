@@ -18,9 +18,7 @@ type OrderItem struct {
 	ProductCategory       string                `gorm:"not null"`
 	ProductRegularPrice   float64               `gorm:"type:numeric(10,2);not null"`
 	ProductSalePrice      float64               `gorm:"type:numeric(10,2);not null"`
-	CouponDiscount        float64 				`gorm:"type:numeric(10,2)"`
 	SubTotal              float64               `gorm:"type:numeric(10,2)" json:"subtotal"`
-	ShippingCharge        float64               `gorm:"type:numeric(10,2)" json:"shippingcharge"`
 	Tax                   float64               `gorm:"type:numeric(10,2)" json:"tax"`
 	Total                 float64               `gorm:"type:numeric(10,2)" json:"total"`
 	OrderStatus           string                `gorm:"type:varchar(255);default:'Pending'" json:"status"`

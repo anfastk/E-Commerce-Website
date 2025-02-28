@@ -23,6 +23,7 @@ func UserRouter(r *gin.Engine) {
 	r.POST("/checkout/payment/verify", middleware.NoCacheMiddleware(),middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
 	r.GET("/order/success", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
 	r.POST("/order/failed", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)
+	
 
 	user := r.Group("/user")
 	user.Use(middleware.NoCacheMiddleware())
@@ -61,6 +62,8 @@ func UserRouter(r *gin.Engine) {
 		userProfile.GET("/order/details", controllers.OrderDetails)
 		userProfile.GET("/order/details/track/:id", controllers.TrackingPage)
 		userProfile.POST("/order/details/track/:id/cancel", controllers.CancelOrder)
+		userProfile.POST("/order/details/track/pay/now", controllers.PayNow)
+		userProfile.POST("/order/details/track/pay/now/verify", controllers.VerifyPayNowRazorpayPayment)
 		userProfile.GET("/order/history", controllers.OrderHistory)
 	}
 

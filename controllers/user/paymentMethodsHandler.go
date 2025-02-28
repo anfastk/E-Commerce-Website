@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -35,39 +36,36 @@ func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId uint, paymentA
 	return nil
 }
 
-// Add this function to create a Razorpay order
 func CreateRazorpayOrder(c *gin.Context, amount float64) (map[string]interface{}, error) {
 
 	client := razorpay.NewClient(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
-	receiptID := uuid.New().String()[:30] // Taking only the first 30 characters
+	receiptID := uuid.New().String()[:30] 
 
 	data := map[string]interface{}{
-		"amount":   int64(amount * 100), // Amount in smallest currency unit (paise for INR)
+		"amount":   int64(amount * 100), 
 		"currency": "INR",
 		"receipt":  "rcpt_" + receiptID,
 	}
-	log.Println("Creating Razorpay Order with Data:", data) // Debug log
+	log.Println("Creating Razorpay Order with Data:", data) 
 
 	order, err := client.Order.Create(data, nil)
 	if err != nil {
-		log.Println("Razorpay Order Creation Error:", err) // Log the exact error
+		log.Println("Razorpay Order Creation Error:", err) 
 		return nil, err
 	}
 
 	return order, nil
 }
 
-var razorPayOrderID string
+var RazorPayOrderID string
 
-// Add this function for verifying Razorpay payments
 func VerifyRazorpayPayment(c *gin.Context) {
 	currentTime := time.Now()
 	userID := c.MustGet("userid").(uint)
 	var verifyRequest struct {
-		PaymentID    string `json:"razorpay_payment_id"`
-		OrderID      string `json:"razorpay_order_id"`
-		Signature    string `json:"razorpay_signature"`
-		OrderItemIDs []uint `json:"order_item_ids"`
+		PaymentID string `json:"razorpay_payment_id"`
+		OrderID   string `json:"razorpay_order_id"`
+		Signature string `json:"razorpay_signature"`
 	}
 
 	if err := c.ShouldBindJSON(&verifyRequest); err != nil {
@@ -129,7 +127,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 			PaymentStatus: "Completed",
 			PaymentAmount: total,
 			PaymentMethod: "Razorpay",
-			OrderId:       razorPayOrderID,
+			OrderId:       RazorPayOrderID,
 			TransactionID: verifyRequest.PaymentID,
 			Receipt:       receiptID,
 		}
@@ -140,7 +138,6 @@ func VerifyRazorpayPayment(c *gin.Context) {
 			return
 		}
 
-		// Update order status
 		var orderedItem models.OrderItem
 		if err := tx.First(&orderedItem, orderItem.ID).Error; err != nil {
 			tx.Rollback()
@@ -222,7 +219,7 @@ func PaymentFailureHandler(c *gin.Context) {
 			PaymentStatus: "Failed",
 			PaymentAmount: total,
 			PaymentMethod: "Razorpay",
-			OrderId:       razorPayOrderID,
+			OrderId:       RazorPayOrderID,
 			TransactionID: verifyRequest.PaymentID,
 			Receipt:       receiptID,
 		}
@@ -233,7 +230,6 @@ func PaymentFailureHandler(c *gin.Context) {
 			return
 		}
 
-		// Update order status
 		var orderedItem models.OrderItem
 		if err := tx.First(&orderedItem, orderItem.ID).Error; err != nil {
 			tx.Rollback()
@@ -253,4 +249,79 @@ func PaymentFailureHandler(c *gin.Context) {
 	tx.Commit()
 
 	c.Redirect(http.StatusSeeOther, "/profile/order/details")
+}
+
+func VerifyPayNowRazorpayPayment(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	var verifyRequest struct {
+		PaymentID   string `json:"razorpay_payment_id"`
+		OrderID     string `json:"razorpay_order_id"`
+		Signature   string `json:"razorpay_signature"`
+		OrderItemID string   `json:"order_id"`
+	}
+
+	if err := c.ShouldBindJSON(&verifyRequest); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request", "Invalid request format", "")
+		return
+	}
+
+	var userDetails models.UserAuth
+
+	if err := config.DB.First(&userDetails, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/profile/order/details")
+		return
+	}
+
+	data := verifyRequest.OrderID + "|" + verifyRequest.PaymentID
+	expectedSignature := hmac.New(sha256.New, []byte(config.RAZORPAY_KEY_SECRET))
+	expectedSignature.Write([]byte(data))
+	calculatedSignature := hex.EncodeToString(expectedSignature.Sum(nil))
+
+	if calculatedSignature != verifyRequest.Signature {
+		fmt.Println("Payment verification failed")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid signature", "Payment verification failed", "/profile/order/details")
+		return
+	}
+	var orderItem models.OrderItem
+	ordrID,_:=strconv.Atoi(verifyRequest.OrderItemID)
+	if err:=config.DB.First(&orderItem,ordrID).Error;err!=nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Order Item not found", "Something Went Wrong", "/profile/order/details")
+		return
+	}
+	 var orderDetails models.Order
+	 if err:=config.DB.First(&orderDetails,orderItem.OrderID).Error;err!=nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Order not found", "Something Went Wrong", "/profile/order/details")
+		return
+	}
+
+	var allOrderItem []models.OrderItem
+	if err:=config.DB.Find(&allOrderItem,"order_id = ?",orderDetails.ID).Error;err!=nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Order Items not found", "Something Went Wrong", "/profile/order/details")
+		return
+	}
+
+	for _,items:=range allOrderItem{
+
+		var paymentDetails models.PaymentDetail
+		if err:=config.DB.First(&paymentDetails,"order_item_id = ?",items.ID).Error;err!=nil {
+			helper.RespondWithError(c, http.StatusNotFound, "Payment Details not found", "Something Went Wrong", "/profile/order/details")
+			return
+		}
+		paymentDetails.PaymentStatus="Completed"
+		if err := config.DB.Save(&paymentDetails).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update payment details", "Failed to update order", "/profile/order/details")
+			return
+		}
+
+		items.OrderStatus = "Confirmed"
+		if err := config.DB.Save(&items).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Failed to update order", "/profile/order/details")
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "success",
+			"message": "Payment verified successfully",
+		})
+	}
 }
