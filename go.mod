@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/joho/godotenv v1.5.1
+	github.com/razorpay/razorpay-go v1.3.2
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	golang.org/x/crypto v0.31.0
 	golang.org/x/oauth2 v0.25.0

@@ -118,7 +118,7 @@ func AddToCart(c *gin.Context) {
 	count := CartCount(c)
 	if count >= 4 {
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "You have reached the maximum limit for this product in your cart.", "You have reached the maximum limit for this product in your cart.", "")
+		helper.RespondWithError(c, http.StatusUnprocessableEntity, "You have reached the maximum limit for this product in your cart.", "You have reached the maximum limit for this product in your cart.", "")
 		return
 	}
 	productID, iderr := strconv.Atoi(c.Param("id"))
@@ -233,14 +233,14 @@ func ShowCartTotal(c *gin.Context) {
 	var total float64
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something Went Wrong", "Something Went Wrong", "")
 		return
 	}
 	var cartItems []models.CartItem
 	if err := config.DB.
 		Preload("ProductVariant").
 		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something Went Wrong", "Something Went Wrong", "")
 		return
 	}
 	for _, items := range cartItems {
@@ -260,12 +260,12 @@ func CartCount(c *gin.Context) int {
 	var count int
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something Went Wrong", "Something Went Wrong", "")
 		return 0
 	}
 	var cartItems []models.CartItem
 	if err := config.DB.Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something Went Wrong", "Something Went Wrong", "")
 		return 0
 	}
 	var productIDs []uint
@@ -274,7 +274,7 @@ func CartCount(c *gin.Context) int {
 	}
 	var product []models.ProductVariantDetails
 	if err := config.DB.Find(&product, "id IN ?", productIDs).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Something went wrong", "Something went wrong", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Something Went Wrong", "Something Went Wrong", "")
 		return 0
 	}
 	count = len(product)

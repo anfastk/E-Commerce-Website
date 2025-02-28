@@ -662,7 +662,7 @@ func OrderHistory(c *gin.Context) {
 	}
 
 	var orderItems []models.OrderItem
-	if err := config.DB.Order("created_at DESC").Find(&orderItems, "user_id = ?", userID).Error; err != nil{
+	if err := config.DB.Order("created_at DESC").Find(&orderItems, "user_id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
 		return
 	}

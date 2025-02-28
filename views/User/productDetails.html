@@ -282,30 +282,22 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
-                    <!-- Quantity Selector -->
-                    <div class="flex items-center border border-gray-300 rounded">
-                        <button id="minus-button"
-                            class="px-4 py-2 text-gray-600 bg-white hover:bg-gray-100 font-medium">-</button>
-                        <input id="quantity-input" type="number" min="1" value="01"
-                            class="w-12 text-center border-0 bg-white text-gray-600 font-medium focus:outline-none">
-                        <button id="plus-button"
-                            class="px-4 py-2 text-gray-600 bg-white hover:bg-gray-100 font-medium">+</button>
-                    </div>
-
+                <div class="flex flex-col md:flex-row md:items-stretch space-y-4 md:space-y-0 md:space-x-4 mb-4">
                     <!-- Buy Now Button -->
                     <button
-                        class="w-full md:flex-grow bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition">BUY
-                        NOW</button>
-
+                        class="w-full md:flex-grow h-full bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition">
+                        BUY NOW
+                    </button>
+                
                     <!-- Add to Cart Button -->
-                    <form action="/cart/add/{{.product.ID}}" method="post" class="cart-form">
+                    <form action="/cart/add/{{.product.ID}}" method="post" class="cart-form w-full md:flex-grow">
                         <button
-                            class="w-full md:flex-grow border border-black text-black text-center px-6 py-3 rounded-md font-bold hover:bg-gray-100 transition">ADD
-                            TO CART</button>
+                            class="w-full h-full border border-black text-black text-center px-6 py-3 rounded-md font-bold hover:bg-gray-100 transition">
+                            ADD TO CART
+                        </button>
                     </form>
-
                 </div>
+                
 
                 <!-- Coupon Button Section -->
                 <div class="mb-4 w-full">

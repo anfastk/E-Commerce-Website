@@ -11,7 +11,7 @@ import (
 )
 
 func UserHome(c *gin.Context) {
-	
+
 	keyboard, _ := helper.RelatedProducts(2)
 	laptop, _ := helper.RelatedProducts(3)
 	mouse, _ := helper.RelatedProducts(4)
@@ -35,11 +35,11 @@ func ShowProducts(c *gin.Context) {
 	var Brand []string
 	var Category []string
 
-	if err := config.DB.Model(&models.ProductDetail{}).Distinct("brand_name").Where("is_deleted =?",false).Pluck("brand_name", &Brand).Error; err != nil {
+	if err := config.DB.Model(&models.ProductDetail{}).Distinct("brand_name").Where("is_deleted =?", false).Pluck("brand_name", &Brand).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch brand name", "Something Went Wrong", "")
 		return
 	}
-	if err := config.DB.Model(&models.Categories{}).Where("is_deleted =?",false).Pluck("name", &Category).Error; err != nil {
+	if err := config.DB.Model(&models.Categories{}).Where("is_deleted =?", false).Pluck("name", &Category).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch category name", "Something Went Wrong", "")
 		return
 	}

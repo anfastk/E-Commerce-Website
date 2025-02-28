@@ -289,7 +289,7 @@
                 if (status === "Pending" || status === "Shipped" || status === "Confirmed") {
                     statusElement.classList.add("bg-orange-100", "text-orange-800");
                     dotElement.classList.add("bg-orange-500");
-                } else if (status === "Cancelled" || status === "Returned") {
+                } else if (status === "Cancelled" || status === "Returned"|| status === "Order Not Placed" || status === "Failed") {
                     statusElement.classList.add("bg-red-100", "text-red-800");
                     dotElement.classList.add("bg-red-500");
                 } else if (status === "Delivered") {

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -25,6 +24,4 @@ type ProductVariantDetails struct {
 	Category             Categories             `gorm:"foreignKey:CategoryID;references:ID"`
 	VariantsImages       []ProductVariantsImage `gorm:"foreignKey:ProductVariantID"`
 	Specification        []ProductSpecification `gorm:"foreignKey:ProductVariantID"`
-	ReservedStock        uint                   `gorm:"default:0"`
-	ReservationExpiresAt time.Time
 }

@@ -150,7 +150,8 @@
                             </svg>
                             Wallet
                         </a>
-                        <a href="/profile/order/history" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/order/history"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -197,7 +198,7 @@
                             <!-- Order Header -->
                             <div class="flex justify-between text-sm mb-4 p-4 -mx-4 -mt-4 
     {{if eq .OrderStatus `Pending`}} bg-orange-200 
-    {{else if or (eq .OrderStatus `Cancelled`) (eq .OrderStatus `Returned`) (eq .OrderStatus `Failed`)}} bg-red-200 
+    {{else if or (eq .OrderStatus `Cancelled`) (eq .OrderStatus `Returned`) (eq .OrderStatus `Failed`) (eq .OrderStatus `Order Not Placed`) }} bg-red-200 
     {{else if or (eq .OrderStatus `Shipped`) (eq .OrderStatus `Out For Delivery`) (eq .OrderStatus `Confirmed`)}} bg-blue-200 
     {{else if eq .OrderStatus `Delivered` }} bg-green-200 
     {{end}}">
@@ -225,12 +226,20 @@
                                     <div class="text-gray-600">
                                         ORDER ID {{.OrderUID}}
                                     </div>
+                                    {{if eq .OrderStatus "Order Not Placed" }}
+                                    <a href="/profile/order/details/track/{{.ID}}"
+                                            class="text-blue-600 hover:underline">Retry Payment</a>
+                                            {{else if eq .OrderStatus "Failed" }}
+                                            <a href="/profile/order/details/track/{{.ID}}"
+                                            class="text-blue-600 hover:underline">View order details</a>
+                                    {{else}}
                                     <div class="flex space-x-2">
                                         <a href="/profile/order/details/track/{{.ID}}"
                                             class="text-blue-600 hover:underline">View order details</a>
                                         <span class="text-gray-400">|</span>
                                         <a href="#" class="text-blue-600 hover:underline">Invoice</a>
                                     </div>
+                                    {{end}}
                                 </div>
                             </div>
 
@@ -240,8 +249,12 @@
                                 <div class=" text-lg font-bold">Delivered {{.DeliveryDate}}</div>
                                 {{else if eq .OrderStatus "Returned"}}
                                 <div class="text-lg font-bold">Returned on {{.ReturnDate}}</div>
+                                {{else if eq .OrderStatus "Order Not Placed"}}
+                                <div class="text-lg font-bold">Payment Failed Retry Payment</div>
                                 {{else if eq .OrderStatus "Cancelled"}}
                                 <div class="text-lg font-bold">Cancelled on {{.CancelDate}}</div>
+                                {{else if eq .OrderStatus "Failed"}}
+                                <div class="text-lg font-bold">Order Failed On {{.OrderDate}}</div>
                                 {{else}}
                                 <div class="text-lg font-bold">Expected Delivered Date {{.ExpectedDeliveryDate}}</div>
                                 {{end}}
@@ -252,6 +265,10 @@
                                 <div class="text-orange-600 font-medium mb-2">{{.OrderStatus }}</div>
                                 {{else if eq .OrderStatus "Delivered"}}
                                 <div class="text-green-600 font-medium mb-2">{{.OrderStatus }}</div>
+                                {{else if eq .OrderStatus "Order Not Placed"}}
+                                <div class="text-red-600 font-medium mb-2">{{.OrderStatus }}</div>
+                                {{else if eq .OrderStatus "Failed"}}
+                                <div class="text-red-600 font-medium mb-2">{{.OrderStatus }}</div>
                                 {{else}}
                                 <div class="text-blue-600 font-medium mb-2">{{.OrderStatus }}</div>
                                 {{end}}
@@ -267,6 +284,14 @@
                                                 {{if eq .OrderStatus "Delivered"}}
                                                 <div class="text-sm text-gray-600 mt-1">Return window closed on
                                                     {{.ReturnDate}}</div>
+                                                {{else if eq .OrderStatus "Failed"}}
+                                                <div class="text-sm text-gray-600 mt-1"></div>
+                                                {{else if eq .OrderStatus "Returned"}}
+                                                <div class="text-sm text-gray-600 mt-1">Return on
+                                                    {{.ReturnDate}}</div>
+                                                {{else if eq .OrderStatus "Cancelled"}}
+                                                <div class="text-sm text-gray-600 mt-1">Cancelled on
+                                                    {{.CancelDate}}</div>
                                                 {{else}}
                                                 <div class="text-sm text-gray-600 mt-1">Expected Delivery date
                                                     {{.ExpectedDeliveryDate}}</div>

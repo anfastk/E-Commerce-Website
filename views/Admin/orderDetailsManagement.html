@@ -196,8 +196,8 @@
                         {{end}}
                     </div>
                     <div class="space-y-2 text-gray-700">
-                        <p>Master Card <span class="font-medium">{{.Payment.PaymentMethod}}</span></p>
-                        <p>Business name: <span class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</span>
+                        <p>Payment Method <span class="font-medium">{{.Payment.PaymentMethod}}</span></p>
+                        <p>Business Name: <span class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</span>
                         </p>
                         <p>Phone: <span class="font-medium">{{.Address.Mobile}}</span></p>
                     </div>
@@ -433,6 +433,8 @@
                 'Shipped': ['Out for Delivery', 'Cancel'],
                 'Out For Delivery': ['Delivered', 'Cancel'],
                 'Delivered': ['Return'],
+                'Order Not Placed': ['Confirmed', 'Cancel'],
+                'Failed': ['Confirmed', 'Cancel'],
                 'Returned': [],
                 'Cancelled': []
             };

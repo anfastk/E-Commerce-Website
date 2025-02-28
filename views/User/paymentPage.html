@@ -6,11 +6,271 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+    <style>
+        /* Animation styles */
+        .payment-option {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .payment-option.selected {
+            background-color: #EEF2FF;
+            border-color: #4F46E5;
+        }
+
+        .payment-option.selected::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: #4F46E5;
+        }
+
+        .payment-option.selected .payment-title {
+            color: #4338CA;
+            font-weight: 600;
+        }
+
+        .wallet-input {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .wallet-input.active {
+            max-height: 200px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: max-height 0.5s ease-in, opacity 0.3s ease-in, transform 0.3s ease-in;
+        }
+
+        /* Custom radio styles */
+        .custom-radio {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .custom-radio.selected {
+            border-color: #4F46E5;
+            border-width: 6px;
+        }
+
+        /* Pulse animation for selection */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+            }
+        }
+
+        .payment-option.just-selected .custom-radio {
+            animation: pulse 0.8s 1;
+        }
+
+        /* Button styles */
+        .apply-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .apply-btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .apply-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        /* Toast notification styles */
+        /* Toast Container Styles */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Base Toast Styles */
+        .toast {
+            min-width: 300px;
+            max-width: 400px;
+            background-color: white;
+            color: #333;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transform: translateX(120%);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.4s ease, opacity 0.3s ease, visibility 0.3s;
+            overflow: hidden;
+        }
+
+        /* Toast Content */
+        .toast-content {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        /* Toast Icon */
+        .toast-icon {
+            flex-shrink: 0;
+            font-size: 24px;
+        }
+
+        .toast-icon-success,
+        .toast-icon-error {
+            display: none;
+        }
+
+        /* Toast Message */
+        .toast-message {
+            flex-grow: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Toast Type Styles */
+        .toast-success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .toast-error {
+            border-left: 4px solid #F44336;
+        }
+
+        .toast-success .toast-icon-success {
+            display: block;
+            color: #4CAF50;
+        }
+
+        .toast-error .toast-icon-error {
+            display: block;
+            color: #F44336;
+        }
+
+        /* Toast Animation - Show */
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Progress Bar */
+        .toast-progress {
+            height: 4px;
+            width: 100%;
+            background: #f0f0f0;
+            position: relative;
+        }
+
+        .toast-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #e0e0e0, #c0c0c0);
+            animation: toast-progress 3s linear forwards;
+            transform-origin: left;
+        }
+
+        .toast-success .toast-progress::after {
+            background: linear-gradient(to right, #A5D6A7, #4CAF50);
+        }
+
+        .toast-error .toast-progress::after {
+            background: linear-gradient(to right, #EF9A9A, #F44336);
+        }
+
+        @keyframes toast-progress {
+            0% {
+                transform: scaleX(1);
+            }
+
+            100% {
+                transform: scaleX(0);
+            }
+        }
+
+        /* Optional: Add a bounce effect */
+        .toast.show {
+            animation: toast-bounce 0.6s ease;
+        }
+
+        @keyframes toast-bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(0);
+            }
+
+            40% {
+                transform: translateX(-10px);
+            }
+
+            60% {
+                transform: translateX(-5px);
+            }
+        }
+
+        /* Multiple toasts stacking */
+        .toast+.toast {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
     <div class="bg-black py-4 sticky top-0 z-50 ">
-        <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+        <header class="bg-white rounded-lg shadow-md mx-4 px-6 z-50">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
 
@@ -78,8 +338,6 @@
             </div>
         </header>
     </div>
-    <div id="errorToast" class="hidden fixed bottom-5 right-5 bg-red-500 text-white px-4 py-2 rounded shadow-lg"></div>
-
     <div class="container mx-auto p-4 md:p-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Left Section -->
@@ -93,20 +351,22 @@
                         {{.Address.Address}}, {{.Address.City}},<br>
                         {{.Address.State}}, {{.Address.PinCode}}, {{.Address.Country}}
                     </p>
-                    <!-- Add a hidden input field for the address ID -->
-                    <input type="hidden" id="addressId" value="{{.Address.ID}}">
                 </div>
 
                 <!-- Payment Method -->
-                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
                     <h2 class="text-lg font-semibold mb-4">Payment method</h2>
+
+                    <!-- Hidden input to store the address ID -->
+                    <input type="hidden" id="addressId" value="{{.Address.ID}}">
 
                     <!-- Wallet Balance -->
                     <div class="mb-6">
-                        <div class="flex items-start gap-2 mb-4">
-                            <input type="radio" class="mt-1" name="payment" value="Wallet" id="walletPayment">
+                        <div class="payment-option flex items-start gap-3 mb-4 p-4 rounded-lg cursor-pointer"
+                            id="walletPayment" data-value="Wallet">
+                            <div class="custom-radio mt-1"></div>
                             <div class="flex-1">
-                                <p class="font-medium">Wallet Balance ₹ 0.00 Unavailable</p>
+                                <p class="payment-title font-medium">Wallet Balance ₹ 0.00 Unavailable</p>
                                 <div class="flex items-center gap-1 text-sm text-blue-600">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z">
@@ -118,9 +378,15 @@
                         </div>
 
                         <!-- Code Input -->
-                        <div class="flex gap-2">
-                            <input type="text" placeholder="Enter Code" class="flex-1 border rounded px-3 py-2 text-sm">
-                            <button class="px-4 py-2 border rounded text-sm">Apply</button>
+                        <div class="wallet-input ml-8 mb-4">
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="flex gap-2 mb-3">
+                                    <input type="text" placeholder="Enter Code"
+                                        class="flex-1 border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:outline-none transition">
+                                    <button
+                                        class="px-4 py-2 rounded-md text-sm bg-indigo-600 text-white hover:bg-indigo-700 transition apply-btn">Apply</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -128,14 +394,35 @@
                     <div class="space-y-4">
                         <h3 class="font-medium">Another payment method</h3>
                         <div class="space-y-3">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="payment" id="codPayment" value="COD">
-                                <span>Cash on Delivery/Pay on Delivery</span>
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="payment" id="otherPayment" value="Other">
-                                <span>Other Payment Options</span>
-                            </label>
+                            <div class="payment-option flex items-center gap-3 p-4 rounded-lg cursor-pointer"
+                                id="codPayment" data-value="COD">
+                                <div class="custom-radio"></div>
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+                                        <i class="fas fa-truck-fast"></i>
+                                    </div>
+                                    <span class="payment-title">Cash on Delivery/Pay on Delivery</span>
+                                </div>
+                            </div>
+
+                            <div class="payment-option flex items-center gap-3 p-4 rounded-lg cursor-pointer"
+                                id="razorpayPayment" data-value="Razorpay">
+                                <div class="custom-radio"></div>
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <span class="payment-title">Razorpay Payment</span>
+                                </div>
+                                <div class="flex gap-2 ml-auto">
+                                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1740422437/Untitled_design_hxznin.png"
+                                        alt="Visa" class="h-4 rounded-sm" />
+                                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1740422654/Untitled_design_1_wlkrzh.png"
+                                        alt="Mastercard" class="h-4 rounded-sm" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -202,7 +489,8 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Shipping</span>
-                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
+                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span
+                                class="line-through text-xs">&#8377;100</span> {{end}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Tax</span>
@@ -223,19 +511,28 @@
                         <span>Total</span>
                         <span>&#8377; {{.Total}}</span>
                     </div>
-                    <button id="proceedToPay"
-                        class="w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2">
-                        PROCEED TO PAY
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
+                    <div class="mt-6">
+                        <button id="proceedToPay"
+                            class="w-full bg-black text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-md flex items-center justify-center">
+                            <span>Proceed to Pay</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <div class="toast-container fixed top-0 right-4 z-40">
+        <div id="toast" class="toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
 
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
@@ -303,40 +600,6 @@
         </div>
     </footer>
     <script>
-        document.getElementById('proceedToPay').addEventListener('click', function () {
-            let selectedPayment = document.querySelector('input[name="payment"]:checked');
-            let addressIdElement = document.getElementById('addressId');
-
-            if (!selectedPayment || !addressIdElement || !addressIdElement.value) {
-                showErrorToast("Missing payment method or address.");
-                return;
-            }
-
-            let selectedPaymentMethod = selectedPayment.value;
-            let addressId = addressIdElement.value;
-
-            fetch('/checkout/payment/proceed', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    document.open();
-                    document.write(html);
-                    document.close();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorToast(error.message || "An error occurred while processing the payment.");
-                });
-        });
-
         // Function to show error toast
         function showErrorToast(message) {
             let toast = document.getElementById("errorToast");
@@ -383,6 +646,271 @@
 
         // Live update every second
         setInterval(updateDeliveryDate, 1000);
+
+
+        // Get all payment options and the wallet input
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        const walletInput = document.querySelector('.wallet-input');
+        let selectedPaymentMethod = null;
+
+        // Set up event listeners for each payment option
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                // Remove selected class from all options
+                paymentOptions.forEach(opt => {
+                    opt.classList.remove('selected');
+                    opt.classList.remove('just-selected');
+                    opt.querySelector('.custom-radio').classList.remove('selected');
+                });
+
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                this.classList.add('just-selected');
+                this.querySelector('.custom-radio').classList.add('selected');
+
+                // Store the selected payment method
+                selectedPaymentMethod = this.getAttribute('data-value');
+
+                // Toggle wallet input visibility
+                if (this.id === 'walletPayment') {
+                    walletInput.classList.add('active');
+                } else {
+                    walletInput.classList.remove('active');
+                }
+
+                // Remove the pulse animation class after animation completes
+                setTimeout(() => {
+                    this.classList.remove('just-selected');
+                }, 800);
+            });
+        });
+
+        // Add hover effects
+        paymentOptions.forEach(option => {
+            option.addEventListener('mouseenter', function () {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = '#f9fafb';
+                }
+            });
+
+            option.addEventListener('mouseleave', function () {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = '';
+                }
+            });
+        });
+
+        // Set default selection (wallet)
+        document.getElementById('walletPayment').click();
+
+        // Add ripple effect to amount buttons
+        const amountButtons = document.querySelectorAll('.wallet-input button');
+        amountButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                this.classList.add('active');
+                setTimeout(() => {
+                    this.classList.remove('active');
+                }, 300);
+            });
+        });
+
+        // Toast notification functions
+        function showToast(message, type) {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastTemplate = document.getElementById('toast');
+            const toast = toastTemplate.cloneNode(true);
+
+            // Set unique ID
+            const toastId = 'toast-' + Date.now();
+            toast.id = toastId;
+
+            // Set message
+            toast.querySelector('.toast-message').textContent = message;
+
+            // Set type class
+            toast.className = 'toast';
+
+            if (type === 'error') {
+                toast.classList.add('toast-error');
+            } else if (type === 'success') {
+                toast.classList.add('toast-success');
+            }
+
+            // Add to container
+            toastContainer.appendChild(toast);
+
+            // Show with slight delay for proper animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            // Remove after animation completes
+            setTimeout(() => {
+                toast.classList.remove('show');
+
+                // Remove from DOM after hide animation
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function showErrorToast(message) {
+            showToast(message, 'error');
+        }
+
+        function showSuccessToast(message) {
+            showToast(message, 'success');
+        }
+
+        // Initialize Razorpay handler
+        function initializeRazorpay(data) {
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: data.currency,
+                name: "LAPTIX",
+                description: "Purchase Payment",
+                image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
+                order_id: data.order_id,
+                handler: function (response) {
+                    // Handle successful payment
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                    });
+                },
+                prefill: {
+                    name: data.prefill.name,
+                    email: data.prefill.email,
+                    contact: data.prefill.contact
+                },
+                notes: data.notes,
+                theme: {
+                    color: "#0000"
+                },
+                modal: {
+                    ondismiss: function () {
+                        const payButton = document.getElementById('proceedToPay');
+                        payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                        payButton.disabled = false;
+                        showErrorToast("Payment cancelled");
+                    }
+                },
+                // Add retry configuration to prevent retry option
+                retry: {
+                    enabled: false  // Disable retry functionality
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            // Add payment failed handler
+            rzp.on('payment.failed', function (response) {
+                fetch('/order/failed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.error.metadata.payment_id,
+                        razorpay_order_id: response.error.metadata.order_id
+                    })
+                })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url; // Manually redirect browser
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        if (data) console.log('Response:', data);
+                    })
+                    .catch(error => console.error('Error:', error));
+
+                // Optional: Delay before redirection to show failure message
+                setTimeout(function () {
+                    window.location.href = '/payment-failed';
+                }, 3000);
+            });
+
+            rzp.open();
+        }
+
+        // Function to verify payment with backend
+        function verifyPayment(paymentData) {
+            fetch('/checkout/payment/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment verification failed."); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Redirect to success page
+                    window.location.href = '/order/success';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast(error.message || "An error occurred while verifying the payment.");
+
+                    // Reset button state
+                    const payButton = document.getElementById('proceedToPay');
+                    payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                    payButton.disabled = false;
+                });
+        }
+
+        // Process payment function
+        document.getElementById('proceedToPay').addEventListener('click', function () {
+            let addressIdElement = document.getElementById('addressId');
+
+            if (!selectedPaymentMethod || !addressIdElement || !addressIdElement.value) {
+                showErrorToast("Missing payment method or address.");
+                return;
+            }
+
+            let addressId = addressIdElement.value;
+
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
+
+            fetch('/checkout/payment/proceed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
+                    }
+                    return response.json(); // Expecting JSON response
+                })
+                .then(data => {
+                    if (data.redirect) {
+                        // Redirect to the given URL
+                        window.location.href = data.redirect;
+                    } else {
+                        // Initialize Razorpay if needed
+                        initializeRazorpay(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast(error.message || "An error occurred while processing the payment.");
+
+                    // Reset button state
+                    this.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                    this.disabled = false;
+                });
+        });
     </script>
 </body>
 

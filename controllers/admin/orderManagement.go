@@ -193,7 +193,7 @@ func ChangeOrderStatus(c *gin.Context) {
 		if err := tx.Model(&orderItemDetails).Updates(map[string]interface{}{
 			"order_status":  "Delivered",
 			"delivery_date": currentTime,
-			"return_date":currentTime.AddDate(0, 0, 7),
+			"return_date":   currentTime.AddDate(0, 0, 7),
 		}).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order status ", "Something Went Wrong", "")
