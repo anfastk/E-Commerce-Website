@@ -516,7 +516,7 @@ func CancelSpecificOrder(c *gin.Context) {
 			Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
 			Type:          "Refund",
 			Receipt:       receiptID,
-			OrderId:       orderItems.OrderUID,
+			OrderId:       order.OrderUID,
 			TransactionID: transactionID,
 			PaymentMethod: payment.PaymentMethod,
 		}
@@ -690,10 +690,10 @@ func CancelAllOrderItems(c *gin.Context) {
 			UserID:        userID,
 			WalletID:      wallet.ID,
 			Amount:        refundAmount,
-			Description:   fmt.Sprintf("Order Refund ORD ID " + orderID),
+			Description:   fmt.Sprintf("Order Refund ORD ID " + order.OrderUID),
 			Type:          "Refund",
 			Receipt:       receiptID,
-			OrderId:       orderID,
+			OrderId:       order.OrderUID,
 			TransactionID: transactionID,
 			PaymentMethod: paymentMethod,
 		}
@@ -757,4 +757,46 @@ func CancelAllOrderItems(c *gin.Context) {
 		"message": "Order cancelled successfully",
 		"code":    http.StatusOK,
 	})
+}
+
+func ReturnOrder(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	var input struct {
+		Reason            string `json:"reason" binding:"required"`
+		AdditionalDetails string `json:"additionalDetails" binding:"required"`
+		ProductId         string `json:"productId" binding:"required"`
+		OrderId           string `json:"orderId" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data", "Enter All Fields", "")
+		return
+	}
+
+	ordId, err := strconv.ParseUint(input.OrderId, 10, 32)
+	prdtId, err := strconv.ParseUint(input.ProductId, 10, 32)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data", "Something Went Wrong", "")
+		return
+	}
+	reqstId := "RTN-" + uuid.New().String()
+	returnRequest := models.ReturnRequest{
+		RequestUID:         reqstId,
+		OrderItemID:       uint(ordId),
+		ProductVariantID:  uint(prdtId),
+		UserID:            userID,
+		Reason:            input.Reason,
+		AdditionalDetails: input.AdditionalDetails,
+		Status:            "Pending",
+	}
+	if err := config.DB.Create(&returnRequest).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to submit return request", "Something Went Wrong", "")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Return request submitted successfully. Awaiting admin approval.",
+		"code":    http.StatusOK,
+	})
+
 }

@@ -64,8 +64,11 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/order/details/track/:id/cancel", controllers.CancelSpecificOrder)
 		userProfile.POST("/order/details/track/:id/cancel/all", controllers.CancelAllOrderItems)
 		userProfile.POST("/order/details/track/pay/now", controllers.PayNow)
+		userProfile.POST("/order/details/track/item/return", controllers.ReturnOrder)
 		userProfile.POST("/order/details/track/pay/now/verify", controllers.VerifyPayNowRazorpayPayment)
 		userProfile.GET("/order/history", controllers.OrderHistory)
+		userProfile.GET("/wallet", controllers.WalletHandler)
+
 	}
 
 	cart := r.Group("/cart")

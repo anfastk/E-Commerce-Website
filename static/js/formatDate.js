@@ -22,6 +22,8 @@ function formatDates() {
             formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`; // 27 Feb, 10:33 AM
         } else if (formatType === "short") {
             formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}`; // 27 Feb
+        } else if (formatType === "custom") {
+            formattedDate = `${date.toLocaleString('en', { month: 'short' })} ${date.getDate()}, ${date.getFullYear()}`; // Example: Mar 2, 2025
         }
 
         element.innerHTML = formattedDate;

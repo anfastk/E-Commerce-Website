@@ -150,7 +150,7 @@
                             </svg>
                             Shopping Cart
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/wallet" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -512,31 +512,7 @@
         </div>
     </footer>
     <script>
-        // Toggle forms visibility
-        document.getElementById('addMoneyBtn').addEventListener('click', function () {
-            document.getElementById('addMoneyForm').classList.remove('hidden');
-            document.getElementById('giftCardForm').classList.add('hidden');
-        });
-
-        document.getElementById('sendGiftBtn').addEventListener('click', function () {
-            document.getElementById('giftCardForm').classList.remove('hidden');
-            document.getElementById('addMoneyForm').classList.add('hidden');
-        });
-
-        document.getElementById('cancelAddMoney').addEventListener('click', function () {
-            document.getElementById('addMoneyForm').classList.add('hidden');
-        });
-
-        document.getElementById('cancelGiftCard').addEventListener('click', function () {
-            document.getElementById('giftCardForm').classList.add('hidden');
-        });
-
-        // Quick amount buttons
-        document.querySelectorAll('.amount-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                document.getElementById('amount').value = this.dataset.amount;
-            });
-        });
+        
     </script>
 </body>
 

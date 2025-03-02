@@ -117,6 +117,21 @@
                 <span id="statusElement" data-status="{{.OrderItem.OrderStatus}}"
                     class="px-3 py-1 rounded text-sm font-medium">{{.OrderItem.OrderStatus}}
                 </span>
+                {{if .IsReurnRequested}}
+                {{if eq .ReturnRequest.Status "Pending"}}
+                <span class="bg-purple-100 text-purple-600 px-6 py-1 rounded-full border border-purple-500 text-sm">
+                    User Requested For Return
+                    <span class="px-2 py-4 whitespace-nowrap ">
+                        <button onclick="openModal('{{.ReturnRequest.RequestUID}}')"
+                            class="text-sm text-purple-500 hover:underline">View</button>
+                    </span>
+                </span>
+                {{else if eq .ReturnRequest.Status "Rejected" }}
+                <p class="bg-red-100 text-red-600 px-2 py-1 rounded-full border border-red-600 text-sm" >
+                   Return Rejected <span><a href="" class="pl-2 hover:underline text-red-400 hover:text-red-600"> View</a></span>
+                </p>
+                {{end}}
+                {{end}}
             </div>
             <div class="flex items-center text-gray-600 my-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -187,7 +202,8 @@
                         {{if eq .Payment.PaymentStatus "Pending"}}
                         <span
                             class="bg-orange-100 text-orange-600 px-3 py-1 rounded text-sm font-medium">{{.Payment.PaymentStatus}}</span>
-                        {{else if or (eq .Payment.PaymentStatus "Cancelled") (eq .Payment.PaymentStatus "Refunded") (eq .Payment.PaymentStatus "Failed")}}
+                        {{else if or (eq .Payment.PaymentStatus "Cancelled") (eq .Payment.PaymentStatus "Refunded") (eq
+                        .Payment.PaymentStatus "Failed")}}
                         <span
                             class="bg-red-100 text-red-600 px-3 py-1 rounded text-sm font-medium">{{.Payment.PaymentStatus}}</span>
                         {{else}}
@@ -365,9 +381,9 @@
                             <div class="flex justify-between text-gray-600">
                                 <span>Shipping </span>
                                 <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge}}
-                                     {{else}} 
-                                     <span class="text-green-600">Free </span> <span
-                                    class="line-through text-sm">&#8377;100</span>{{end}}</span>
+                                    {{else}}
+                                    <span class="text-green-600">Free </span> <span
+                                        class="line-through text-sm">&#8377;100</span>{{end}}</span>
 
                             </div>
                             <div class="flex justify-between text-green-600 ">
@@ -391,8 +407,180 @@
             </div>
         </div>
     </div>
+    <!-- Modal for Request Details -->
+    <div id="requestModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-xl font-bold text-gray-900" id="modalTitle">{{.ReturnRequest.RequestUID}}</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="py-4">
+                <!-- Request Details -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Order ID</p>
+                        <p class="text-sm text-gray-900">{{.Order.OrderUID}}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Request Date</p>
+                        <p class="text-sm text-gray-900">{{.ReturnRequestDate}}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Customer</p>
+                        <p class="text-sm text-gray-900">{{.User.FullName}}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Email</p>
+                        <p class="text-sm text-gray-900">{{.User.Email}}</p>
+                    </div>
+                </div>
+
+                <!-- Return Items -->
+                <div class="mb-4">
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">Items for Return</h4>
+                    <div class="border rounded-lg overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Product</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Quantity</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                        Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm">
+                                        <div class="flex items-center">
+                                            <img src="{{.OrderItem.ProductImage}}" alt="ProductImage"
+                                                class="h-10 w-10 flex-shrink-0 bg-gray-200 rounded object-contain">
+                                            <div class="ml-3">
+                                                <p class="font-medium text-gray-900">{{.OrderItem.ProductName}}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">{{.OrderItem.Quantity}}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">&#8377;{{printf "%.2f"
+                                        .OrderItem.ProductRegularPrice}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Return Reason -->
+                <div class="mb-4">
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">Return Reason</h4>
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-gray-700">{{.ReturnRequest.Reason}} <span><br></span>
+                            {{.ReturnRequest.AdditionalDetails}}
+                        </p>
+                    </div>
+                </div>
+
+
+
+                <!-- Admin Notes -->
+                <div class="mb-4">
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">Admin Notes</h4>
+                    <textarea
+                        class="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows="3" placeholder="Add notes about this return request..."></textarea>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end pt-4 border-t">
+                <button onclick="closeModal()"
+                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    Cancel
+                </button>
+                <button onclick="rejectRequest()"
+                    class="bg-red-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    Reject Return
+                </button>
+                <button onclick="approveRequest()"
+                    class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Approve Return
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
+        let orderId = "{{ .OrderItem.ID }}";
+
+        function openModal(requestId) {
+            document.getElementById('modalTitle').textContent = 'Request ID ' + requestId;
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        function sendRequestToBackend(action) {
+            // Get the admin notes from the textarea - using a more specific selector
+            const adminNotes = document.querySelector('#requestModal textarea').value;
+            const requestUID = document.getElementById('modalTitle').textContent.split(' ').pop();
+
+            // Log for debugging
+            console.log("Admin Notes:", adminNotes);
+
+            // Prepare data for sending to backend
+            const data = {
+                orderId: orderId,
+                requestUID: requestUID,
+                action: action, // 'approve' or 'reject'
+                adminNotes: adminNotes
+            };
+
+            // Log the data being sent
+            console.log("Sending data:", data);
+
+            // Send data to backend using fetch API
+            fetch('/admin/orderlist/details/return/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(`Return request ${action}ed successfully!`);
+                    closeModal();
+                    // Optionally refresh the page or update the UI
+                    // location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`Error ${action}ing return request. Please try again.`);
+                });
+        }
+
+        function approveRequest() {
+            sendRequestToBackend('Approved');
+        }
+
+        function rejectRequest() {
+            sendRequestToBackend('Rejected');
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             const statusElement = document.getElementById("statusElement");
             const status = statusElement.dataset.status;

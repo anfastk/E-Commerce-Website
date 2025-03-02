@@ -138,7 +138,7 @@
                             Personal Information
                         </a>
                         <a href="/profile/order/details"
-                            class="p-2  text-white bg-black rounded flex items-center gap-2">
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -162,7 +162,7 @@
                             </svg>
                             Shopping Cart
                         </a>
-                        <a href="#" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/wallet" class="p-2 text-white bg-black rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -231,7 +231,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                             <div>
                                 <p class="text-sm opacity-80">Current Balance</p>
-                                <p class="text-4xl font-bold">&#8377;1,245.50</p>
+                                <p id="amount" class="text-4xl font-bold">&#8377;{{.Wallet.Balance}}</p>
                             </div>
                         </div>
                     </div>
@@ -252,13 +252,13 @@
                                 <div class="bg-white rounded-lg p-4 shadow-sm">
                                     <p class="text-gray-500 text-sm">Total Referrals</p>
                                     <div class="flex items-center mt-1">
-                                        <span class="text-3xl font-bold text-indigo-800">23</span>
+                                        <span class="text-3xl font-bold text-indigo-800">00</span>
                                     </div>
                                 </div>
                                 <div class="bg-white rounded-lg p-4 shadow-sm">
                                     <p class="text-gray-500 text-sm">Referral Earnings</p>
                                     <div class="flex items-center mt-1">
-                                        <span class="text-3xl font-bold text-indigo-800">&#8377;230.00</span>
+                                        <span class="text-3xl font-bold text-indigo-800">&#8377;000.00</span>
                                     </div>
                                 </div>
                             </div>
@@ -423,9 +423,29 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
+                                        {{range .WalletTransactions}}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                Feb 28, 2025
+                                                {{.Date}}
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-900">
+                                                {{.Description}}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="px-2 py-1 text-xs font-medium bg-violet-100 text-violet-800 rounded-full">
+                                                    {{.Type}}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
+                                                +&#8377;{{printf "%.2f" .Amount}}
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                        <!-- <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <span class="format-date" data-date="{{.OrderDate}}" data-format="custom"></span>
                                             </td>
                                             <td class="px-6 py-4 text-sm text-gray-900">
                                                 Added funds via Credit Card
@@ -512,7 +532,7 @@
                                                 class="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
                                                 +&#8377;200.00
                                             </td>
-                                        </tr>
+                                        </tr> -->
                                     </tbody>
                                 </table>
 
@@ -607,6 +627,48 @@
             </div>
         </div>
     </footer>
+    <script>
+        // Get the raw amount from the rendered HTML
+        let amountElement = document.getElementById("amount");
+        let rawAmount = amountElement.innerText.replace("₹", "").trim(); // Remove ₹ and trim spaces
+
+        // Convert to float
+        let amount = parseFloat(rawAmount);
+
+        // Format the amount using Intl.NumberFormat for Indian currency
+        let formattedAmount = new Intl.NumberFormat('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+
+        // Update the element with formatted value
+        amountElement.innerHTML = `&#8377;${formattedAmount}`;
+        // Toggle forms visibility
+        document.getElementById('addMoneyBtn').addEventListener('click', function () {
+            document.getElementById('addMoneyForm').classList.remove('hidden');
+            document.getElementById('giftCardForm').classList.add('hidden');
+        });
+
+        document.getElementById('sendGiftBtn').addEventListener('click', function () {
+            document.getElementById('giftCardForm').classList.remove('hidden');
+            document.getElementById('addMoneyForm').classList.add('hidden');
+        });
+
+        document.getElementById('cancelAddMoney').addEventListener('click', function () {
+            document.getElementById('addMoneyForm').classList.add('hidden');
+        });
+
+        document.getElementById('cancelGiftCard').addEventListener('click', function () {
+            document.getElementById('giftCardForm').classList.add('hidden');
+        });
+
+        // Quick amount buttons
+        document.querySelectorAll('.amount-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                document.getElementById('amount').value = this.dataset.amount;
+            });
+        });
+    </script>
 </body>
 
 </html>

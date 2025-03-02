@@ -7,25 +7,27 @@
     <title>Login - LAPTIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
-<style>
-    .toast {
-    position: fixed;
-    top: 90px;
-    left: 42%;
-    padding: 10px 20px;
-    border-radius: 5px;
-    color: white;
-    z-index: 1000;
-}
+    <style>
+        .toast {
+            position: fixed;
+            top: 90px;
+            left: 42%;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1000;
+        }
 
-.toast.error {
-    background-color: #ff4444; /* Red for errors */
-}
+        .toast.error {
+            background-color: #ff4444;
+            /* Red for errors */
+        }
 
-.toast.success {
-    background-color: #00C851; /* Green for success */
-}
-</style>
+        .toast.success {
+            background-color: #00C851;
+            /* Green for success */
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -63,12 +65,14 @@
                 <div class="text-center mt-4">
                     <a href="/user/forgot/password" class="text-sm text-blue-500 underline">Forgot Your Password?</a>
                 </div>
-                <div class="mt-4 flex items-center justify-between">
-                    <button type="button"
-                        class="flex items-center w-full py-2 bg-gray-100 border border-gray-300 rounded-md mr-2">
-                        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google logo" class="mr-2">
-                        <a href="/auth/google/login">Login with Google </a>
-                    </button>
+                <div class="mt-4 flex items-center justify-between w-full">
+                    <a href="/auth/google/login" class="w-full">
+                        <div
+                            class="flex items-center justify-center w-full py-2 bg-gray-100 border border-gray-300 rounded-md">
+                            <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google logo" class="mr-2">
+                            Login with Google
+                        </div>
+                    </a>
                 </div>
             </form>
         </div>
@@ -90,7 +94,7 @@
             <p>&copy; 2025 LAPTIX, Inc.</p>
         </div>
     </footer>
-        <div id="toast-containers"></div>
+    <div id="toast-containers"></div>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function (event) {
@@ -130,8 +134,8 @@
                     window.toast.error('An error occurred. Please try again.');
                 });
         });
-         // Function to display toast messages
-         function showToast(message, type = 'error') {
+        // Function to display toast messages
+        function showToast(message, type = 'error') {
             const toastContainer = document.getElementById('toast-containers');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;

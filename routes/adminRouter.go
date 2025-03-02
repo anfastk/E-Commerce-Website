@@ -73,5 +73,6 @@ func AdminRoutes(r *gin.Engine) {
 		OrderList.GET("/", controllers.ShowOrderManagent)
 		OrderList.GET("/details/:id", controllers.ShowOrderDetailManagement)
 		OrderList.PATCH("/details/status/update",controllers.ChangeOrderStatus)
+		OrderList.POST("/details/return/request",controllers.ApproveReturn)
 	}
 }

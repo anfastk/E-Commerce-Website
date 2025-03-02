@@ -23,7 +23,7 @@ func ProfileDetails(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
-	CreateWallet(c,userID)
+	CreateWallet(c, userID)
 	c.HTML(http.StatusOK, "profile.html", gin.H{
 		"User": authDetails,
 	})
@@ -502,8 +502,6 @@ func OrderDetails(c *gin.Context) {
 	})
 }
 
-
-
 func OrderHistory(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
@@ -548,5 +546,51 @@ func OrderHistory(c *gin.Context) {
 		"message": "Order details fetched successfully",
 		"User":    userauth,
 		"Order":   orderHistoryResponse,
+	})
+}
+
+func WalletHandler(c *gin.Context) {
+	userID := c.MustGet("userid").(uint)
+	type TransactionHistoryWallet struct {
+		Date        string  `json:"date"`
+		Description string  `json:"description"`
+		Type        string  `json:"type"`
+		Amount      float64 `json:"amount"`
+	}
+
+	var userauth models.UserAuth
+	if err := config.DB.First(&userauth, userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
+	var walletDetails models.Wallet
+	if err := config.DB.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
+		return
+	}
+
+	var walletTransactons []models.WalletTransaction
+	if err := config.DB.Order("created_at DESC").Find(&walletTransactons, "user_id = ? AND wallet_id = ?", userID, walletDetails.ID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
+		return
+	}
+
+	var history []TransactionHistoryWallet
+	for _, his := range walletTransactons {
+		row := TransactionHistoryWallet{
+			Date:        his.CreatedAt.Format("Jan 02, 2006"),
+			Description: his.Description,
+			Type:        his.Type,
+			Amount:      his.Amount,
+		}
+		history = append(history, row)
+	}
+
+	c.HTML(http.StatusOK, "profileWallet.html", gin.H{
+		"status":             "success",
+		"message":            "Order details fetched successfully",
+		"User":               userauth,
+		"Wallet":             walletDetails,
+		"WalletTransactions": history,
 	})
 }
