@@ -91,7 +91,8 @@
                     <h1 class="text-2xl font-bold text-gray-800">Order ID {{.OrderItem.OrderUID}}</h1>
                     {{if eq .OrderItem.OrderStatus "Pending"}}
                     <p class="text-orange-500 font-semibold mt-1">Order {{.OrderItem.OrderStatus}}</p>
-                    {{else if or (eq .OrderItem.OrderStatus "Returned") (eq .OrderItem.OrderStatus "Cancelled") (eq .OrderItem.OrderStatus "Failed") }}
+                    {{else if or (eq .OrderItem.OrderStatus "Returned") (eq .OrderItem.OrderStatus "Cancelled") (eq
+                    .OrderItem.OrderStatus "Failed") }}
                     <p class="text-red-500 font-semibold mt-1">Order {{.OrderItem.OrderStatus}}</p>
                     {{else if eq .OrderItem.OrderStatus "Confirmed"}}
                     <p class=" text-blue-500 font-semibold mt-1">Order {{.OrderItem.OrderStatus}}</p>
@@ -105,7 +106,6 @@
                     {{else if or (eq .Payment.PaymentStatus "Refunded") (eq .Payment.PaymentStatus "Failed")}}
                     <p class="text-red-500 font-semibold mt-1">Payment {{.Payment.PaymentStatus}}</p>
                     {{else if eq .Payment.PaymentStatus "Cancelled"}}
-                    <p class=" text-red-500 font-semibold mt-1">Order {{.Payment.PaymentStatus}}</p>
                     {{else}}
                     <p class="text-green-500 font-semibold mt-1">Payment {{.Payment.PaymentStatus}}</p>
                     {{end}}
@@ -113,10 +113,68 @@
                 <div class="flex items-center space-x-2 mt-2 sm:mt-0">
                     {{if not (or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") (eq .OrderItem.OrderStatus "Cancelled"))}}
                     <button
-                        class="inline-flex items-center bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition border border-blue-400 backdrop-blur-md "
-                        >
+                        class="inline-flex items-center bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition border border-blue-400 backdrop-blur-md ">
                         <i class="fas fa-download mr-2"></i> Download Invoice
                     </button>
+                    {{end}}
+                    {{if .isAllOrderCancel}}
+
+                    <form id="deleteForm" action="/profile/order/details/track/{{.Order.ID}}/cancel/all" method="post"
+                        class="inline">
+                        <input type="hidden" name="cancelAllReason" id="cancelAllReason">
+                        <button type="button" onclick="openDeletePopup()"
+                            class="z-50 inline-flex items-center bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition border border-red-400 backdrop-blur-md ">
+                            <i class="fas fa-times mr-2"></i> Cancel All
+                        </button>
+                    </form>
+
+                    <div id="deletePopup"
+                        class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-30 transition-opacity duration-300"
+                        role="dialog" aria-labelledby="popupTitle" aria-modal="true">
+                        <div
+                            class="relative w-full max-w-md mx-4 md:mx-auto bg-white rounded-xl shadow-2xl transform transition-all duration-300">
+                            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                                <h3 id="popupTitle" class="text-xl font-bold text-gray-900">Delete Item</h3>
+                                <button onclick="closeDeletePopup()"
+                                    class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                                    aria-label="Close popup">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <div class="mb-5">
+                                    <label for="deleteText" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Please provide a reason for deletion
+                                    </label>
+                                    <textarea id="deleteText" rows="4"
+                                        class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow duration-200 resize-none"
+                                        placeholder="Enter your reason here..." aria-label="Deletion reason"></textarea>
+                                </div>
+                                <div class="flex justify-end space-x-4">
+                                    <button onclick="closeDeletePopup()"
+                                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                        Cancel
+                                    </button>
+                                    <button onclick="confirmDeleteItem()"
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="alertBox" class="hidden fixed top-4 right-4 z-50 min-w-[300px] max-w-md">
+                        <div class="flex items-center p-4 rounded-lg shadow-lg">
+                            <div class="flex-1 mr-4"></div>
+                            <button onclick="dismissAlert()" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
                     {{end}}
                 </div>
             </div>
@@ -155,7 +213,8 @@
                             {{if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Order Not Placed`) }}
                              bg-red-500 {{else}} bg-green-500 {{end}}" {{if eq .OrderItem.OrderStatus `Pending`}}
                                 style="width: 12%" {{else if eq .OrderItem.OrderStatus `Confirmed`}} style="width: 27%"
-                                {{else if eq .OrderItem.OrderStatus `Shipped`}} style="width: 42%" {{else if eq .OrderItem.OrderStatus `Out For Delivery`}} style="width: 67%" {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Delivered`)}}
+                                {{else if eq .OrderItem.OrderStatus `Shipped`}} style="width: 42%" {{else if eq .OrderItem.OrderStatus `Out For Delivery`}} style="width: 67%" {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) 
+                                    (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Delivered`)}}
                                 style="width: 100%" {{else if eq .OrderItem.OrderStatus `Order Not Placed`}}
                                 style="width: 6%" {{end}}></div>
                         </div>
@@ -268,16 +327,21 @@
                                         </button>
                                         {{else if or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") }}
                                         {{else}}
+                                        {{if .IsCancelSpecificOrder}}
                                         <form id="cancelForm"
                                             action="/profile/order/details/track/{{.OrderItem.ID}}/cancel" method="post"
                                             class="inline">
                                             <input type="hidden" name="cancelReason" id="cancelReason">
                                             <button type="button" onclick="showCancelPrompt()"
                                                 class=" text-sm flex items-center {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Returned`)}} cursor-not-allowed text-red-300 hover:text-red-300 {{else}}text-red-600 hover:text-red-700{{end}}"
-                                                {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Returned`)}} disabled{{else}}{{end}}>
+                                                {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq
+                                                .OrderItem.OrderStatus `Returned`)}} disabled{{else}}{{end}}>
                                                 <i class="fas fa-times mr-1"></i>Cancel Item
                                             </button>
                                         </form>
+
+                                        {{else}}
+                                        {{end}}
 
                                         <!-- Modal for cancel reason -->
                                         <div id="cancelModal"
@@ -354,9 +418,10 @@
                 {{if len .AllProduct}}
                 <div class="bg-gray-50 rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold mb-4">Other Items In This Order</h2>
-                    <div class="space-y-4">  <!-- Apply space-y-4 here -->
+                    <div class="space-y-4"> <!-- Apply space-y-4 here -->
                         {{range .AllProduct}}
-                        <div class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition bg-white">
+                        <div
+                            class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition bg-white">
                             <div class="flex items-center flex-1">
                                 <img src="{{ (index .ProductVariantDetails.VariantsImages 0).ProductVariantsImages }}"
                                     alt="Product" class="w-20 h-20 object-contain rounded" />
@@ -370,7 +435,7 @@
                         {{end}}
                     </div>
                 </div>
-                
+
                 {{end}}
             </div>
 
@@ -401,7 +466,8 @@
                 {{else}}
                 <!-- Payment Section -->
                 <div id="paymentPending" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq .Payment.PaymentStatus "Failed")}} Complete Payment{{else}} Payment Status{{end}}</h2>
+                    <h2 class="text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq
+                        .Payment.PaymentStatus "Failed")}} Complete Payment{{else}} Payment Status{{end}}</h2>
                     <div class="space-y-4">
                         <div
                             class="p-4  border  {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} bg-orange-50  border-orange-200 {{else}}bg-red-50 border-red-200{{end}} rounded-lg">
@@ -426,6 +492,7 @@
                                         .st0 {
                                             fill: #3395FF;
                                         }
+
                                         .st1 {
                                             fill: #072654;
                                         }
@@ -536,7 +603,7 @@
                         </div>
                         <div class="flex justify-between font-semibold text-lg pt-3 border-t">
                             <span>Total</span>
-                            <span>&#8377; {{printf "%.2f" .Order.OrderTotalAmount}}</span>
+                            <span>&#8377; {{printf "%.2f" .Order.TotalAmount}}</span>
                         </div>
                     </div>
                 </div>
@@ -545,8 +612,8 @@
         </div>
     </div>
 
-    <div class="toast-container fixed top-0 right-4 z-40">
-        <div id="toast" class="toast bg-white shadow-lg rounded-lg p-4">
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
                 <div class="toast-icon mr-2">
                     <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
@@ -624,62 +691,56 @@
         </div>
     </footer>
     <script>
-        
+
         let orderId = "{{ .OrderItem.ID }}";
-            function submitCancelForm() {
-            const reason = document.getElementById('reasonText').value.trim();
-            const form = document.getElementById('cancelForm');
-
-            // Validate reason
-            if (!reason) {
-                showNotification('Please enter a reason for cancellation', 'error');
-                return;
-            }
-
-            // Set the hidden input value
-            document.getElementById('cancelReason').value = reason;
-
-            // Prepare JSON data
-            const jsonData = {
-                cancelReason: reason
-            };
-
-            // Send request using fetch with JSON
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(jsonData),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    // Success handling
-                    closeModal();
-                    showNotification('Item cancelled successfully');
-
-                    // Refresh page after a delay
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification(
-                        error.message || 'Error cancelling item. Please try again.',
-                        'error'
-                    );
-                });
+        function openDeletePopup() {
+            document.getElementById("deletePopup").classList.remove("hidden");
         }
+
+        function closeDeletePopup() {
+            document.getElementById("deletePopup").classList.add("hidden");
+        }
+
+        function confirmDeleteItem() {
+    const reason = document.getElementById("deleteText").value.trim();
+    if (reason === "") {
+        showErrorToast("Please provide a reason for deletion.", "error");
+        return;
+    }
+
+    document.getElementById("cancelAllReason").value = reason;
+
+    fetch(document.getElementById("deleteForm").action, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({ cancelAllReason: reason })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, "error");
+            return;
+        }
+        showSuccessToast(data.message || "Item cancelled successfully", "success");
+
+
+
+        setTimeout(() => {
+            location.reload();
+
+        }, 1000);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        showErrorToast("Error cancelling item. Please try again.", "error");
+    });
+}
+
+
+
 
         // Helper functions for UI handling
         function showNotification(message, type = 'success') {
@@ -744,55 +805,55 @@
         }
 
         document.getElementById("payButton").addEventListener("click", async function () {
-    let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
-    if (!selectedPayment) {
-        showErrorToast("Please select a payment method.");
-        return;
-    }
+            let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
+            if (!selectedPayment) {
+                showErrorToast("Please select a payment method.");
+                return;
+            }
 
- 
-    let addressId = "{{ .Address.ID }}";
-    let paymentData = {
-        method: selectedPayment.name,
-        orderId: orderId,
-        addressId: addressId
-    };
 
-    // Show loading state
-    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-    this.disabled = true;
+            let addressId = "{{ .Address.ID }}";
+            let paymentData = {
+                method: selectedPayment.name,
+                orderId: orderId,
+                addressId: addressId
+            };
 
-    try {
-        let response = await fetch("/profile/order/details/track/pay/now", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(paymentData)
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
+
+            try {
+                let response = await fetch("/profile/order/details/track/pay/now", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentData)
+                });
+
+                let result = await response.json();
+                if (response.ok) {
+                    showSuccessToast("Payment initiated successfully!");
+                    console.log(result);
+
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
+                        initializeRazorpay(result);
+                    }
+                } else {
+                    showErrorToast("Payment failed: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showErrorToast(error.message || "An error occurred while processing the payment.");
+            } finally {
+                // Reset button state
+                this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
+                this.disabled = false;
+            }
         });
 
-        let result = await response.json();
-        if (response.ok) {
-            showSuccessToast("Payment initiated successfully!");
-            console.log(result);
-            
-            if (result.redirect) {
-                window.location.href = result.redirect;
-            } else {
-                initializeRazorpay(result);
-            }
-        } else {
-            showErrorToast("Payment failed: " + result.message);
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        showErrorToast(error.message || "An error occurred while processing the payment.");
-    } finally {
-        // Reset button state
-        this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
-        this.disabled = false;
-    }
-});
-
-function initializeRazorpay(data) {
+        function initializeRazorpay(data) {
             const options = {
                 key: data.key_id,
                 amount: data.amount,
@@ -807,7 +868,7 @@ function initializeRazorpay(data) {
                         razorpay_payment_id: response.razorpay_payment_id,
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_signature: response.razorpay_signature,
-                        order_id:orderId,
+                        order_id: orderId,
                     });
                 },
                 prefill: {

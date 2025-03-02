@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -89,11 +90,14 @@ func VerifyOtp(c *gin.Context) {
 		fullName, _ := session.Values["full_name"].(string)
 		hashedPassword, _ := session.Values["password"].(string)
 
+		referralCode := helper.GenerateReferralCode()
+
 		userAuth := models.UserAuth{
-			FullName: fullName,
-			Email:    otpInput.Email,
-			Password: hashedPassword,
-			ProfilePic: os.Getenv("DEFAULT_PROFILE_PIC"),
+			FullName:     fullName,
+			Email:        otpInput.Email,
+			Password:     hashedPassword,
+			ProfilePic:   os.Getenv("DEFAULT_PROFILE_PIC"),
+			ReferralCode: strings.ToUpper(referralCode),
 		}
 
 		if err := config.DB.Create(&userAuth).Error; err != nil {

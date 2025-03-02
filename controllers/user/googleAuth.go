@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -68,17 +70,19 @@ func HandleGoogleCallback(c *gin.Context) {
 
 	var user models.UserAuth
 	result := config.DB.Unscoped().Where("email = ?", googleUser.Email).First(&user)
-	cloudinaryURL, err := utils.UploadImageToCloudinary(nil, nil, config.InitCloudinary(), "ProfilePicture", googleUser.Picture)
 
 	if result.Error != nil {
+		cloudinaryURL, _ := utils.UploadImageToCloudinary(nil, nil, config.InitCloudinary(), "ProfilePicture", googleUser.Picture)
+		referralCode := helper.GenerateReferralCode()
 		user = models.UserAuth{
-			FullName:   googleUser.Name,
-			Email:      googleUser.Email,
-			Password:   "",
-			GoogleID:   googleUser.Email,
-			ProfilePic: cloudinaryURL,
-			IsVerified: googleUser.VerifiedEmail,
-			Status:     "Active",
+			FullName:     googleUser.Name,
+			Email:        googleUser.Email,
+			Password:     "",
+			GoogleID:     googleUser.Email,
+			ProfilePic:   cloudinaryURL,
+			IsVerified:   googleUser.VerifiedEmail,
+			Status:       "Active",
+			ReferralCode: strings.ToUpper(referralCode),
 		}
 
 		if err := config.DB.Create(&user).Error; err != nil {

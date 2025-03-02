@@ -39,18 +39,18 @@ func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId uint, paymentA
 func CreateRazorpayOrder(c *gin.Context, amount float64) (map[string]interface{}, error) {
 
 	client := razorpay.NewClient(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
-	receiptID := uuid.New().String()[:30] 
+	receiptID := uuid.New().String()[:30]
 
 	data := map[string]interface{}{
-		"amount":   int64(amount * 100), 
+		"amount":   int64(amount * 100),
 		"currency": "INR",
 		"receipt":  "rcpt_" + receiptID,
 	}
-	log.Println("Creating Razorpay Order with Data:", data) 
+	log.Println("Creating Razorpay Order with Data:", data)
 
 	order, err := client.Order.Create(data, nil)
 	if err != nil {
-		log.Println("Razorpay Order Creation Error:", err) 
+		log.Println("Razorpay Order Creation Error:", err)
 		return nil, err
 	}
 
@@ -105,11 +105,11 @@ func VerifyRazorpayPayment(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 11", "Something Went Wrong", "/cart")
 		return
 	}
-	reservedMap, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
+	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
 
 	tx := config.DB.Begin()
 
-	orderID := CreateOrder(c, tx, userDetails.ID, total, tax, float64(shippingCharge), currentTime)
+	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount, tax, float64(shippingCharge), total, currentTime)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 	orderItems := FetchOrderItems(c, tx, orderID)
@@ -197,11 +197,11 @@ func PaymentFailureHandler(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 11", "Something Went Wrong", "/cart")
 		return
 	}
-	reservedMap, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
+	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
 
 	tx := config.DB.Begin()
 
-	orderID := CreateOrder(c, tx, userDetails.ID, total, tax, float64(shippingCharge), currentTime)
+	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount, tax, float64(shippingCharge), total, currentTime)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 	orderItems := FetchOrderItems(c, tx, orderID)
@@ -257,7 +257,7 @@ func VerifyPayNowRazorpayPayment(c *gin.Context) {
 		PaymentID   string `json:"razorpay_payment_id"`
 		OrderID     string `json:"razorpay_order_id"`
 		Signature   string `json:"razorpay_signature"`
-		OrderItemID string   `json:"order_id"`
+		OrderItemID string `json:"order_id"`
 	}
 
 	if err := c.ShouldBindJSON(&verifyRequest); err != nil {
@@ -283,31 +283,31 @@ func VerifyPayNowRazorpayPayment(c *gin.Context) {
 		return
 	}
 	var orderItem models.OrderItem
-	ordrID,_:=strconv.Atoi(verifyRequest.OrderItemID)
-	if err:=config.DB.First(&orderItem,ordrID).Error;err!=nil {
+	ordrID, _ := strconv.Atoi(verifyRequest.OrderItemID)
+	if err := config.DB.First(&orderItem, ordrID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "Order Item not found", "Something Went Wrong", "/profile/order/details")
 		return
 	}
-	 var orderDetails models.Order
-	 if err:=config.DB.First(&orderDetails,orderItem.OrderID).Error;err!=nil {
+	var orderDetails models.Order
+	if err := config.DB.First(&orderDetails, orderItem.OrderID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "Order not found", "Something Went Wrong", "/profile/order/details")
 		return
 	}
 
 	var allOrderItem []models.OrderItem
-	if err:=config.DB.Find(&allOrderItem,"order_id = ?",orderDetails.ID).Error;err!=nil {
+	if err := config.DB.Find(&allOrderItem, "order_id = ?", orderDetails.ID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "Order Items not found", "Something Went Wrong", "/profile/order/details")
 		return
 	}
 
-	for _,items:=range allOrderItem{
+	for _, items := range allOrderItem {
 
 		var paymentDetails models.PaymentDetail
-		if err:=config.DB.First(&paymentDetails,"order_item_id = ?",items.ID).Error;err!=nil {
+		if err := config.DB.First(&paymentDetails, "order_item_id = ?", items.ID).Error; err != nil {
 			helper.RespondWithError(c, http.StatusNotFound, "Payment Details not found", "Something Went Wrong", "/profile/order/details")
 			return
 		}
-		paymentDetails.PaymentStatus="Completed"
+		paymentDetails.PaymentStatus = "Completed"
 		if err := config.DB.Save(&paymentDetails).Error; err != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update payment details", "Failed to update order", "/profile/order/details")
 			return

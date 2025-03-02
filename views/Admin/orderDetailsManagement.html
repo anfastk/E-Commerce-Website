@@ -364,9 +364,10 @@
                             </div>
                             <div class="flex justify-between text-gray-600">
                                 <span>Shipping </span>
-                                <span>{{if .OrderItem.ShippingCharge}}&#8377; {{printf "%.2f" .OrderItem.ShippingCharge
-                                    }} {{else}} <span class="text-green-600">Free </span> <span
-                                        class="line-through text-sm">&#8377;100</span>{{end}}</span>
+                                <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge}}
+                                     {{else}} 
+                                     <span class="text-green-600">Free </span> <span
+                                    class="line-through text-sm">&#8377;100</span>{{end}}</span>
 
                             </div>
                             <div class="flex justify-between text-green-600 ">

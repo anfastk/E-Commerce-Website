@@ -22,6 +22,7 @@ func ShowCart(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed", "Cart creation Failed", "")
 		}
 	}
+	CreateWallet(c,userID)
 	var cartItems []models.CartItem
 	if err := config.DB.Preload("ProductVariant").
 		Preload("ProductVariant.VariantsImages").

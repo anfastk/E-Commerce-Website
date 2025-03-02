@@ -5,7 +5,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -24,6 +23,7 @@ func ProfileDetails(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
+	CreateWallet(c,userID)
 	c.HTML(http.StatusOK, "profile.html", gin.H{
 		"User": authDetails,
 	})
@@ -502,170 +502,7 @@ func OrderDetails(c *gin.Context) {
 	})
 }
 
-func TrackingPage(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
-	orderID := c.Param("id")
 
-	var orderItem models.OrderItem
-	if err := config.DB.Preload("ProductVariantDetails").
-		Preload("ProductVariantDetails.VariantsImages").
-		First(&orderItem, "id = ? AND user_id = ?", orderID, userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
-		return
-	}
-
-	var order models.Order
-	if err := config.DB.First(&order, "user_id = ? AND id = ?", userID, orderItem.OrderID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Order Not found", "Something Went Wrong", "")
-		return
-	}
-
-	var allOrderItems []models.OrderItem
-	if err := config.DB.Preload("ProductVariantDetails").
-		Preload("ProductVariantDetails.VariantsImages").
-		Find(&allOrderItems, "id != ? AND user_id = ? AND order_id = ?", orderID, userID, order.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
-		return
-	}
-
-	var shippingAddress models.ShippingAddress
-	if err := config.DB.First(&shippingAddress, "user_id = ? AND order_id = ?", userID, order.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Address Not found", "Something Went Wrong", "")
-		return
-	}
-
-	var payment models.PaymentDetail
-	if err := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, orderItem.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Payment details Not found", "Something Went Wrong", "")
-		return
-	}
-	isPaid := false
-	if payment.PaymentStatus == "Paid" {
-		isPaid = true
-	}
-	isDelivered := false
-	if orderItem.OrderStatus == "Delivered" {
-		isDelivered = true
-	}
-	productDiscount := (orderItem.ProductRegularPrice - orderItem.ProductSalePrice) * float64(orderItem.Quantity)
-	totalDiscount := productDiscount + order.CouponDiscount
-	
-	var (
-		allSubTotal             float64
-		allSalePrice            float64
-		allProductDiscount      float64
-		allProductTotalDiscount float64
-		shipCharge              float64
-	)
-	for _, allItems := range allOrderItems {
-		allSubTotal += allItems.ProductRegularPrice
-		allSalePrice += allItems.ProductSalePrice
-	}
-	allProductDiscount = (allSubTotal - allSalePrice)
-	if order.ShippingCharge == 0.0 {
-		shipCharge = 100
-	}
-	allProductTotalDiscount = allProductDiscount + order.ShippingCharge + shipCharge
-
-	c.HTML(http.StatusOK, "trackOrder.html", gin.H{
-		"status":                  "success",
-		"message":                 "Order details fetched successfully",
-		"Order":                   order,
-		"Address":                 shippingAddress,
-		"OrderItem":               orderItem,
-		"Payment":                 payment,
-		"IsPaid":                  isPaid,
-		"IsDelivered":             isDelivered,
-		"ProductDiscount":         productDiscount,
-		"TotalDiscount":           totalDiscount,
-		"OrderDate":               orderItem.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
-		"ExpectedDeliveryDate":    orderItem.ExpectedDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"ReturnDate":              orderItem.ReturnDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"ShippedDate":             orderItem.ShippedDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"OutOfDeliveryDate":       orderItem.OutOfDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"DeliveryDate":            orderItem.DeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"CancelDate":              orderItem.CancelDate.Format("2006-01-02T15:04:05.000-07:00"),
-		"AllProduct":              allOrderItems,
-		"AllSubTotal":             allSubTotal,
-		"AllProductDiscount":      allProductDiscount,
-		"AllProductTotalDiscount": allProductTotalDiscount,
-	})
-}
-
-func CancelOrder(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
-	orderItemID := c.Param("id")
-	var inputReason struct {
-		Reason string ` json:"cancelReason" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&inputReason); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Reason Not Found", "Reason is required", "")
-		return
-	}
-
-	tx := config.DB.Begin()
-
-	var orderItems models.OrderItem
-	if err := tx.First(&orderItems, "id = ? AND user_id = ?", orderItemID, userID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Order Items Not Found", "Something Went Wrong", "")
-		return
-	}
-
-	var order models.Order
-	if err := tx.First(&order, "user_id = ? AND id = ?", userID, orderItems.OrderID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
-		return
-	}
-
-	if err := tx.Model(&orderItems).Where("user_id = ? AND order_id = ?", userID, order.ID).
-		Updates(map[string]interface{}{
-			"order_status":           "Cancelled",
-			"reason":                 inputReason.Reason,
-			"cancel_date":            time.Now(),
-			"expected_delivery_date": time.Now(),
-			"return_date":            time.Now(),
-		}).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Order Status Update Failed", "Order Status Update Failed", "/checkout")
-		return
-	}
-
-	var payment models.PaymentDetail
-	if err := tx.First(&payment, "order_item_id = ? AND user_id = ?", orderItems.ID, userID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Payment Details Not Found", "Something Went Wrong", "")
-		return
-	}
-
-	if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", userID, orderItems.ID).
-		Update("payment_status", "Cancelled").Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Payment Status Update Failed", "Payment Status Update Failed", "/checkout")
-		return
-	}
-
-	var product models.ProductVariantDetails
-	if err := tx.First(&product, orderItems.ProductVariantID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Something Went Wrong", "")
-		return
-	}
-	if err := tx.Model(&product).Where("id = ?", orderItems.ProductVariantID).
-		Update("stock_quantity", product.StockQuantity+orderItems.Quantity).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Stock Reverse Failed", "Stock Update Failed", "/checkout")
-		return
-	}
-
-	tx.Commit()
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "success",
-		"message": "Order cancelled successfully",
-		"code":    http.StatusOK,
-	})
-}
 
 func OrderHistory(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)

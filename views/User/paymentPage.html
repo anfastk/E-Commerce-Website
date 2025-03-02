@@ -587,7 +587,12 @@
                     return response.json(); // Expecting JSON response
                 })
                 .then(data => {
-                        initializeRazorpay(data);                    
+                    if (selectedPaymentMethod === 'Razorpay'){
+                        initializeRazorpay(data);
+                    }
+                    else if (selectedPaymentMethod === 'COD'){
+                        window.location.href = '/order/success';
+                    }                     
                 })
                 .catch(error => {
                     console.error('Error:', error);

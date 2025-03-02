@@ -10,7 +10,7 @@ import (
 )
 
 func ShowCheckoutPage(c *gin.Context) {
-	userID := c.MustGet("userid")
+	userID := c.MustGet("userid").(uint)
 	var (
 		regularPrice    float64
 		salePrice       float64
@@ -66,7 +66,7 @@ func ShowCheckoutPage(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
 		return
 	}
-
+	CreateWallet(c,userID)
 	c.HTML(http.StatusOK, "checkOut.html", gin.H{
 		"status":          "OK",
 		"message":         "Checkout fetch success",
