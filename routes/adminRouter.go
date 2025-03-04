@@ -14,8 +14,8 @@ func AdminRoutes(r *gin.Engine) {
 	{
 		admin.GET("/login", controllers.ShowLoginPage)
 		admin.POST("/login", controllers.AdminLoginHandler)
-		admin.GET("/settings",controllers.ShowSettings)
-		admin.POST("/logout",controllers.AdminLogoutHandler)
+		admin.GET("/settings", controllers.ShowSettings)
+		admin.POST("/logout", controllers.AdminLogoutHandler)
 	}
 	// Admin Product Managemant
 	product := r.Group("/admin/products")
@@ -66,13 +66,24 @@ func AdminRoutes(r *gin.Engine) {
 		category.POST("/add", controllers.AddCategory)
 		category.POST("/:id/delete", controllers.DeleteCategory)
 	}
-	OrderList:=r.Group("/admin/orderlist")
+	OrderList := r.Group("/admin/orderlist")
 	OrderList.Use(middleware.AuthMiddleware(RoleAdmin))
 	OrderList.Use(middleware.NoCacheMiddleware())
 	{
 		OrderList.GET("/", controllers.ShowOrderManagent)
 		OrderList.GET("/details/:id", controllers.ShowOrderDetailManagement)
-		OrderList.PATCH("/details/status/update",controllers.ChangeOrderStatus)
-		OrderList.POST("/details/return/request",controllers.ApproveReturn)
+		OrderList.PATCH("/details/status/update", controllers.ChangeOrderStatus)
+		OrderList.POST("/details/return/request", controllers.ApproveReturn)
+	}
+
+	coupon := r.Group("/admin/coupon")
+	coupon.Use(middleware.AuthMiddleware(RoleAdmin))
+	coupon.Use(middleware.NoCacheMiddleware())
+	{
+		coupon.GET("/", controllers.ShowCoupon)
+		coupon.POST("/add", controllers.AddCoupon)
+		coupon.POST("/delete/:id",controllers.DeleteCoupon)
+		coupon.GET("/details/:id", controllers.CouponDetails)
+		coupon.POST("/details/edit/:id", controllers.UpdateCoupon)
 	}
 }

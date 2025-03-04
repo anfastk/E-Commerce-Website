@@ -106,6 +106,11 @@ func TrackingPage(c *gin.Context) {
 			isAllOrderCancel = true
 		}
 	}
+	isAlreadyRequested := true
+	var returnRequest models.ReturnRequest
+	if err := config.DB.First(&returnRequest, "order_item_id = ? AND product_variant_id = ? AND user_id = ?", orderItem.ID, orderItem.ProductVariantID, userID).Error; err != nil {
+		isAlreadyRequested = false
+	}
 
 	c.HTML(http.StatusOK, "trackOrder.html", gin.H{
 		"status":                  "success",
@@ -119,6 +124,7 @@ func TrackingPage(c *gin.Context) {
 		"ProductDiscount":         productDiscount,
 		"TotalDiscount":           totalDiscount,
 		"isAllOrderCancel":        isAllOrderCancel,
+		"isAlreadyRequested":      isAlreadyRequested,
 		"IsCancelSpecificOrder":   IsCancelSpecificOrder,
 		"OrderDate":               orderItem.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
 		"ExpectedDeliveryDate":    orderItem.ExpectedDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
@@ -455,7 +461,7 @@ func CancelSpecificOrder(c *gin.Context) {
 			return
 		}
 
-		if (total - productTotal) < couponDetails.MinOrderPrice {
+		if (total - productTotal) < couponDetails.MinOrdervalue {
 			refundAmount = orderItems.Total - order.CouponDiscountAmount
 			if refundAmount < 0 {
 				tx.Rollback()
@@ -781,7 +787,7 @@ func ReturnOrder(c *gin.Context) {
 	}
 	reqstId := "RTN-" + uuid.New().String()
 	returnRequest := models.ReturnRequest{
-		RequestUID:         reqstId,
+		RequestUID:        reqstId,
 		OrderItemID:       uint(ordId),
 		ProductVariantID:  uint(prdtId),
 		UserID:            userID,

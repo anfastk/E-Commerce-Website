@@ -273,7 +273,6 @@ func ChangeOrderStatus(c *gin.Context) {
 }
 
 func ApproveReturn(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
 	var input struct {
 		ReturnRequestID string `json:"requestUID"`
 		OrderID         string `json:"orderId"`
@@ -286,7 +285,7 @@ func ApproveReturn(c *gin.Context) {
 		return
 	}
 	tx := config.DB.Begin()
-	ordid, err := strconv.ParseUint(input.OrderID, 10, 32) // 10 → Base 10, 32 → uint32 range
+	ordid, err := strconv.ParseUint(input.OrderID, 10, 32) 
 	if err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Something Went Wrong", "Something Went Wrong", "")
@@ -294,7 +293,7 @@ func ApproveReturn(c *gin.Context) {
 	}
 
 	var returnRequest models.ReturnRequest
-	if err := tx.First(&returnRequest, "order_item_id = ? AND request_uid = ? AND user_id = ?", ordid, input.ReturnRequestID, userID).Error; err != nil {
+	if err := tx.First(&returnRequest, "order_item_id = ? AND request_uid = ?", ordid, input.ReturnRequestID).Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Return request not found", "Something Went Wrong", "")
 		return
@@ -307,14 +306,14 @@ func ApproveReturn(c *gin.Context) {
 
 	if input.Status == "Approved" {
 		var orderItems models.OrderItem
-		if err := tx.First(&orderItems, "id = ? AND user_id = ?", ordid, userID).Error; err != nil {
+		if err := tx.First(&orderItems, "id = ? AND user_id = ?", ordid, returnRequest.UserID).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusNotFound, "Order Items Not Found", "Something Went Wrong", "")
 			return
 		}
 
 		var order models.Order
-		if err := tx.First(&order, "user_id = ? AND id = ?", userID, orderItems.OrderID).Error; err != nil {
+		if err := tx.First(&order, "user_id = ? AND id = ?", returnRequest.UserID, orderItems.OrderID).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "")
 			return
@@ -333,7 +332,7 @@ func ApproveReturn(c *gin.Context) {
 				return
 			}
 
-			if (total - productTotal) < couponDetails.MinOrderPrice {
+			if (total - productTotal) < couponDetails.MinOrdervalue {
 				refundAmount = orderItems.Total - order.CouponDiscountAmount
 				if refundAmount < 0 {
 					tx.Rollback()
@@ -366,14 +365,14 @@ func ApproveReturn(c *gin.Context) {
 		}
 
 		var payment models.PaymentDetail
-		if err := tx.First(&payment, "order_item_id = ? AND user_id = ?", orderItems.ID, userID).Error; err != nil {
+		if err := tx.First(&payment, "order_item_id = ? AND user_id = ?", orderItems.ID, returnRequest.UserID).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusNotFound, "Payment Details Not Found", "Something Went Wrong", "")
 			return
 		}
 		if payment.PaymentStatus == "Completed" {
 			var wallet models.Wallet
-			if err := tx.First(&wallet, "user_id = ?", userID).Error; err != nil {
+			if err := tx.First(&wallet, "user_id = ?", returnRequest.UserID).Error; err != nil {
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 				return
@@ -388,7 +387,7 @@ func ApproveReturn(c *gin.Context) {
 			transactionID := "TXN_" + uuid.New().String()
 
 			walletTransaction := models.WalletTransaction{
-				UserID:        userID,
+				UserID:        returnRequest.UserID,
 				WalletID:      wallet.ID,
 				Amount:        refundAmount,
 				Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
@@ -403,7 +402,7 @@ func ApproveReturn(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
 				return
 			}
-			if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", userID, orderItems.ID).
+			if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", returnRequest.UserID, orderItems.ID).
 				Update("payment_status", "Refunded").Error; err != nil {
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusInternalServerError, "Payment Status Update Failed", "Payment Status Update Failed", "/checkout")
@@ -417,7 +416,7 @@ func ApproveReturn(c *gin.Context) {
 		}
 
 		if IscouponRemoved {
-			if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
+			if err := tx.Model(&order).Where("user_id = ? AND id = ?", returnRequest.UserID, order.ID).
 				Updates(map[string]interface{}{
 					"coupon_code":            gorm.Expr("NULL"),
 					"coupon_id":              gorm.Expr("NULL"),
@@ -430,7 +429,7 @@ func ApproveReturn(c *gin.Context) {
 				return
 			}
 		} else {
-			if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
+			if err := tx.Model(&order).Where("user_id = ? AND id = ?", returnRequest.UserID, order.ID).
 				Updates(map[string]interface{}{
 					"shipping_charge":        shipCharge,
 					"coupon_discount_amount": gorm.Expr("NULL"),
@@ -441,7 +440,7 @@ func ApproveReturn(c *gin.Context) {
 			}
 		}
 
-		if err := tx.Model(&orderItems).Where("user_id = ? AND order_id = ?", userID, order.ID).
+		if err := tx.Model(&orderItems).Where("user_id = ? AND order_id = ?", returnRequest.UserID, order.ID).
 			Updates(map[string]interface{}{
 				"order_status":           "Returned",
 				"reason":                 returnRequest.Reason,
