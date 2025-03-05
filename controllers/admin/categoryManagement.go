@@ -12,14 +12,47 @@ import (
 )
 
 func ListCategory(c *gin.Context) {
-	var categories []models.Categories
+	type categoryResponce struct {
+		ID           uint
+		Name         string
+		Description  string
+		Status       string
+		ProductCount int
+	}
 
-	if err := config.DB.Order("id ASC").Find(&categories).Error; err != nil {
+	var categories []models.Categories
+	if err := config.DB.Find(&categories).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
 		return
 	}
+	var (
+		activeCount       int
+		totalProductCount int
+	)
+	var responce []categoryResponce
+	for _, category := range categories {
+		var products []models.ProductVariantDetails
+		config.DB.Find(&products, "category_id = ?", category.ID)
+		count := len(products)
+		row := categoryResponce{
+			ID:           category.ID,
+			Name:         category.Name,
+			Description:  category.Description,
+			Status:       category.Status,
+			ProductCount: count,
+		}
+		totalProductCount += count
+		responce = append(responce, row)
+		if category.Status == "Active" {
+			activeCount++
+		}
+	}
+	categoryCount := len(categories)
 	c.HTML(http.StatusOK, "categoryManagement.html", gin.H{
-		"categories": categories,
+		"categories":          responce,
+		"CategoryCount":       categoryCount,
+		"ActiveCategoryCount": activeCount,
+		"TotalProductCount":   totalProductCount,
 	})
 }
 
@@ -159,5 +192,37 @@ func DeleteCategory(c *gin.Context) {
 		"status":  "OK",
 		"message": message,
 		"code":    http.StatusOK,
+	})
+}
+
+func ShowCategoryDetails(c *gin.Context) {
+	categoryID := c.Param("id")
+
+	var category models.Categories
+	if err := config.DB.First(&category, categoryID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Categoey not found", "Something Weint Wrong", "")
+		return
+	}
+
+	var product []models.ProductVariantDetails
+	config.DB.Preload("VariantsImages").Find(&product, "category_id = ?", categoryID)
+
+	isOfferNotAvailable := false
+	var offer models.OfferByCategory
+	if err := config.DB.First(&offer, "category_id = ? AND offer_status = ?", categoryID, "Active").Error; err != nil {
+		isOfferNotAvailable = true
+	}
+
+	c.HTML(http.StatusOK, "categoryDetails.html", gin.H{
+		"Category":            category,
+		"Products":            product,
+		"IsOfferNotAvailable": isOfferNotAvailable,
+		"OfferName":           offer.CategoryOfferName,
+		"OfferPercentage":     offer.CategoryOfferPercentage,
+		"OfferDescription":    offer.OfferDescription,
+		"OfferId":             offer.ID,
+		"OfferStatus":         offer.OfferStatus,
+		"OfferStartDate":      offer.StartDate.Format("2006-01-02"),
+		"OfferEndDate":        offer.EndDate.Format("2006-01-02"),
 	})
 }

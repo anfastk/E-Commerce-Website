@@ -6,8 +6,8 @@ import (
 
 type ProductDetail struct {
 	gorm.Model
-	ProductName    string `gorm:"size:255" json:"productname"`
-	CategoryID     uint
+	ProductName    string                  `gorm:"size:255" json:"productname"`
+	CategoryID     uint                    `gorm:"not null"`
 	BrandName      string                  `gorm:"size:100" json:"brand"`
 	IsCODAvailable bool                    `gorm:"default:true"`
 	IsReturnable   bool                    `gorm:"default:true"`

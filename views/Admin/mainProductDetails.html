@@ -325,10 +325,6 @@
                         <p><span class="font-semibold">Offer Name:</span> {{ .Product.OfferName }}</p>
                         <p><span class="font-semibold">Offer Details:</span> {{ .Product.OfferDetails }}</p>
                         <p><span class="font-semibold">Offer Start Date:</span> {{ .Product.OfferStartDate }}</p>
-                        {{ if .Product.OfferAmount }}
-                        <p><span class="font-semibold">Offer Amount:</span> ₹{{ .Product.OfferAmount }}</p>
-                        {{else}}
-                        {{end}}
                         {{ if .Product.OfferPercentage }}
                         <p><span class="font-semibold">Offer Percentage:</span> {{ .Product.OfferPercentage }}%</p>
                         {{else}}
@@ -386,13 +382,6 @@
                                             required>
                                     </div>
                                     <div class="mb-4">
-                                        <label for="addAmount" class="block text-sm font-medium text-gray-700">Offer
-                                            Amount</label>
-                                        <input type="number" id="addAmount" name="offer_amount"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            required>
-                                    </div>
-                                    <div class="mb-4">
                                         <label for="addPercentage" class="block text-sm font-medium text-gray-700">Offer
                                             Percentage</label>
                                         <input type="number" id="addPercentage" name="offer_percentage"
@@ -440,13 +429,6 @@
                                         <label for="updateEndDate" class="block text-sm font-medium text-gray-700">End
                                             Date</label>
                                         <input type="date" id="updateEndDate"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updateAmount" class="block text-sm font-medium text-gray-700">Offer
-                                            Amount</label>
-                                        <input type="number" id="updateAmount"
                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                             required>
                                     </div>

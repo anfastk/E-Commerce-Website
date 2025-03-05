@@ -72,7 +72,6 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		OfferStartDate:  offer.StartDate.Format("02-01-2006"),
 		OfferEndDate:    offer.EndDate.Format("02-01-2006"),
 		OfferPercentage: offer.OfferPercentage,
-		OfferAmount:     offer.OfferAmount,
 		IsDeleted:       product.IsDeleted,
 	}, nil
 }
