@@ -14,7 +14,6 @@ type ProductOffer struct {
 	StartDate       time.Time     `gorm:"not null"`
 	EndDate         time.Time     `gorm:"not null"`
 	ProductID       uint          `gorm:"unique;not null" json:"productid"`
-	IsValid         bool          `gorm:"default:true"`
-	IsDeleted       bool          `gorm:"default:false"`
+	Status          string        `gorm:"not null"`
 	Product         ProductDetail `gorm:"foreignKey:ProductID"`
 }

@@ -16,6 +16,7 @@ type MainProductDetails struct {
 	CategoryName    string
 	Descriptions    []models.ProductDescription
 	Images          []models.ProductImage
+	OfferID         uint
 	OfferName       string
 	OfferDetails    string
 	OfferStartDate  string
@@ -54,7 +55,7 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		return MainProductDetails{}, errors.New("images not found")
 	}
 
-	if err := tx.Where("product_id = ? AND is_valid = true", productID).First(&offer).Error; err != nil {
+	if err := tx.Where("product_id = ?", productID).First(&offer).Error; err != nil {
 		offer = models.ProductOffer{}
 	}
 	tx.Commit()
@@ -67,6 +68,7 @@ func ShowMainProductsDetails(productID uint) (MainProductDetails, error) {
 		CategoryName:    category.Name,
 		Descriptions:    descriptions,
 		Images:          images,
+		OfferID:         offer.ID,
 		OfferName:       offer.OfferName,
 		OfferDetails:    offer.OfferDetails,
 		OfferStartDate:  offer.StartDate.Format("02-01-2006"),

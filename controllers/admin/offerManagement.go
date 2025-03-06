@@ -41,6 +41,32 @@ func AddProductOffer(c *gin.Context) {
 		return
 	}
 
+	var existingOffers models.ProductOffer
+	if err := config.DB.First(&existingOffers, "product_id = ?", productID).Error; err == nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Can't Add Offer", "Can't Add Offer.If You Want TO Add Offer Delete Existing Offer", "")
+		return
+	}
+
+	if time.Now().After(startDates) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+		return
+	}
+
+	if time.Now().After(endDates) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid End Date", "End date must be in the future", "")
+		return
+	}
+
+	if startDates.After(endDates) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
+		return
+	}
+
+	status := "Active"
+	if startDates.After(time.Now()) {
+		status = "Scheduled"
+	}
+
 	productOffer := models.ProductOffer{
 		OfferName:       offerName,
 		OfferDetails:    offerDetails,
@@ -48,6 +74,7 @@ func AddProductOffer(c *gin.Context) {
 		EndDate:         endDates,
 		OfferPercentage: percentageValue,
 		ProductID:       uint(productID),
+		Status:          status,
 	}
 
 	if err := config.DB.Create(&productOffer).Error; err != nil {
@@ -55,8 +82,137 @@ func AddProductOffer(c *gin.Context) {
 		return
 	}
 
-	redirectURL := "/admin/products/main/details?product_id=" + strconv.Itoa(productID)
-	c.Redirect(http.StatusFound, redirectURL)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Offer Added Successfully",
+		"code":    http.StatusOK,
+	})
+}
+
+func UpdateProductOffer(c *gin.Context) {
+	var editOfferInput struct {
+		Id              string `json:"offerId"`
+		ProductId       string `json:"productId"`
+		OfferName       string `json:"offerName"`
+		OfferDetails    string `json:"offerDetails"`
+		OfferPercentage string `json:"percentage"`
+		StartDate       string `json:"startDate"`
+		EndDate         string `json:"endDate"`
+	}
+
+	if err := c.ShouldBindJSON(&editOfferInput); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Enter Details Correctly", "")
+		return
+	}
+
+	offerId, err := strconv.Atoi(editOfferInput.Id)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Offer ID", "Offer ID must be a number", "")
+		return
+	}
+
+	productId, err := strconv.Atoi(editOfferInput.ProductId)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Offer ID", "Offer ID must be a number", "")
+		return
+	}
+
+	offerPercentage, err := strconv.ParseFloat(editOfferInput.OfferPercentage, 64)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Offer Value", "Offer Value must be a valid number", "")
+		return
+	}
+
+	layout := "2006-01-02"
+	startDate, err := time.Parse(layout, editOfferInput.StartDate)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Start Date", "Enter a valid start date", "")
+		return
+	}
+
+	endDate, err := time.Parse(layout, editOfferInput.EndDate)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid End Date", "Enter a valid end date", "")
+		return
+	}
+
+	var offer models.ProductOffer
+	if err := config.DB.First(&offer, offerId).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Offer Not Found", "Offer Not Found", "")
+		return
+	}
+
+	if time.Now().After(startDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+		return
+	}
+
+	if time.Now().After(endDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid End Date", "End date must be in the future", "")
+		return
+	}
+
+	if startDate.After(endDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
+		return
+	}
+
+	offer.OfferName = editOfferInput.OfferName
+	offer.OfferDetails = editOfferInput.OfferDetails
+	offer.OfferPercentage = offerPercentage
+	offer.StartDate = startDate
+	offer.EndDate = endDate
+	offer.ProductID = uint(productId)
+	if startDate.After(time.Now()) {
+		offer.Status = "Scheduled"
+	} else {
+		offer.Status = "Active"
+	}
+
+	if err := config.DB.Save(&offer).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update offer", "Something Went Wrong", "")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Offer Updated Successfully",
+		"code":    http.StatusOK,
+	})
+}
+
+func DeleteProductOffer(c *gin.Context) {
+	var deleteOfferInput struct {
+		Id string `json:"productId"`
+	}
+
+	if err := c.ShouldBindJSON(&deleteOfferInput); err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Something Went Wrong", "")
+		return
+	}
+
+	offerId, err := strconv.Atoi(deleteOfferInput.Id)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Offer ID", "Offer ID must be a number", "")
+		return
+	}
+
+	var Offer models.ProductOffer
+	if err := config.DB.First(&Offer, offerId).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Offer not found", "Offer not found", "")
+		return
+	}
+
+	if err := config.DB.Unscoped().Delete(&Offer).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed To Delete Offer", "Delete Offer Failed", "")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Offer deleted successfully",
+		"code":    200,
+	})
 }
 
 func AddCategoryOffer(c *gin.Context) {
@@ -204,9 +360,13 @@ func UpdateCategoryOffer(c *gin.Context) {
 	offer.CategoryOfferName = editOfferInput.OfferName
 	offer.CategoryOfferPercentage = offerValue
 	offer.OfferDescription = editOfferInput.OfferDescription
-	offer.OfferStatus = "Active"
 	offer.StartDate = startDate
 	offer.EndDate = endDate
+	if startDate.After(time.Now()) {
+		offer.OfferStatus = "Scheduled"
+	} else {
+		offer.OfferStatus = "Active"
+	}
 
 	if err := config.DB.Save(&offer).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update offer", "Something Went Wrong", "")
@@ -221,7 +381,7 @@ func UpdateCategoryOffer(c *gin.Context) {
 }
 
 func DeleteCategoryOffer(c *gin.Context) {
-	var DeleteOfferInput struct{
+	var DeleteOfferInput struct {
 		OfferId string `json:"offerId"`
 	}
 

@@ -1,239 +1,3 @@
-const addOfferBtn = document.getElementById("addOfferBtn");
-const offerModal = document.getElementById("offerModal");
-const closeAddOfferModal = document.getElementById("closeAddOfferModal");
-
-if (addOfferBtn) {
-    addOfferBtn.addEventListener("click", () => {
-        offerModal.classList.remove("hidden");
-    });
-}
-
-if (closeAddOfferModal) {
-    closeAddOfferModal.addEventListener("click", () => {
-        offerModal.classList.add("hidden");
-    });
-}
-
-// Update/Delete Offer Modal
-const updateModal = document.getElementById("updateModal");
-const closeUpdateModal = document.getElementById("closeUpdateModal");
-const deleteOfferBtn = document.getElementById("deleteOfferBtn");
-const updateOfferBtn = document.getElementById("updateOfferBtn");
-
-updateOfferBtn.addEventListener("click", () => {
-    updateModal.classList.remove("hidden"); // Show the modal by removing the 'hidden' class
-});
-
-closeUpdateModal.addEventListener("click", () => {
-    updateModal.classList.add("hidden");
-});
-
-deleteOfferBtn.addEventListener("click", () => {
-    const confirmation = confirm("Are you sure you want to delete this offer?");
-
-});
-
-// Open/Close Description Modal
-const openModal = document.getElementById("openModal");
-const closeDescriptionModal = document.getElementById("closeModal"); // Close modal element
-const modal = document.getElementById("descriptionModal");
-
-openModal.onclick = () => {
-    modal.classList.remove("hidden");
-};
-
-closeDescriptionModal.onclick = () => {
-    modal.classList.add("hidden");
-};
-
-// Get the form element
-const descriptionForm = document.getElementById("descriptionForm");
-
-// Add submit event listener to the form
-descriptionForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    try {
-        const formData = new FormData(descriptionForm);
-
-        const response = await fetch("/admin/products/main/submit-description", {
-            method: "POST",
-            body: formData
-        });
-
-        if (response.ok) {
-            window.toast.success("Description added successfully!");
-            setTimeout(() => {
-                window.location.reload();
-            }, 500); modal.classList.add("hidden"); // Close modal on success
-            descriptionForm.reset(); // Reset form
-
-            // Reset the form to just one pair of inputs
-            keyValuePairs.innerHTML = `
-                <div class="flex mb-4 space-x-4">
-                    <input type="text" name="heading[]" placeholder="Enter heading"
-                        class="p-2 border border-gray-300 rounded w-1/3" required>
-                    <textarea name="description[]" placeholder="Enter description"
-                        class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
-                </div>
-            `;
-        } else {
-            window.toast.error("Failed to add description. Please try again.");
-        }
-    } catch (error) {
-        console.error("Error submitting form:", error);
-        window.toast.error("An error occurred. Please try again.");
-    }
-});
-
-// Add a new pair (heading and description)
-const addPairButton = document.getElementById("addPair");
-const keyValuePairs = document.getElementById("keyValuePairs");
-
-addPairButton.onclick = () => {
-    const newPair = document.createElement('div');
-    newPair.classList.add('flex', 'mb-4', 'space-x-4');
-    newPair.innerHTML = `
-        <input type="text" name="heading[]" placeholder="Enter heading" class="p-2 border border-gray-300 rounded w-1/3" required>
-        <textarea name="description[]" placeholder="Enter description" class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
-    `;
-    keyValuePairs.appendChild(newPair);
-    window.toast.success("New description field added");
-};
-
-// Optional: Add error handling for required fields
-descriptionForm.querySelectorAll('input, textarea').forEach(field => {
-    field.addEventListener('invalid', () => {
-        window.toast.error("Please fill in all required fields");
-    });
-});
-
-
-const optionsBtn = document.getElementById("options-btn");
-const optionsMenu = document.getElementById("options");
-
-if (optionsBtn && optionsMenu) {
-    optionsBtn.addEventListener("click", function (event) {
-        event.stopPropagation();
-        optionsMenu.classList.toggle("hidden");
-    });
-
-    window.addEventListener("click", function (event) {
-        if (!event.target.closest(".group")) {
-            optionsMenu.classList.add("hidden");
-        }
-    });
-}
-
-window.addEventListener("click", function (event) {
-    if (!event.target.closest(".group")) {
-        optionsMenu.classList.add("hidden");
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const openPopupBtn = document.getElementById('openUpdatePopup');
-    const closePopupBtn = document.getElementById('closeUpdatePopup');
-    const popupModal = document.getElementById('updatePopupModal');
-    const updateDescriptionsForm = document.getElementById('updateDescriptionsForm');
-
-    // Open popup
-    openPopupBtn.addEventListener('click', () => {
-        popupModal.classList.remove('hidden');
-    });
-
-    // Close popup
-    closePopupBtn.addEventListener('click', () => {
-        popupModal.classList.add('hidden');
-    });
-
-    // Close popup if clicking outside the modal
-    popupModal.addEventListener('click', (event) => {
-        if (event.target === popupModal) {
-            popupModal.classList.add('hidden');
-        }
-    });
-
-    // Form submission handling
-    updateDescriptionsForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        try {
-            // Create FormData object
-            const formData = new FormData(updateDescriptionsForm);
-
-            // Convert FormData to an object
-            const data = {
-                description_id: formData.getAll('description_id[]'),
-                heading: formData.getAll('heading[]'),
-                description: formData.getAll('description[]')
-            };
-
-            const response = await fetch(updateDescriptionsForm.action, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-
-            const responseData = await response.json();
-
-            if (response.ok) {
-                window.toast.success('Descriptions updated successfully');
-                popupModal.classList.add('hidden');
-                // Reload page after a short delay to allow toast to be seen
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                // Show error message from server or fallback
-                window.toast.error(responseData.error || 'Failed to update descriptions');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            window.toast.error('An error occurred while updating descriptions');
-        }
-    });
-});
-
-function deleteDescription(descriptionId, productId) {
-    // Split the IDs if they're passed as a comma-separated string
-    const ids = descriptionId.split(',');
-    const descId = ids[0];
-    const prodId = ids[1] || productId;
-
-    fetch(`/admin/products/variant/description/delete/${descId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to delete description');
-            }
-            return response.json();
-        })
-        .then(() => {
-            window.toast.success('Description deleted successfully');
-            // Remove the description item from the DOM
-            const descriptionItem = document.querySelector(`.Descriptions-item[data-desc-id="${descId}"]`);
-            if (descriptionItem) {
-                descriptionItem.remove();
-            }
-            // Redirect after a short delay to allow toast to be seen
-            setTimeout(() => {
-                window.location.href = `/admin/products/main/details?product_id=${prodId}`;
-            }, 1000);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            window.toast.error('Failed to delete description');
-        });
-}
-
-
 let cropper = null;
 let currentImageElement = null;
 let currentFile = null;
@@ -426,3 +190,263 @@ function saveCrop() {
 
 // Initialize drag and drop on page load
 document.addEventListener('DOMContentLoaded', enableDragAndDrop);
+
+const addOfferBtn = document.getElementById("addOfferBtn");
+const offerModal = document.getElementById("offerModal");
+const closeAddOfferModal = document.getElementById("closeAddOfferModal");
+
+if (addOfferBtn) {
+    addOfferBtn.addEventListener("click", () => {
+        offerModal.classList.remove("hidden");
+    });
+}
+
+if (closeAddOfferModal) {
+    closeAddOfferModal.addEventListener("click", () => {
+        offerModal.classList.add("hidden");
+    });
+}
+
+// Open/Close Description Modal
+const openModal = document.getElementById("openModal");
+const closeDescriptionModal = document.getElementById("closeModal"); // Close modal element
+const modal = document.getElementById("descriptionModal");
+
+openModal.onclick = () => {
+    modal.classList.remove("hidden");
+};
+
+closeDescriptionModal.onclick = () => {
+    modal.classList.add("hidden");
+};
+
+// Get the form element
+const descriptionForm = document.getElementById("descriptionForm");
+
+// Add submit event listener to the form
+descriptionForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+        const formData = new FormData(descriptionForm);
+
+        const response = await fetch("/admin/products/main/submit-description", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.ok) {
+            window.toast.success("Description added successfully!");
+            setTimeout(() => {
+                window.location.reload();
+            }, 500); modal.classList.add("hidden"); // Close modal on success
+            descriptionForm.reset(); // Reset form
+
+            // Reset the form to just one pair of inputs
+            keyValuePairs.innerHTML = `
+                <div class="flex mb-4 space-x-4">
+                    <input type="text" name="heading[]" placeholder="Enter heading"
+                        class="p-2 border border-gray-300 rounded w-1/3" required>
+                    <textarea name="description[]" placeholder="Enter description"
+                        class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
+                </div>
+            `;
+        } else {
+            window.toast.error("Failed to add description. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error submitting form:", error);
+        window.toast.error("An error occurred. Please try again.");
+    }
+});
+
+// Add a new pair (heading and description)
+const addPairButton = document.getElementById("addPair");
+const keyValuePairs = document.getElementById("keyValuePairs");
+
+addPairButton.onclick = () => {
+    const newPair = document.createElement('div');
+    newPair.classList.add('flex', 'mb-4', 'space-x-4');
+    newPair.innerHTML = `
+        <input type="text" name="heading[]" placeholder="Enter heading" class="p-2 border border-gray-300 rounded w-1/3" required>
+        <textarea name="description[]" placeholder="Enter description" class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
+    `;
+    keyValuePairs.appendChild(newPair);
+    window.toast.success("New description field added");
+};
+
+// Optional: Add error handling for required fields
+descriptionForm.querySelectorAll('input, textarea').forEach(field => {
+    field.addEventListener('invalid', () => {
+        window.toast.error("Please fill in all required fields");
+    });
+});
+
+function deleteDescription(descriptionId, productId) {
+    // Split the IDs if they're passed as a comma-separated string
+    const ids = descriptionId.split(',');
+    const descId = ids[0];
+    const prodId = ids[1] || productId;
+
+    fetch(`/admin/products/variant/description/delete/${descId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete description');
+            }
+            return response.json();
+        })
+        .then(() => {
+            window.toast.success('Description deleted successfully');
+            // Remove the description item from the DOM
+            const descriptionItem = document.querySelector(`.Descriptions-item[data-desc-id="${descId}"]`);
+            if (descriptionItem) {
+                descriptionItem.remove();
+            }
+            // Redirect after a short delay to allow toast to be seen
+            setTimeout(() => {
+                window.location.href = `/admin/products/main/details?product_id=${prodId}`;
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.toast.error('Failed to delete description');
+        });
+}
+
+
+// Update/Delete Offer Modal
+const updateModal = document.getElementById("updateModal");
+const closeUpdateModal = document.getElementById("closeUpdateModal");
+const updateOfferForm = document.getElementById("updateOfferForm");
+const updateOfferBtn = document.getElementById("updateOfferBtn");
+const deleteOfferBtn = document.getElementById("deleteOfferBtn");
+
+// Function to show the modal
+function openUpdateModal() {
+    updateModal.classList.remove("hidden");
+}
+
+// Function to close the modal
+function closeModal() {
+    updateModal.classList.add("hidden");
+}
+
+// Event listener for opening the modal
+if (updateOfferBtn) {
+    updateOfferBtn.addEventListener("click", openUpdateModal);
+}
+
+// Event listener for closing the modal
+if (closeUpdateModal) {
+    closeUpdateModal.addEventListener("click", closeModal);
+}
+
+// Handle form submission
+if (updateOfferForm) {
+    updateOfferForm.addEventListener("submit", function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+
+        // Get form data
+        const formData = new FormData(updateOfferForm);
+
+        // Create an object from form data
+        const offerData = {
+            productId: document.getElementById("productId").value,
+            offerId: document.getElementById("offerId").value,
+            offerName: document.getElementById("updateOfferName").value,
+            offerDetails: document.getElementById("updateOfferDetails").value,
+            startDate: document.getElementById("updateStartDate").value,
+            endDate: document.getElementById("updateEndDate").value,
+            percentage: document.getElementById("updatePercentage").value
+        };
+
+        // Send data using fetch API with POST method
+        fetch('/admin/products/main/edit/offer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(offerData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                alert('Offer updated successfully!');
+                closeModal();
+
+                // Optionally refresh the page or update the UI
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error updating offer:', error);
+                alert('Failed to update offer. Please try again.');
+            });
+    });
+}
+
+ // Wait for the DOM to be fully loaded
+ document.addEventListener('DOMContentLoaded', function() {
+    // Select all delete buttons
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    
+    // Add click event listener to each delete button
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the parent form
+            const form = this.closest('.delete-product-form');
+            
+            // Get the product ID from the hidden input
+            const productId = form.querySelector('.product-id').value;
+            
+            // Confirm before proceeding
+            if (confirm(`Are you sure you want to delete product offer`)) {
+                // Option 1: Submit the form (traditional approach)
+                // form.submit();
+                
+                // Option 2: Use fetch API (modern approach)
+                fetch('/admin/products/main/delete/offer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Include CSRF token if your framework requires it
+                        // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        productId: productId
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    // Handle successful deletion
+                    
+                    console.log('Product deleted successfully');
+                    location.reload();
+                    // Remove the product element from the DOM
+                    const productElement = form.closest('.border-b');
+                    if (productElement) {
+                        productElement.remove();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting product:', error);
+                    alert('Failed to delete product. Please try again.');
+                });
+            }
+        });
+    });
+});

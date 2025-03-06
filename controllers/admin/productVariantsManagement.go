@@ -135,58 +135,6 @@ func AddProductVariants(c *gin.Context) {
 	})
 }
 
-func ShowMutiProductVariantDetails(c *gin.Context) {
-	productID, err := strconv.Atoi(c.Query("product_id"))
-	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid Input", "")
-		return
-	}
-	variantDetails, err := services.ShowMultipleProductVariants(uint(productID))
-	if err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details", "Database Error", "")
-		return
-	}
-
-	var formattedVariantDetails []map[string]interface{}
-
-	for _, variant := range variantDetails {
-		formattedVariant := map[string]interface{}{
-			"Id":              variant.Id,
-			"ProductId":       variant.ProductId,
-			"ProductName":     variant.ProductName,
-			"BrandName":       variant.BrandName,
-			"IsReturnable":    variant.IsReturnable,
-			"IsCodAvailable":  variant.IsCodAvailable,
-			"CategoryName":    variant.CategoryName,
-			"Descriptions":    variant.Descriptions,
-			"Images":          variant.Images,
-			"OfferName":       variant.OfferName,
-			"OfferDetails":    variant.OfferDetails,
-			"OfferStartDate":  variant.OfferStartDate,
-			"OfferEndDate":    variant.OfferEndDate,
-			"OfferPercentage": variant.OfferPercentage,
-			"OfferAmount":     variant.OfferAmount,
-			"Size":            variant.Size,
-			"Colour":          variant.Colour,
-			"Ram":             variant.Ram,
-			"Storage":         variant.Storage,
-			"StockQuantity":   variant.StockQuantity,
-			"RegularPrice":    fmt.Sprintf("%.2f", variant.RegularPrice),
-			"SalePrice":       fmt.Sprintf("%.2f", variant.SalePrice),
-			"SKU":             variant.SKU,
-			"ProductSummary":  variant.ProductSummary,
-			"Specification":   variant.Specification,
-			"IsDeleted":       variant.IsDeleted,
-		}
-
-		formattedVariantDetails = append(formattedVariantDetails, formattedVariant)
-	}
-
-	c.HTML(http.StatusSeeOther, "productAllVariantsDetails.html", gin.H{
-		"Product": formattedVariantDetails,
-	})
-}
-
 func ShowSingleProductVariantDetail(c *gin.Context) {
 	variantID, idErr := strconv.Atoi(c.Query("variant_id"))
 	if idErr != nil {

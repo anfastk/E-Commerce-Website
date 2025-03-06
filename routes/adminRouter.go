@@ -28,9 +28,10 @@ func AdminRoutes(r *gin.Engine) {
 		product.GET("/main/details", controllers.ShowMainProductDetails)
 		product.POST("/main/submit-description", controllers.AddProductDescription)
 		product.POST("/main/submit-offer", controllers.AddProductOffer)
+		product.POST("/main/edit/offer", controllers.UpdateProductOffer)
+		product.POST("/main/delete/offer", controllers.DeleteProductOffer)
 		product.GET("/variants/add/:id", controllers.ShowProductVariant)
 		product.POST("/variants/add", controllers.AddProductVariants)
-		product.GET("/variant/details", controllers.ShowMutiProductVariantDetails)
 		product.GET("/variant/detail", controllers.ShowSingleProductVariantDetail)
 		product.POST("/variant/submit-specification", controllers.AddProductSpecification)
 		product.POST("/variant/delete/:id", controllers.DeleteProductVariant)
@@ -43,9 +44,7 @@ func AdminRoutes(r *gin.Engine) {
 		product.POST("/main/details/delete/:id", controllers.DeleteMainProduct)
 		product.DELETE("/variant/specification/delete/:id", controllers.DeleteSpecification)
 		product.DELETE("/variant/description/delete/:id", controllers.DeleteDescription)
-		product.PATCH("/variant/update/description/:id", controllers.UpdateProductDescription)
 		product.PATCH("/variant/update/specification/:id", controllers.UpdateProductSpecification)
-
 	}
 	// Admin User Managemant
 	adminUser := r.Group("/admin/users")
@@ -67,7 +66,7 @@ func AdminRoutes(r *gin.Engine) {
 		category.POST("/:id/delete", controllers.DeleteCategory)
 		category.GET("/details/:id", controllers.ShowCategoryDetails)
 		category.POST("/add/offer", controllers.AddCategoryOffer)
-		category.PATCH("/offer/edit",controllers.UpdateCategoryOffer)
+		category.PATCH("/offer/edit", controllers.UpdateCategoryOffer)
 		category.POST("/delete/offer", controllers.DeleteCategoryOffer)
 	}
 	OrderList := r.Group("/admin/orderlist")
@@ -86,7 +85,7 @@ func AdminRoutes(r *gin.Engine) {
 	{
 		coupon.GET("/", controllers.ShowCoupon)
 		coupon.POST("/add", controllers.AddCoupon)
-		coupon.POST("/delete/:id",controllers.DeleteCoupon)
+		coupon.POST("/delete/:id", controllers.DeleteCoupon)
 		coupon.GET("/details/:id", controllers.CouponDetails)
 		coupon.POST("/details/edit/:id", controllers.UpdateCoupon)
 	}

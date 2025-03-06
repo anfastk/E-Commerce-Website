@@ -18,9 +18,9 @@
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
     <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
         <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
-          <span id="toast-message"></span>
+            <span id="toast-message"></span>
         </div>
-      </div>
+    </div>
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -84,7 +84,8 @@
                         <path fill="currentColor"
                             d="M14.8 8L16 9.2L9.2 16L8 14.8zM4 4h16c1.11 0 2 .89 2 2v4a2 2 0 1 0 0 4v4c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4c1.11 0 2-.89 2-2a2 2 0 0 0-2-2V6a2 2 0 0 1 2-2m0 2v2.54a3.994 3.994 0 0 1 0 6.92V18h16v-2.54a3.994 3.994 0 0 1 0-6.92V6zm5.5 2c.83 0 1.5.67 1.5 1.5S10.33 11 9.5 11S8 10.33 8 9.5S8.67 8 9.5 8m5 5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
                     </svg>
-<a href="/admin/coupon" class="text-base font-medium text-white">Coupon Management</a>                </li>
+                    <a href="/admin/coupon" class="text-base font-medium text-white">Coupon Management</a>
+                </li>
                 <li class="py-3 px-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
                         <path fill="currentColor"
@@ -127,110 +128,39 @@
         </header>
 
         <!-- Breadcrumbs -->
-        <div class="mt-2 text-gray-500 mx-5 text-xs"><a href="/admin/products">All Products</a> &gt; <a href="">Main Product Details</a></div>
-
+        <!--<div class="mt-2 text-gray-500 mx-5 text-xs"><a href="/admin/products">All Products</a> &gt; <a href="">Main Product Details</a></div> -->
         <!-- Content -->
-        <main class="mx-5 flex-1 font-roboto-medium">
-            <div class="flex flex-col sm:flex-row justify-between items-center mt-5 pb-4 mb-5">
-                <h2 class="text-2xl font-bold">Product Details</h2>
-                <div class="space-x-2 mt-3 sm:mt-0 z-0">
-                    <button style="background-color: #FF0000;"
-                        class="text-white py-2 px-5 rounded inline-flex items-center drop-shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 15 15">
-                            <path fill="#fff"
-                                d="M2.5 6.5V6H2v.5zm4 0V6H6v.5zm0 4H6v.5h.5zm7-7h.5v-.207l-.146-.147zm-3-3l.354-.354L10.707 0H10.5zM2.5 7h1V6h-1zm.5 4V8.5H2V11zm0-2.5v-2H2v2zm.5-.5h-1v1h1zm.5-.5a.5.5 0 0 1-.5.5v1A1.5 1.5 0 0 0 5 7.5zM3.5 7a.5.5 0 0 1 .5.5h1A1.5 1.5 0 0 0 3.5 6zM6 6.5v4h1v-4zm.5 4.5h1v-1h-1zM9 9.5v-2H8v2zM7.5 6h-1v1h1zM9 7.5A1.5 1.5 0 0 0 7.5 6v1a.5.5 0 0 1 .5.5zM7.5 11A1.5 1.5 0 0 0 9 9.5H8a.5.5 0 0 1-.5.5zM10 6v5h1V6zm.5 1H13V6h-2.5zm0 2H12V8h-1.5zM2 5V1.5H1V5zm11-1.5V5h1V3.5zM2.5 1h8V0h-8zm7.646-.146l3 3l.708-.708l-3-3zM2 1.5a.5.5 0 0 1 .5-.5V0A1.5 1.5 0 0 0 1 1.5zM1 12v1.5h1V12zm1.5 3h10v-1h-10zM14 13.5V12h-1v1.5zM12.5 15a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zM1 13.5A1.5 1.5 0 0 0 2.5 15v-1a.5.5 0 0 1-.5-.5z" />
-                        </svg>
-                        <span class="mx-2 font-bold">PDF</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="#fff"
-                                d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
-                        </svg>
-                    </button>
-                    <button style="background-color: #06B806;"
-                        class=" text-white py-2 px-4 rounded inline-flex items-center drop-shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
-                            <path fill="#fff"
-                                d="M6 3v26h20V9.594l-.28-.313l-6-6l-.314-.28H6zm2 2h10v6h6v16H8zm12 1.438L22.563 9H20zM11 13v2h10v-2zm0 4v2h10v-2zm0 4v2h10v-2z" />
-                        </svg>
-                        <span class="mx-2 font-bold">EXCEL</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="#fff"
-                                d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
-                        </svg>
-                    </button>
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header -->
+            <div class="bg-white shadow-md rounded-lg mb-6 p-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Product Details</h1>
+                    <div class="space-x-3">
+                        <a href="/admin/products/main/details/update/{{.Product.Id}}">
+                            <button class="bg-black text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                                UPDATE PRODUCT
+                            </button>
+                        </a>
+                        <button onclick="handleProductAction('{{.Product.Id}}', '{{.Product.IsDeleted}}')"
+                            class="{{if .Product.IsDeleted}}bg-green-500{{else}}bg-red-500{{end}} text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                            {{if .Product.IsDeleted}}RECOVER PRODUCT{{else}}DELETE PRODUCT{{end}}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Sales Report -->
-            <div>
-                <div class="flex flex-col sm:flex-row justify-between items-center border-b border-black pb-4 mb-4">
-                    <h3 class="text-xl font-semibold">Sale Report</h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button class="bg-gray-200 py-1 px-3 rounded">Custom Date</button>
-                        <button class="bg-gray-200 py-1 px-3 rounded">Weekly</button>
-                        <button class="bg-black text-white py-1 px-3 rounded">Monthly</button>
-                        <button class="bg-gray-200 py-1 px-3 rounded">Yearly</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="bg-white p-5 shadow rounded">
-                        <h4 class="text-lg">Total Orders</h4>
-                        <p class="text-2xl font-bold">10,000</p>
-                    </div>
-                    <div class="bg-white p-5 shadow rounded">
-                        <h4 class="text-lg">Total Orders Value</h4>
-                        <p class="text-2xl font-bold">&#8377; 10,000</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-4 mt-5 justify-between">
-                    <a href="/admin/products/variants/add/{{.Product.Id}}">
-                        <button
-                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                            ADD PRODUCT VARIANTS
-                        </button>
-                    </a>
-                    <a href="/admin/products/variant/details?product_id={{.Product.Id}}">
-                        <button
-                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                            SHOW ALL VARIANTS
-                        </button>
-                    </a>
-                    <a href="/admin/products/main/details/update/{{.Product.Id}}">
-                        <button
-                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                            UPDATE MAIN PRODUCT
-                        </button>
-                    </a>
-                    <button onclick="handleProductAction('{{.Product.Id}}', '{{.Product.IsDeleted}}')"
-                        class="{{if .Product.IsDeleted}}bg-green-600{{else}}bg-red-600{{end}} text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                        {{if .Product.IsDeleted}}RECOVER PRODUCT{{else}}DELETE PRODUCT{{end}}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Product Images -->
-            <div class="flex  mt-8 justify-center">
-                <div class="w-full lg:w-1/2 relative group">
-                    <!-- Image container with hover effect -->
+            <!-- Product Information -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Product Image and Basic Info -->
+                <div class="md:col-span-1 bg-white shadow-md rounded-lg p-6">
                     {{if .Product.Images}}
-                    <img class="rounded shadow w-full h-auto max-w-[400px] mx-auto"
-                        src="{{(index .Product.Images 0).ProductImages}}" alt="Main Product Image">
-                    <!-- Three dots icon visible on hover -->
-                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button id="options-btn" class="text-2xl text-gray-500 hover:text-gray-700">
-                            &#x22EE;
+                    <div class="mb-6">
+                        <img src="{{(index .Product.Images 0).ProductImages}}" alt="Main Product Image"
+                            class="w-full h-64 object-contain rounded-lg">
+                        <button id="openUploadPopup"
+                            class="mt-4 w-full bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300 transition">
+                            Change Image
                         </button>
-
-                        <!-- Options container (Change and Replace) -->
-                        <div id="options"
-                            class="hidden absolute top-8 right-0 mt-2 bg-white shadow-md rounded-md w-32 text-gray-700">
-                            <ul>
-                                <li>
-                                    <button id="openUploadPopup"
-                                        class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer">CHANGE</button>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Image Upload Popup -->
@@ -291,61 +221,174 @@
                     {{else}}
                     <p>No images available</p>
                     {{end}}
-                </div>
-            </div>
-            <!-- Product Details -->
-            <div class="bg-white p-4 sm:p-6 mt-8 rounded shadow">
-                <div style="font-family: rubik;" class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-                    <div class="space-y-6">
-                        <p class="text-semibold"><span class="font-semibold">Product Name:</span> {{
-                            .Product.ProductName }}</p>
-                        <p class="text-semibold"><span class="font-semibold">Category:</span><br> {{
-                            .Product.CategoryName }}</p>
-                        <p class="text-semibold"><span class="font-semibold">Brand Name:</span><br> {{
-                            .Product.BrandName }}</p>
-                        <p class="font-semibold">Descriptions:</p>
-                        <ul class="list-disc pl-5 text-sm max-w-xl">
-                            {{ range .Product.Descriptions }}
-                            <li class="break-words whitespace-normal"> {{ .Description }}</li>
-                            {{ end }}
-                        </ul>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Product Name</label>
+                            <p class="text-gray-900">{{.Product.ProductName }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Category</label>
+                            <p class="text-gray-900">{{.Product.CategoryName }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Brand</label>
+                            <p class="text-gray-900">{{.Product.BrandName }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold">Status</label>
+                            {{if .Product.IsDeleted}}
+                            <span
+                                class="px-3 py-1 bg-red-100 text-red-800 border border-red-500 rounded-full">Deleted</span>
+                            {{else}}
+                            <span
+                                class="px-3 py-1 bg-green-100 text-green-800 border border-green-500 rounded-full">Active</span>
+                            {{end}}
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold">Return</label>
+                                {{ if .Product.IsReturnable }}
+                                <span class="text-green-600">Available</span>
+                                {{else}}
+                                <span class="text-red-600">Not Available</span>
+                                {{end}}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold">COD</label>
+                                {{ if .Product.IsCodAvailable }}
+                                <span class="text-green-600">Available</span>
+                                {{else}}
+                                <span class="text-red-600">Not Available</span>
+                                {{end}}
+                            </div>
+                        </div>
                     </div>
-                    <div class="space-y-6">
-                        {{if .Product.IsDeleted}}
-                        <p class="text-xl font-bold mt-1">Status:<span class=" text-red-600">Deleted</span></p>
-                        {{else}}
-                        <p class="text-xl font-bold mt-1">Status:<span class="text-green-600">Active</span></p>
-                        {{end}}
-                        <p><span class="font-semibold">Return Available:</span> {{ if .Product.IsReturnable }} YES
-                            {{else}} NO {{end}}</p>
-                        <p><span class="font-semibold">Cash On Delivery Available:</span> {{ if .Product.IsCodAvailable
-                            }} YES {{else}} NO {{end}}</p>
-                        <h1 class="font-bold text-2xl">OFFERS</h1>
+                </div>
+
+                <!-- Product Descriptions and Variants -->
+                <div class="md:col-span-2 space-y-6">
+
+                    <!-- Offers Section -->
+                    <div class="bg-white shadow-md rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Product Offers</h2>
+                            <div class="space-x-2">
+                                <button id="addOfferBtn"
+                                    class="bg-black text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                                    Add Offer
+                                </button>
+                            </div>
+                        </div>
                         {{ if .Product.OfferName }}
-                        <p><span class="font-semibold">Offer Name:</span> {{ .Product.OfferName }}</p>
-                        <p><span class="font-semibold">Offer Details:</span> {{ .Product.OfferDetails }}</p>
-                        <p><span class="font-semibold">Offer Start Date:</span> {{ .Product.OfferStartDate }}</p>
-                        {{ if .Product.OfferPercentage }}
-                        <p><span class="font-semibold">Offer Percentage:</span> {{ .Product.OfferPercentage }}%</p>
-                        {{else}}
-                        {{end}}
-                        <p><span class="font-semibold">Offer End Date:</span> {{ .Product.OfferEndDate }}</p>
+                        <div
+                            class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition duration-200">
+                            <div class="border-l-4 border-green-500 p-5">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold text-xl text-gray-800">{{ .Product.OfferName }}</h3>
+                                        <div class="flex items-center mt-1">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                            <span class="ml-2 text-lg font-bold text-indigo-600">{{
+                                                .Product.OfferPercentage }}% Off</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-gray-600 mt-3">{{ .Product.OfferDetails }}</p>
+
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Start Date</p>
+                                        <p class="text-gray-700 font-medium">{{ .Product.OfferStartDate }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">End Date</p>
+                                        <p class="text-gray-700 font-medium">{{ .Product.OfferEndDate }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-4 border-t border-gray-200 flex justify-end space-x-3">
+                                    <button id="updateOfferBtn"
+                                        class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center transition duration-200">
+                                        <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <form id="deleteForm" class="delete-product-form" method="POST" action="/api/products/delete">
+                                        <input type="hidden" name="productId" class="product-id" value="{{.Product.OfferID}}">
+                                        <button type="button" 
+                                                class="delete-btn text-red-600 hover:text-red-800 font-medium flex items-center transition duration-200">
+                                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="updateModal"
+                            class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
+                                <h2 class="text-xl font-bold text-gray-800 mb-4">Update Offer</h2>
+                                <form id="updateOfferForm">
+                                    <input type="text" id="offerId" name="offerId" value="{{.Product.OfferID}}" hidden>
+                                    <input type="text" id="productId" name="productId" value="{{.Product.Id}}" hidden>
+                                    <div class="mb-4">
+                                        <label for="updateOfferName"
+                                            class="block text-sm font-medium text-gray-700">Offer Name</label>
+                                        <input type="text" id="updateOfferName"
+                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            value="{{ .Product.OfferName }}" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="updateOfferDetails"
+                                            class="block text-sm font-medium text-gray-700">Offer Details</label>
+                                        <textarea id="updateOfferDetails"
+                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            required>{{ .Product.OfferDetails }}</textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="updateStartDate"
+                                            class="block text-sm font-medium text-gray-700">Start Date</label>
+                                        <input type="date" id="updateStartDate"
+                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="updateEndDate" class="block text-sm font-medium text-gray-700">End
+                                            Date</label>
+                                        <input type="date" id="updateEndDate"
+                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="updatePercentage"
+                                            class="block text-sm font-medium text-gray-700">Offer Percentage</label>
+                                        <input type="number" id="updatePercentage"
+                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                            value="{{ .Product.OfferPercentage }}" required>
+                                    </div>
+                                    <div class="flex justify-end gap-4">
+                                        <button type="submit" id="updateOfferBtn"
+                                            class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">Update</button>
+                                        <button type="button" id="closeUpdateModal"
+                                            class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         {{ else }}
                         <p>No offers available for this product.</p>
-                        {{ end }}
-                        <div class="flex flex-wrap gap-4 mt-5 justify-between">
-                            <!-- Add Product Offer Button -->
-                            <button id="addOfferBtn"
-                                class="bg-blue-600 text-white py-2 px-4 rounded font-bold hover:bg-blue-700 transition">
-                                ADD PRODUCT OFFER
-                            </button>
-                            <!-- Update or Delete Offer Button -->
-                            <button id="updateOfferBtn"
-                                class="bg-red-600 text-white py-2 px-4 rounded font-bold hover:bg-red-700 transition">
-                                UPDATE OR DELETE OFFER
-                            </button>
-                        </div>
-                        <!-- Add Offer Modal -->
                         <div id="offerModal"
                             class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
                             <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
@@ -397,153 +440,214 @@
                                 </form>
                             </div>
                         </div>
+                        {{ end }}
+                    </div>
 
-                        <!-- Update/Delete Offer Modal -->
-                        <div id="updateModal"
-                            class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
-                                <h2 class="text-xl font-bold text-gray-800 mb-4">Update or Delete Offer</h2>
-                                <form id="updateOfferForm">
-                                    <div class="mb-4">
-                                        <label for="updateOfferName"
-                                            class="block text-sm font-medium text-gray-700">Offer Name</label>
-                                        <input type="text" id="updateOfferName"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            placeholder="Enter Offer Name" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updateOfferDetails"
-                                            class="block text-sm font-medium text-gray-700">Offer Details</label>
-                                        <textarea id="updateOfferDetails"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            placeholder="Enter Offer Details" required></textarea>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updateStartDate"
-                                            class="block text-sm font-medium text-gray-700">Start Date</label>
-                                        <input type="date" id="updateStartDate"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updateEndDate" class="block text-sm font-medium text-gray-700">End
-                                            Date</label>
-                                        <input type="date" id="updateEndDate"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updatePercentage"
-                                            class="block text-sm font-medium text-gray-700">Offer Percentage</label>
-                                        <input type="number" id="updatePercentage"
-                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            required>
-                                    </div>
-                                    <div class="flex justify-end gap-4">
-                                        <button type="submit" id="updateOfferBtn"
-                                            class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">Update</button>
-                                        <button type="button" id="deleteOfferBtn"
-                                            class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition">Delete</button>
-                                        <button type="button" id="closeUpdateModal"
-                                            class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition">Close</button>
-                                    </div>
-                                </form>
+                    <!-- Product Variants -->
+                    <div class="bg-white shadow-md rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Product Variants</h2>
+                            <div class="space-x-2">
+                                <button class="bg-black text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                                    Add Variant
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    <!-- Button to open modal -->
-                    <button id="openModal"
-                        class="bg-blue-600 text-white py-2 px-6 rounded font-bold hover:bg-blue-700 transition">
-                        ADD DESCRIPTION
-                    </button>
-
-                    <!-- Modal -->
-                    <div id="descriptionModal"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden overflow-y-auto ">
-                        <div class="bg-white p-6 rounded-lg w-full max-w-3xl">
-                            <h2 class="text-xl font-semibold mb-4">Add Description</h2>
-
-                            <form id="descriptionForm" action="/admin/products/main/submit-description" method="POST">
-                                <input hidden name="product_id" value="{{.Product.Id}}" />
-                                <div id="keyValuePairs">
-                                    <div class="flex mb-4 space-x-4">
-                                        <input type="text" name="heading[]" placeholder="Enter heading"
-                                            class="p-2 border border-gray-300 rounded w-1/3" required>
-                                        <textarea name="description[]" placeholder="Enter description"
-                                            class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
-                                    </div>
-                                </div>
-
-                                <button type="button" id="addPair"
-                                    class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition mb-4">Add
-                                    More</button>
-                                <button type="submit"
-                                    class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Submit</button>
-                                <span id="closeModal"
-                                    class="text-white text-xl bg-gray-600 float-right cursor-pointer py-2 px-4 rounded hover:bg-blue-600 transition">Close</span>
-                            </form>
+                        <div class="overflow-x-none">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Name</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Price
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Stock
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {{range .Products}}
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-16 w-16 object-contain"
+                                                        src="{{ (index .VariantsImages 0).ProductVariantsImages }}"
+                                                        alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">{{.ProductName}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">&#8377; {{printf
+                                            "%.2f"
+                                            .RegularPrice}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{.StockQuantity}}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{if .IsDeleted}}
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 border border-red-500">Blocked</span>
+                                            {{else}}
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 border border-green-500">Active</span>
+                                            {{end}}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="/admin/products/variant/detail?variant_id={{.ID}}"
+                                                class="text-blue-600 hover:text-blue-900 mr-3">View</a>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <button id="openUpdatePopup"
-                        class="bg-red-600 text-white py-2 px-6 rounded font-bold hover:bg-red-700 transition">
-                        Update/Delete Descriptions
-                    </button>
 
-                    <!-- Popup Modal -->
-                    <div id="updatePopupModal"
-                        class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-                        <div
-                            class="w-full max-w-2xl mx-4 p-6 bg-white shadow-lg rounded-lg overflow-y-auto max-h-screen">
-                            <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Update/Delete Product
-                                Descriptions</h1>
+                    <!-- Descriptions Section -->
+                    <div class="bg-white shadow-md rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Product Descriptions</h2>
+                            <div class="space-x-2">
+                                <button id="openModal"
+                                    class="bg-black text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                                    Add Description
+                                </button>
+                                <div id="descriptionModal"
+                                    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden overflow-y-auto ">
+                                    <div class="bg-white p-6 rounded-lg w-full max-w-3xl">
+                                        <h2 class="text-xl font-semibold mb-4">Add Description</h2>
 
-                            <form action="/admin/products/variant/update/description/{{.Product.Id}}" method="post"
-                                class="space-y-4" id="updateDescriptionsForm">
-                                <input hidden name="variant_id" value="{{.Product.Id}}" />
+                                        <form id="descriptionForm" action="/admin/products/main/submit-description"
+                                            method="POST">
+                                            <input hidden name="product_id" value="{{.Product.Id}}" />
+                                            <div id="keyValuePairs">
+                                                <div class="flex mb-4 space-x-4">
+                                                    <input type="text" name="heading[]" placeholder="Enter heading"
+                                                        class="p-2 border border-gray-300 rounded w-1/3" required>
+                                                    <textarea name="description[]" placeholder="Enter description"
+                                                        class="p-2 border border-gray-300 rounded w-2/3"
+                                                        required></textarea>
+                                                </div>
+                                            </div>
 
-                                <div id="updateDescriptionsList">
-                                    {{if .Product.Descriptions}}
-                                    {{range .Product.Descriptions}}
-                                    <div class="Descriptions-item flex flex-row gap-4 items-center">
-                                        <input type="hidden" name="description_id[]" value="{{.ID}}" />
-                                        <div class="flex-1">
-                                            <label for="key-{{.ID}}" class="block text-gray-700 font-medium">Description
-                                                Heading</label>
-                                            <input type="text" id="key-{{.ID}}" name="heading[]" value="{{.Heading}}"
-                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
-                                        </div>
-                                        <div class="flex-1">
-                                            <label for="value-{{.ID}}"
-                                                class="block text-gray-700 font-medium">Description</label>
-                                            <input type="text" id="value-{{.ID}}" name="description[]"
-                                                value="{{.Description}}"
-                                                class="w-full p-2 border border-gray-300 rounded-lg" required>
-                                        </div>
-                                        <a href="/admin/products/variant/description/delete/{{.ID}}"
-                                            class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"
-                                            onclick="event.preventDefault(); deleteDescription('{{.ID}},{{.ProductID}}');">
-                                            Delete
-                                        </a>
+                                            <button type="button" id="addPair"
+                                                class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition mb-4">Add
+                                                More</button>
+                                            <button type="submit"
+                                                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Submit</button>
+                                            <span id="closeModal"
+                                                class="text-white text-xl bg-gray-600 float-right cursor-pointer py-2 px-4 rounded hover:bg-blue-600 transition">Close</span>
+                                        </form>
                                     </div>
-                                    {{end}}
-                                    {{else}}
-                                    <p>No description available for this product.</p>
-                                    {{end}}
                                 </div>
-
-                                <!-- Submit and Close Buttons -->
-                                <div class="flex justify-center space-x-4 mt-4">
-                                    <button type="submit"
-                                        class="bg-blue-500 text-white p-2 w-32 rounded-lg hover:bg-blue-600">Update</button>
-                                    <button type="button" id="closeUpdatePopup"
-                                        class="bg-red-500 text-white p-2 w-32 rounded-lg hover:bg-red-600">Close</button>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            {{if .Product.Descriptions}}
+                            {{range .Product.Descriptions}}
+                            <div class="bg-gray-100 p-4 rounded flex justify-between items-center">
+                                <p class="text-gray-800 line-clamp-2  max-w-2xl">{{ .Description }}</p>
+                                <div class="space-x-2">
+                                    <a href="/admin/products/variant/description/delete/{{.ID}}"
+                                        class="text-red-600 hover:text-red-800"
+                                        onclick="event.preventDefault(); deleteDescription('{{.ID}},{{.ProductID}}');">
+                                        Delete
+                                    </a>
                                 </div>
-                            </form>
+                            </div>
+                            {{ end }}
+                            {{else}}
+                            <p>No description available for this product.</p>
+                            {{end}}
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Sales Analytics -->
+        <div class="bg-white shadow-md rounded-lg mt-6 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Sales Analytics</h2>
+                <div class="space-x-2">
+                    <select class="border rounded px-3 py-1">
+                        <option>Daily</option>
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                        <option>Yearly</option>
+                    </select>
+                    <input type="date" class="border rounded px-3 py-1">
+                    <input type="date" class="border rounded px-3 py-1">
+                    <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+                        Apply
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-blue-100 p-4 rounded">
+                    <p class="text-gray-600">Total Sales</p>
+                    <p class="text-2xl font-bold text-blue-800">$45,678</p>
+                </div>
+                <div class="bg-green-100 p-4 rounded">
+                    <p class="text-gray-600">Units Sold</p>
+                    <p class="text-2xl font-bold text-green-800">1,234</p>
+                </div>
+                <div class="bg-purple-100 p-4 rounded">
+                    <p class="text-gray-600">Average Price</p>
+                    <p class="text-2xl font-bold text-purple-800">$129.99</p>
+                </div>
+                <div class="bg-red-100 p-4 rounded">
+                    <p class="text-gray-600">Revenue</p>
+                    <p class="text-2xl font-bold text-red-800">$78,543</p>
+                </div>
+            </div>
+            <div class="flex justify-between">
+                <canvas id="salesChart" class="w-full h-80"></canvas>
+            </div>
+            <div class="mt-6 flex justify-end space-x-4">
+                <button style="background-color: #FF0000;"
+                    class="text-white py-2 px-5 rounded inline-flex items-center drop-shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 15 15">
+                        <path fill="#fff"
+                            d="M2.5 6.5V6H2v.5zm4 0V6H6v.5zm0 4H6v.5h.5zm7-7h.5v-.207l-.146-.147zm-3-3l.354-.354L10.707 0H10.5zM2.5 7h1V6h-1zm.5 4V8.5H2V11zm0-2.5v-2H2v2zm.5-.5h-1v1h1zm.5-.5a.5.5 0 0 1-.5.5v1A1.5 1.5 0 0 0 5 7.5zM3.5 7a.5.5 0 0 1 .5.5h1A1.5 1.5 0 0 0 3.5 6zM6 6.5v4h1v-4zm.5 4.5h1v-1h-1zM9 9.5v-2H8v2zM7.5 6h-1v1h1zM9 7.5A1.5 1.5 0 0 0 7.5 6v1a.5.5 0 0 1 .5.5zM7.5 11A1.5 1.5 0 0 0 9 9.5H8a.5.5 0 0 1-.5.5zM10 6v5h1V6zm.5 1H13V6h-2.5zm0 2H12V8h-1.5zM2 5V1.5H1V5zm11-1.5V5h1V3.5zM2.5 1h8V0h-8zm7.646-.146l3 3l.708-.708l-3-3zM2 1.5a.5.5 0 0 1 .5-.5V0A1.5 1.5 0 0 0 1 1.5zM1 12v1.5h1V12zm1.5 3h10v-1h-10zM14 13.5V12h-1v1.5zM12.5 15a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zM1 13.5A1.5 1.5 0 0 0 2.5 15v-1a.5.5 0 0 1-.5-.5z" />
+                    </svg>
+                    <span class="mx-2 font-bold">PDF</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#fff"
+                            d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
+                    </svg>
+                </button>
+                <button style="background-color: #06B806;"
+                    class=" text-white py-2 px-4 rounded inline-flex items-center drop-shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+                        <path fill="#fff"
+                            d="M6 3v26h20V9.594l-.28-.313l-6-6l-.314-.28H6zm2 2h10v6h6v16H8zm12 1.438L22.563 9H20zM11 13v2h10v-2zm0 4v2h10v-2zm0 4v2h10v-2z" />
+                    </svg>
+                    <span class="mx-2 font-bold">EXCEL</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#fff"
+                            d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
     </div>
     <script>
         async function handleProductAction(productId, isDeleted) {
@@ -605,6 +709,57 @@
                 toast.classList.add('hidden');
             }, 3000);
         }
+        // Sample Chart.js Sales Chart
+        /* const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Sales',
+                    data: [12000, 19000, 15000, 22000, 16000, 25000],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Product Sales Trend'
+                    }
+                }
+            }
+        }); */
+        document.addEventListener("DOMContentLoaded", function () {
+            let startDateInput = document.getElementById("updateStartDate");
+            let endDateInput = document.getElementById("updateEndDate");
+
+            if (!startDateInput || !endDateInput) {
+                console.error("Date input fields not found!");
+                return;
+            }
+
+            let startDateRaw = "{{ .Product.OfferStartDate }}";
+            let endDateRaw = "{{ .Product.OfferEndDate }}";
+
+            function convertToDateInputFormat(dateStr) {
+                if (!dateStr || dateStr.length !== 10) return "";
+                let parts = dateStr.split("-");
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+
+            let startDateFormatted = convertToDateInputFormat(startDateRaw);
+            let endDateFormatted = convertToDateInputFormat(endDateRaw);
+
+            console.log("Formatted Start Date:", startDateFormatted);
+            console.log("Formatted End Date:", endDateFormatted);
+
+            startDateInput.value = startDateFormatted;
+            endDateInput.value = endDateFormatted;
+        });
+
     </script>
     <script src="/static/js/toast.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>

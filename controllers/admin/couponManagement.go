@@ -87,6 +87,10 @@ func AddCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Something Went Wrong", "")
 		return
 	}
+	status := "Active"
+	if validFrom.After(time.Now()) {
+		status = "Scheduled"
+	}
 	couponFixed := models.Coupon{
 		CouponCode:       strings.ToUpper(couponInput.CouponCode),
 		Discription:      couponInput.Discription,
@@ -99,7 +103,7 @@ func AddCoupon(c *gin.Context) {
 		IsFixedCoupon:    couponInput.CouponType == "Fixed",
 		CouponType:       couponInput.CouponType,
 		ApplicableFor:    couponInput.ApplicableProduct,
-		Status:           "Active",
+		Status:           status,
 	}
 	if err := config.DB.Create(&couponFixed).Error; err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Failed to create coupon code already exist", "Failed to create coupon code already exist", "")
@@ -209,6 +213,12 @@ func UpdateCoupon(c *gin.Context) {
 	coupon.ValidFrom = validFrom
 	coupon.ExpirationDate = expiryDate
 	coupon.IsFixedCoupon = request.CouponType == "Fixed"
+
+	if validFrom.After(time.Now()) {
+		coupon.Status = "Scheduled"
+	} else {
+		coupon.Status = "Active"
+	}
 
 	if err := config.DB.Save(&coupon).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update coupon", "Something Went Wrong", "")

@@ -130,7 +130,7 @@ func AddMainProductDetails(c *gin.Context) {
 			file, _ := fileHeader.Open()
 			defer file.Close()
 
-			url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "products","")
+			url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "products", "")
 			if err != nil {
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
@@ -164,8 +164,12 @@ func ShowMainProductDetails(c *gin.Context) {
 		return
 	}
 
+	var product []models.ProductVariantDetails
+	config.DB.Preload("VariantsImages").Find(&product, "product_id = ?", productID)
+
 	c.HTML(http.StatusSeeOther, "mainProductDetails.html", gin.H{
-		"Product": productDetails,
+		"Product":  productDetails,
+		"Products": product,
 	})
 }
 
@@ -373,117 +377,62 @@ func DeleteDescription(c *gin.Context) {
 	})
 }
 
-func UpdateProductDescription(c *gin.Context) {
-	type UpdateDescription struct {
-		DescriptionIDs []string `json:"description_id"`
-		Headings       []string `json:"heading"`
-		Descriptions   []string `json:"description"`
-	}
-
-	var updateData UpdateDescription
-	if err := c.ShouldBindJSON(&updateData); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Invalid request payload", "")
-		return
-	}
-
-	productID, err := strconv.Atoi(c.Param("id"))
+func ReplaceMainProductImage(c *gin.Context) {
+	productID, err := strconv.Atoi(c.PostForm("product_id"))
 	if err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
 		return
 	}
 
-	if len(updateData.DescriptionIDs) != len(updateData.Headings) ||
-		len(updateData.Headings) != len(updateData.Descriptions) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in description IDs, headings, and descriptions", "Mismatch in description IDs, headings, and descriptions", "")
+	tx := config.DB.Begin()
+	var productImage models.ProductImage
+	if err := tx.First(&productImage, "product_id = ?", productID).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Product image not found", "Product image not found", "")
 		return
 	}
 
-	for i := 0; i < len(updateData.DescriptionIDs); i++ {
-		descID, err := strconv.Atoi(updateData.DescriptionIDs[i])
-		if err != nil {
-			helper.RespondWithError(c, http.StatusBadRequest, "Invalid description ID", "Invalid description ID", "")
-			return
-		}
-		result := config.DB.Model(&models.ProductDescription{}).
-			Where("id = ? AND product_id = ?", descID, productID).
-			Updates(map[string]interface{}{
-				"heading":     updateData.Headings[i],
-				"description": updateData.Descriptions[i],
-			})
+	oldImage := productImage.ProductImages
 
-		if result.Error != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update description", "Failed to update description", "")
-			return
-		}
-
-		if result.RowsAffected == 0 {
-			helper.RespondWithError(c, http.StatusNotFound, "Description not found", "Description not found", "")
-			return
-		}
+	form, err := c.FormFile("product_image")
+	if err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusBadRequest, "No file uploaded", "No file uploaded", "")
+		return
 	}
 
+	cld := config.InitCloudinary()
+	file, _ := form.Open()
+	url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products", "")
+	if uploadErr != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
+		return
+	}
+
+	if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update image", "Failed to update image", "")
+		return
+	}
+
+	publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
+	if err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to extract Cloudinary public ID", "Failed to extract Cloudinary public ID", "")
+		return
+	}
+
+	if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary", "Failed to delete image from Cloudinary", "")
+		return
+	}
+
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Success",
-		"message": "Descriptions updated successfully",
-		"code":    200,
+		"status":   "Success",
+		"filename": url,
+		"code":     http.StatusOK,
 	})
-}
-func ReplaceMainProductImage(c *gin.Context) {
-    productID, err := strconv.Atoi(c.PostForm("product_id"))
-    if err != nil {
-        helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid product ID", "")
-        return
-    }
-
-    tx := config.DB.Begin()
-    var productImage models.ProductImage
-    if err := tx.First(&productImage, "product_id = ?", productID).Error; err != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusNotFound, "Product image not found", "Product image not found", "")
-        return
-    }
-
-    oldImage := productImage.ProductImages
-
-    form, err := c.FormFile("product_image")
-    if err != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusBadRequest, "No file uploaded", "No file uploaded", "")
-        return
-    }
-
-    cld := config.InitCloudinary()
-    file, _ := form.Open()
-    url, uploadErr := utils.UploadImageToCloudinary(file, form, cld, "products","")
-    if uploadErr != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Failed to upload product image", "")
-        return
-    }
-
-    if err := tx.Model(&productImage).Update("product_images", url).Error; err != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update image", "Failed to update image", "")
-        return
-    }
-
-    publicID, err := helper.ExtractCloudinaryPublicID(oldImage)
-    if err != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to extract Cloudinary public ID", "Failed to extract Cloudinary public ID", "")
-        return
-    }
-
-    if err := utils.DeleteCloudinaryImage(cld, publicID, c); err != nil {
-        tx.Rollback()
-        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary", "Failed to delete image from Cloudinary", "")
-        return
-    }
-
-    tx.Commit()
-    c.JSON(http.StatusOK, gin.H{
-        "status":   "Success",
-        "filename": url,
-        "code":     http.StatusOK,
-    })
 }
