@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-
 func ShowReferralPage(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
@@ -23,13 +22,7 @@ func ShowReferralPage(c *gin.Context) {
 
 	var refferal models.ReferralAccount
 	if err := config.DB.First(&refferal, "user_id = ?", userauth.ID).Error; err != nil {
-		createReferral := models.ReferralAccount{
-			UserID: userauth.ID,
-		}
-		if err := config.DB.Create(&createReferral).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Referral Account Creation Failed", "Something Went Wrong", "")
-			return
-		}
+		CreateCart(c, userauth.ID)
 	}
 
 	var referalHistory []models.ReferalHistory
@@ -42,6 +35,16 @@ func ShowReferralPage(c *gin.Context) {
 		"ReferralAccount": refferal,
 		"ReferalHistory":  referalHistory,
 	})
+}
+
+func CreateCart(c *gin.Context, userID uint) {
+	createReferral := models.ReferralAccount{
+		UserID: userID,
+	}
+	if err := config.DB.Create(&createReferral).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Referral Account Creation Failed", "Something Went Wrong", "")
+		return
+	}
 }
 
 func AddReferral(c *gin.Context) {
@@ -93,9 +96,8 @@ func AddReferral(c *gin.Context) {
 
 	var referrerAccountDetails models.ReferralAccount
 	if err := tx.First(&referrerAccountDetails, "user_id = ? ", referrer.ID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
-		return
+		CreateCart(c, userauth.ID)
+		CreateCart(c, referrer.ID)
 	}
 
 	referrerAccountDetails.Count += 1
@@ -142,9 +144,7 @@ func CheckForReferrer(c *gin.Context) {
 
 	var referralAccountDetails models.ReferralAccount
 	if err := tx.First(&referralAccountDetails, "user_id = ? ", userID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
-		return
+		CreateCart(c, userauth.ID)
 	}
 
 	var referralHistory []models.ReferalHistory
@@ -278,9 +278,8 @@ func CheckForJoinee(c *gin.Context) {
 			}
 			var referrerAccountDetails models.ReferralAccount
 			if err := tx.First(&referrerAccountDetails, referralHistory.ReferralID).Error; err != nil {
-				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
-				return
+				CreateCart(c, userauth.ID)
+				CreateCart(c, referralHistory.ReferralID)
 			}
 			var referrerDetails models.UserAuth
 			if err := tx.First(&referrerDetails, referrerAccountDetails.UserID).Error; err != nil {

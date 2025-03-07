@@ -42,6 +42,7 @@ func WalletHandler(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
+	CreateWallet(c, userID)
 	var walletDetails models.Wallet
 	if err := config.DB.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
@@ -67,8 +68,7 @@ func WalletHandler(c *gin.Context) {
 
 	var referralDetails models.ReferralAccount
 	if err := config.DB.First(&referralDetails, "user_id = ?", userID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
-		return
+		CreateCart(c, userauth.ID)
 	}
 
 	CheckForReferrer(c)
