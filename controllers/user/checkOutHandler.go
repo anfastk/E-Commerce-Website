@@ -19,6 +19,10 @@ func ShowCheckoutPage(c *gin.Context) {
 		tax             float64
 		total           float64
 	)
+	type CartItemWithDiscount struct {
+		Item          models.CartItem
+		DiscountPrice float64
+	}
 	shippingCharge := 100
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
@@ -46,9 +50,15 @@ func ShowCheckoutPage(c *gin.Context) {
 		}
 	}
 
+	var CartItems []CartItemWithDiscount
 	for _, items := range cartItems {
+		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
+		CartItems = append(CartItems, CartItemWithDiscount{
+			Item:          items,
+			DiscountPrice: items.ProductVariant.SalePrice - discountAmount,
+		})
 		regularPrice += items.ProductVariant.RegularPrice * float64(items.Quantity)
-		salePrice += items.ProductVariant.SalePrice * float64(items.Quantity)
+		salePrice += (items.ProductVariant.SalePrice * float64(items.Quantity))-discountAmount
 	}
 	tax = (salePrice * 18) / 100
 	productDiscount = regularPrice - salePrice
@@ -66,14 +76,12 @@ func ShowCheckoutPage(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
 		return
 	}
-	CreateWallet(c,userID)
-	CheckForReferrer(c)
-	CheckForJoinee(c)
+	CreateWallet(c, userID)
 	c.HTML(http.StatusOK, "checkOut.html", gin.H{
 		"status":          "OK",
 		"message":         "Checkout fetch success",
 		"Address":         address,
-		"CartItem":        cartItems,
+		"CartItem":        CartItems,
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
 		"Tax":             tax,

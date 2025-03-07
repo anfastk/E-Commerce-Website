@@ -811,6 +811,133 @@
         let orderId = "{{ .OrderItem.ID }}";
         let productId = "{{ .OrderItem.ProductVariantID }}";
 
+        document.getElementById("payButton").addEventListener("click", async function () {
+            let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
+            if (!selectedPayment) {
+                showErrorToast("Please select a payment method.");
+                return;
+            }
+
+
+            let addressId = "{{ .Address.ID }}";
+            let paymentData = {
+                method: selectedPayment.name,
+                orderId: orderId,
+                addressId: addressId
+            };
+
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
+
+            try {
+                let response = await fetch("/profile/order/details/track/pay/now", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentData)
+                });
+
+                let result = await response.json();
+                if (response.ok) {
+                    showSuccessToast("Payment initiated successfully!");
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
+                        initializeRazorpay(result);
+                    }
+                } else {
+                    showErrorToast("Payment failed: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showErrorToast(error.message || "An error occurred while processing the payment.");
+            } finally {
+                // Reset button state
+                this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
+                this.disabled = false;
+            }
+        });
+
+        function initializeRazorpay(data) {
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: data.currency,
+                name: "LAPTIX",
+                description: "Purchase Payment",
+                image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
+                order_id: data.order_id,
+                handler: function (response) {
+                    // Handle successful payment
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        order_id: orderId,
+                    });
+                },
+                prefill: {
+                    name: data.prefill.name,
+                    email: data.prefill.email,
+                    contact: data.prefill.contact
+                },
+                notes: data.notes,
+                theme: {
+                    color: "#0000"
+                },
+                modal: {
+                    ondismiss: function () {
+                        const payButton = document.getElementById('proceedToPay');
+                        payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                        payButton.disabled = false;
+                        showErrorToast("Payment cancelled");
+                    }
+                },
+                // Add retry configuration to prevent retry option
+                retry: {
+                    enabled: false  // Disable retry functionality
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            // Add payment failed handler
+            rzp.on('payment.failed', function (response) {
+                showErrorToast("Payment Failed");
+                setTimeout(function () {
+                    showErrorToast("Payment Failed");
+                }, 3000);
+            });
+
+            rzp.open();
+        }
+
+        function verifyPayment(paymentData) {
+            fetch('/profile/order/details/track/pay/now/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment verification failed."); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Redirect to success page
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast(error.message || "An error occurred while verifying the payment.");
+
+                    // Reset button state
+                    const payButton = document.getElementById('proceedToPay');
+                    payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                    payButton.disabled = false;
+                });
+        }
 
         // Elements
         const returnItemBtn = document.getElementById('returnItemBtn');
@@ -1092,133 +1219,6 @@ function submitCancelForm() {
             }
         }
 
-        document.getElementById("payButton").addEventListener("click", async function () {
-            let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
-            if (!selectedPayment) {
-                showErrorToast("Please select a payment method.");
-                return;
-            }
-
-
-            let addressId = "{{ .Address.ID }}";
-            let paymentData = {
-                method: selectedPayment.name,
-                orderId: orderId,
-                addressId: addressId
-            };
-
-            // Show loading state
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-            this.disabled = true;
-
-            try {
-                let response = await fetch("/profile/order/details/track/pay/now", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(paymentData)
-                });
-
-                let result = await response.json();
-                if (response.ok) {
-                    showSuccessToast("Payment initiated successfully!");
-                    if (result.redirect) {
-                        window.location.href = result.redirect;
-                    } else {
-                        initializeRazorpay(result);
-                    }
-                } else {
-                    showErrorToast("Payment failed: " + result.message);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                showErrorToast(error.message || "An error occurred while processing the payment.");
-            } finally {
-                // Reset button state
-                this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
-                this.disabled = false;
-            }
-        });
-
-        function initializeRazorpay(data) {
-            const options = {
-                key: data.key_id,
-                amount: data.amount,
-                currency: data.currency,
-                name: "LAPTIX",
-                description: "Purchase Payment",
-                image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
-                order_id: data.order_id,
-                handler: function (response) {
-                    // Handle successful payment
-                    verifyPayment({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature,
-                        order_id: orderId,
-                    });
-                },
-                prefill: {
-                    name: data.prefill.name,
-                    email: data.prefill.email,
-                    contact: data.prefill.contact
-                },
-                notes: data.notes,
-                theme: {
-                    color: "#0000"
-                },
-                modal: {
-                    ondismiss: function () {
-                        const payButton = document.getElementById('proceedToPay');
-                        payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
-                        payButton.disabled = false;
-                        showErrorToast("Payment cancelled");
-                    }
-                },
-                // Add retry configuration to prevent retry option
-                retry: {
-                    enabled: false  // Disable retry functionality
-                }
-            };
-
-            const rzp = new Razorpay(options);
-
-            // Add payment failed handler
-            rzp.on('payment.failed', function (response) {
-                showErrorToast("Payment Failed");
-                setTimeout(function () {
-                    showErrorToast("Payment Failed");
-                }, 3000);
-            });
-
-            rzp.open();
-        }
-
-        function verifyPayment(paymentData) {
-            fetch('/profile/order/details/track/pay/now/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(paymentData),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message || "Payment verification failed."); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Redirect to success page
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorToast(error.message || "An error occurred while verifying the payment.");
-
-                    // Reset button state
-                    const payButton = document.getElementById('proceedToPay');
-                    payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
-                    payButton.disabled = false;
-                });
-        }
 
     </script>
     <script src="/static/js/toastMain.js"></script>

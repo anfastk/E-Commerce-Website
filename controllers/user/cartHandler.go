@@ -12,6 +12,10 @@ import (
 
 func ShowCart(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
+	type CartItemWithDiscount struct {
+		Item          models.CartItem
+		DiscountPrice float64
+	}
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
 		cart = models.Cart{
@@ -22,7 +26,7 @@ func ShowCart(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed", "Cart creation Failed", "")
 		}
 	}
-	CreateWallet(c,userID)
+	CreateWallet(c, userID)
 	var cartItems []models.CartItem
 	if err := config.DB.Preload("ProductVariant").
 		Preload("ProductVariant.VariantsImages").
@@ -31,18 +35,23 @@ func ShowCart(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product Not Found", "")
 		return
 	}
-	var activeCartItems []models.CartItem
+	var activeCartItems []CartItemWithDiscount
 	for _, item := range cartItems {
+		discountAmount, _, _ := helper.DiscountCalculation(item.ProductVariantID, item.ProductVariant.CategoryID, item.ProductVariant.RegularPrice, item.ProductVariant.SalePrice)
 		if item.ProductVariant.ID != 0 {
-			activeCartItems = append(activeCartItems, item)
+			activeCartItems = append(activeCartItems, CartItemWithDiscount{
+				Item:          item,
+				DiscountPrice: item.ProductVariant.SalePrice - discountAmount,
+			})
 		}
 	}
+
 	for i := range activeCartItems {
-		if activeCartItems[i].ProductVariant.StockQuantity < 3 {
-			if activeCartItems[i].ProductVariant.StockQuantity < activeCartItems[i].Quantity {
-				activeCartItems[i].Quantity = activeCartItems[i].ProductVariant.StockQuantity
-				if createErr := config.DB.Model(&activeCartItems[i]).Updates(map[string]interface{}{
-					"quantity": activeCartItems[i].Quantity,
+		if activeCartItems[i].Item.ProductVariant.StockQuantity < 3 {
+			if activeCartItems[i].Item.ProductVariant.StockQuantity < activeCartItems[i].Item.Quantity {
+				activeCartItems[i].Item.Quantity = activeCartItems[i].Item.ProductVariant.StockQuantity
+				if createErr := config.DB.Model(&activeCartItems[i].Item).Updates(map[string]interface{}{
+					"quantity": activeCartItems[i].Item.Quantity,
 				}).Error; createErr != nil {
 					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
 					return
@@ -50,16 +59,18 @@ func ShowCart(c *gin.Context) {
 			}
 		}
 	}
+
 	var productIDs []uint
 	for _, cartItem := range cartItems {
 		productIDs = append(productIDs, cartItem.ProductID)
 	}
 	type suggestion struct {
-		ID           uint     `json:"id"`
-		ProductName  string   `json:"product_name"`
-		RegularPrice float64  `json:"regular_price"`
-		SalePrice    float64  `json:"sale_price"`
-		Images       []string `json:"images"`
+		ID              uint     `json:"id"`
+		ProductName     string   `json:"product_name"`
+		RegularPrice    float64  `json:"regular_price"`
+		SalePrice       float64  `json:"sale_price"`
+		OfferPersentage int      `jso:"offer_persentage"`
+		Images          []string `json:"images"`
 	}
 	var suggestionProduct []models.ProductVariantDetails
 	if len(productIDs) == 0 {
@@ -86,17 +97,17 @@ func ShowCart(c *gin.Context) {
 		for _, img := range variant.VariantsImages {
 			images = append(images, img.ProductVariantsImages)
 		}
+		DiscountAmount, TotalPercentage, _ := helper.DiscountCalculation(variant.ID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
 
 		suggest = append(suggest, suggestion{
-			ID:           variant.ID,
-			ProductName:  variant.ProductName,
-			RegularPrice: variant.RegularPrice,
-			SalePrice:    variant.SalePrice,
-			Images:       images,
+			ID:              variant.ID,
+			ProductName:     variant.ProductName,
+			RegularPrice:    variant.RegularPrice,
+			SalePrice:       variant.SalePrice - DiscountAmount,
+			OfferPersentage: int(TotalPercentage),
+			Images:          images,
 		})
 	}
-	CheckForReferrer(c)
-	CheckForJoinee(c)
 
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		"Suggestion": suggest,
@@ -247,7 +258,8 @@ func ShowCartTotal(c *gin.Context) {
 		return
 	}
 	for _, items := range cartItems {
-		total += items.ProductVariant.SalePrice * float64(items.Quantity)
+		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
+		total += (items.ProductVariant.SalePrice * float64(items.Quantity))-discountAmount
 	}
 	count := CartCount(c)
 	c.JSON(http.StatusOK, gin.H{

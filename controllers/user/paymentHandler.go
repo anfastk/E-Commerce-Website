@@ -63,6 +63,12 @@ func PaymentPage(c *gin.Context) {
 		tax             float64
 		total           float64
 	)
+
+	type CartItemWithDiscount struct {
+		Item          models.CartItem
+		DiscountPrice float64
+	}
+
 	shippingCharge := 100
 	var cart models.Cart
 	if err := tx.First(&cart, "user_id = ?", userID).Error; err != nil {
@@ -71,7 +77,7 @@ func PaymentPage(c *gin.Context) {
 		return
 	}
 	var cartItems []models.CartItem
-	if err := tx.Preload("ProductVariant").
+	if err := tx.Unscoped().Preload("ProductVariant").
 		Preload("ProductVariant.VariantsImages").
 		Preload("ProductVariant.Category").
 		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
@@ -116,10 +122,15 @@ func PaymentPage(c *gin.Context) {
 			return
 		}
 	}
-
+	var CartItems []CartItemWithDiscount
 	for _, items := range cartItems {
+		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
+		CartItems = append(CartItems, CartItemWithDiscount{
+			Item:          items,
+			DiscountPrice: items.ProductVariant.SalePrice - discountAmount,
+		})
 		regularPrice += items.ProductVariant.RegularPrice * float64(items.Quantity)
-		salePrice += items.ProductVariant.SalePrice * float64(items.Quantity)
+		salePrice += (items.ProductVariant.SalePrice * float64(items.Quantity))-discountAmount
 	}
 	tax = (salePrice * 18) / 100
 	productDiscount = regularPrice - salePrice
@@ -140,7 +151,7 @@ func PaymentPage(c *gin.Context) {
 		"status":          "OK",
 		"message":         "Checkout fetch success",
 		"Address":         address,
-		"CartItem":        cartItems,
+		"CartItem":        CartItems,
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
 		"Tax":             tax,

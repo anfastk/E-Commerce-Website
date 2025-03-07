@@ -268,10 +268,13 @@
                 <p class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                     ₹{{printf "%.2f" .product.SalePrice}} <span class="line-through text-gray-500 text-lg">₹
                         {{printf "%.2f" .product.RegularPrice}}</span>
-                    <span class="text-red-500">21% OFF</span>
+                        {{if .product.OfferPercentage}}
+                        <span class="text-red-500">{{.product.OfferPercentage}}% OFF</span>
+                        {{else}}
+                    {{end}}
                 </p>
-                <div class="bg-red-500 text-white rounded px-4 py-1 inline-block text-sm font-semibold mb-4">New Year
-                    Offer</div>
+                <!-- <div class="bg-red-500 text-white rounded px-4 py-1 inline-block text-sm font-semibold mb-4">New Year
+                    Offer</div> -->
 
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-1">Color</label>
@@ -299,61 +302,7 @@
                 </div>
                 
 
-                <!-- Coupon Button Section -->
-                <div class="mb-4 w-full">
-                    <label class="block text-gray-700 font-medium mb-2">Apply Coupon Code to Get More Discount</label>
-                    <div class="relative">
-                        <button
-                            class="w-full text-left p-3 border border-gray-300 rounded flex justify-between items-center bg-white shadow-sm hover:shadow-md"
-                            id="showCouponButton">
-                            <span class="text-black font-bold">COUPON CODES</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Popup Modal -->
-                <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                    id="couponModal">
-                    <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Available Coupon Codes</h2>
-                        <ul class="space-y-4">
-                            <li class="bg-gray-100 p-4 rounded shadow">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-lg font-bold text-blue-600">SAVE20</span>
-                                    <button
-                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                                        onclick="copyToClipboard('SAVE20')">Copy</button>
-                                </div>
-                                <p class="text-gray-600 mt-2">Get 20% off on your purchase!</p>
-                            </li>
-                            <li class="bg-gray-100 p-4 rounded shadow">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-lg font-bold text-blue-600">FREESHIP</span>
-                                    <button
-                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                                        onclick="copyToClipboard('FREESHIP')">Copy</button>
-                                </div>
-                                <p class="text-gray-600 mt-2">Free shipping on orders over $50.</p>
-                            </li>
-                            <li class="bg-gray-100 p-4 rounded shadow">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-lg font-bold text-blue-600">NEW10</span>
-                                    <button
-                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                                        onclick="copyToClipboard('NEW10')">Copy</button>
-                                </div>
-                                <p class="text-gray-600 mt-2">10% off for new customers.</p>
-                            </li>
-                        </ul>
-                        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-6"
-                            id="closeModalButton">Close</button>
-                    </div>
-                </div>
+                
 
                 <div
                     class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-gray-500 mt-4">

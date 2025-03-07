@@ -24,11 +24,12 @@ func UserHome(c *gin.Context) {
 }
 
 type ProductVariantResponse struct {
-	ID           uint     `json:"id"`
-	ProductName  string   `json:"product_name"`
-	RegularPrice float64  `json:"regular_price"`
-	SalePrice    float64  `json:"sale_price"`
-	Images       []string `json:"images"`
+	ID              uint     `json:"id"`
+	ProductName     string   `json:"product_name"`
+	RegularPrice    float64  `json:"regular_price"`
+	SalePrice       float64  `json:"sale_price"`
+	OfferPercentage int      `json:"offer_persentage"`
+	Images          []string `json:"images"`
 }
 
 func ShowProducts(c *gin.Context) {
@@ -65,13 +66,18 @@ func ShowProducts(c *gin.Context) {
 		for _, img := range variant.VariantsImages {
 			images = append(images, img.ProductVariantsImages)
 		}
-
+		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
+		if disErr != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
+			return
+		}
 		response = append(response, ProductVariantResponse{
-			ID:           variant.ID,
-			ProductName:  variant.ProductName,
-			RegularPrice: variant.RegularPrice,
-			SalePrice:    variant.SalePrice,
-			Images:       images,
+			ID:              variant.ID,
+			ProductName:     variant.ProductName,
+			RegularPrice:    variant.RegularPrice,
+			SalePrice:       variant.SalePrice - discountAmount,
+			OfferPercentage: int(TotalPercentage),
+			Images:          images,
 		})
 	}
 
@@ -175,12 +181,18 @@ func FilterProducts(c *gin.Context) {
 			images = append(images, img.ProductVariantsImages)
 		}
 
+		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
+		if disErr != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
+			return
+		}
 		response = append(response, ProductVariantResponse{
-			ID:           variant.ID,
-			ProductName:  variant.ProductName,
-			RegularPrice: variant.RegularPrice,
-			SalePrice:    variant.SalePrice,
-			Images:       images,
+			ID:              variant.ID,
+			ProductName:     variant.ProductName,
+			RegularPrice:    variant.RegularPrice,
+			SalePrice:       variant.SalePrice - discountAmount,
+			OfferPercentage: int(TotalPercentage),
+			Images:          images,
 		})
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -191,21 +203,22 @@ func FilterProducts(c *gin.Context) {
 }
 
 type ProductDetailResponse struct {
-	ID             uint                    `json:"id"`
-	ProductName    string                  `json:"product_name"`
-	CategoryName   string                  `json:"category_name"`
-	CategoryID     uint                    `json:"category_id"`
-	RegularPrice   float64                 `json:"regular_price"`
-	SalePrice      float64                 `json:"sale_price"`
-	Images         []string                `json:"images"`
-	Size           string                  `json:"size"`
-	Color          string                  `json:"color"`
-	Ram            string                  `json:"ram"`
-	Storage        string                  `json:"storage"`
-	Stock          int                     `json:"stock"`
-	Summary        string                  `json:"summary"`
-	Specifications []SpecificationResponse `json:"specifications"`
-	Description    []DescriptionResponse   `json:"description"`
+	ID              uint                    `json:"id"`
+	ProductName     string                  `json:"product_name"`
+	CategoryName    string                  `json:"category_name"`
+	CategoryID      uint                    `json:"category_id"`
+	RegularPrice    float64                 `json:"regular_price"`
+	SalePrice       float64                 `json:"sale_price"`
+	Images          []string                `json:"images"`
+	Size            string                  `json:"size"`
+	Color           string                  `json:"color"`
+	Ram             string                  `json:"ram"`
+	Storage         string                  `json:"storage"`
+	Stock           int                     `json:"stock"`
+	OfferPercentage int                     `json:"offer_percentage"`
+	Summary         string                  `json:"summary"`
+	Specifications  []SpecificationResponse `json:"specifications"`
+	Description     []DescriptionResponse   `json:"description"`
 }
 
 type DescriptionResponse struct {
@@ -263,11 +276,12 @@ func ShowProductDetail(c *gin.Context) {
 		Find(&relatedProducts)
 
 	type RelatedProductsResponce struct {
-		ID             uint     `json:"id"`
-		ProductName    string   `json:"product_name"`
-		ProductSummary string   `json:"product_summary"`
-		SalePrice      float64  `json:"sale_price "`
-		Images         []string `json:"images"`
+		ID              uint     `json:"id"`
+		ProductName     string   `json:"product_name"`
+		ProductSummary  string   `json:"product_summary"`
+		OfferPercentage int      `json:"offer_percentage"`
+		SalePrice       float64  `json:"sale_price "`
+		Images          []string `json:"images"`
 	}
 	var relatedProductsResponce []RelatedProductsResponce
 
@@ -276,31 +290,42 @@ func ShowProductDetail(c *gin.Context) {
 		for _, image := range product.VariantsImages {
 			images = append(images, image.ProductVariantsImages)
 		}
+		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(product.ID, product.CategoryID, product.RegularPrice, product.SalePrice)
+		if disErr != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
+			return
+		}
 		relatedProductsResponce = append(relatedProductsResponce, RelatedProductsResponce{
-			ID:             product.ID,
-			ProductName:    product.ProductName,
-			ProductSummary: product.ProductSummary,
-			SalePrice:      product.SalePrice,
-			Images:         images,
+			ID:              product.ID,
+			ProductName:     product.ProductName,
+			ProductSummary:  product.ProductSummary,
+			OfferPercentage: int(TotalPercentage),
+			SalePrice:       product.SalePrice - discountAmount,
+			Images:          images,
 		})
 	}
-
+	discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
+	if disErr != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
+		return
+	}
 	product := ProductDetailResponse{
-		ID:             variant.ID,
-		ProductName:    variant.ProductName,
-		CategoryName:   variant.Category.Name,
-		CategoryID:     variant.CategoryID,
-		RegularPrice:   variant.RegularPrice,
-		SalePrice:      variant.SalePrice,
-		Images:         images,
-		Size:           variant.Size,
-		Color:          variant.Colour,
-		Ram:            variant.Ram,
-		Storage:        variant.Storage,
-		Stock:          variant.StockQuantity,
-		Summary:        variant.ProductSummary,
-		Specifications: specs,
-		Description:    description,
+		ID:              variant.ID,
+		ProductName:     variant.ProductName,
+		CategoryName:    variant.Category.Name,
+		CategoryID:      variant.CategoryID,
+		RegularPrice:    variant.RegularPrice,
+		SalePrice:       variant.SalePrice - discountAmount,
+		Images:          images,
+		Size:            variant.Size,
+		Color:           variant.Colour,
+		Ram:             variant.Ram,
+		Storage:         variant.Storage,
+		OfferPercentage: int(TotalPercentage),
+		Stock:           variant.StockQuantity,
+		Summary:         variant.ProductSummary,
+		Specifications:  specs,
+		Description:     description,
 	}
 
 	c.HTML(http.StatusFound, "productDetails.html", gin.H{

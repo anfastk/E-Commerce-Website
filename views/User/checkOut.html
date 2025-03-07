@@ -355,15 +355,15 @@
                         <!-- Product 1 -->
                         {{range .CartItem}}
                         <div class="flex gap-4">
-                            <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                            <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
                                 alt="Camera" class="w-16 h-16 object-contain rounded">
                             <div>
-                                <p class="text-sm">{{ .ProductVariant.ProductName }}</p>
+                                <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-sm">{{.Quantity}} ×</span>
-                                    <span class="font-medium">&#8377; {{ .ProductVariant.SalePrice}}</span>
-                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
-                                        .ProductVariant.RegularPrice}}</span>
+                                    <span class="text-sm">{{.Item.Quantity}} ×</span>
+                                    <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice}}</span>
+                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f" 
+                                        .Item.ProductVariant.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
@@ -374,7 +374,7 @@
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between">
                             <span>Sub-total</span>
-                            <span>&#8377; {{.SubTotal}}</span>
+                            <span>&#8377; {{printf "%.2f" .SubTotal}}</span>
                         </div>
 
                         <!-- Coupon Input -->
@@ -389,20 +389,20 @@
                             <span>-&#8377; 00</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
+                            <span>Product Discount</span>
+                            <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax (18%)</span>
+                            <span>&#8377; {{printf "%.2f" .Tax}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
                             <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
-                            <span>Tax</span>
-                            <span>&#8377; {{.Tax}}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Product Discount</span>
-                            <span>&#8377; {{.ProductDiscount}}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
-                            <span>&#8377; {{.TotalDiscount}}</span>
+                            <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
                         </div>
                         <div class="flex justify-between font-bold pt-4 border-t">
                             <span>Total</span>

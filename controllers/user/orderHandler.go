@@ -174,13 +174,13 @@ func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.Res
 		var firstImage string
 
 		var firstVariantImage models.ProductVariantsImage
-		err := config.DB.Where("product_variant_id = ?", item.ProductVariant.ID).Order("id ASC").First(&firstVariantImage).Error
+		err := config.DB.Unscoped().Where("product_variant_id = ?", item.ProductVariant.ID).Order("id ASC").First(&firstVariantImage).Error
 
 		if err == nil {
 			firstImage = firstVariantImage.ProductVariantsImages
 		}
 		var mainProduct models.ProductDetail
-		if err := tx.First(&mainProduct, "id = ?", item.ProductVariant.ProductID).Error; err != nil {
+		if err := tx.Unscoped().First(&mainProduct, "id = ?", item.ProductVariant.ProductID).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch main product", "Something Went Wrong", "/checkout")
 			return
@@ -328,7 +328,7 @@ func FetchAddressByIDAndUserID(c *gin.Context, userID uint, addressID string) *m
 
 func FetchReservedProducts(c *gin.Context, userID uint) []models.ReservedStock {
 	var reservedProducts []models.ReservedStock
-	if err := config.DB.Preload("ProductVariant").
+	if err := config.DB.Unscoped().Preload("ProductVariant").
 		Find(&reservedProducts, "user_id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Database Error", "Unable to fetch cart items", "/cart")
 		return nil
@@ -348,9 +348,10 @@ func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStoc
 	)
 	reservedMap := make(map[uint]int)
 	for _, r := range reservedProducts {
+		discountAmount, _, _ := helper.DiscountCalculation(r.ProductVariantID, r.ProductVariant.CategoryID, r.ProductVariant.RegularPrice, r.ProductVariant.SalePrice)
 		reservedMap[r.ProductVariantID] = r.Quantity
 		regularPrice += r.ProductVariant.RegularPrice * float64(r.Quantity)
-		salePrice += r.ProductVariant.SalePrice * float64(r.Quantity)
+		salePrice += (r.ProductVariant.SalePrice * float64(r.Quantity)) - discountAmount
 	}
 
 	for _, item := range cartItems {

@@ -47,8 +47,8 @@ func AddProductOffer(c *gin.Context) {
 		return
 	}
 
-	if time.Now().After(startDates) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+	if startDates.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
 		return
 	}
 
@@ -142,8 +142,8 @@ func UpdateProductOffer(c *gin.Context) {
 		return
 	}
 
-	if time.Now().After(startDate) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+	if startDate.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
 		return
 	}
 
@@ -259,8 +259,8 @@ func AddCategoryOffer(c *gin.Context) {
 		return
 	}
 
-	if time.Now().After(startDate) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+	if startDate.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
 		return
 	}
 
@@ -342,8 +342,8 @@ func UpdateCategoryOffer(c *gin.Context) {
 		return
 	}
 
-	if time.Now().After(startDate) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be in the future", "")
+	if startDate.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
 		return
 	}
 
@@ -413,3 +413,4 @@ func DeleteCategoryOffer(c *gin.Context) {
 		"code":    200,
 	})
 }
+

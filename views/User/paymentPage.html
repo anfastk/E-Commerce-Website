@@ -292,15 +292,15 @@
                     </div>
                     {{range .CartItem}}
                     <div class="flex items-center gap-4 p-4  rounded-lg border border-gray-200 mt-1">
-                        <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages }}"
+                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages }}"
                             alt="Laptop Stand" class="w-20 h-20 object-contain">
                         <div class="flex flex-col">
-                            <p class="text-sm font-medium">{{ .ProductVariant.ProductSummary }}</p>
+                            <p class="text-sm font-medium">{{ .Item.ProductVariant.ProductSummary }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{ .Quantity }} ×</span>
-                                <span class="font-medium text-sm">&#8377; {{ .ProductVariant.SalePrice }}</span>
+                                <span class="text-sm">{{ .Item.Quantity }} ×</span>
+                                <span class="font-medium text-sm">&#8377; {{ .DiscountPrice }}</span>
                                 <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
-                                    .ProductVariant.RegularPrice }}</span>
+                                    .Item.ProductVariant.RegularPrice }}</span>
                             </div>
                         </div>
                     </div>
@@ -316,15 +316,15 @@
                 <div class="space-y-4 mb-6">
                     {{range .CartItem}}
                     <div class="flex gap-4">
-                        <img src="{{ (index .ProductVariant.VariantsImages 0).ProductVariantsImages  }}" alt="Camera"
+                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}" alt="Camera"
                             class="w-16 h-16 object-contain">
                         <div>
-                            <p class="text-sm">{{ .ProductVariant.ProductName }}</p>
+                            <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{.Quantity}} ×</span>
-                                <span class="font-medium">&#8377; {{ .ProductVariant.SalePrice}}</span>
-                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
-                                    .ProductVariant.RegularPrice}}</span>
+                                <span class="text-sm">{{.Item.Quantity}} ×</span>
+                                <span class="font-medium">&#8377; {{printf "%.2f"  .DiscountPrice }}</span>
+                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f" 
+                                    .Item.ProductVariant.RegularPrice}}</span>
                             </div>
                         </div>
                     </div>
@@ -335,11 +335,19 @@
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span>Sub-total</span>
-                        <span>&#8377; {{.SubTotal}}</span>
+                        <span>&#8377; {{printf "%.2f" .SubTotal}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Coupon Discount</span>
                         <span>-&#8377;00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Product Discount</span>
+                        <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Tax</span>
+                        <span>&#8377; {{printf "%.2f" .Tax}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Shipping</span>
@@ -347,23 +355,15 @@
                                 class="line-through text-xs">&#8377;100</span> {{end}}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>Tax</span>
-                        <span>&#8377; {{.Tax}}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Product Discount</span>
-                        <span>&#8377; {{.ProductDiscount}}</span>
-                    </div>
-                    <div class="flex justify-between">
                         <span>Total Discount</span>
-                        <span>&#8377; {{.TotalDiscount}}</span>
+                        <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
                     </div>
                 </div>
 
                 <div class="border-t mt-4 pt-4">
                     <div class="flex justify-between font-semibold mb-4">
                         <span>Total</span>
-                        <span>&#8377; {{.Total}}</span>
+                        <span>&#8377; {{printf "%.2f" .Total}}</span>
                     </div>
                     <div class="mt-6">
                         <button id="proceedToPay"
