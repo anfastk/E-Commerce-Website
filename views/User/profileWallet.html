@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
     <style>
         .glass-effect {
             background: rgba(255, 255, 255, 0.25);
@@ -283,10 +285,40 @@
                         <!-- Forms: Initially Hidden -->
                         <div id="addMoneyForm" class="hidden bg-white rounded-xl border border-gray-200 p-6 mb-8">
                             <h2 class="text-xl font-bold text-gray-800 mb-4">Add Money to Wallet</h2>
-                            <form>
+                            <!-- Note: Removed the form tag to prevent default form submission behavior -->
+                            <div id="walletFormContainer">
+                                <!-- Quick Amount Selection (Initially Visible) -->
                                 <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">
+                                        Select Amount
+                                    </label>
+                                    <div class="grid grid-cols-3 gap-3 mb-2">
+                                        <button type="button"
+                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded"
+                                            data-amount="10">&#8377;10</button>
+                                        <button type="button"
+                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded"
+                                            data-amount="20">&#8377;20</button>
+                                        <button type="button"
+                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded"
+                                            data-amount="50">&#8377;50</button>
+                                        <button type="button"
+                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded"
+                                            data-amount="100">&#8377;100</button>
+                                        <button type="button"
+                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded"
+                                            data-amount="200">&#8377;200</button>
+                                        <button type="button" id="otherAmountBtn"
+                                            class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded">
+                                            Other
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Amount Input (Initially Hidden) -->
+                                <div id="customAmountSection" class="mb-4 hidden">
                                     <label class="block text-gray-700 text-sm font-medium mb-2" for="amount">
-                                        Amount
+                                        Enter Amount
                                     </label>
                                     <div class="relative">
                                         <div
@@ -298,42 +330,31 @@
                                             placeholder="0.00" min="1">
                                     </div>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="block text-gray-700 text-sm font-medium mb-2">
-                                        Quick Amounts
-                                    </label>
-                                    <div class="grid grid-cols-4 gap-2">
-                                        <button type="button"
-                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded"
-                                            data-amount="10">&#8377;10</button>
-                                        <button type="button"
-                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded"
-                                            data-amount="20">&#8377;20</button>
-                                        <button type="button"
-                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded"
-                                            data-amount="50">&#8377;50</button>
-                                        <button type="button"
-                                            class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded"
-                                            data-amount="100">&#8377;100</button>
-                                    </div>
-                                </div>
+
+                                <!-- Hidden field to store the selected amount -->
+                                <input type="hidden" id="selectedAmount" value="">
+
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-medium mb-2" for="payment-method">
                                         Payment Method
                                     </label>
-                                    <select id="payment-method" name="payment-method"
+                                    <select id="payment-method"
                                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5">
                                         <option value="Razorpay">RazorPay</option>
                                     </select>
                                 </div>
+
+                                <!-- Status message for feedback -->
+                                <div id="statusMessage" class="mb-4 hidden rounded-md p-3"></div>
+
                                 <div class="flex justify-end gap-3">
                                     <button type="button" id="cancelAddMoney"
                                         class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
-                                    <button type="submit"
+                                    <button type="button" id="submitButton"
                                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition">Add
                                         Money</button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
                         <div id="giftCardForm" class="hidden bg-white rounded-xl border border-gray-200 p-6 mb-8">
@@ -492,7 +513,6 @@
                                                 {{.Date}}
                                             </td>
                                             <td class="px-6 py-4 text-sm text-gray-900">
-                                                <!-- Added funds via Credit Card -->
                                                 {{.Description}}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -534,6 +554,18 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
         </div>
     </div>
 
@@ -638,12 +670,286 @@
         });
 
         // Quick amount buttons
-        document.querySelectorAll('.amount-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                document.getElementById('amount').value = this.dataset.amount;
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get elements
+            const amountButtons = document.querySelectorAll('.amount-btn');
+            const otherAmountBtn = document.getElementById('otherAmountBtn');
+            const customAmountSection = document.getElementById('customAmountSection');
+            const amountInput = document.getElementById('amount');
+            const selectedAmountField = document.getElementById('selectedAmount');
+            const submitButton = document.getElementById('submitButton');
+            const cancelButton = document.getElementById('cancelAddMoney');
+            const statusMessage = document.getElementById('statusMessage');
+
+
+            // Function to hide status message
+            function hideStatus() {
+                statusMessage.classList.add('hidden');
+            }
+
+            // Function to enable submit button
+            function enableSubmitButton() {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50');
+            }
+
+            // Function to disable submit button
+            function disableSubmitButton() {
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50');
+            }
+
+            // Handle amount button selection
+            amountButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    // Remove active class from all buttons
+                    amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                    otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
+
+                    // Add active class to clicked button
+                    this.classList.add('bg-blue-500', 'text-white');
+
+                    // Hide custom amount section
+                    customAmountSection.classList.add('hidden');
+
+                    // Set the selected amount
+                    const amount = this.getAttribute('data-amount');
+                    selectedAmountField.value = amount;
+
+                    // Enable submit button
+                    enableSubmitButton();
+
+                    // Hide any previous status messages
+                    hideStatus();
+                });
+            });
+
+            // Handle "Other" button click
+            otherAmountBtn.addEventListener('click', function () {
+                // Remove active class from all buttons
+                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+
+                // Add active class to Other button
+                this.classList.add('bg-blue-500', 'text-white');
+
+                // Show custom amount section
+                customAmountSection.classList.remove('hidden');
+
+                // Focus on amount input
+                amountInput.focus();
+
+                // Reset the amount input
+                amountInput.value = '';
+
+                // Clear the selected amount until user enters a value
+                selectedAmountField.value = '';
+
+                // Disable submit button until a valid amount is entered
+                disableSubmitButton();
+
+                // Hide any previous status messages
+                hideStatus();
+            });
+
+            // Validate custom amount input
+            amountInput.addEventListener('input', validateCustomAmount);
+            amountInput.addEventListener('change', validateCustomAmount);
+
+            // Separate validation function to avoid code duplication
+            function validateCustomAmount() {
+                // Get the value and trim any whitespace
+                let value = amountInput.value.trim();
+
+                // Parse as float
+                const amount = parseFloat(value);
+
+                // Check if valid amount (not empty, is a number, and ≥ 1)
+                if (value && !isNaN(amount) && amount >= 1) {
+                    // Set the hidden field value
+                    selectedAmountField.value = amount.toString();
+                    // Enable the submit button
+                    enableSubmitButton();
+                } else {
+                    // Invalid amount, clear hidden field
+                    selectedAmountField.value = '';
+                    // Disable the submit button
+                    disableSubmitButton();
+                }
+            }
+
+            // Handle submit button click - completely separated from form submission
+            submitButton.addEventListener('click', function () {
+                // When "Other" option is selected, get the latest value directly from the input
+                if (!customAmountSection.classList.contains('hidden')) {
+                    const customValue = amountInput.value.trim();
+                    const customAmount = parseFloat(customValue);
+
+                    if (customValue && !isNaN(customAmount) && customAmount >= 1) {
+                        selectedAmountField.value = customAmount.toString();
+                    }
+                }
+
+                const amount = selectedAmountField.value;
+                const paymentMethod = document.getElementById('payment-method').value;
+
+                // Ensure we have a valid amount
+                if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) < 1) {
+                    showErrorToast('Please select or enter a valid amount');
+                    return;
+                }
+
+                // Disable the submit button to prevent multiple submissions
+                disableSubmitButton();
+                submitButton.textContent = 'Processing...';
+
+                // Prepare data for submission
+                const data = {
+                    amount: parseFloat(amount),
+                    paymentMethod: paymentMethod
+                };
+
+
+                // Send AJAX request
+                fetch('/profile/wallet/add/amount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showSuccessToast("Payment initiated successfully!");
+                        initializeRazorpay(data);
+                        // Reset the form after success
+                        setTimeout(() => {
+                            resetForm();
+                            hideStatus();
+                            // If you want to hide the form after success
+                            document.getElementById('addMoneyForm').classList.add('hidden');
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        showErrorToast('Failed to add money. Please try again.', true);
+
+                        // Re-enable the submit button
+                        enableSubmitButton();
+                        submitButton.textContent = 'Add Money';
+                    });
+            });
+
+            // Function to reset the form
+            function resetForm() {
+                // Reset all form fields
+                amountInput.value = '';
+                document.getElementById('payment-method').selectedIndex = 0;
+
+                // Reset UI state
+                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
+                customAmountSection.classList.add('hidden');
+                selectedAmountField.value = '';
+                disableSubmitButton();
+                submitButton.textContent = 'Add Money';
+            }
+
+            // Handle cancel button
+            cancelButton.addEventListener('click', function () {
+                document.getElementById('addMoneyForm').classList.add('hidden');
+                resetForm();
+                hideStatus();
             });
         });
+
+        function initializeRazorpay(data) {
+            const options = {
+                key: data.key_id,
+                amount: data.amount,
+                currency: data.currency,
+                name: "LAPTIX",
+                description: "Purchase Payment",
+                image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
+                order_id: data.order_id,
+                handler: function (response) {
+                    // Handle successful payment
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        amount: data.amount,
+                    });
+                },
+                prefill: {
+                    name: data.prefill.name,
+                    email: data.prefill.email,
+                },
+                notes: data.notes,
+                theme: {
+                    color: "#0000"
+                },
+                modal: {
+                    ondismiss: function () {
+                        const payButton = document.getElementById('proceedToPay');
+                        payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                        payButton.disabled = false;
+                        showErrorToast("Payment cancelled");
+                    }
+                },
+                // Add retry configuration to prevent retry option
+                retry: {
+                    enabled: false  // Disable retry functionality
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            // Add payment failed handler
+            rzp.on('payment.failed', function (response) {
+                showErrorToast("Payment Failed");
+                setTimeout(function () {
+                    showErrorToast("Payment Failed");
+                }, 3000);
+            });
+
+            rzp.open();
+        }
+
+        function verifyPayment(paymentData) {
+            fetch('/profile/wallet/add/amount/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Payment verification failed."); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showSuccessToast("Amount Added Successfully");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000); // 3000 milliseconds = 3 seconds
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast(error.message || "An error occurred while verifying the payment.");
+
+                    // Reset button state
+                    const payButton = document.getElementById('proceedToPay');
+                    payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
+                    payButton.disabled = false;
+                });
+        }
     </script>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

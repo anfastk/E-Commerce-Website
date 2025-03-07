@@ -1121,8 +1121,6 @@ function submitCancelForm() {
                 let result = await response.json();
                 if (response.ok) {
                     showSuccessToast("Payment initiated successfully!");
-                    console.log(result);
-
                     if (result.redirect) {
                         window.location.href = result.redirect;
                     } else {

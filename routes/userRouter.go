@@ -70,6 +70,8 @@ func UserRouter(r *gin.Engine) {
 		userProfile.GET("/wallet", controllers.WalletHandler)
 		userProfile.GET("/referral",controllers.ShowReferralPage)
 		userProfile.POST("/referral/add",controllers.AddReferral)
+		userProfile.POST("/wallet/add/amount", controllers.AddMoneyTOWalltet)
+		userProfile.POST("/wallet/add/amount/verify", controllers.VerifyAddTOWalletRazorpayPayment)
 	}
 
 	cart := r.Group("/cart")

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -320,7 +319,6 @@ func PayNow(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
 			return
 		}
-		fmt.Println(address.Mobile, address.Address)
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
