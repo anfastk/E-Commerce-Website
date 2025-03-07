@@ -95,6 +95,8 @@ func ShowCart(c *gin.Context) {
 			Images:       images,
 		})
 	}
+	CheckForReferrer(c)
+	CheckForJoinee(c)
 
 	c.HTML(http.StatusOK, "cart.html", gin.H{
 		"Suggestion": suggest,

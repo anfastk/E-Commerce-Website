@@ -67,6 +67,8 @@ func ShowCheckoutPage(c *gin.Context) {
 		return
 	}
 	CreateWallet(c,userID)
+	CheckForReferrer(c)
+	CheckForJoinee(c)
 	c.HTML(http.StatusOK, "checkOut.html", gin.H{
 		"status":          "OK",
 		"message":         "Checkout fetch success",

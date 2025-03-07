@@ -134,6 +134,8 @@ func PaymentPage(c *gin.Context) {
 	total = salePrice + tax
 
 	tx.Commit()
+	CheckForReferrer(c)
+	CheckForJoinee(c)
 
 	c.HTML(http.StatusOK, "paymentPage.html", gin.H{
 		"status":          "OK",

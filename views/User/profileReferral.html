@@ -150,7 +150,8 @@
                             </svg>
                             Shopping Cart
                         </a>
-                        <a href="/profile/wallet" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/wallet"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -251,9 +252,9 @@
                         <div class="bg-gray-100 rounded-lg p-6 mb-8">
                             <p class="text-gray-600 text-sm mb-2">Your Referral Code</p>
                             <div class="flex items-center">
-                                <div
-                                    class="bg-white border border-gray-300 rounded px-4 py-3 flex-grow text-lg font-mono font-medium">
-                                    JOHN750
+                                <div class="bg-white border border-gray-300 rounded px-4 py-3 flex-grow text-lg font-mono font-medium cursor-pointer"
+                                    id="referralCodeDisplay" onclick="copyReferralCode()">
+                                    {{.User.ReferralCode}}
                                 </div>
                                 <button onclick="copyReferralCode()"
                                     class="ml-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded transition duration-200"
@@ -272,7 +273,7 @@
                                     <i class="fas fa-users text-purple-500 text-3xl"></i>
                                 </div>
                                 <p class="text-gray-600 text-sm">Total Referrals</p>
-                                <p class="text-3xl font-bold text-gray-800">12</p>
+                                <p class="text-3xl font-bold text-gray-800">{{.ReferralAccount.Count}}</p>
                             </div>
 
                             <!-- Earnings -->
@@ -281,7 +282,8 @@
                                     <i class="fas fa-coins text-yellow-500 text-3xl"></i>
                                 </div>
                                 <p class="text-gray-600 text-sm">Total Earnings</p>
-                                <p class="text-3xl font-bold text-gray-800">₹3,000</p>
+                                <p id="amount" class="text-3xl font-bold text-gray-800">
+                                    &#8377;{{.ReferralAccount.Balance}}</p>
                             </div>
                         </div>
 
@@ -310,7 +312,8 @@
                                             <i class="ml-1 fas fa-user-plus text-purple-500 text-2xl"></i>
                                         </div>
                                         <h3 class="font-semibold text-lg mb-2">Friend Signs Up</h3>
-                                        <p class="text-gray-600">They enter your code in their referral section and make a order
+                                        <p class="text-gray-600">They enter your code in their referral section, place
+                                            their first order, and once it's delivered
                                         </p>
                                     </div>
 
@@ -321,30 +324,35 @@
                                             <i class="fas fa-gift text-green-500 text-2xl"></i>
                                         </div>
                                         <h3 class="font-semibold text-lg mb-2">Both Get Rewards</h3>
-                                        <p class="text-gray-600">You get ₹250, they get ₹100 in store credit</p>
+                                        <p class="text-gray-600">You get ₹250, they get ₹100 in store wallet</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        {{if .User.IsRefered}}
+                        {{else}}
                         <!-- Enter Referral Code Box -->
                         <div class="bg-gray-100 rounded-lg p-6 mb-8">
                             <h3 class="text-xl font-bold text-gray-800 mb-4">Have a Referral Code?</h3>
                             <div class="flex items-center">
-                                <input type="text" placeholder="Enter code here"
+                                <input type="text" id="referralCodeInput" placeholder="Enter code here"
                                     class="border border-gray-300 rounded px-4 py-2 flex-grow">
-                                <button
+                                <button id="redeemButton"
                                     class="ml-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition duration-200">
                                     Redeem
                                 </button>
                             </div>
+                            <p id="statusMessage" class="mt-2 text-sm hidden"></p>
                         </div>
+                        {{end}}
 
                         <!-- Referral History -->
                         <div class="bg-white overflow-hidden">
                             <div class="px-6 py-4 border-b border-gray-200">
                                 <h2 class="text-2xl font-bold text-gray-800">Referral History</h2>
                             </div>
+                            {{if len .ReferalHistory}}
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
@@ -364,73 +372,41 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
+                                        {{range .ReferalHistory}}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <div
-                                                        class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                        JS</div>
+                                                    <img src="{{.JoinedUser.ProfilePic}}" alt="{{.JoinedUser.FullName}}"
+                                                        class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 object-contain">
                                                     <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">John Smith</div>
-                                                        <div class="text-sm text-gray-500">john@example.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Feb 28, 2025
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹250</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div
-                                                        class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                        MJ</div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">Maria Johnson
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{.JoinedUser.FullName}}
                                                         </div>
-                                                        <div class="text-sm text-gray-500">maria@example.com</div>
+                                                        <div class="text-sm text-gray-500">{{.JoinedUser.Email}}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Feb 15, 2025
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹250</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div
-                                                        class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                        RP</div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">Raj Patel</div>
-                                                        <div class="text-sm text-gray-500">raj@example.com</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Feb 10, 2025
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                {{if eq .Status "Pending"}}
                                                 <span
                                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                                {{else}}
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                                {{end}}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">-</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                &#8377;{{.Reward}}</td>
                                         </tr>
+                                        {{end}}
                                     </tbody>
                                 </table>
                             </div>
+                            {{else}}
                             <!-- Empty or Few Referrals State -->
-                            <div class="p-6 text-center hidden">
-                                <img src="/api/placeholder/200/150" alt="No referrals yet" class="mx-auto mb-4">
+                            <div class="p-6 text-center ">
                                 <h3 class="text-lg font-semibold text-gray-700 mb-2">No Referrals Yet</h3>
                                 <p class="text-gray-500 mb-4">Share your code with friends to start earning rewards!</p>
                                 <button
@@ -438,6 +414,7 @@
                                     Share Now
                                 </button>
                             </div>
+                            {{end}}
                         </div>
                     </div>
                 </div>
@@ -512,7 +489,114 @@
         </div>
     </footer>
     <script>
-        
+        function copyReferralCode() {
+            // Get the referral code text
+            const referralCode = document.getElementById('referralCodeDisplay').textContent.trim();
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(referralCode)
+                .then(() => {
+                    // Show success message
+                    const copyMsg = document.getElementById('copyMsg');
+                    copyMsg.classList.remove('hidden');
+
+                    // Hide the message after 2 seconds
+                    setTimeout(() => {
+                        copyMsg.classList.add('hidden');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
+                });
+        }
+
+        // Get the raw amount from the rendered HTML
+        let amountElement = document.getElementById("amount");
+        let rawAmount = amountElement.innerText.replace("₹", "").trim(); // Remove ₹ and trim spaces
+
+        // Convert to float
+        let amount = parseFloat(rawAmount);
+
+        // Format the amount using Intl.NumberFormat for Indian currency
+        let formattedAmount = new Intl.NumberFormat('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+
+        // Update the element with formatted value
+        amountElement.innerHTML = `&#8377;${formattedAmount}`;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get references to the elements
+            const codeInput = document.getElementById('referralCodeInput');
+            const redeemButton = document.getElementById('redeemButton');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Add click event listener to the Redeem button
+            redeemButton.addEventListener('click', async function () {
+                // Get the referral code from the input
+                const referralCode = codeInput.value.trim();
+
+                // Validate input
+                if (!referralCode) {
+                    showStatus('Please enter a referral code', 'text-red-600');
+                    return;
+                }
+
+                // Show loading state
+                redeemButton.disabled = true;
+                redeemButton.textContent = 'Processing...';
+
+                try {
+                    // Prepare the data to be sent
+                    const data = {
+                        referralCode: referralCode
+                    };
+
+                    // Make the POST request to your backend endpoint
+                    const response = await fetch('/profile/referral/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    // Check if the request was successful
+                    if (response.ok) {
+                        const result = await response.json();
+                        showStatus(result.message || 'Code successfully redeemed!', 'text-green-600');
+
+                        // Clear the input field after successful redemption
+                        codeInput.value = '';
+                    } else {
+                        // Handle error responses
+                        const errorData = await response.json();
+                        showStatus(errorData.message || 'Failed to redeem code', 'text-red-600');
+                    }
+                } catch (error) {
+                    console.error('Error submitting referral code:', error);
+                    showStatus('An error occurred. Please try again later.', 'text-red-600');
+                } finally {
+                    // Reset button state
+                    redeemButton.disabled = false;
+                    redeemButton.textContent = 'Redeem';
+                }
+            });
+
+            // Helper function to show status messages
+            function showStatus(message, colorClass) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'mt-2 text-sm ' + colorClass;
+                statusMessage.classList.remove('hidden');
+
+                // Hide the message after 5 seconds
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 5000);
+            }
+        });
     </script>
 </body>
 
