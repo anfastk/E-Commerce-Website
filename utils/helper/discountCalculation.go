@@ -33,7 +33,7 @@ func DiscountCalculation(productID uint, categoryID uint, regularPrice float64, 
 	// Calculate discount amount
 	discountAmount := 0.0
 	if discountPercentage > 0 {
-		discountAmount = regularPrice * (discountPercentage / 100)
+		discountAmount = regularPrice * discountPercentage / 100
 	}
 
 	// Calculate product discount percentage based on sale price

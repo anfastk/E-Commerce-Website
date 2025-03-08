@@ -23,6 +23,10 @@ func ReleaseExpiredReservations(db *gorm.DB) {
 	}
 
 	for _, reservation := range expiredReservations {
+		var coupon models.ReservedCoupon
+		tx.First(&coupon, reservation.ReservedCouponID)
+		tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID)
+		tx.Unscoped().Delete(&coupon)
 		tx.Exec(
 			"UPDATE product_variant_details SET stock_quantity = stock_quantity + ? WHERE id = ?",
 			reservation.Quantity, reservation.ProductVariantID,
@@ -36,7 +40,7 @@ func ReleaseExpiredReservations(db *gorm.DB) {
 		Find(&failedOrderItems).Error; err != nil {
 		tx.Rollback()
 		log.Println("Error finding expired reservations:", err)
-		return 
+		return
 	}
 
 	for _, item := range failedOrderItems {
@@ -46,25 +50,25 @@ func ReleaseExpiredReservations(db *gorm.DB) {
 		).Error; err != nil {
 			tx.Rollback()
 			log.Println("Error updating stock quantity:", err)
-			return 
+			return
 		}
 
 		item.OrderStatus = "Failed"
 		if err := tx.Save(&item).Error; err != nil {
 			tx.Rollback()
 			log.Println("Error updating order status:", err)
-			return 
+			return
 		}
 
 		var paymentDetail models.PaymentDetail
 		if err := tx.First(&paymentDetail, "order_item_id = ?", item.ID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				log.Println("Payment detail not found for order item:", item.ID)
-				continue 
+				continue
 			}
 			tx.Rollback()
 			log.Println("Error fetching payment detail:", err)
-			return 
+			return
 		}
 
 		paymentDetail.PaymentStatus = "Cancelled"

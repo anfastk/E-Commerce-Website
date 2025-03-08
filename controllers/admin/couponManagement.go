@@ -68,8 +68,8 @@ func AddCoupon(c *gin.Context) {
 		MinOrdervalue     string `json:"minOrderValue" binding:"required"`
 		MaxDiscountValue  string `json:"maxDiscount" binding:"required"`
 		MaxUseCount       string `json:"usageLimit" binding:"required"`
-		ValidFrom         string `json:"expiryDate" binding:"required"`
-		ExpirationDate    string `json:"validDate" binding:"required"`
+		ValidFrom         string `json:"validDate" binding:"required"`
+		ExpirationDate    string `json:"expiryDate" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&couponInput); err != nil {
@@ -87,6 +87,18 @@ func AddCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Something Went Wrong", "")
 		return
 	}
+	if validFrom.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
+		return
+	}
+	if time.Now().After(expirationDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid End Date", "End date must be in the future", "")
+		return
+	}
+	if validFrom.After(expirationDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
+		return
+	}
 	status := "Active"
 	if validFrom.After(time.Now()) {
 		status = "Scheduled"
@@ -96,7 +108,7 @@ func AddCoupon(c *gin.Context) {
 		Discription:      couponInput.Discription,
 		DiscountValue:    discountValue,
 		MaxDiscountValue: maxDiscountValue,
-		MinOrdervalue:    minOrderValue,
+		MinOrderValue:    minOrderValue,
 		MaxUseCount:      maxUseCount,
 		ValidFrom:        validFrom,
 		ExpirationDate:   expirationDate,
@@ -126,7 +138,14 @@ func DeleteCoupon(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Unscoped().Delete(&coupon).Error; err != nil {
+	coupon.Status = "Deleted"
+
+	if err := config.DB.Save(&coupon).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete coupon", "Failed to delete coupon", "")
+		return
+	}
+
+	if err := config.DB.Delete(&coupon).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete coupon", "Failed to delete coupon", "")
 		return
 	}
@@ -166,8 +185,8 @@ func UpdateCoupon(c *gin.Context) {
 		MinOrderValue    string `json:"minOrderValue"`
 		MaxDiscountValue string `json:"maxDiscount"`
 		UsageLimit       string `json:"usageLimit"`
-		ExpiryDate       string `json:"expiryDate"`
 		ValidDate        string `json:"validDate"`
+		ExpiryDate       string `json:"expiryDate"`
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -202,22 +221,33 @@ func UpdateCoupon(c *gin.Context) {
 		return
 	}
 
-	coupon.CouponCode = request.CouponCode
+	coupon.CouponCode = strings.ToUpper(request.CouponCode)
 	coupon.Discription = request.Description
 	coupon.CouponType = request.CouponType
 	coupon.DiscountValue = discountValue
 	coupon.ApplicableFor = request.AppliedTo
-	coupon.MinOrdervalue = minOrderValue
+	coupon.MinOrderValue = minOrderValue
 	coupon.MaxDiscountValue = maxDiscountValue
 	coupon.MaxUseCount = maxUseCount
 	coupon.ValidFrom = validFrom
 	coupon.ExpirationDate = expiryDate
 	coupon.IsFixedCoupon = request.CouponType == "Fixed"
 
+	if validFrom.Before(time.Now().Truncate(24 * time.Hour)) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
+		return
+	}
+	if time.Now().After(expiryDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid End Date", "End date must be in the future", "")
+		return
+	}
+	if validFrom.After(expiryDate) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
+		return
+	}
+	coupon.Status = "Active"
 	if validFrom.After(time.Now()) {
 		coupon.Status = "Scheduled"
-	} else {
-		coupon.Status = "Active"
 	}
 
 	if err := config.DB.Save(&coupon).Error; err != nil {

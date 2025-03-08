@@ -109,7 +109,14 @@ func VerifyRazorpayPayment(c *gin.Context) {
 
 	tx := config.DB.Begin()
 
-	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount, tax, float64(shippingCharge), total, currentTime)
+	var coupon models.ReservedCoupon
+	tx.First(&coupon, paymentRequest.CouponId)
+	couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+		return
+	}
+	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 	orderItems := FetchOrderItems(c, tx, orderID)
@@ -154,6 +161,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 		DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
 	}
 	ClearCart(c, tx, reservedMap)
+	tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
 	tx.Commit()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -200,8 +208,14 @@ func PaymentFailureHandler(c *gin.Context) {
 	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
 
 	tx := config.DB.Begin()
-
-	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount, tax, float64(shippingCharge), total, currentTime)
+	var coupon models.ReservedCoupon
+	tx.First(&coupon, paymentRequest.CouponId)
+	couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
+		if err != nil {
+			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+			return
+		}
+		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 	orderItems := FetchOrderItems(c, tx, orderID)
@@ -246,6 +260,8 @@ func PaymentFailureHandler(c *gin.Context) {
 		DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
 	}
 	ClearCart(c, tx, reservedMap)
+	tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
+
 	tx.Commit()
 
 	c.Redirect(http.StatusSeeOther, "/profile/order/details")

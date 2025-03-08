@@ -12,7 +12,7 @@ type Coupon struct {
 	Discription      string    `gorm:"not null"`
 	DiscountValue    float64   `json:"discount_value"`
 	MaxDiscountValue float64   `json:"max_value"`
-	MinOrdervalue    float64   `gorm:"type:numeric(10,2)" json:"min_productvalue"`
+	MinOrderValue    float64   `gorm:"type:numeric(10,2)" json:"min_productvalue"`
 	UsersUsedCount   int       `json:"used_count"`
 	MaxUseCount      int       `json:"max_use_count"`
 	ApplicableFor    string    `json:"applicable"`

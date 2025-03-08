@@ -8,6 +8,7 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 )
@@ -16,12 +17,15 @@ func PaymentPage(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
 
 	var request struct {
-		AddressID string `json:"addressId"`
+		AddressID            string  `json:"addressId"`
+		CouponCode           string  `json:"couponCode"`
+		CouponId             int     `json:"couponId"`
+		CouponDiscountAmount float64 `json:"couponDiscountAmount"`
 	}
 
 	tx := config.DB.Begin()
 	var expiredReservations []models.ReservedStock
-	err := tx.Where("is_confirmed = ? AND reserve_till >= ?", false, time.Now().Add(time.Duration(25)*time.Millisecond)).
+	err := tx.Where("is_confirmed = ? AND reserve_till >= ?", false, time.Now()).
 		Find(&expiredReservations).Error
 	if err != nil {
 		tx.Rollback()
@@ -29,6 +33,10 @@ func PaymentPage(c *gin.Context) {
 		return
 	}
 	for _, reservation := range expiredReservations {
+		var coupon models.ReservedCoupon
+		tx.First(&coupon, reservation.ReservedCouponID)
+		tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID)
+		tx.Unscoped().Delete(&coupon)
 		if err := tx.Exec(
 			"UPDATE product_variant_details SET stock_quantity = stock_quantity + ? WHERE id = ?",
 			reservation.Quantity, reservation.ProductVariantID,
@@ -44,7 +52,7 @@ func PaymentPage(c *gin.Context) {
 		}
 	}
 
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data", "Binding the data", "")
 		return
 	}
@@ -55,40 +63,44 @@ func PaymentPage(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Address not found", "Address not found", "")
 	}
 
-	var (
-		regularPrice    float64
-		salePrice       float64
-		productDiscount float64
-		totalDiscount   float64
-		tax             float64
-		total           float64
-	)
-
 	type CartItemWithDiscount struct {
 		Item          models.CartItem
 		DiscountPrice float64
 	}
 
 	shippingCharge := 100
-	var cart models.Cart
-	if err := tx.First(&cart, "user_id = ?", userID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "", "Something Went Wrong", "/checkout")
+	_, cartItems, err := services.FetchCartItems(userID)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Cart Error", err.Error(), "/cart")
 		return
 	}
-	var cartItems []models.CartItem
-	if err := tx.Unscoped().Preload("ProductVariant").
-		Preload("ProductVariant.VariantsImages").
-		Preload("ProductVariant.Category").
-		Find(&cartItems, "cart_id = ?", cart.ID).Error; err != nil {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "", "Product Not Found", "/checkout")
-		return
-	}
+	var couponId uint
+	if request.CouponId != 0 {
+		var coupon models.Coupon
+		if productErr := tx.First(&coupon, request.CouponId).Error; productErr != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Coupon not found", "Something Went Wrong", "/checkout")
+			return
+		}
+		coupon.UsersUsedCount += 1
+		if err := tx.Save(&coupon).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusConflict, "Failed to Reserve coupon", "Something Went Wrong", "/checkout")
+			return
+		}
 
-	if len(cartItems) == 0 {
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Add Product in Your Cart", "/checkout")
-		return
+		reserveCoupon := models.ReservedCoupon{
+			CouponCode:           request.CouponCode,
+			Discription:          coupon.Discription,
+			CouponDiscountAmount: request.CouponDiscountAmount,
+			CouponID:             uint(request.CouponId),
+		}
+		if err := tx.Create(&reserveCoupon).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to coupon reserved stock", "Something Went Wrong", "/checkout")
+			return
+		}
+		couponId = reserveCoupon.ID
 	}
 
 	for _, item := range cartItems {
@@ -115,6 +127,7 @@ func PaymentPage(c *gin.Context) {
 			ReservedAt:       time.Now(),
 			ReserveTill:      time.Now().Add(15 * time.Minute),
 			IsConfirmed:      false,
+			ReservedCouponID: couponId,
 		}
 		if err := tx.Create(&reserveStock).Error; err != nil {
 			tx.Rollback()
@@ -129,19 +142,11 @@ func PaymentPage(c *gin.Context) {
 			Item:          items,
 			DiscountPrice: items.ProductVariant.SalePrice - discountAmount,
 		})
-		regularPrice += items.ProductVariant.RegularPrice * float64(items.Quantity)
-		salePrice += (items.ProductVariant.SalePrice * float64(items.Quantity))-discountAmount
 	}
-	tax = (salePrice * 18) / 100
-	productDiscount = regularPrice - salePrice
+	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
 
-	if salePrice < 1000 {
-		totalDiscount = productDiscount
-	} else {
-		totalDiscount = productDiscount + float64(shippingCharge)
-		shippingCharge = 0
-	}
-	total = salePrice + tax
+	TotalDiscount := totalDiscount + request.CouponDiscountAmount
+	total := (salePrice + tax) - request.CouponDiscountAmount
 
 	tx.Commit()
 	CheckForReferrer(c)
@@ -155,16 +160,22 @@ func PaymentPage(c *gin.Context) {
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
 		"Tax":             tax,
+		"CouponID":        request.CouponId,
+		"CouponCode":      request.CouponCode,
+		"CouponDiscount":  request.CouponDiscountAmount,
 		"ProductDiscount": productDiscount,
-		"TotalDiscount":   totalDiscount,
+		"TotalDiscount":   TotalDiscount,
 		"Total":           total,
 		"code":            http.StatusOK,
 	})
 }
 
 var paymentRequest struct {
-	PaymentMethod string `json:"paymentMethod"`
-	AddressID     string `json:"addressId"`
+	PaymentMethod        string `json:"paymentMethod"`
+	AddressID            string `json:"addressId"`
+	CouponCode           string `json:"couponCode"`
+	CouponId             string `json:"couponId"`
+	CouponDiscountAmount string `json:"couponDiscountAmount"`
 }
 
 func ProceedToPayment(c *gin.Context) {
@@ -204,7 +215,14 @@ func ProceedToPayment(c *gin.Context) {
 	case "COD":
 		paymentStatus := true
 		tx := config.DB.Begin()
-		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount, tax, float64(shippingCharge), total, currentTime)
+		var coupon models.ReservedCoupon
+		tx.First(&coupon, paymentRequest.CouponId)
+		couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
+		if err != nil {
+			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+			return
+		}
+		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 		orderItems := FetchOrderItems(c, tx, orderID)
@@ -222,7 +240,7 @@ func ProceedToPayment(c *gin.Context) {
 		if paymentStatus {
 			ClearCart(c, tx, reservedMap)
 		}
-
+		tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
 		tx.Commit()
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",

@@ -145,7 +145,11 @@
                         <h2 class="text-lg font-bold mb-4">Cart Total</h2>
                         <div class="flex justify-between mb-4">
                             <span>SUBTOTAL</span>
-                            <span class="subtotal-amount">₹{{.Total}}</span>
+                            <span class="subtotal-amount">₹{{.SubTotal}}</span>
+                        </div>
+                        <div class="flex justify-between mb-4">
+                            <span>DISCOUNT</span>
+                            <span class="discount-amount">₹{{.DiscountAmount}}</span>
                         </div>
                         <div class="flex justify-between mb-8">
                             <span class="font-bold">TOTAL</span>
@@ -333,9 +337,11 @@
                     if (data.status === "OK") {
                         // Update subtotal and total amount displays
                         const subtotalElement = document.querySelector('.subtotal-amount');
+                        const discountElement = document.querySelector('.discount-amount');
                         const totalElement = document.querySelector('.total-amount');
                         if (subtotalElement && totalElement) {
-                            subtotalElement.textContent = `₹${data.Total.toFixed(2)}`;
+                            subtotalElement.textContent = `₹${data.SubTotal.toFixed(2)}`;
+                            discountElement.textContent = `₹${data.DiscountAmount.toFixed(2)}`;
                             totalElement.textContent = `₹${data.Total.toFixed(2)}`;
                         }
 

@@ -213,6 +213,9 @@
 
                     <!-- Hidden input to store the address ID -->
                     <input type="hidden" id="addressId" value="{{.Address.ID}}">
+                    <input type="hidden" id="couponID" value="{{.CouponID}}">
+                    <input type="hidden" id="couponCode" value="{{.CouponCode}}">
+                    <input type="hidden" id="couponDiscount" value="{{.CouponDiscount}}">
 
                     <!-- Wallet Balance -->
                     <div class="mb-6">
@@ -316,14 +319,14 @@
                 <div class="space-y-4 mb-6">
                     {{range .CartItem}}
                     <div class="flex gap-4">
-                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}" alt="Camera"
-                            class="w-16 h-16 object-contain">
+                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                            alt="Camera" class="w-16 h-16 object-contain">
                         <div>
                             <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-sm">{{.Item.Quantity}} ×</span>
-                                <span class="font-medium">&#8377; {{printf "%.2f"  .DiscountPrice }}</span>
-                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f" 
+                                <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice }}</span>
+                                <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f"
                                     .Item.ProductVariant.RegularPrice}}</span>
                             </div>
                         </div>
@@ -338,21 +341,22 @@
                         <span>&#8377; {{printf "%.2f" .SubTotal}}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>Coupon Discount</span>
-                        <span>-&#8377;00</span>
-                    </div>
-                    <div class="flex justify-between">
                         <span>Product Discount</span>
                         <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>Tax</span>
+                        <span>Tax (18%)</span>
                         <span>&#8377; {{printf "%.2f" .Tax}}</span>
                     </div>
                     <div class="flex justify-between">
+                        <span>Coupon Discount</span>
+                        <span class="text-blue-600">-&#8377;{{if .CouponDiscount}}{{printf "%.2f" .CouponDiscount}}{{else}}00{{end}}</span>
+                    </div>
+                    <div class="flex justify-between">
                         <span>Shipping</span>
-                        <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span
-                                class="line-through text-xs">&#8377;100</span> {{end}}</span>
+                        <span>{{if .Shipping}} {{.Shipping}} {{else}} <span class="text-green-600">
+                                Free <span class="line-through text-xs">&#8377;100</span>
+                            </span> {{end}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Total Discount</span>
@@ -455,7 +459,7 @@
     </footer>
     <script>
         // Function to show error toast
-        
+
 
         function updateDeliveryDate() {
             let now = new Date();
@@ -558,11 +562,14 @@
                     this.classList.remove('active');
                 }, 300);
             });
-        }); 
-        
+        });
+
         // Process payment function
         document.getElementById('proceedToPay').addEventListener('click', function () {
             let addressIdElement = document.getElementById('addressId');
+            let couponIDElement = document.getElementById('couponID');
+            let couponCodeElement = document.getElementById('couponCode');
+            let couponDiscountElement = document.getElementById('couponDiscount');
 
             if (!selectedPaymentMethod || !addressIdElement || !addressIdElement.value) {
                 showErrorToast("Missing payment method or address.");
@@ -570,6 +577,9 @@
             }
 
             let addressId = addressIdElement.value;
+            let couponID = couponIDElement.value;
+            let couponCode = couponCodeElement.value;
+            let couponDiscount = couponDiscountElement.value;
 
             // Show loading state
             this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
@@ -578,7 +588,13 @@
             fetch('/checkout/payment/proceed', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentMethod: selectedPaymentMethod, addressId: addressId }),
+                body: JSON.stringify({
+                     paymentMethod: selectedPaymentMethod,
+                    addressId: addressId ,
+                    couponCode:couponCode,
+                    couponId:couponID,
+                    couponDiscountAmount:couponDiscount
+                    }),
             })
                 .then(response => {
                     if (!response.ok) {
@@ -587,12 +603,12 @@
                     return response.json(); // Expecting JSON response
                 })
                 .then(data => {
-                    if (selectedPaymentMethod === 'Razorpay'){
+                    if (selectedPaymentMethod === 'Razorpay') {
                         initializeRazorpay(data);
                     }
-                    else if (selectedPaymentMethod === 'COD'){
+                    else if (selectedPaymentMethod === 'COD') {
                         window.location.href = '/order/success';
-                    }                     
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);

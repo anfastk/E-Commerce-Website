@@ -663,13 +663,14 @@
                             <span>Subtotal</span>
                             <span>&#8377; {{printf "%.2f" .OrderItem.SubTotal}}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Tax</span>
-                            <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
-                        </div>
+                        
                         <div class="flex justify-between text-gray-600">
                             <span>Product Discount</span>
                             <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax</span>
+                            <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
                         </div>
 
                         <div class="flex justify-between text-gray-600">
@@ -691,26 +692,31 @@
                             <span>Subtotal</span>
                             <span>&#8377; {{printf "%.2f" .AllSubTotal}}</span>
                         </div>
+                        
+                        <div class="flex justify-between text-gray-600">
+                            <span>Product Discount</span>
+                            <span>&#8377; {{printf "%.2f" .AllProductDiscount}}</span>
+                        </div>
+                        
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax</span>
+                            <span>&#8377; {{printf "%.2f" .Order.Tax}}</span>
+                        </div>
+                        {{if .Order.CouponDiscountAmount }}
                         <div class="flex justify-between text-green-600 bg-green-50 p-2 rounded">
                             <span class="flex items-center">
                                 <i class="fas fa-tag mr-2"></i>
-                                Coupon (SAVE20)
+                                Coupon ({{.Order.CouponCode}})
                             </span>
-                            <span>-00</span>
+                            <span>-{{.Order.CouponDiscountAmount }}</span>
                         </div>
+                        {{else}}
+                        {{end}}
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
                             <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge }}
                                 {{else}} <span class="text-green-600">Free </span> <span
                                     class="line-through text-sm">&#8377;100</span>{{end}}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Tax</span>
-                            <span>&#8377; {{printf "%.2f" .Order.Tax}}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Product Discount</span>
-                            <span>&#8377; {{printf "%.2f" .AllProductDiscount}}</span>
                         </div>
 
                         <div class="flex justify-between text-gray-600">

@@ -7,6 +7,16 @@
     <title>Checkout - Shipping Address</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        .coupon-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .coupon-list.show {
+            max-height: 500px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -222,11 +232,13 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">First Name</label>
-                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Last Name</label>
-                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                             </div>
 
@@ -242,33 +254,38 @@
 
                             <div>
                                 <label class="block text-sm mb-1">Country</label>
-                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    required>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Region/State</label>
-                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    required>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">City</label>
-                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                        required>
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Zip Code</label>
-                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Phone Number</label>
-                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2" required>
+                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
+                                    required>
                             </div>
 
                             <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">UPDATE
                                 ADDRESS</button>
-                        </form>
+                            </form>
                     </div>
                 </div>
 
@@ -294,11 +311,13 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">First Name</label>
-                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Last Name</label>
-                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                             </div>
 
@@ -314,28 +333,33 @@
 
                             <div>
                                 <label class="block text-sm mb-1">Country</label>
-                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    required>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Region/State</label>
-                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    required>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">City</label>
-                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white" required>
+                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                        required>
                                 </div>
                                 <div>
                                     <label class="block text-sm mb-1">Zip Code</label>
-                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2" required>
+                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2"
+                                        required>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm mb-1">Phone Number</label>
-                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2" required>
+                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
+                                    required>
                             </div>
 
                             <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">SAVE
@@ -362,7 +386,8 @@
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="text-sm">{{.Item.Quantity}} ×</span>
                                     <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice}}</span>
-                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f" 
+                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf
+                                        "%.2f"
                                         .Item.ProductVariant.RegularPrice}}</span>
                                 </div>
                             </div>
@@ -372,41 +397,84 @@
 
                     <!-- Summary Details -->
                     <div class="space-y-3 text-sm">
-                        <div class="flex justify-between">
-                            <span>Sub-total</span>
-                            <span>&#8377; {{printf "%.2f" .SubTotal}}</span>
-                        </div>
 
                         <!-- Coupon Input -->
-                        <div class="flex gap-2 mb-4">
-                            <input type="text" placeholder="Coupon Code"
-                                class="flex-grow px-3 py-2 rounded bg-gray-200">
-                            <button class="bg-black text-white px-4 py-2 rounded">APPLY</button>
+                        <div class="flex flex-col gap-2 mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" id="coupon-input" placeholder="Coupon Code"
+                                    class="flex-grow px-3 py-2 rounded bg-gray-200">
+                                <button id="apply-coupon-btn"
+                                    class="bg-black text-white px-4 py-2 rounded">APPLY</button>
+                            </div>
+                            <!-- Coupon validation message -->
+                            <div id="coupon-validation-message" class="text-sm hidden"></div>
+                        </div>
+
+                        <!-- Applied Coupon -->
+                        <div id="applied-coupon" class="hidden bg-gray-100 p-3 rounded-md mb-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium" id="applied-coupon-code"></p>
+                                    <p class="text-sm text-gray-600" id="applied-coupon-desc"></p>
+                                </div>
+                                <button id="remove-coupon-btn" class="text-red-600 text-sm">Remove</button>
+                            </div>
+                        </div>
+
+                        <!-- Show Available Coupons Button -->
+                        <button id="show-coupons-btn" class="text-blue-600 text-sm flex items-center">
+                            <span>Show available coupons</span>
+                            <svg id="coupon-arrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Available Coupons List -->
+                        <div id="coupon-list" class="coupon-list mt-2 border border-gray-200 rounded-md">
+                            {{range .Coupons}}
+                            <div class="p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item"
+                                data-code="{{.CouponCode}}" data-discount="{{.DiscountValue}}"
+                                data-type="{{.CouponType}}"
+                                data-desc="{{.DiscountValue}} %off Upto{{.MaxDiscountValue}}">
+                                <p class="font-medium text-base">{{.CouponCode}}</p>
+                                <p class="text-sm text-gray-800">{{.Discription}}</p>
+                                <p class="text-xs text-gray-600">Valid on orders above {{.MinOrderValue}}</p>
+                            </div>
+                            {{end}}
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Sub-total</span>
+                            <span id="order-subtotal">&#8377; {{printf "%.2f" .SubTotal}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Product Discount</span>
+                            <span id="product-discount">&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tax (18%)</span>
+                            <span id="tax-amount">&#8377; {{printf "%.2f" .Tax}}</span>
                         </div>
 
                         <div class="flex justify-between text-gray-600">
                             <span>Coupon Discount</span>
-                            <span>-&#8377; 00</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Product Discount</span>
-                            <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Tax (18%)</span>
-                            <span>&#8377; {{printf "%.2f" .Tax}}</span>
+                            <span class="text-blue-600"><span id="coupon-discount">-&#8377; 0.00</span></span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
-                            <span>{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
+                            <span id="shipping-cost">{{if .Shipping}} {{.Shipping}} {{else}} <span
+                                    class="text-green-600">
+                                    Free <span class="line-through text-xs">&#8377;100</span>
+                                </span> {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
-                            <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
+                            <span id="total-discount">&#8377; {{printf "%.2f" .TotalDiscount}}</span>
                         </div>
                         <div class="flex justify-between font-bold pt-4 border-t">
                             <span>Total</span>
-                            <span>&#8377; {{printf "%.2f" .Total}}</span>
+                            <span id="final-total">&#8377; {{printf "%.2f" .Total}}</span>
                         </div>
                     </div>
 
@@ -618,11 +686,23 @@
 
             const addressId = selectedAddress.value;
 
+            // Prepare data object with address ID
+            const paymentData = {
+                addressId: addressId
+            };
+
+            // Add coupon information if a coupon is applied
+            if (appliedCoupon) {
+                paymentData.couponCode = appliedCoupon.code;
+                paymentData.couponId = appliedCoupon.couponId; // This will come from validation response
+                paymentData.couponDiscountAmount = couponDiscountAmount;
+            }
+
             try {
                 const response = await fetch('/checkout/payment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ addressId }),
+                    body: JSON.stringify(paymentData),
                 });
 
                 if (response.ok) {
@@ -657,6 +737,270 @@
             setTimeout(() => {
                 toast.classList.add("hidden");
             }, 3000);
+        }
+
+        // Define raw values from the template
+        const rawSubTotal = "{{.SubTotal}}";
+        const rawProductDiscount = "{{.ProductDiscount}}";
+        const rawTax = "{{.Tax}}";
+        const rawTotalDiscount = "{{.TotalDiscount}}";
+        const rawTotal = "{{.Total}}";
+
+        // Get original values with proper parsing for Indian format (accounting for commas)
+        // Example: "1,418,694.06" -> 1418694.06
+        function parseIndianNumber(value) {
+            // Remove ₹ symbol and all non-numeric characters except dots
+            const numStr = value.replace(/₹|,|\s/g, '');
+            return parseFloat(numStr);
+        }
+
+        // Original values properly parsed
+        const originalValues = {
+            subTotal: parseIndianNumber(rawSubTotal),
+            productDiscount: parseIndianNumber(rawProductDiscount),
+            tax: parseIndianNumber(rawTax),
+            shipping: 0, // Assuming free shipping by default
+            totalDiscount: parseIndianNumber(rawTotalDiscount),
+            total: parseIndianNumber(rawTotal)
+        };
+
+        // For debugging - check if values are parsed correctly
+        console.log("Original values:", originalValues);
+
+        // Current values (will be updated when coupons are applied)
+        let currentValues = { ...originalValues };
+        let appliedCoupon = null;
+        let couponDiscountAmount = 0;
+
+        // Elements
+        const couponInput = document.getElementById('coupon-input');
+        const applyCouponBtn = document.getElementById('apply-coupon-btn');
+        const showCouponsBtn = document.getElementById('show-coupons-btn');
+        const couponList = document.getElementById('coupon-list');
+        const couponArrow = document.getElementById('coupon-arrow');
+        const appliedCouponDiv = document.getElementById('applied-coupon');
+        const appliedCouponCode = document.getElementById('applied-coupon-code');
+        const appliedCouponDesc = document.getElementById('applied-coupon-desc');
+        const removeCouponBtn = document.getElementById('remove-coupon-btn');
+        const couponDiscount = document.getElementById('coupon-discount');
+        const totalDiscount = document.getElementById('total-discount');
+        const finalTotal = document.getElementById('final-total');
+        const couponValidationMessage = document.getElementById('coupon-validation-message');
+
+        // Toggle coupon list
+        showCouponsBtn.addEventListener('click', () => {
+            couponList.classList.toggle('show');
+            couponArrow.classList.toggle('rotate-180');
+        });
+
+        // Track the previously applied coupon code
+        let previouslyAppliedCode = '';
+
+        // Add input event listener to the coupon input field
+        couponInput.addEventListener('input', () => {
+            const currentCode = couponInput.value.trim().toUpperCase();
+
+            // If there's an applied coupon and the current input is different from the applied code
+            if (appliedCoupon && currentCode !== previouslyAppliedCode) {
+                // Remove the applied coupon automatically
+                removeCoupon();
+
+                // Reset the Apply button to normal state
+                applyCouponBtn.textContent = "APPLY";
+                applyCouponBtn.disabled = false;
+                applyCouponBtn.classList.remove('bg-green-600');
+                applyCouponBtn.classList.add('bg-black');
+            }
+        });
+
+        // Select a coupon from the list
+        document.querySelectorAll('.coupon-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const code = item.getAttribute('data-code');
+
+                // Fill the input box with the selected coupon code
+                couponInput.value = code;
+
+                // Validate with backend just like manual input
+                validateCouponWithBackend(code);
+
+                // Close the coupon list
+                couponList.classList.remove('show');
+                couponArrow.classList.remove('rotate-180');
+            });
+        });
+
+        // Apply coupon button
+        applyCouponBtn.addEventListener('click', () => {
+            const code = couponInput.value.trim().toUpperCase();
+            if (!code) return;
+
+            // Validate the coupon with backend
+            validateCouponWithBackend(code);
+        });
+
+        // Remove coupon
+        removeCouponBtn.addEventListener('click', () => {
+            removeCoupon();
+        });
+
+        // Function to validate coupon with backend
+        // Function to validate coupon with backend
+        async function validateCouponWithBackend(code) {
+            // Show loading state
+            applyCouponBtn.textContent = "VALIDATING...";
+            applyCouponBtn.disabled = true;
+
+            try {
+                // Create the data to send to backend with correctly parsed values
+                const data = {
+                    couponCode: code,
+                    subTotal: originalValues.subTotal,
+                    productDiscount: originalValues.productDiscount
+                };
+
+                console.log("Sending to backend:", data);
+
+                // Call your backend API
+                const response = await fetch('/checkout/check/coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                console.log("Response status:", response.status);
+
+                // Parse the response JSON
+                const result = await response.json();
+                console.log("Response data:", result);
+
+                // Check if the response indicates success (status is 'ok' or code is 200)
+                if (response.ok && (result.status === 'ok' || result.code === 200)) {
+                    // Coupon is valid, apply it
+                    showValidationMessage(result.message || "Coupon applied successfully!", 'success');
+
+                    // Store the currently applied code for future comparison
+                    previouslyAppliedCode = code;
+
+                    // Use the discount amount sent from the backend and also store couponId
+                    applyCoupon(
+                        code,
+                        result.discountAmount, // Using the exact amount from backend
+                        result.description || "Discount applied",
+                        result.CouponID // Store the coupon ID from the validation response
+                    );
+
+                    // Hide the "show available coupons" button when a coupon is applied
+                    showCouponsBtn.classList.add('hidden');
+                } else {
+                    // Coupon is invalid
+                    showValidationMessage(result.message || "Invalid coupon code", 'error');
+                    resetCouponState();
+                }
+            } catch (error) {
+                console.error('Error validating coupon:', error);
+                showValidationMessage('Error validating coupon. Please try again.', 'error');
+                resetCouponState();
+            }
+        }
+
+        // Show validation message
+        function showValidationMessage(message, type) {
+            couponValidationMessage.textContent = message;
+            couponValidationMessage.classList.remove('hidden', 'text-green-600', 'text-red-600');
+
+            if (type === 'success') {
+                couponValidationMessage.classList.add('text-green-600');
+            } else {
+                couponValidationMessage.classList.add('text-red-600');
+            }
+        }
+
+        // Reset coupon input state after failed validation
+        function resetCouponState() {
+            applyCouponBtn.textContent = "APPLY";
+            applyCouponBtn.disabled = false;
+            applyCouponBtn.classList.remove('bg-green-600');
+            applyCouponBtn.classList.add('bg-black');
+            couponInput.classList.remove('border-green-500');
+        }
+
+        // Apply coupon function - now using exact discount amount from backend
+        // Apply coupon function - now including coupon ID from backend
+        function applyCoupon(code, discountAmount, desc, couponId) {
+            // Reset to original values first
+            if (appliedCoupon) {
+                removeCoupon();
+            }
+
+            // Set the new applied coupon with coupon ID
+            appliedCoupon = { code, discountAmount, desc, couponId };
+
+            // Show the applied coupon section
+            appliedCouponDiv.classList.remove('hidden');
+            appliedCouponCode.textContent = code;
+            appliedCouponDesc.textContent = desc;
+
+            // Change Apply button to show "Applied"
+            applyCouponBtn.textContent = "APPLIED";
+            applyCouponBtn.disabled = false;
+            applyCouponBtn.classList.remove('bg-black');
+            applyCouponBtn.classList.add('bg-green-600');
+
+            // Make the input appear as applied
+            couponInput.classList.add('border-green-500');
+
+            // Use the discount amount directly from the backend
+            couponDiscountAmount = discountAmount;
+
+            // Update UI with coupon discount
+            couponDiscount.textContent = `-₹ ${couponDiscountAmount.toFixed(2)}`;
+
+            // Update total discount (product discount + coupon discount)
+            const newTotalDiscount = originalValues.totalDiscount + couponDiscountAmount;
+            totalDiscount.textContent = `₹ ${newTotalDiscount.toFixed(2)}`;
+
+            // Calculate new total (original total - coupon discount)
+            const newTotal = originalValues.total - couponDiscountAmount;
+            finalTotal.textContent = `₹ ${newTotal.toFixed(2)}`;
+        }
+
+        // Remove coupon function
+        function removeCoupon() {
+            appliedCoupon = null;
+            previouslyAppliedCode = ''; // Reset the previously applied code
+            appliedCouponDiv.classList.add('hidden');
+
+            // Don't clear the input box when called from the input event listener
+            // Only clear it when explicitly removing a coupon via the remove button
+            if (event && event.type === 'click' && event.currentTarget === removeCouponBtn) {
+                couponInput.value = '';
+            }
+
+            // Hide validation message
+            couponValidationMessage.classList.add('hidden');
+
+            // Reset Apply button
+            applyCouponBtn.textContent = "APPLY";
+            applyCouponBtn.disabled = false;
+            applyCouponBtn.classList.remove('bg-green-600');
+            applyCouponBtn.classList.add('bg-black');
+
+            // Reset input styling
+            couponInput.classList.remove('border-green-500');
+
+            // Reset values
+            couponDiscountAmount = 0;
+
+            // Update UI
+            couponDiscount.textContent = `-₹ 0.00`;
+            totalDiscount.textContent = `₹ ${originalValues.totalDiscount.toFixed(2)}`;
+            finalTotal.textContent = `₹ ${originalValues.total.toFixed(2)}`;
+
+            // Show the "show available coupons" button again when coupon is removed
+            showCouponsBtn.classList.remove('hidden');
         }
     </script>
 </body>

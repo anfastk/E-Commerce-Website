@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .coupon-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .coupon-list.show {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+<div class="md:col-span-1">
+    <div class="bg-white shadow-lg p-6 rounded-lg">
+        <h2 class="text-lg font-bold mb-6">Order Summary</h2>
+
+        <!-- Product Items -->
+        <div class="space-y-4 mb-6">
+            <!-- Product 1 -->
+            {{range .CartItem}}
+            <div class="flex gap-4">
+                <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                    alt="Camera" class="w-16 h-16 object-contain rounded">
+                <div>
+                    <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-sm">{{.Item.Quantity}} ×</span>
+                        <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice}}</span>
+                        <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f" 
+                            .Item.ProductVariant.RegularPrice}}</span>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Summary Details -->
+        <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+                <span>Sub-total</span>
+                <span id="order-subtotal">&#8377; {{printf "%.2f" .SubTotal}}</span>
+            </div>
+
+            <!-- Coupon Input -->
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="coupon-input" placeholder="Coupon Code"
+                    class="flex-grow px-3 py-2 rounded bg-gray-200">
+                <button id="apply-coupon-btn" class="bg-black text-white px-4 py-2 rounded">APPLY</button>
+            </div>
+            
+            <!-- Applied Coupon -->
+            <div id="applied-coupon" class="hidden bg-gray-100 p-3 rounded-md mb-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-medium" id="applied-coupon-code"></p>
+                        <p class="text-sm text-gray-600" id="applied-coupon-desc"></p>
+                    </div>
+                    <button id="remove-coupon-btn" class="text-red-600 text-sm">Remove</button>
+                </div>
+            </div>
+            
+            <!-- Show Available Coupons Button -->
+            <button id="show-coupons-btn" class="text-blue-600 text-sm flex items-center">
+                <span>Show available coupons</span>
+                <svg id="coupon-arrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            
+            <!-- Available Coupons List -->
+            <div id="coupon-list" class="coupon-list mt-2 border border-gray-200 rounded-md">
+                <div class="p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item" data-code="WELCOME10" data-discount="10" data-type="percent" data-desc="10% off your order">
+                    <p class="font-medium">WELCOME10</p>
+                    <p class="text-sm text-gray-600">10% off your order</p>
+                </div>
+                <div class="p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item" data-code="FREESHIP" data-discount="100" data-type="fixed" data-desc="Free shipping on your order">
+                    <p class="font-medium">FREESHIP</p>
+                    <p class="text-sm text-gray-600">Free shipping on your order</p>
+                </div>
+                <div class="p-3 hover:bg-gray-50 cursor-pointer coupon-item" data-code="SAVE20" data-discount="20" data-type="percent" data-desc="20% off orders over ₹1000">
+                    <p class="font-medium text-base">SAVE20</p>
+                    <p class="text-sm text-gray-800">20% off orders over ₹1000</p>
+                    <p class="text-xs text-gray-600">Valid on orders above ₹20000</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between text-gray-600">
+                <span>Coupon Discount</span>
+                <span id="coupon-discount">-&#8377; 0.00</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+                <span>Product Discount</span>
+                <span id="product-discount">&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+                <span>Tax (18%)</span>
+                <span id="tax-amount">&#8377; {{printf "%.2f" .Tax}}</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+                <span>Shipping</span>
+                <span id="shipping-cost">{{if .Shipping}} {{.Shipping}} {{else}} Free <span class="line-through text-xs">&#8377;100</span> {{end}}</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+                <span>Total Discount</span>
+                <span id="total-discount">&#8377; {{printf "%.2f" .TotalDiscount}}</span>
+            </div>
+            <div class="flex justify-between font-bold pt-4 border-t">
+                <span>Total</span>
+                <span id="final-total">&#8377; {{printf "%.2f" .Total}}</span>
+            </div>
+        </div>
+
+        <button id="proceedToPaymentBtn"
+            class="w-full bg-black text-white py-3 rounded-lg mt-6 flex items-center justify-center gap-2">
+            PLACE ORDER
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    // Get original values from the rendered template
+    const originalValues = {
+        subTotal: parseFloat("{{.SubTotal}}".replace(/[^\d.-]/g, '')),
+        productDiscount: parseFloat("{{.ProductDiscount}}".replace(/[^\d.-]/g, '')),
+        tax: parseFloat("{{.Tax}}".replace(/[^\d.-]/g, '')),
+        shipping: 0, // Assuming free shipping by default
+        totalDiscount: parseFloat("{{.TotalDiscount}}".replace(/[^\d.-]/g, '')),
+        total: parseFloat("{{.Total}}".replace(/[^\d.-]/g, ''))
+    };
+    
+    // Current values (will be updated when coupons are applied)
+    let currentValues = {...originalValues};
+    let appliedCoupon = null;
+    let couponDiscountAmount = 0;
+    
+    // Elements
+    const couponInput = document.getElementById('coupon-input');
+    const applyCouponBtn = document.getElementById('apply-coupon-btn');
+    const showCouponsBtn = document.getElementById('show-coupons-btn');
+    const couponList = document.getElementById('coupon-list');
+    const couponArrow = document.getElementById('coupon-arrow');
+    const appliedCouponDiv = document.getElementById('applied-coupon');
+    const appliedCouponCode = document.getElementById('applied-coupon-code');
+    const appliedCouponDesc = document.getElementById('applied-coupon-desc');
+    const removeCouponBtn = document.getElementById('remove-coupon-btn');
+    const couponDiscount = document.getElementById('coupon-discount');
+    const totalDiscount = document.getElementById('total-discount');
+    const shippingCost = document.getElementById('shipping-cost');
+    const finalTotal = document.getElementById('final-total');
+    
+    // Toggle coupon list
+    showCouponsBtn.addEventListener('click', () => {
+        couponList.classList.toggle('show');
+        couponArrow.classList.toggle('rotate-180');
+    });
+    
+    // Select a coupon from the list
+    document.querySelectorAll('.coupon-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const code = item.getAttribute('data-code');
+            const discount = parseFloat(item.getAttribute('data-discount'));
+            const type = item.getAttribute('data-type');
+            const desc = item.getAttribute('data-desc');
+            
+            // Fill the input box with the selected coupon code
+            couponInput.value = code;
+            
+            // Apply the coupon
+            applyCoupon(code, discount, type, desc);
+            
+            // Close the coupon list
+            couponList.classList.remove('show');
+            couponArrow.classList.remove('rotate-180');
+        });
+    });
+    
+    // Apply coupon button
+    applyCouponBtn.addEventListener('click', () => {
+        const code = couponInput.value.trim().toUpperCase();
+        if (!code) return;
+        
+        // Find the coupon from our available list
+        const couponItems = document.querySelectorAll('.coupon-item');
+        let found = false;
+        
+        couponItems.forEach(item => {
+            if (item.getAttribute('data-code') === code) {
+                const discount = parseFloat(item.getAttribute('data-discount'));
+                const type = item.getAttribute('data-type');
+                const desc = item.getAttribute('data-desc');
+                
+                applyCoupon(code, discount, type, desc);
+                found = true;
+            }
+        });
+        
+        if (!found) {
+            alert('Invalid coupon code');
+        }
+    });
+    
+    // Remove coupon
+    removeCouponBtn.addEventListener('click', () => {
+        removeCoupon();
+    });
+    
+    // Apply coupon function
+    function applyCoupon(code, discount, type, desc) {
+        // Reset to original values first
+        if (appliedCoupon) {
+            removeCoupon();
+        }
+        
+        // Set the new applied coupon
+        appliedCoupon = { code, discount, type, desc };
+        
+        // Show the applied coupon section
+        appliedCouponDiv.classList.remove('hidden');
+        appliedCouponCode.textContent = code;
+        appliedCouponDesc.textContent = desc;
+        
+        // Change Apply button to show "Applied"
+        applyCouponBtn.textContent = "APPLIED";
+        applyCouponBtn.classList.remove('bg-black');
+        applyCouponBtn.classList.add('bg-green-600');
+        
+        // Make the input appear as applied
+        couponInput.classList.add('border-green-500');
+        
+        // Keep the code in the input box
+        couponInput.value = code;
+        
+        // Calculate discount
+        couponDiscountAmount = 0;
+        
+        if (type === 'percent') {
+            couponDiscountAmount = (originalValues.subTotal * discount / 100);
+            
+            // For SAVE20 coupon, check if subtotal is over ₹1000
+            if (code === 'SAVE20' && originalValues.subTotal < 1000) {
+                alert('SAVE20 is only applicable for orders over ₹1000');
+                removeCoupon();
+                return;
+            }
+        } else if (type === 'fixed') {
+            couponDiscountAmount = discount;
+            
+            // For FREESHIP coupon, update the shipping display
+            if (code === 'FREESHIP') {
+                shippingCost.innerHTML = 'Free <span class="line-through text-xs">&#8377;100</span>';
+            }
+        }
+        
+        // Update UI with coupon discount
+        couponDiscount.textContent = `-₹ ${couponDiscountAmount.toFixed(2)}`;
+        
+        // Update total discount (product discount + coupon discount)
+        const newTotalDiscount = originalValues.totalDiscount + couponDiscountAmount;
+        totalDiscount.textContent = `₹ ${newTotalDiscount.toFixed(2)}`;
+        
+        // Calculate new total (original total - coupon discount)
+        const newTotal = originalValues.total - couponDiscountAmount;
+        finalTotal.textContent = `₹ ${newTotal.toFixed(2)}`;
+    }
+    
+    // Remove coupon function
+    function removeCoupon() {
+        appliedCoupon = null;
+        appliedCouponDiv.classList.add('hidden');
+        couponInput.value = '';
+        
+        // Reset Apply button
+        applyCouponBtn.textContent = "APPLY";
+        applyCouponBtn.classList.remove('bg-green-600');
+        applyCouponBtn.classList.add('bg-black');
+        
+        // Reset input styling
+        couponInput.classList.remove('border-green-500');
+        
+        // Reset values
+        couponDiscountAmount = 0;
+        
+        // Update UI
+        couponDiscount.textContent = `-₹ 0.00`;
+        totalDiscount.textContent = `₹ ${originalValues.totalDiscount.toFixed(2)}`;
+        finalTotal.textContent = `₹ ${originalValues.total.toFixed(2)}`;
+        
+        // Reset shipping display if FREESHIP was applied
+        if (appliedCoupon && appliedCoupon.code === 'FREESHIP') {
+            // This will need to be adjusted based on your original shipping logic
+            shippingCost.innerHTML = 'Free <span class="line-through text-xs">&#8377;100</span>';
+        }
+    }
+</script>
+</body>
+</html>

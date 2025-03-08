@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -244,6 +245,7 @@ func CartItemUpdate(c *gin.Context) {
 
 func ShowCartTotal(c *gin.Context) {
 	userID := c.MustGet("userid").(uint)
+	var subTotal float64
 	var total float64
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
@@ -259,15 +261,22 @@ func ShowCartTotal(c *gin.Context) {
 	}
 	for _, items := range cartItems {
 		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
-		total += (items.ProductVariant.SalePrice * float64(items.Quantity))-discountAmount
+		subTotal += items.ProductVariant.RegularPrice * float64(items.Quantity)
+		total += (items.ProductVariant.SalePrice - discountAmount) * float64(items.Quantity) 
+		fmt.Println(subTotal, total, int(subTotal-total))
+
 	}
+	cartDiscountAmount := subTotal - total
+
 	count := CartCount(c)
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "OK",
-		"message": "Total fetch success",
-		"Count":   count,
-		"Total":   total,
-		"code":    http.StatusOK,
+		"status":         "OK",
+		"message":        "Total fetch success",
+		"Count":          count,
+		"SubTotal":       subTotal,
+		"DiscountAmount": cartDiscountAmount,
+		"Total":          total,
+		"code":           http.StatusOK,
 	})
 }
 func CartCount(c *gin.Context) int {

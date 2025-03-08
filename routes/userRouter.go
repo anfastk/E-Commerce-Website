@@ -93,5 +93,6 @@ func UserRouter(r *gin.Engine) {
 		checkout.GET("/", controllers.ShowCheckoutPage)
 		checkout.POST("/payment", controllers.PaymentPage)
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
+		checkout.POST("/check/coupon",controllers.CheckCoupon)
 	}
 }

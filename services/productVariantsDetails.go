@@ -78,7 +78,7 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 		return VariantsDetails{}, errors.New("Specification not found")
 	}
 
-	if err := tx.Where("product_id = ? AND is_valid = true", product.ID).First(&offer).Error; err != nil {
+	if err := tx.Where("product_id = ?", product.ID).First(&offer).Error; err != nil {
 		offer = models.ProductOffer{}
 	}
 	

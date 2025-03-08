@@ -285,7 +285,7 @@ func ApproveReturn(c *gin.Context) {
 		return
 	}
 	tx := config.DB.Begin()
-	ordid, err := strconv.ParseUint(input.OrderID, 10, 32) 
+	ordid, err := strconv.ParseUint(input.OrderID, 10, 32)
 	if err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Something Went Wrong", "Something Went Wrong", "")
@@ -326,13 +326,13 @@ func ApproveReturn(c *gin.Context) {
 
 		if order.IsCouponApplied {
 			var couponDetails models.Coupon
-			if err := tx.Unscoped().First(&couponDetails, order.CouponID).Error; err != nil {
+			if err := tx.Unscoped().First(&couponDetails, "coupon_code = ?", order.CouponCode).Error; err != nil {
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 				return
 			}
 
-			if (total - productTotal) < couponDetails.MinOrdervalue {
+			if (total - productTotal) < couponDetails.MinOrderValue {
 				refundAmount = orderItems.Total - order.CouponDiscountAmount
 				if refundAmount < 0 {
 					tx.Rollback()

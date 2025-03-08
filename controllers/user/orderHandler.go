@@ -79,7 +79,7 @@ func TrackingPage(c *gin.Context) {
 	if order.ShippingCharge == 0.0 {
 		shipCharge = 100
 	}
-	allProductTotalDiscount = allProductDiscount + order.ShippingCharge + shipCharge
+	allProductTotalDiscount = allProductDiscount + order.ShippingCharge + shipCharge + order.CouponDiscountAmount
 
 	IsCancelSpecificOrder := true
 	cancelCheckAmount := order.SubTotal - orderItem.SubTotal
@@ -140,7 +140,7 @@ func TrackingPage(c *gin.Context) {
 	})
 }
 
-func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, totalProductDiscount float64, totalDiscount float64, tax float64, shippingCharge float64, totalAmount float64, currentTime time.Time) uint {
+func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, totalProductDiscount float64, totalDiscount float64, tax float64, shippingCharge float64, totalAmount float64, currentTime time.Time, CouponCode string, CouponDiscountAmount float64, CouponDiscription string) uint {
 	orderUID := helper.GenerateOrderID()
 	var order models.Order
 	order = models.Order{
@@ -153,19 +153,31 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 		ShippingCharge:       shippingCharge,
 		TotalAmount:          totalAmount,
 		OrderDate:            currentTime,
+		CouponCode:           CouponCode,
+		CouponDiscountAmount: CouponDiscountAmount,
+		CouponDiscription:    CouponDiscription,
 	}
 	if err := tx.Create(&order).Error; err != nil {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
 		return 0
 	}
+	if CouponCode != "" && CouponDiscountAmount != 0 && CouponDiscription != "" {
+		order.IsCouponApplied = true
+		if err := tx.Save(&order).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Something Went Wrong", "/checkout")
+			return 0
+		}
+	}
 	return order.ID
 }
 func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.ReservedStock, shippingCharge float64, orderID uint, userID uint, currentTime time.Time) {
 	for _, item := range reservedProducts {
 		orderUID := helper.GenerateOrderID()
+		discountAmount, _, _ := helper.DiscountCalculation(item.ProductVariant.ProductID, item.ProductVariant.CategoryID, item.ProductVariant.RegularPrice, item.ProductVariant.SalePrice)
 		regularPrice := item.ProductVariant.RegularPrice * float64(item.Quantity)
-		salePrice := item.ProductVariant.SalePrice * float64(item.Quantity)
+		salePrice := (item.ProductVariant.SalePrice - discountAmount) * float64(item.Quantity)
 		tax := (salePrice * 18) / 100
 		if salePrice > 1000 {
 			shippingCharge = 0
@@ -194,16 +206,15 @@ func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.Res
 		}
 
 		orderItems := models.OrderItem{
-			OrderID:         orderID,
-			UserID:          userID,
-			OrderUID:        orderUID,
-			ProductName:     item.ProductVariant.ProductName,
-			ProductSummary:  item.ProductVariant.ProductSummary,
-			ProductCategory: category.Name,
-			/* CouponDiscount: , */
+			OrderID:              orderID,
+			UserID:               userID,
+			OrderUID:             orderUID,
+			ProductName:          item.ProductVariant.ProductName,
+			ProductSummary:       item.ProductVariant.ProductSummary,
+			ProductCategory:      category.Name,
 			ProductImage:         firstImage,
 			ProductRegularPrice:  item.ProductVariant.RegularPrice,
-			ProductSalePrice:     item.ProductVariant.SalePrice,
+			ProductSalePrice:     item.ProductVariant.SalePrice - discountAmount,
 			ProductVariantID:     item.ProductVariantID,
 			Quantity:             item.Quantity,
 			SubTotal:             regularPrice,
@@ -456,13 +467,13 @@ func CancelSpecificOrder(c *gin.Context) {
 
 	if order.IsCouponApplied {
 		var couponDetails models.Coupon
-		if err := tx.Unscoped().First(&couponDetails, order.CouponID).Error; err != nil {
+		if err := tx.Unscoped().First(&couponDetails, "coupon_code = ?", order.CouponCode).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 			return
 		}
 
-		if (total - productTotal) < couponDetails.MinOrdervalue {
+		if (total - productTotal) < couponDetails.MinOrderValue {
 			refundAmount = orderItems.Total - order.CouponDiscountAmount
 			if refundAmount < 0 {
 				tx.Rollback()
@@ -712,7 +723,7 @@ func CancelAllOrderItems(c *gin.Context) {
 	}
 	if order.IsCouponApplied {
 		var couponDetails models.Coupon
-		if err := tx.Unscoped().First(&couponDetails, order.CouponID).Error; err != nil {
+		if err := tx.Unscoped().First(&couponDetails, "coupon_code = ?", order.CouponCode).Error; err != nil {
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 			return
