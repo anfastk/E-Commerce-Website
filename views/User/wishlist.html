@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes custom-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes ribbon-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            20% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Apply animations correctly */
+        .black-cart-button {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .custom-shine-element {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            animation: custom-shine 3s infinite;
+        }
+
+        .ribbon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            animation: ribbon-shine 3s infinite;
+        }
+
+        .animate-heartbeat {
+            animation: heartbeat 1.5s infinite;
+        }
+
+        /* Wishlist specific styles */
+        .empty-wishlist-image {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .action-button {
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .move-all-btn {
+            background: linear-gradient(to right, #000000, #434343);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .move-all-btn:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .wishlist-card {
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="bg-black py-4 sticky top-0 z-50 ">
+        <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+            <div class="flex justify-between items-center py-2">
+                <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
+
+                <!-- Desktop Navigation -->
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                </nav>
+
+                <!-- Icons Section -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <button class="hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2.5"
+                                d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
+                        </svg>
+                    </button>
+                    <a href="/cart">
+                        <button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
+                                <path fill="#000"
+                                    d="M241.55 64.74A12 12 0 0 0 232 60H60.23l-8.67-31.21A12 12 0 0 0 40 20H20a12 12 0 0 0 0 24h10.88l34.3 123.49a28.09 28.09 0 0 0 27 20.51H191a28.09 28.09 0 0 0 27-20.51l25.63-92.28a12 12 0 0 0-2.08-10.47m-46.75 96.33A4 4 0 0 1 191 164H92.16a4 4 0 0 1-3.85-2.93L66.9 84h149.31ZM108 220a20 20 0 1 1-20-20a20 20 0 0 1 20 20m104 0a20 20 0 1 1-20-20a20 20 0 0 1 20 20" />
+                            </svg>
+                        </button>
+                    </a>
+                    <a href="/wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                            </svg>
+                        </a>
+                    <a href="/profile"><button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="#000"
+                                    d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
+                            </svg>
+                        </button>
+
+                    </a>
+
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden" onclick="toggleMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
+                <nav class="flex flex-col space-y-4 text-md font-medium">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                    <a href="/cart" class="hover:text-gray-600">Cart</a>
+                    <a href="#" class="hover:text-gray-600">Whishlist</a>
+                    <a href="/profile" class="hover:text-gray-600">Profile</a>
+
+                </nav>
+            </div>
+        </header>
+    </div>
+    {{if .count}}
+    <div class="wishlist-header pt-3 px-4 sm:px-6 lg:px-8 mb-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-3xl font-bold text-gray-800">My Wishlist</h1>
+                    <p class="text-gray-600 mt-1">Items you've saved for later</p>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white shadow-md rounded-lg px-4 py-2 flex items-center">
+                        <span class="text-gray-800 font-medium">Total Items:</span>
+                        <span id="wishlist-count"
+                            class="ml-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">{{.Count}}</span>
+                    </div>
+
+                    <form action="/wishlist/all/products/move/cart" method="post">
+                        <button id="move-all-to-cart" type="submit"
+                            class="move-all-btn text-white rounded-lg px-6 py-3 font-medium flex items-center relative">
+                            <div class="custom-shine-element"></div>
+                            <span class="relative z-10 flex items-center">
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Move All to Cart
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{else}}
+    {{end}}
+
+    <!-- Wishlist Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <!-- Empty wishlist state -->
+        <div id="empty-wishlist" class="hidden flex flex-col items-center justify-center py-16 my-24">
+            <h3 class="text-2xl font-semibold text-gray-800 mt-6">Your wishlist is empty</h3>
+            <p class="text-gray-600 mt-2 text-center max-w-md">Start saving items you love by clicking the heart icon on
+                products.</p>
+            <a href="/products"
+                class="mt-6 bg-black text-white rounded-lg px-6 py-3 font-medium hover:bg-gray-800 transition-colors duration-300 action-button">
+                Continue Shopping
+            </a>
+        </div>
+
+        <!-- Wishlist items -->
+        <div id="wishlist-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {{range .Data}}
+            <div class="wishlist-card bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+                <div class="relative h-64 group">
+                    <div class="absolute -left-6 top-6 transform -rotate-45 z-10">
+                        <div class="ribbon bg-red-600 text-white text-xs px-8 py-1 font-bold relative overflow-hidden">
+                            {{.DiscountPercentage}}% OFF</div>
+                    </div>
+                    <form action="/wishlist/remove/{{.WishListID}}" method="post">
+
+                        <button type="submit"
+                            class="z-20 absolute top-2 right-2 bg-white p-2 rounded-full shadow hover:bg-red-50 animate-heartbeat">
+                            <i class="fas fa-trash-alt text-red-500"></i>
+                        </button>
+                    </form>
+                    <div
+                        class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition bg-black/30">
+                        <a href="/products/details/{{.ProductID}}"
+                            class="bg-white/90 px-4 py-2 text-sm rounded-full font-medium">Quick View</a>
+                    </div>
+                    <img src="{{.ProductImage}}" alt="{{.ProductName}}" class="w-full h-full object-contain">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold truncate">{{.ProductName}}</h3>
+                    <div class="mt-2 flex items-center space-x-2">
+                        <span class="text-black font-bold text-lg">&#8377;{{printf "%.2f" .ProductSalePrice}}</span>
+                        <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
+                            .ProductRegularPrice}}</span>
+                    </div>
+                    {{if .IsStockAvailable}}
+                    {{if .IsInCart}}
+                    <a href="/cart"
+                        class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                        <i class="fas fa-shopping-cart mr-2"></i> Go to Cart</a>
+                    {{else}}
+                    <form action="/wishlist/products/move/cart/{{.WishListID}}" method="post">
+                        <button type="submit"
+                            class="black-cart-button mt-4 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 flex items-center justify-center">
+                            <i class="fas fa-shopping-cart mr-2"></i> Move to Cart</button>
+                    </form>
+                    {{end}}
+                    {{else}}
+                    <button
+                        class="mt-4 w-full bg-gray-100 text-gray-500 py-2 rounded-lg cursor-not-allowed flex items-center justify-center">
+                        <i class="fas fa-times-circle mr-2"></i> Out of Stock</button>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-black text-white py-12 mt-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">LAPTIX</h2>
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
+                        our exclusive collections and latest laptops.</p>
+                    <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-x"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Home</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Shop</a></li>
+                        <li><a href="#" class="hover:text-gray-400">About</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Help</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Payment Options</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Returns</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Privacy Policies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Dell Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mac Book</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
+                <p>&copy; 2025 LAPTIX, Inc</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // wishlist.js - Handles all wishlist functionality
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if wishlist has items
+    const wishlistItems = document.getElementById('wishlist-items');
+    const emptyWishlist = document.getElementById('empty-wishlist');
+    
+    // Show empty state if no items are present
+    if (wishlistItems && wishlistItems.children.length === 0) {
+        wishlistItems.classList.add('hidden');
+        emptyWishlist.classList.remove('hidden');
+    }
+    
+    // Handle all wishlist removal forms
+    const removeForms = document.querySelectorAll('form[action^="/wishlist/remove/"]');
+    removeForms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const wishlistId = form.action.split('/').pop();
+            const wishlistCard = form.closest('.wishlist-card');
+            
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+                // Send AJAX request to remove item
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Remove the item with animation
+                        wishlistCard.classList.add('fade-out');
+                        
+                        // After animation completes, remove the element
+                        setTimeout(() => {
+                            wishlistCard.remove();
+                            
+                            // Check if wishlist is now empty
+                            if (wishlistItems.children.length === 0) {
+                                wishlistItems.classList.add('hidden');
+                                emptyWishlist.classList.remove('hidden');
+                            }
+                            
+                            // Show success notification
+                            showNotification('Item removed from wishlist', 'success');
+                        }, 300);
+                    } else {
+                        showNotification('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while removing the item', 'error');
+                });
+            }
+        });
+    });
+    
+    // Handle "Move to Cart" forms
+    const moveToCartForms = document.querySelectorAll('form[action^="/wishlist/products/move/cart/"]');
+    moveToCartForms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const wishlistId = form.action.split('/').pop();
+            const button = form.querySelector('button');
+            
+            // Disable button and show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
+            
+            // Send AJAX request to move item to cart
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update button to "Go to Cart"
+                    const wishlistCard = form.closest('.wishlist-card');
+                    const buttonContainer = form.parentElement;
+                    
+                    // Replace form with link
+                    buttonContainer.innerHTML = `
+                        <a href="/cart" 
+                           class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                           <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
+                        </a>
+                    `;
+                    
+                    // Update cart counter in navbar if it exists
+                    const cartCounter = document.querySelector('.cart-counter');
+                    if (cartCounter && data.cartCount) {
+                        cartCounter.textContent = data.cartCount;
+                        cartCounter.classList.remove('hidden');
+                    }
+                    
+                    // Show success notification
+                    showNotification('Item added to your cart', 'success');
+                } else {
+                    // Reset button state
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
+                    
+                    // Show error notification
+                    showNotification(data.message || 'Failed to add item to cart', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Reset button state
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
+                
+                showNotification('An error occurred while adding to cart', 'error');
+            });
+        });
+    });
+    
+    // Notification handler function
+    function showNotification(message, type = 'info') {
+        // Check if notification container exists, if not create it
+        let notificationContainer = document.getElementById('notification-container');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notification-container';
+            notificationContainer.className = 'fixed bottom-4 right-4 z-50 flex flex-col space-y-2';
+            document.body.appendChild(notificationContainer);
+        }
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `px-4 py-3 rounded-lg shadow-lg flex items-center justify-between min-w-72 transform transition-all duration-300 translate-x-full`;
+        
+        // Set notification type specific styles
+        switch (type) {
+            case 'success':
+                notification.classList.add('bg-green-500', 'text-white');
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button class="ml-4 text-white focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                break;
+            case 'error':
+                notification.classList.add('bg-red-500', 'text-white');
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button class="ml-4 text-white focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                break;
+            default:
+                notification.classList.add('bg-blue-500', 'text-white');
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                    <button class="ml-4 text-white focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+        }
+        
+        // Add to container
+        notificationContainer.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 10);
+        
+        // Set up close button
+        const closeButton = notification.querySelector('button');
+        closeButton.addEventListener('click', () => {
+            closeNotification(notification);
+        });
+        
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+            closeNotification(notification);
+        }, 5000);
+        
+        function closeNotification(notificationElement) {
+            notificationElement.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => {
+                notificationElement.remove();
+            }, 300);
+        }
+    }
+    
+    // Add animation styles to the document
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 300ms, transform 300ms;
+        }
+        
+        .animate-heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            5% { transform: scale(1.1); }
+            10% { transform: scale(1); }
+            15% { transform: scale(1.1); }
+            20% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(styleElement);
+});
+    </script>
+</body>
+
+</html>

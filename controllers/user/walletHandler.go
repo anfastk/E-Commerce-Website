@@ -29,7 +29,18 @@ func CreateWallet(c *gin.Context, userID uint) {
 }
 
 func WalletHandler(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	type TransactionHistoryWallet struct {
 		Date        string  `json:"date"`
 		Description string  `json:"description"`
@@ -85,7 +96,18 @@ func WalletHandler(c *gin.Context) {
 }
 
 func AddMoneyTOWalltet(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var addMoneyInput struct {
 		PaymentMethod string  `json:"paymentMethod"`
 		Amount        float64 `json:"amount"`
@@ -148,11 +170,22 @@ func AddMoneyTOWalltet(c *gin.Context) {
 }
 
 func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var verifyRequest struct {
-		PaymentID string `json:"razorpay_payment_id"`
-		OrderID   string `json:"razorpay_order_id"`
-		Signature string `json:"razorpay_signature"`
+		PaymentID string  `json:"razorpay_payment_id"`
+		OrderID   string  `json:"razorpay_order_id"`
+		Signature string  `json:"razorpay_signature"`
 		Amount    float64 `json:"amount"`
 	}
 

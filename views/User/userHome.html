@@ -10,6 +10,84 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/userhome.js" defer></script>
     <script src="/static/js/productpage.js" defer></script>
+    <style>
+        /* Updated custom animation with the specified timing pattern */
+        @keyframes custom-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            20%,
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Fixed ribbon animation with proper exit */
+        @keyframes ribbon-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            20% {
+                transform: translateX(100%);
+            }
+
+            20.1% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .black-cart-button {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .black-cart-button:hover {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Apply the custom shine animation to the button */
+        .custom-shine-animation {
+            animation: custom-shine 3s infinite;
+        }
+
+        /* Fixed ribbon shine animation */
+        .ribbon-shine-fix {
+            animation: ribbon-shine 3s infinite;
+        }
+
+        .animate-heartbeat {
+            animation: heartbeat 1.5s infinite;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -45,12 +123,12 @@
                             </svg>
                         </button>
                     </a>
-                    <button class="hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                        </svg>
-                    </button>
+                    <a href="/wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                            </svg>
+                        </a>
                     <a href="/profile">
                         <button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -125,31 +203,108 @@
         </div>
 
         <!-- Cards Section -->
-        <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
+        <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-4 pl-4">
             {{range .Laptop}}
-            <a href="/products/details/{{.ID}}">
-                <div class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2">
-                    <div class="relative h-48">
+            <a href="/products/details/{{.ID}}" class="block transition-transform duration-300 hover:scale-105">
+                <div
+                    class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2 border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+                    <!-- Improved glossy ribbon with fixed animation and shine effect -->
+                    <div class="absolute -left-6 top-6 z-20 transform rotate-[-45deg] overflow-hidden">
+                        <div
+                            class="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white py-1 px-8 font-bold text-xs shadow-lg relative overflow-hidden">
+                            <!-- Fixed shine effect animation for ribbon -->
+                            <div class="absolute inset-0 w-full h-full">
+                                <div class="absolute top-0 left-0 w-full h-full bg-white/30 ribbon-shine-fix"></div>
+                            </div>
+                            {{.OfferPercentage}}% OFF
+                        </div>
+                    </div>
+
+                    <div class="relative h-48 group">
+                        <!-- Quick view button with pulse animation -->
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button
+                                class="bg-white/80 backdrop-blur-sm text-gray-800 rounded-full px-4 py-2 text-sm font-medium shadow-lg transform hover:scale-105 transition-all duration-300 animate-pulse">
+                                Quick View
+                            </button>
+                        </div>
+
+                        <!-- Enhanced wishlist button with heart beat animation -->
+                        <button
+                            class="absolute top-2 right-2 z-10 bg-white rounded-full p-2 shadow-md transition-all duration-300 hover:bg-red-50 hover:shadow-lg focus:outline-none wishlist-btn"
+                            data-product-id="{{.ID}}" onclick="toggleWishlist(event, '{{.ID}}')">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-400 wishlist-icon transition-colors duration-300 hover:text-red-500 animate-heartbeat"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </button>
+
+                        <!-- Product Image with enhanced zoom and fade effect -->
                         {{if len .Images}}
-                        <img src="{{index .Images 0}}" alt="Product" class="w-full h-full object-contain">
+                        <div class="w-full h-full overflow-hidden rounded-md">
+                            <img src="{{index .Images 0}}" alt="Product"
+                                class="w-full h-full object-contain transition-all duration-500 group-hover:scale-110 group-hover:brightness-110">
+                        </div>
                         {{else}}
-                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                        <div
+                            class="w-full h-full flex items-center justify-center text-gray-400 transition-colors duration-300 hover:text-gray-600 rounded-md bg-gray-50">
                             No Image Available
                         </div>
                         {{end}}
                     </div>
+
+                    <!-- Product Name with enhanced hover effect -->
                     <div class="p-2 text-center">
-                        <h2 class="text-lg font-semibold">{{.ProductName}}</h2>
+                        <h2
+                            class="text-lg font-semibold transition-all duration-300 hover:text-blue-800 truncate relative group/title">
+                            {{.ProductName}}
+                            <span
+                                class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover/title:w-full"></span>
+                        </h2>
                     </div>
-                    <div class="text-center">
-                        <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
+
+                    <!-- Price with enhanced styling and left-to-right hover animation matching product name -->
+                    <div class="text-center space-x-2">
+                        <span class="text-black font-bold text-lg relative inline-block overflow-hidden group/price">
+                            &#8377;{{printf "%.2f" .SalePrice}}
+                            <!-- Changed to match the product name bar animation style -->
+                            <span
+                                class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300 group-hover/price:w-full"></span>
+                        </span>
                         <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
                     </div>
+                    <!-- Black to Grey Glossy Add to Cart button with updated animation timing -->
                     <div class="flex flex-1 justify-center p-4">
-                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
+                        <form action="/cart/add/{{.ID}}" method="post" class="mt-2 w-full">
                             <button
-                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                                Add To Cart
+                                class="w-full py-2.5 px-4 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                                <!-- Black to Grey gradient -->
+                                <span
+                                    class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
+
+                                <!-- Glossy overlay -->
+                                <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
+
+                                <!-- Full-width shine animation with updated timing -->
+                                <span class="absolute inset-0 w-full h-full overflow-hidden">
+                                    <span
+                                        class="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full custom-shine-animation"></span>
+                                </span>
+
+                                <!-- Hover glow effect -->
+                                <span
+                                    class="absolute inset-0 w-full h-full bg-white/0 transition-all duration-300 group-hover:bg-white/10"></span>
+
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 mr-2 relative z-10 text-white group-hover:animate-bounce" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span class="relative z-10 text-white font-medium text-sm">Add To Cart</span>
                             </button>
                         </form>
                     </div>
@@ -295,39 +450,110 @@
             <div id="product-scroll"
                 class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4 pb-6">
                 {{range .Mouse}}
-                <a href="/products/details/{{.ID}}">
+                <a href="/products/details/{{.ID}}" class="block transition-transform duration-300 hover:scale-105">
                     <div
-                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0">
-                        <div class="relative w-full flex justify-center">
+                        class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2 border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+                        <!-- Improved glossy ribbon with fixed animation and shine effect -->
+                        <div class="absolute -left-6 top-6 z-20 transform rotate-[-45deg] overflow-hidden">
+                            <div
+                                class="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white py-1 px-8 font-bold text-xs shadow-lg relative overflow-hidden">
+                                <!-- Fixed shine effect animation for ribbon -->
+                                <div class="absolute inset-0 w-full h-full">
+                                    <div class="absolute top-0 left-0 w-full h-full bg-white/30 ribbon-shine-fix"></div>
+                                </div>
+                                {{.OfferPercentage}}% OFF
+                            </div>
+                        </div>
+    
+                        <div class="relative h-48 group">
+                            <!-- Quick view button with pulse animation -->
+                            <div
+                                class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button
+                                    class="bg-white/80 backdrop-blur-sm text-gray-800 rounded-full px-4 py-2 text-sm font-medium shadow-lg transform hover:scale-105 transition-all duration-300 animate-pulse">
+                                    Quick View
+                                </button>
+                            </div>
+    
+                            <!-- Enhanced wishlist button with heart beat animation -->
                             <button
-                                class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                    stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
+                                class="absolute top-2 right-2 z-10 bg-white rounded-full p-2 shadow-md transition-all duration-300 hover:bg-red-50 hover:shadow-lg focus:outline-none wishlist-btn"
+                                data-product-id="{{.ID}}" onclick="toggleWishlist(event, '{{.ID}}')">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 text-gray-400 wishlist-icon transition-colors duration-300 hover:text-red-500 animate-heartbeat"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 15l7-7 7 7" />
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
                             </button>
+    
+                            <!-- Product Image with enhanced zoom and fade effect -->
                             {{if len .Images}}
-                            <img src="{{index .Images 0}}" alt="Product" class="rounded-lg shadow-md">
+                            <div class="w-full h-full overflow-hidden rounded-md">
+                                <img src="{{index .Images 0}}" alt="Product"
+                                    class="w-full h-full object-contain transition-all duration-500 group-hover:scale-110 group-hover:brightness-110">
+                            </div>
                             {{else}}
-                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                            <div
+                                class="w-full h-full flex items-center justify-center text-gray-400 transition-colors duration-300 hover:text-gray-600 rounded-md bg-gray-50">
                                 No Image Available
                             </div>
                             {{end}}
                         </div>
-                        <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}</p>
-                        <div class="text-center">
-                            <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
-                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
-                                .RegularPrice}}</span>
+    
+                        <!-- Product Name with enhanced hover effect -->
+                        <div class="p-2 text-center">
+                            <h2
+                                class="text-lg font-semibold transition-all duration-300 hover:text-blue-800 truncate relative group/title">
+                                {{.ProductName}}
+                                <span
+                                    class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover/title:w-full"></span>
+                            </h2>
                         </div>
-                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
-                            <button
-                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                                Add To Cart
-                            </button>
-                        </form>
-
+    
+                        <!-- Price with enhanced styling and left-to-right hover animation matching product name -->
+                        <div class="text-center space-x-2">
+                            <span class="text-black font-bold text-lg relative inline-block overflow-hidden group/price">
+                                &#8377;{{printf "%.2f" .SalePrice}}
+                                <!-- Changed to match the product name bar animation style -->
+                                <span
+                                    class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300 group-hover/price:w-full"></span>
+                            </span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
+                        </div>
+    
+                        <!-- Black to Grey Glossy Add to Cart button with updated animation timing -->
+                        <div class="flex flex-1 justify-center p-4">
+                            <form action="/cart/add/{{.ID}}" method="post" class="mt-2 w-full">
+                                <button
+                                    class="w-full py-2.5 px-4 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                                    <!-- Black to Grey gradient -->
+                                    <span
+                                        class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
+    
+                                    <!-- Glossy overlay -->
+                                    <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
+    
+                                    <!-- Full-width shine animation with updated timing -->
+                                    <span class="absolute inset-0 w-full h-full overflow-hidden">
+                                        <span
+                                            class="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full custom-shine-animation"></span>
+                                    </span>
+    
+                                    <!-- Hover glow effect -->
+                                    <span
+                                        class="absolute inset-0 w-full h-full bg-white/0 transition-all duration-300 group-hover:bg-white/10"></span>
+    
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5 mr-2 relative z-10 text-white group-hover:animate-bounce" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span class="relative z-10 text-white font-medium text-sm">Add To Cart</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </a>
                 {{end}}
@@ -376,42 +602,125 @@
             </button>
         </div>
         <div class="relative">
-            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4">
+            <div id="product-scroll" class="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide px-2 md:px-4 pb-6">
                 {{range .Keyboard}}
-                <a href="/products/details/{{.ID}}">
+                <a href="/products/details/{{.ID}}" class="block transition-transform duration-300 hover:scale-105">
                     <div
-                        class="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center w-48 md:w-60 flex-shrink-0 mb-4">
-                        <div class="relative w-full flex justify-center">
+                        class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2 border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+                        <!-- Improved glossy ribbon with fixed animation and shine effect -->
+                         {{if .OfferPercentage}}
+                        <div class="absolute -left-6 top-6 z-20 transform rotate-[-45deg] overflow-hidden">
+                            <div
+                                class="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white py-1 px-8 font-bold text-xs shadow-lg relative overflow-hidden">
+                                <!-- Fixed shine effect animation for ribbon -->
+                                <div class="absolute inset-0 w-full h-full">
+                                    <div class="absolute top-0 left-0 w-full h-full bg-white/30 ribbon-shine-fix"></div>
+                                </div>
+                                {{.OfferPercentage}}% OFF
+                            </div>
+                        </div>
+                        {{else}}
+                        <div class="absolute -left-6 top-6 z-20 transform rotate-[-45deg] overflow-hidden">
+                            <div
+                                class="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white py-1 px-12 font-bold text-xs shadow-lg relative overflow-hidden">
+                                <!-- Fixed shine effect animation for ribbon -->
+                                <div class="absolute inset-0 w-full h-full">
+                                    <div class="absolute top-0 left-0 w-full h-full bg-white/30 ribbon-shine-fix"></div>
+                                </div>
+                                SALE
+                            </div>
+                        </div>
+                        {{end}}
+    
+                        <div class="relative h-48 group">
+                            <!-- Quick view button with pulse animation -->
+                            <div
+                                class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button
+                                    class="bg-white/80 backdrop-blur-sm text-gray-800 rounded-full px-4 py-2 text-sm font-medium shadow-lg transform hover:scale-105 transition-all duration-300 animate-pulse">
+                                    Quick View
+                                </button>
+                            </div>
+    
+                            <!-- Enhanced wishlist button with heart beat animation -->
                             <button
-                                class="absolute top-2 left-2 bg-white rounded-full shadow-md p-1 md:p-2 hover:bg-gray-100 focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
-                                    stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 text-gray-600">
+                                class="absolute top-2 right-2 z-10 bg-white rounded-full p-2 shadow-md transition-all duration-300 hover:bg-red-50 hover:shadow-lg focus:outline-none wishlist-btn"
+                                data-product-id="{{.ID}}" onclick="toggleWishlist(event, '{{.ID}}')">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 text-gray-400 wishlist-icon transition-colors duration-300 hover:text-red-500 animate-heartbeat"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 15l7-7 7 7" />
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
                             </button>
+    
+                            <!-- Product Image with enhanced zoom and fade effect -->
                             {{if len .Images}}
-                            <img src="{{index .Images 0}}" alt="Product" class="rounded-lg shadow-md">
+                            <div class="w-full h-full overflow-hidden rounded-md">
+                                <img src="{{index .Images 0}}" alt="Product"
+                                    class="w-full h-full object-contain transition-all duration-500 group-hover:scale-110 group-hover:brightness-110">
+                            </div>
                             {{else}}
-                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                            <div
+                                class="w-full h-full flex items-center justify-center text-gray-400 transition-colors duration-300 hover:text-gray-600 rounded-md bg-gray-50">
                                 No Image Available
                             </div>
                             {{end}}
                         </div>
-                        <p class="text-center text-sm md:text-base font-semibold mt-4">{{.ProductName}}
-                        </p>
-                        <div class="text-center">
-                            <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
-                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
-                                .RegularPrice}}</span>
+    
+                        <!-- Product Name with enhanced hover effect -->
+                        <div class="p-2 text-center">
+                            <h2
+                                class="text-lg font-semibold transition-all duration-300 hover:text-blue-800 truncate relative group/title">
+                                {{.ProductName}}
+                                <span
+                                    class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover/title:w-full"></span>
+                            </h2>
                         </div>
-                        <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
-                            <button
-                                class="bg-black text-white text-sm md:text-base font-medium py-2 px-4 md:px-6 rounded-full mt-4 shadow-lg focus:outline-none hover:bg-gray-800">
-                                Add To Cart
-                            </button>
-                        </form>
-
+    
+                        <!-- Price with enhanced styling and left-to-right hover animation matching product name -->
+                        <div class="text-center space-x-2">
+                            <span class="text-black font-bold text-lg relative inline-block overflow-hidden group/price">
+                                &#8377;{{printf "%.2f" .SalePrice}}
+                                <!-- Changed to match the product name bar animation style -->
+                                <span
+                                    class="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300 group-hover/price:w-full"></span>
+                            </span>
+                            <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
+                        </div>
+    
+                        <!-- Black to Grey Glossy Add to Cart button with updated animation timing -->
+                        <div class="flex flex-1 justify-center p-4">
+                            <form action="/cart/add/{{.ID}}" method="post" class="mt-2 w-full">
+                                <button
+                                    class="w-full py-2.5 px-4 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                                    <!-- Black to Grey gradient -->
+                                    <span
+                                        class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
+    
+                                    <!-- Glossy overlay -->
+                                    <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
+    
+                                    <!-- Full-width shine animation with updated timing -->
+                                    <span class="absolute inset-0 w-full h-full overflow-hidden">
+                                        <span
+                                            class="absolute top-0 left-0 w-full h-full bg-white/20 transform -translate-x-full custom-shine-animation"></span>
+                                    </span>
+    
+                                    <!-- Hover glow effect -->
+                                    <span
+                                        class="absolute inset-0 w-full h-full bg-white/0 transition-all duration-300 group-hover:bg-white/10"></span>
+    
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5 mr-2 relative z-10 text-white group-hover:animate-bounce" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span class="relative z-10 text-white font-medium text-sm">Add To Cart</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </a>
                 {{end}}
@@ -719,6 +1028,65 @@
                 toast.classList.add("hidden");
             }, 3000);
         }
+
+        function toggleWishlist(event, productId) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const wishlistBtn = event.currentTarget;
+            const icon = wishlistBtn.querySelector('.wishlist-icon');
+
+            // Toggle wishlist state
+            if (icon.classList.contains('text-red-500')) {
+                // Remove from wishlist
+                icon.classList.remove('text-red-500');
+                icon.classList.remove('fill-current');
+                icon.classList.add('text-gray-400');
+
+                // Send request to remove from wishlist
+                fetch('/wishlist/remove/' + productId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+            } else {
+                // Add to wishlist
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+                icon.classList.add('fill-current');
+
+                // Send request to add to wishlist
+                fetch('/wishlist/add/' + productId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+            }
+        }
+
+        // Initialize wishlist buttons - check if products are in wishlist
+        document.addEventListener('DOMContentLoaded', function () {
+            const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+
+            // Fetch user's wishlist
+            fetch('/wishlist/items')
+                .then(response => response.json())
+                .then(wishlist => {
+                    wishlistBtns.forEach(btn => {
+                        const productId = btn.getAttribute('data-product-id');
+                        const icon = btn.querySelector('.wishlist-icon');
+
+                        // If product is in wishlist, fill the heart
+                        if (wishlist.includes(parseInt(productId))) {
+                            icon.classList.remove('text-gray-400');
+                            icon.classList.add('text-red-500');
+                            icon.classList.add('fill-current');
+                        }
+                    });
+                });
+        });
     </script>
 </body>
 

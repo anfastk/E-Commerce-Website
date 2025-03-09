@@ -14,7 +14,18 @@ import (
 )
 
 func ProfileDetails(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var authDetails models.UserAuth
 	if err := config.DB.Preload("UserProfile").
 		Where("id = ? AND is_blocked = ?", userID, false).
@@ -98,7 +109,18 @@ func ProfileUpdate(c *gin.Context) {
 }
 
 func ProfileImageUpdate(c *gin.Context) {
-	userID := c.MustGet("userid")
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	tx := config.DB.Begin()
 	file, fileHeader, err := c.Request.FormFile("image")
 	if err != nil {
@@ -149,7 +171,17 @@ func ProfileImageUpdate(c *gin.Context) {
 }
 
 func Settings(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var userDetails models.UserAuth
 	if err := config.DB.First(&userDetails, "id=? AND is_blocked = ?", userID, false).Error; err != nil {
@@ -163,7 +195,17 @@ func Settings(c *gin.Context) {
 }
 
 func ManageAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var authDetails models.UserAuth
 	if err := config.DB.First(&authDetails, userID).Error; err != nil {
@@ -183,7 +225,17 @@ func ManageAddress(c *gin.Context) {
 }
 
 func ShowAddAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var userauth models.UserAuth
 	if err := config.DB.Find(&userauth, "id = ?", userID).Error; err != nil {
@@ -196,7 +248,18 @@ func ShowAddAddress(c *gin.Context) {
 }
 
 func AddAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var addAddress struct {
 		FirstName string `json:"firstName"`
 		LastName  string `json:"lastName"`
@@ -239,7 +302,18 @@ func AddAddress(c *gin.Context) {
 }
 
 func ShowEditAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	id := c.Param("id")
 	var userauth models.UserAuth
 	if err := config.DB.Find(&userauth, "id = ?", userID).Error; err != nil {
@@ -259,7 +333,17 @@ func ShowEditAddress(c *gin.Context) {
 }
 
 func EditAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var UpdateAddress struct {
 		Id        string `json:"id"`
@@ -307,7 +391,18 @@ func EditAddress(c *gin.Context) {
 }
 
 func SetAsDefaultAddress(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	addressID := c.Param("id")
 	tx := config.DB.Begin()
 	if err := tx.Model(&models.UserAddress{}).Where("user_id = ?", userID).Update("is_default", false).Error; err != nil {
@@ -350,7 +445,18 @@ func DeleteAddress(c *gin.Context) {
 }
 
 func ShowChangePassword(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var userAuth models.UserAuth
 	if err := config.DB.First(&userAuth, userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
@@ -409,7 +515,17 @@ func ChangePassword(c *gin.Context) {
 }
 
 func OrderDetails(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	type OrderResponse struct {
 		Slno                 int     `json:"slno"`
@@ -505,7 +621,17 @@ func OrderDetails(c *gin.Context) {
 }
 
 func OrderHistory(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	type OrderHistoryResponse struct {
 		ID          uint    `json:"id"`

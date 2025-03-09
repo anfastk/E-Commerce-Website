@@ -12,7 +12,18 @@ import (
 )
 
 func ShowCart(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	type CartItemWithDiscount struct {
 		Item          models.CartItem
 		DiscountPrice float64
@@ -117,7 +128,18 @@ func ShowCart(c *gin.Context) {
 }
 
 func AddToCart(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var cart models.Cart
 	tx := config.DB.Begin()
 
@@ -130,12 +152,7 @@ func AddToCart(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Cart creation Failed", "Cart creation Failed", "")
 		}
 	}
-	count := CartCount(c)
-	if count >= 4 {
-		tx.Rollback()
-		helper.RespondWithError(c, http.StatusUnprocessableEntity, "You have reached the maximum limit for this product in your cart.", "You have reached the maximum limit for this product in your cart.", "")
-		return
-	}
+
 	productID, iderr := strconv.Atoi(c.Param("id"))
 	if iderr != nil {
 		tx.Rollback()
@@ -155,7 +172,7 @@ func AddToCart(c *gin.Context) {
 	}
 
 	var cartItems models.CartItem
-	if err := tx.First(&cartItems, "product_id = ? AND cart_id = ?", productID, cart.ID).Error; err != nil {
+	if err := tx.First(&cartItems, "product_id = ? AND product_variant_id = ? AND cart_id = ?", product.ProductID,product.ID, cart.ID).Error; err != nil {
 		cartItems = models.CartItem{
 			CartID:           cart.ID,
 			ProductID:        product.ProductID,
@@ -244,7 +261,18 @@ func CartItemUpdate(c *gin.Context) {
 }
 
 func ShowCartTotal(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var subTotal float64
 	var total float64
 	var cart models.Cart
@@ -262,7 +290,7 @@ func ShowCartTotal(c *gin.Context) {
 	for _, items := range cartItems {
 		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
 		subTotal += items.ProductVariant.RegularPrice * float64(items.Quantity)
-		total += (items.ProductVariant.SalePrice - discountAmount) * float64(items.Quantity) 
+		total += (items.ProductVariant.SalePrice - discountAmount) * float64(items.Quantity)
 		fmt.Println(subTotal, total, int(subTotal-total))
 
 	}
@@ -280,7 +308,18 @@ func ShowCartTotal(c *gin.Context) {
 	})
 }
 func CartCount(c *gin.Context) int {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return 0
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return 0
+	}
+
 	var count int
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
@@ -307,10 +346,27 @@ func CartCount(c *gin.Context) int {
 }
 
 func DeleteCartItems(c *gin.Context) {
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+	var cart models.Cart
+	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Cart Not Found", "Something Went Wrong", "")
+		return
+	}
+
 	itemID := c.Param("id")
 
 	var cartItem models.CartItem
-	if err := config.DB.First(&cartItem, itemID).Error; err != nil {
+	if err := config.DB.First(&cartItem, "id = ? AND cart_id = ?", itemID, cart.ID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Inavlid request", "Inavlid request", "")
 	}
 

@@ -61,7 +61,18 @@ var RazorPayOrderID string
 
 func VerifyRazorpayPayment(c *gin.Context) {
 	currentTime := time.Now()
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var verifyRequest struct {
 		PaymentID string `json:"razorpay_payment_id"`
 		OrderID   string `json:"razorpay_order_id"`
@@ -172,7 +183,17 @@ func VerifyRazorpayPayment(c *gin.Context) {
 
 func PaymentFailureHandler(c *gin.Context) {
 	currentTime := time.Now()
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var verifyRequest struct {
 		PaymentID string `json:"razorpay_payment_id"`
@@ -211,11 +232,11 @@ func PaymentFailureHandler(c *gin.Context) {
 	var coupon models.ReservedCoupon
 	tx.First(&coupon, paymentRequest.CouponId)
 	couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
-		if err != nil {
-			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
-			return
-		}
-		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+		return
+	}
+	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
 	orderItems := FetchOrderItems(c, tx, orderID)
@@ -268,7 +289,18 @@ func PaymentFailureHandler(c *gin.Context) {
 }
 
 func VerifyPayNowRazorpayPayment(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
 	var verifyRequest struct {
 		PaymentID   string `json:"razorpay_payment_id"`
 		OrderID     string `json:"razorpay_order_id"`

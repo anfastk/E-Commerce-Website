@@ -12,7 +12,17 @@ import (
 )
 
 func ShowCheckoutPage(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	type CartItemWithDiscount struct {
 		Item          models.CartItem
@@ -112,7 +122,17 @@ func ShowCheckoutPage(c *gin.Context) {
 }
 
 func CheckCoupon(c *gin.Context) {
-	userID := c.MustGet("userid").(uint)
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
 
 	var couponInput struct {
 		CouponCode      string  `json:"couponCode"`

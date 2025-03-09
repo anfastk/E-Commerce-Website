@@ -8,8 +8,112 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/productpage.js" defer></script>
+    <style>
+        .sale-ribbon {
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            animation: ribbon-bounce 5s ease-in-out infinite;
+        }
 
+        .text-shadow {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
 
+        @keyframes ribbon-bounce {
+
+            0%,
+            100% {
+                transform: rotate(-45deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(-45deg) scale(1.05);
+            }
+        }
+
+        .shine-effect {
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0) 20%,
+                    rgba(255, 255, 255, 0.8) 45%,
+                    rgba(255, 255, 255, 0.8) 50%,
+                    rgba(255, 255, 255, 0) 80%,
+                    rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-100%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            20%,
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes pulse-border {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.03);
+            }
+        }
+
+        .animate-pulse-border {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-light {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse-light {
+            animation: pulse-light 2s ease-in-out infinite;
+        }
+
+        .heart-icon:hover {
+            animation: heartBeat 1s ease-in-out;
+            fill: rgba(236, 72, 153, 0.3);
+        }
+
+        @keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+
+            14% {
+                transform: scale(1.3);
+            }
+
+            28% {
+                transform: scale(1);
+            }
+
+            42% {
+                transform: scale(1.3);
+            }
+
+            70% {
+                transform: scale(1);
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
@@ -44,12 +148,12 @@
                             </svg>
                         </button>
                     </a>
-                    <button class="hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                        </svg>
-                    </button>
+                    <a href="/wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                            </svg>
+                        </a>
                     <a href="/profile">
                         <button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -239,46 +343,106 @@
         <!-- Product Cards -->
         <div class="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 z-0">
             {{range .data}}
-            <a href="/products/details/{{.ID}}">
-                <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[400px]">
-                    <!-- Heart icon -->
+            <a href="/products/details/{{.ID}}"
+                class="block transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[450px] overflow-hidden group">
+                    <!-- Ribbon offer design -->
+                    <div
+                        class="sale-ribbon absolute -left-10 top-5 bg-gradient-to-r from-red-600 to-red-500 text-white py-1 px-12 transform rotate-[-45deg] z-10 shadow-md overflow-hidden">
+                        <span class="font-bold relative z-10 text-shadow">SALE!</span>
+
+                        <!-- Glossy shine effect - animated reflection -->
+                        <div class="shine-effect absolute inset-0 w-full h-full"></div>
+
+                        <!-- Additional glossy highlight at the top -->
+                        <div class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent">
+                        </div>
+
+                        <!-- Pulsing border effect -->
+                        <div class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border"></div>
+                    </div>
+
+                    <!-- Wishlist button -->
                     <button
-                        class="absolute top-2 right-2 text-gray-500 hover:text-black transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        class="absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-110 hover:bg-pink-50 hover:shadow-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6 text-gray-400 group-hover:text-pink-500 transition-colors duration-300 heart-icon"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </button>
 
-                    <!-- Product image -->
-                    <div class="rounded-lg w-full h-2/3 flex items-center justify-center">
+                    <!-- Product image with hover zoom effect -->
+                    <div class="rounded-lg w-full h-2/3 flex items-center justify-center overflow-hidden">
                         {{if len .Images}}
-                        <img src="{{index .Images 0}}" alt="{{.ProductName}}" class="w-full h-full object-contain">
+                        <img src="{{index .Images 0}}" alt="{{.ProductName}}"
+                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
                         {{else}}
-                        <img src="" alt="Default Image" class="w-full h-full object-contain">
+                        <img src="" alt="Default Image"
+                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
                         {{end}}
                     </div>
 
-                    <!-- Product details -->
-                    <h2 class="mt-4 text-gray-800 font-semibold text-base text-center">{{.ProductName}}</h2>
+                    <!-- Product details with enhanced styling -->
+                    <h2 class="mt-4 text-gray-800 font-semibold text-base text-center truncate">{{.ProductName}}</h2>
                     <div class="mt-2 text-center">
                         <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
                         <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
                     </div>
 
-                    <!-- Add to Cart button -->
-                    <form action="/cart/add/{{.ID}}" method="post" class="cart-form">
+                    <!-- Ratings stars -->
+                    <div class="flex justify-center mt-1">
+                        <div class="flex text-yellow-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart button with improved styling and hover effect -->
+                    <form class="cart-form" action="/cart/add/{{.ID}}" method="POST">
                         <button type="submit"
-                            class="absolute bottom-4 left-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                            class="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105 overflow-hidden group">
+                            <span
+                                class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 to-blue-500/30 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            <span>Add to Cart</span>
+                            <span class="relative z-10">Add to Cart</span>
                         </button>
                     </form>
+
+
+                    <!-- Decorative accent border -->
+                    <div
+                        class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 group-hover:h-2 transition-all duration-300">
+                    </div>
                 </div>
             </a>
             {{end}}
@@ -371,9 +535,10 @@
                 e.preventDefault(); // Prevent normal form submission
 
                 let formData = new FormData(this);
+                let actionUrl = this.action; // Ensure action URL is correctly fetched
 
                 try {
-                    const response = await fetch(this.action, {
+                    const response = await fetch(actionUrl, {
                         method: 'POST',
                         body: formData
                     });
@@ -389,6 +554,7 @@
                 }
             });
         });
+
 
         function showToast(message, bgColor) {
             let toast = document.getElementById("toast");

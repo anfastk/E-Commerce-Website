@@ -20,10 +20,9 @@ func UserRouter(r *gin.Engine) {
 	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
 	r.GET("/products/details/:id", middleware.NoCacheMiddleware(), controllers.ShowProductDetail)
 	r.POST("/products/filter", controllers.FilterProducts)
-	r.POST("/checkout/payment/verify", middleware.NoCacheMiddleware(),middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
+	r.POST("/checkout/payment/verify", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
 	r.GET("/order/success", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
 	r.POST("/order/failed", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)
-	
 
 	user := r.Group("/user")
 	user.Use(middleware.NoCacheMiddleware())
@@ -68,8 +67,8 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/order/details/track/pay/now/verify", controllers.VerifyPayNowRazorpayPayment)
 		userProfile.GET("/order/history", controllers.OrderHistory)
 		userProfile.GET("/wallet", controllers.WalletHandler)
-		userProfile.GET("/referral",controllers.ShowReferralPage)
-		userProfile.POST("/referral/add",controllers.AddReferral)
+		userProfile.GET("/referral", controllers.ShowReferralPage)
+		userProfile.POST("/referral/add", controllers.AddReferral)
 		userProfile.POST("/wallet/add/amount", controllers.AddMoneyTOWalltet)
 		userProfile.POST("/wallet/add/amount/verify", controllers.VerifyAddTOWalletRazorpayPayment)
 	}
@@ -93,6 +92,17 @@ func UserRouter(r *gin.Engine) {
 		checkout.GET("/", controllers.ShowCheckoutPage)
 		checkout.POST("/payment", controllers.PaymentPage)
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
-		checkout.POST("/check/coupon",controllers.CheckCoupon)
+		checkout.POST("/check/coupon", controllers.CheckCoupon)
+	}
+
+	wishlist := r.Group("/wishlist")
+	wishlist.Use(middleware.NoCacheMiddleware())
+	wishlist.Use(middleware.AuthMiddleware(RoleUser))
+	{
+		wishlist.GET("/", controllers.ShowWishlist)
+		wishlist.POST("/add/:id", controllers.AddToWishlist)
+		wishlist.POST("/products/move/cart/:id", controllers.WishlistTOCart)
+		wishlist.POST("/all/products/move/cart", controllers.WishlistAllTOCart)
+		wishlist.POST("/remove/:id", controllers.RemoveFromWishlist)
 	}
 }
