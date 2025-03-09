@@ -161,11 +161,11 @@
                         </button>
                     </a>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
@@ -200,7 +200,6 @@
             </div>
         </header>
     </div>
-    {{if .count}}
     <div class="wishlist-header pt-3 px-4 sm:px-6 lg:px-8 mb-6">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -230,8 +229,6 @@
             </div>
         </div>
     </div>
-    {{else}}
-    {{end}}
 
     <!-- Wishlist Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -367,163 +364,170 @@
     <script>
         // wishlist.js - Handles all wishlist functionality
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if wishlist has items
-    const wishlistItems = document.getElementById('wishlist-items');
-    const emptyWishlist = document.getElementById('empty-wishlist');
-    
-    // Show empty state if no items are present
-    if (wishlistItems && wishlistItems.children.length === 0) {
-        wishlistItems.classList.add('hidden');
-        emptyWishlist.classList.remove('hidden');
-    }
-    
-    // Handle all wishlist removal forms
-    const removeForms = document.querySelectorAll('form[action^="/wishlist/remove/"]');
-    removeForms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const wishlistId = form.action.split('/').pop();
-            const wishlistCard = form.closest('.wishlist-card');
-            
-            // Show confirmation dialog
-            if (confirm('Are you sure you want to remove this item from your wishlist?')) {
-                // Send AJAX request to remove item
-                fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Remove the item with animation
-                        wishlistCard.classList.add('fade-out');
-                        
-                        // After animation completes, remove the element
-                        setTimeout(() => {
-                            wishlistCard.remove();
-                            
-                            // Check if wishlist is now empty
-                            if (wishlistItems.children.length === 0) {
-                                wishlistItems.classList.add('hidden');
-                                emptyWishlist.classList.remove('hidden');
-                            }
-                            
-                            // Show success notification
-                            showNotification('Item removed from wishlist', 'success');
-                        }, 300);
-                    } else {
-                        showNotification('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('An error occurred while removing the item', 'error');
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if wishlist has items
+            const wishlistItems = document.getElementById('wishlist-items');
+            const emptyWishlist = document.getElementById('empty-wishlist');
+
+            // Show empty state if no items are present
+            if (wishlistItems && wishlistItems.children.length === 0) {
+                wishlistItems.classList.add('hidden');
+                emptyWishlist.classList.remove('hidden');
             }
-        });
-    });
-    
-    // Handle "Move to Cart" forms
-    const moveToCartForms = document.querySelectorAll('form[action^="/wishlist/products/move/cart/"]');
-    moveToCartForms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const wishlistId = form.action.split('/').pop();
-            const button = form.querySelector('button');
-            
-            // Disable button and show loading state
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
-            
-            // Send AJAX request to move item to cart
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Update button to "Go to Cart"
+
+            // Handle all wishlist removal forms
+            const removeForms = document.querySelectorAll('form[action^="/wishlist/remove/"]');
+            removeForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const wishlistId = form.action.split('/').pop();
                     const wishlistCard = form.closest('.wishlist-card');
-                    const buttonContainer = form.parentElement;
-                    
-                    // Replace form with link
-                    buttonContainer.innerHTML = `
+
+                    // Show confirmation dialog
+                    if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+                        // Send AJAX request to remove item
+                        fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    // Remove the item with animation
+                                    wishlistCard.classList.add('fade-out');
+                                    location.reload();
+
+                                    // After animation completes, remove the element
+                                    setTimeout(() => {
+                                        wishlistCard.remove();
+
+                                        // Check if wishlist is now empty
+                                        if (wishlistItems.children.length === 0) {
+                                            wishlistItems.classList.add('hidden');
+                                            emptyWishlist.classList.remove('hidden');
+                                        }
+
+                                        // Show success notification
+                                        showNotification('Item removed from wishlist', 'success');
+                                    }, 300);
+                                } else {
+                                    showNotification('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
+                                    location.reload();
+
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                showNotification('An error occurred while removing the item', 'error');
+                            });
+                    }
+                });
+            });
+
+            // Handle "Move to Cart" forms
+            const moveToCartForms = document.querySelectorAll('form[action^="/wishlist/products/move/cart/"]');
+            moveToCartForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const wishlistId = form.action.split('/').pop();
+                    const button = form.querySelector('button');
+
+                    // Disable button and show loading state
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
+
+                    // Send AJAX request to move item to cart
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Update button to "Go to Cart"
+                                const wishlistCard = form.closest('.wishlist-card');
+                                const buttonContainer = form.parentElement;
+
+                                // Replace form with link
+                                buttonContainer.innerHTML = `
                         <a href="/cart" 
                            class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
                            <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
                         </a>
                     `;
-                    
-                    // Update cart counter in navbar if it exists
-                    const cartCounter = document.querySelector('.cart-counter');
-                    if (cartCounter && data.cartCount) {
-                        cartCounter.textContent = data.cartCount;
-                        cartCounter.classList.remove('hidden');
-                    }
-                    
-                    // Show success notification
-                    showNotification('Item added to your cart', 'success');
-                } else {
-                    // Reset button state
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-                    
-                    // Show error notification
-                    showNotification(data.message || 'Failed to add item to cart', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                
-                // Reset button state
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-                
-                showNotification('An error occurred while adding to cart', 'error');
+
+                                // Update cart counter in navbar if it exists
+                                const cartCounter = document.querySelector('.cart-counter');
+                                if (cartCounter && data.cartCount) {
+                                    cartCounter.textContent = data.cartCount;
+                                    cartCounter.classList.remove('hidden');
+                                }
+
+                                // Show success notification
+                                showNotification('Item added to your cart', 'success');
+                                location.reload();
+
+                            } else {
+                                // Reset button state
+                                button.disabled = false;
+                                button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
+
+                                // Show error notification
+                                showNotification(data.message || 'Failed to add item to cart', 'error');
+                                location.reload();
+
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+
+                            // Reset button state
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
+
+                            showNotification('An error occurred while adding to cart', 'error');
+                        });
+                });
             });
-        });
-    });
-    
-    // Notification handler function
-    function showNotification(message, type = 'info') {
-        // Check if notification container exists, if not create it
-        let notificationContainer = document.getElementById('notification-container');
-        if (!notificationContainer) {
-            notificationContainer = document.createElement('div');
-            notificationContainer.id = 'notification-container';
-            notificationContainer.className = 'fixed bottom-4 right-4 z-50 flex flex-col space-y-2';
-            document.body.appendChild(notificationContainer);
-        }
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `px-4 py-3 rounded-lg shadow-lg flex items-center justify-between min-w-72 transform transition-all duration-300 translate-x-full`;
-        
-        // Set notification type specific styles
-        switch (type) {
-            case 'success':
-                notification.classList.add('bg-green-500', 'text-white');
-                notification.innerHTML = `
+
+            // Notification handler function
+            function showNotification(message, type = 'info') {
+                // Check if notification container exists, if not create it
+                let notificationContainer = document.getElementById('notification-container');
+                if (!notificationContainer) {
+                    notificationContainer = document.createElement('div');
+                    notificationContainer.id = 'notification-container';
+                    notificationContainer.className = 'fixed bottom-4 right-4 z-50 flex flex-col space-y-2';
+                    document.body.appendChild(notificationContainer);
+                }
+
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `px-4 py-3 rounded-lg shadow-lg flex items-center justify-between min-w-72 transform transition-all duration-300 translate-x-full`;
+
+                // Set notification type specific styles
+                switch (type) {
+                    case 'success':
+                        notification.classList.add('bg-green-500', 'text-white');
+                        notification.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-check-circle mr-2"></i>
                         <span>${message}</span>
@@ -532,10 +536,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <i class="fas fa-times"></i>
                     </button>
                 `;
-                break;
-            case 'error':
-                notification.classList.add('bg-red-500', 'text-white');
-                notification.innerHTML = `
+                        break;
+                    case 'error':
+                        notification.classList.add('bg-red-500', 'text-white');
+                        notification.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-exclamation-circle mr-2"></i>
                         <span>${message}</span>
@@ -544,10 +548,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <i class="fas fa-times"></i>
                     </button>
                 `;
-                break;
-            default:
-                notification.classList.add('bg-blue-500', 'text-white');
-                notification.innerHTML = `
+                        break;
+                    default:
+                        notification.classList.add('bg-blue-500', 'text-white');
+                        notification.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-info-circle mr-2"></i>
                         <span>${message}</span>
@@ -556,38 +560,38 @@ document.addEventListener('DOMContentLoaded', function() {
                         <i class="fas fa-times"></i>
                     </button>
                 `;
-        }
-        
-        // Add to container
-        notificationContainer.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => {
-            notification.classList.remove('translate-x-full');
-        }, 10);
-        
-        // Set up close button
-        const closeButton = notification.querySelector('button');
-        closeButton.addEventListener('click', () => {
-            closeNotification(notification);
-        });
-        
-        // Auto-close after 5 seconds
-        setTimeout(() => {
-            closeNotification(notification);
-        }, 5000);
-        
-        function closeNotification(notificationElement) {
-            notificationElement.classList.add('translate-x-full', 'opacity-0');
-            setTimeout(() => {
-                notificationElement.remove();
-            }, 300);
-        }
-    }
-    
-    // Add animation styles to the document
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
+                }
+
+                // Add to container
+                notificationContainer.appendChild(notification);
+
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 10);
+
+                // Set up close button
+                const closeButton = notification.querySelector('button');
+                closeButton.addEventListener('click', () => {
+                    closeNotification(notification);
+                });
+
+                // Auto-close after 5 seconds
+                setTimeout(() => {
+                    closeNotification(notification);
+                }, 5000);
+
+                function closeNotification(notificationElement) {
+                    notificationElement.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => {
+                        notificationElement.remove();
+                    }, 300);
+                }
+            }
+
+            // Add animation styles to the document
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
         .fade-out {
             opacity: 0;
             transform: translateY(-10px);
@@ -607,8 +611,8 @@ document.addEventListener('DOMContentLoaded', function() {
             100% { transform: scale(1); }
         }
     `;
-    document.head.appendChild(styleElement);
-});
+            document.head.appendChild(styleElement);
+        });
     </script>
 </body>
 

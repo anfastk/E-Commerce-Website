@@ -1044,7 +1044,7 @@
                 icon.classList.add('text-gray-400');
 
                 // Send request to remove from wishlist
-                fetch('/wishlist/remove/' + productId, {
+                fetch('/wishlist/add/' + productId, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

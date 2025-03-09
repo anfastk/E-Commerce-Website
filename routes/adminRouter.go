@@ -89,4 +89,15 @@ func AdminRoutes(r *gin.Engine) {
 		coupon.GET("/details/:id", controllers.CouponDetails)
 		coupon.POST("/details/edit/:id", controllers.UpdateCoupon)
 	}
+
+	
+
+	sales := r.Group("/sales")
+	sales.Use(middleware.AuthMiddleware(RoleAdmin))
+	sales.Use(middleware.NoCacheMiddleware())
+	{
+		sales.GET("/", controllers.GetSalesDashboard)
+		sales.GET("/filter", controllers.GetSalesData)
+		sales.GET("/download/report", controllers.DownloadSalesReport)
+	}
 }

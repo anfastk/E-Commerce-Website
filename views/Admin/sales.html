@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laptix Adimin Product Page</title>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+
+<body class="bg-white min-h-screen flex flex-col lg:flex-row">
+    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
+        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
+            <span id="toast-message"></span>
+        </div>
+    </div>
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+        <div class="py-6 px-4 flex items-center justify-start space-x-4">
+            <!-- Hamburger Menu for Small Screens inside Sidebar -->
+            <button class="lg:hidden text-white" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
+        </div>
+        <nav class="flex-1">
+            <ul>
+                <li class="py-3 px-4 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2" />
+                    </svg>
+                    <a href="#" class="text-base font-medium hover:text-blue-500">Dashboard</a>
+                </li>
+                <li class="py-3 px-4  flex items-center space-x-2">
+                    <!-- All Products Button with Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
+                        fill="currentColor">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
+                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                    </svg>
+                    <a href="/admin/products" class="text-base font-medium  hover:text-blue-500">All Products</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor" fill-rule="evenodd"
+                            d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
+                            clip-rule="evenodd" />
+                        <path fill="currentColor"
+                            d="M15.75 2.824c0-.184.193-.301.336-.186q.182.147.323.342l3.013 4.197c.068.096-.006.22-.124.22H16a.25.25 0 0 1-.25-.25z" />
+                    </svg>
+                    <a href="/admin/orderlist" class="text-base font-medium hover:text-blue-500">Order List</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M12 12.75c3.942 0 7.987 2.563 8.249 7.712a.75.75 0 0 1-.71.787c-2.08.106-11.713.171-15.077 0a.75.75 0 0 1-.711-.787C4.013 15.314 8.058 12.75 12 12.75m0-9a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 0 0 0-7.5" />
+                    </svg>
+                    <a href="/admin/users" class="text-base font-medium hover:text-blue-500">User Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2" />
+                    </svg>
+                    <a href="/admin/category" class="text-base font-medium hover:text-blue-500">Category Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M14.8 8L16 9.2L9.2 16L8 14.8zM4 4h16c1.11 0 2 .89 2 2v4a2 2 0 1 0 0 4v4c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4c1.11 0 2-.89 2-2a2 2 0 0 0-2-2V6a2 2 0 0 1 2-2m0 2v2.54a3.994 3.994 0 0 1 0 6.92V18h16v-2.54a3.994 3.994 0 0 1 0-6.92V6zm5.5 2c.83 0 1.5.67 1.5 1.5S10.33 11 9.5 11S8 10.33 8 9.5S8.67 8 9.5 8m5 5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
+                    </svg>
+                    <a href="/admin/coupon" class="text-base font-medium text-white">Coupon Management</a>
+                </li>
+                <li class="py-3 px-4 bg-blue-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
+                        <path fill="Black"
+                            d="M30 6V4h-3V2h-2v2h-1c-1.103 0-2 .898-2 2v2c0 1.103.897 2 2 2h4v2h-6v2h3v2h2v-2h1c1.103 0 2-.897 2-2v-2c0-1.102-.897-2-2-2h-4V6zm-6 14v2h2.586L23 25.586l-2.292-2.293a1 1 0 0 0-.706-.293H20a1 1 0 0 0-.706.293L14 28.586L15.414 30l4.587-4.586l2.292 2.293a1 1 0 0 0 1.414 0L28 23.414V26h2v-6zM4 30H2v-5c0-3.86 3.14-7 7-7h6c1.989 0 3.89.85 5.217 2.333l-1.49 1.334A5 5 0 0 0 15 20H9c-2.757 0-5 2.243-5 5zm8-14a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-12a5 5 0 1 1 0 10a5 5 0 0 1 0-10" />
+                    </svg>
+                    <a href="/admin/settings" class="text-base font-medium text-black">Sales</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M7.05 6.462a2 2 0 0 0 2.63-1.519l.32-1.72a9 9 0 0 1 3.998 0l.322 1.72a2 2 0 0 0 2.63 1.519l1.649-.58a9 9 0 0 1 2.001 3.46l-1.33 1.14a2 2 0 0 0 0 3.037l1.33 1.139a9 9 0 0 1-2.001 3.46l-1.65-.58a2 2 0 0 0-2.63 1.519L14 20.777a9 9 0 0 1-3.998 0l-.322-1.72a2 2 0 0 0-2.63-1.519l-1.649.58a9 9 0 0 1-2.001-3.46l1.33-1.14a2 2 0 0 0 0-3.036L3.4 9.342a9 9 0 0 1 2-3.46zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <a href="/admin/settings" class="text-base font-medium hover:text-blue-500">Settings</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="p-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-black">Sales Dashboard</h1>
+            <div class="flex mt-4 sm:mt-0 gap-4">
+                <button onclick="downloadPDF()" style="background-color: #FF0000;"
+                    class="text-white py-2 px-5 rounded inline-flex items-center drop-shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 15 15">
+                        <path fill="#fff"
+                            d="M2.5 6.5V6H2v.5zm4 0V6H6v.5zm0 4H6v.5h.5zm7-7h.5v-.207l-.146-.147zm-3-3l.354-.354L10.707 0H10.5zM2.5 7h1V6h-1zm.5 4V8.5H2V11zm0-2.5v-2H2v2zm.5-.5h-1v1h1zm.5-.5a.5.5 0 0 1-.5.5v1A1.5 1.5 0 0 0 5 7.5zM3.5 7a.5.5 0 0 1 .5.5h1A1.5 1.5 0 0 0 3.5 6zM6 6.5v4h1v-4zm.5 4.5h1v-1h-1zM9 9.5v-2H8v2zM7.5 6h-1v1h1zM9 7.5A1.5 1.5 0 0 0 7.5 6v1a.5.5 0 0 1 .5.5zM7.5 11A1.5 1.5 0 0 0 9 9.5H8a.5.5 0 0 1-.5.5zM10 6v5h1V6zm.5 1H13V6h-2.5zm0 2H12V8h-1.5zM2 5V1.5H1V5zm11-1.5V5h1V3.5zM2.5 1h8V0h-8zm7.646-.146l3 3l.708-.708l-3-3zM2 1.5a.5.5 0 0 1 .5-.5V0A1.5 1.5 0 0 0 1 1.5zM1 12v1.5h1V12zm1.5 3h10v-1h-10zM14 13.5V12h-1v1.5zM12.5 15a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zM1 13.5A1.5 1.5 0 0 0 2.5 15v-1a.5.5 0 0 1-.5-.5z" />
+                    </svg>
+                    <span class="mx-2 font-bold">PDF</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#fff"
+                            d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
+                    </svg>
+                </button>
+                <button onclick="downloadExcel()" style="background-color: #06B806;"
+                    class=" text-white py-2 px-4 rounded inline-flex items-center drop-shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+                        <path fill="#fff"
+                            d="M6 3v26h20V9.594l-.28-.313l-6-6l-.314-.28H6zm2 2h10v6h6v16H8zm12 1.438L22.563 9H20zM11 13v2h10v-2zm0 4v2h10v-2zm0 4v2h10v-2z" />
+                    </svg>
+                    <span class="mx-2 font-bold">EXCEL</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#fff"
+                            d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <div class="flex flex-wrap gap-2 mb-4 sm:mb-0">
+                    <button data-period="daily" onclick="filterData('daily')"
+                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
+                        Daily
+                    </button>
+                    <button data-period="weekly" onclick="filterData('weekly')"
+                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
+                        Weekly
+                    </button>
+                    <button data-period="monthly" onclick="filterData('monthly')"
+                        class="period-button px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                        Monthly
+                    </button>
+                    <button data-period="yearly" onclick="filterData('yearly')"
+                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
+                        Yearly
+                    </button>
+                </div>
+                <div class="flex items-center">
+                    <span class="mr-2 text-gray-700">Custom:</span>
+                    <input type="date" id="date-from"
+                        class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <span class="mx-2">to</span>
+                    <input type="date" id="date-to"
+                        class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <button onclick="filterCustomDate()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Total Revenue</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="total-revenue">$0.00</span></h3>
+                        <p class="text-sm text-green-600 mt-2">
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-xl text-blue-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Orders</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="order-count">0</span>
+                        </h3>
+                        <p class="text-sm text-green-600 mt-2">
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-xl text-purple-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Average Order</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="average-order">$0.00</span>
+                        </h3>
+                        <p class="text-sm text-green-600 mt-2">
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+                        <i class="fas fa-receipt text-xl text-teal-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Discount Applied</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="total-discount">$0.00</span>
+                        </h3>
+                        <p class="text-sm text-green-600 mt-2">
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+                        <i class="fas fa-receipt text-xl text-teal-500"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Coupon Discount Applied</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="coupon-discount">$0.00</span></h3>
+                        <p class="text-sm text-green-600 mt-2">
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+                        <i class="fas fa-receipt text-xl text-teal-500"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Sales Overview</h3>
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Product Categories</h3>
+                <canvas id="categoriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Orders Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">Recent Orders</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Order ID
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Customer
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Amount
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 flex justify-between items-center">
+                <div class="text-sm text-gray-700">
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span
+                        class="font-medium">56</span> results
+                </div>
+                <div id="pagination" class="flex items-center space-x-2">
+                    <button
+                        class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-100">Previous</button>
+                    <button class="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">1</button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">2</button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">3</button>
+                    <button
+                        class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script>
+        // Initialize global chart variables
+        let salesChart = null;
+        let categoriesChart = null;
+        let currentPeriod = 'monthly';
+
+        // Initialize charts with sample data
+        document.addEventListener('DOMContentLoaded', function () {
+            // Make sure Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js is not loaded. Please check your connection.');
+                return;
+            }
+
+            // Set initial active button
+            document.querySelectorAll('.period-button').forEach(btn => {
+                if (btn.getAttribute('data-period') === 'monthly') {
+                    btn.classList.remove('bg-indigo-100', 'text-indigo-800');
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                }
+            });
+
+            // Fetch initial data from backend
+            fetchDataAndUpdateUI('monthly');
+        });
+
+        function fetchDataAndUpdateUI(period, fromDate = null, toDate = null) {
+            let url = `/sales/filter?period=${period}`;
+
+            // Add date parameters if provided
+            if (fromDate && toDate) {
+                url = `/sales/filter?fromDate=${fromDate}&toDate=${toDate}`;
+            }
+
+            // Show loading state
+            document.getElementById('total-revenue').textContent = 'Loading...';
+            document.getElementById('order-count').textContent = 'Loading...';
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Store current period
+                    currentPeriod = period;
+
+                    // Update UI with fetched data
+                    initializeSalesChart(data.salesOverview);
+                    initializeCategoriesChart(data.categorySales);
+                    updateDashboardStats(data);
+                    updateOrdersTable(data.recentOrders);
+
+                    console.log('Data loaded successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard data:', error);
+                    // Show error message
+                    alert('Failed to load data. Please try again later.');
+
+                    // Use sample data for demo purposes
+                    const sampleData = generateSampleData();
+                    initializeSalesChart(sampleData.salesOverview);
+                    initializeCategoriesChart(sampleData.categorySales);
+                    updateDashboardStats(sampleData);
+                    updateOrdersTable(sampleData.recentOrders);
+                });
+        }
+
+        function initializeSalesChart(salesData) {
+            // Extract labels and datasets from the backend data
+            const labels = salesData.map(item => item.month);
+            const revenue = salesData.map(item => item.revenue);
+            const orders = salesData.map(item => item.orders);
+
+            // Check if there's an existing chart and destroy it
+            if (salesChart instanceof Chart) {
+                salesChart.destroy();
+            }
+
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenue,
+                        borderColor: 'rgb(79, 70, 229)',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Orders',
+                        data: orders,
+                        borderColor: 'rgb(249, 115, 22)',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label === 'Revenue') {
+                                        label += '$' + context.raw.toLocaleString();
+                                    } else {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    if (value >= 1000) {
+                                        return '$' + value / 1000 + 'k';
+                                    }
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeCategoriesChart(categoryData) {
+            // Extract labels and values from backend data
+            const labels = categoryData.map(item => item.category);
+            const values = categoryData.map(item => item.amount);
+
+            // Check if there's an existing chart and destroy it
+            if (categoriesChart instanceof Chart) {
+                categoriesChart.destroy();
+            }
+
+            const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+            categoriesChart = new Chart(categoriesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(107, 114, 128, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function updateDashboardStats(data) {
+            // Update summary statistics with proper formatting
+            document.getElementById('total-revenue').textContent = '$' + data.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('order-count').textContent = data.orderCount.toLocaleString();
+            document.getElementById('average-order').textContent = '$' + data.averageOrder.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('total-discount').textContent = '$' + data.discountApplied.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('coupon-discount').textContent = '$' + data.couponDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Functions to handle data filtering
+        function filterData(period) {
+            // Update active button UI
+            document.querySelectorAll('.period-button').forEach(btn => {
+                if (btn.getAttribute('data-period') === period) {
+                    btn.classList.remove('bg-indigo-100', 'text-indigo-800');
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-indigo-100', 'text-indigo-800');
+                }
+            });
+
+            // Clear custom date inputs
+            document.getElementById('date-from').value = '';
+            document.getElementById('date-to').value = '';
+
+            // Fetch filtered data and update UI
+            fetchDataAndUpdateUI(period);
+        }
+
+        function filterCustomDate() {
+            const fromDate = document.getElementById('date-from').value;
+            const toDate = document.getElementById('date-to').value;
+
+            if (!fromDate || !toDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            // Validate date range
+            if (new Date(fromDate) > new Date(toDate)) {
+                alert('Start date must be before end date');
+                return;
+            }
+
+            // Reset period buttons UI
+            document.querySelectorAll('.period-button').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-indigo-100', 'text-indigo-800');
+            });
+
+            // Fetch filtered data and update UI
+            fetchDataAndUpdateUI('custom', fromDate, toDate);
+        }
+
+        function updateOrdersTable(orders) {
+            const tableBody = document.getElementById('orders-table-body');
+            tableBody.innerHTML = '';
+
+            if (!orders || orders.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found for the selected period</td>
+                `;
+                tableBody.appendChild(row);
+                return;
+            }
+
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${order.orderID}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.customer}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${formatDate(order.date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">$${order.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}">
+                            ${order.status}
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return dateString; // Return the original string if invalid date
+            }
+            return date.toLocaleDateString();
+        }
+
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'completed':
+                    return 'bg-green-100 text-green-800';
+                case 'processing':
+                    return 'bg-blue-100 text-blue-800';
+                case 'pending':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'cancelled':
+                    return 'bg-red-100 text-red-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function downloadExcel() {
+            // Get current filter parameters
+            const params = getCurrentFilterParams();
+            // Redirect to download endpoint
+            window.location.href = `/sales/download/report?format=excel&${params}`;
+        }
+
+        function downloadPDF() {
+            // Get current filter parameters
+            const params = getCurrentFilterParams();
+            // Redirect to download endpoint
+            window.location.href = `/sales/download/report?format=pdf&${params}`;
+        }
+
+        function getCurrentFilterParams() {
+            // Check if custom date range is being used
+            const fromDate = document.getElementById('date-from').value;
+            const toDate = document.getElementById('date-to').value;
+
+            if (fromDate && toDate) {
+                return `fromDate=${fromDate}&toDate=${toDate}`;
+            }
+
+            // Otherwise find which period button is active
+            let period = currentPeriod; // Use stored period
+            document.querySelectorAll('.period-button').forEach(btn => {
+                if (btn.classList.contains('bg-indigo-600')) {
+                    period = btn.getAttribute('data-period');
+                }
+            });
+
+            return `period=${period}`;
+        }
+
+        function changePage(page) {
+            // Get current filter parameters
+            const params = getCurrentFilterParams();
+
+            // Fetch paginated data
+            fetch(`/sales-data?${params}&page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateOrdersTable(data.recentOrders);
+                    updatePagination(data.currentPage, data.totalPages);
+                })
+                .catch(error => {
+                    console.error('Error changing page:', error);
+                    alert('Failed to load page data. Please try again.');
+                });
+        }
+        function updatePagination(currentPage, totalPages) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+            prevButton.textContent = 'Previous';
+            prevButton.disabled = currentPage <= 1;
+            prevButton.onclick = () => changePage(currentPage - 1);
+            paginationContainer.appendChild(prevButton);
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = i === currentPage
+                    ? 'relative inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-indigo-50'
+                    : 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+                pageButton.textContent = i;
+                pageButton.onclick = () => changePage(i);
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+            nextButton.textContent = 'Next';
+            nextButton.disabled = currentPage >= totalPages;
+            nextButton.onclick = () => changePage(currentPage + 1);
+            paginationContainer.appendChild(nextButton);
+        }
+    </script>
+    <script src="/static/js/toast.js"></script>
+    <script src="/static/js/nav&sideBar.js" defer></script>
+</body>
+
+</html>

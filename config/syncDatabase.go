@@ -12,9 +12,8 @@ func SyncDatabase() {
 		&models.ProductOffer{},models.ProductDescription{},&models.ProductVariantsImage{},models.ProductVariantDetails{},&models.ProductSpecification{},
 		&models.ReservedStock{},&models.ReservedCoupon{},&models.Otp{},&models.UserProfile{},&models.UserAddress{},&models.Cart{},&models.CartItem{},
 		&models.Coupon{},&models.OfferByCategory{},&models.Order{},&models.OrderItem{},&models.Rating{},
-		&models.Review{},&models.Sale{},&models.SalesProductItem{},&models.ShippingAddress{},&models.Wallet{}, 
-		&models.WalletGiftCard{},&models.Wishlist{},&models.WishlistItem{},&models.PaymentDetail{},&models.WalletTransaction{},
-		&models.ReferralAccount{},&models.ReferalHistory{},&models.ReturnRequest{},
+		&models.Review{},&models.ShippingAddress{},&models.Wallet{}, &models.WalletGiftCard{},&models.Wishlist{},
+		&models.WishlistItem{},&models.PaymentDetail{},&models.WalletTransaction{},&models.ReferralAccount{},&models.ReferalHistory{},&models.ReturnRequest{},
 	)
 	if err != nil{
 		log.Fatalf("Failed to migrate models: %v",err)

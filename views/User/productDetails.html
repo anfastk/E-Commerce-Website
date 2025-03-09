@@ -306,7 +306,7 @@
 
                 <div
                     class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-gray-500 mt-4">
-                    <button class="text-sm font-medium hover:underline">Add to Wishlist</button>
+                    <form action="/wishlist/add/{{.product.ID}}" method="post"><button type="submit" class="text-sm font-medium hover:underline">Add to Wishlist</button></form>
                     <span class="hidden md:block">|</span>
                     <button class="text-sm font-medium hover:underline">Share product:</button>
                     <div class="flex space-x-2">
