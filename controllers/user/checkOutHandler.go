@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -65,7 +66,7 @@ func ShowCheckoutPage(c *gin.Context) {
 	}
 	isAllCategorySame := true
 	for _, items := range cartItems {
-		if categoryIdForOffer != items.ProductDetail.CategoryID {
+		if categoryIdForOffer != items.ProductVariant.CategoryID {
 			isAllCategorySame = false
 			break
 		}
@@ -144,8 +145,9 @@ func CheckCoupon(c *gin.Context) {
 		return
 	}
 
+	couponCode := strings.TrimSpace(strings.ToUpper(couponInput.CouponCode))
 	var coupon models.Coupon
-	if err := config.DB.First(&coupon, "coupon_code = ?", couponInput.CouponCode).Error; err != nil {
+	if err := config.DB.First(&coupon, "UPPER(coupon_code) = ?", couponCode).Error; err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Coupon Code", "Invalid Coupon Code", "")
 		return
 	}
@@ -164,8 +166,8 @@ func CheckCoupon(c *gin.Context) {
 		return
 	}
 
-	if coupon.ValidFrom.Before(time.Now().Truncate(24 * time.Hour)) {
-		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Started", "Coupon Not Found", "")
+	if time.Now().Before(coupon.ValidFrom) {
+		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Started", "Coupon Not Started", "")
 		return
 	}
 
@@ -175,10 +177,14 @@ func CheckCoupon(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "Cart Error", err.Error(), "/cart")
 			return
 		}
+		if len(cartItems) == 0 {
+			helper.RespondWithError(c, http.StatusBadRequest, "Cart Empty", "Add products to apply coupon", "/cart")
+			return
+		}
 		categoryIdForOffer := cartItems[0].ProductVariant.CategoryID
 		isAllCategorySame := true
 		for _, items := range cartItems {
-			if categoryIdForOffer != items.ProductDetail.CategoryID {
+			if categoryIdForOffer != items.ProductVariant.CategoryID {
 				isAllCategorySame = false
 				break
 			}
@@ -188,14 +194,21 @@ func CheckCoupon(c *gin.Context) {
 			return
 		}
 	}
+
 	purchaseAmount := couponInput.SubTotal - couponInput.ProductDiscount
 	if purchaseAmount < coupon.MinOrderValue {
 		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Applicable", "Coupon Not Applicable", "/cart")
 		return
 	}
-	Discount := purchaseAmount * coupon.DiscountValue / 100
-	if coupon.IsFixedCoupon || Discount > coupon.MaxDiscountValue {
+
+	var Discount float64
+	if coupon.IsFixedCoupon {
 		Discount = coupon.MaxDiscountValue
+	} else {
+		Discount = purchaseAmount * coupon.DiscountValue / 100
+		if Discount > coupon.MaxDiscountValue {
+			Discount = coupon.MaxDiscountValue
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{

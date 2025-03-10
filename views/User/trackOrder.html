@@ -817,6 +817,123 @@
         let orderId = "{{ .OrderItem.ID }}";
         let productId = "{{ .OrderItem.ProductVariantID }}";
 
+        // Elements
+        const returnItemBtn = document.getElementById('returnItemBtn');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modalContainer = document.getElementById('modalContainer');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitReturnBtn = document.getElementById('submitReturnBtn');
+        const returnForm = document.getElementById('returnForm');
+        
+        // Show modal
+        function showModal() {
+            modalBackdrop.classList.remove('hidden');
+            setTimeout(() => {
+                modalContainer.classList.add('modal-show');
+            }, 10);
+        }
+        
+        // Hide modal
+        function hideModal() {
+            modalContainer.classList.remove('modal-show');
+            setTimeout(() => {
+                modalBackdrop.classList.add('hidden');
+            }, 300);
+        }
+        
+        // Event listeners
+        returnItemBtn?.addEventListener('click', showModal);
+        closeModalBtn?.addEventListener('click', hideModal);
+        cancelBtn?.addEventListener('click', hideModal);
+        
+        // Close modal if clicked outside
+        modalBackdrop?.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                hideModal();
+            }
+        });
+        
+        // Handle form submission
+        submitReturnBtn?.addEventListener('click', () => {
+            // Check form validity
+            const returnReason = document.getElementById('returnReason');
+            const termsAgreed = document.getElementById('termsAgreed');
+            const additionalDetails = document.getElementById('additionalDetails');
+            
+            if (!returnReason.value) {
+                returnReason.focus();
+                return;
+            }
+            
+            if (!termsAgreed.checked) {
+                termsAgreed.focus();
+                return;
+            }
+            
+            // Create return request data
+            const returnData = {
+                reason: returnReason.value,
+                additionalDetails: additionalDetails.value,
+                orderId: orderId, 
+                productId: productId,
+            };
+            
+            // Send the return request using fetch API
+            fetch('/profile/order/details/track/item/return', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(returnData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                // Display success message
+                modalContainer.innerHTML = `
+                    <div class="p-8 text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                            <i class="fas fa-check text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Return Request Submitted!</h3>
+                        <p class="text-gray-600 mb-6">Your return request has been received. We'll process it within 1-2 business days.</p>
+                        <button id="doneBtn" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors">
+                            Done
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('doneBtn').addEventListener('click', hideModal);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Display error message (in production, you'd want more specific error handling)
+                showErrorToast('There was a problem submitting your return request. Please try again.');
+            });
+            
+            // Just for demo purposes - immediately show success
+            // In a real application, this would happen after the fetch promise resolves
+            modalContainer.innerHTML = `
+                <div class="p-8 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+                        <i class="fas fa-check text-green-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Return Request Submitted!</h3>
+                    <p class="text-gray-600 mb-6">Your return request has been received. We'll process it within 1-2 business days.</p>
+                    <button id="doneBtn" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors">
+                        Done
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('doneBtn').addEventListener('click', hideModal);
+        });
+
         document.getElementById("payButton").addEventListener("click", async function () {
             let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
             if (!selectedPayment) {
@@ -945,122 +1062,7 @@
                 });
         }
 
-        // Elements
-        const returnItemBtn = document.getElementById('returnItemBtn');
-        const modalBackdrop = document.getElementById('modalBackdrop');
-        const modalContainer = document.getElementById('modalContainer');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const submitReturnBtn = document.getElementById('submitReturnBtn');
-        const returnForm = document.getElementById('returnForm');
         
-        // Show modal
-        function showModal() {
-            modalBackdrop.classList.remove('hidden');
-            setTimeout(() => {
-                modalContainer.classList.add('modal-show');
-            }, 10);
-        }
-        
-        // Hide modal
-        function hideModal() {
-            modalContainer.classList.remove('modal-show');
-            setTimeout(() => {
-                modalBackdrop.classList.add('hidden');
-            }, 300);
-        }
-        
-        // Event listeners
-        returnItemBtn.addEventListener('click', showModal);
-        closeModalBtn.addEventListener('click', hideModal);
-        cancelBtn.addEventListener('click', hideModal);
-        
-        // Close modal if clicked outside
-        modalBackdrop.addEventListener('click', (e) => {
-            if (e.target === modalBackdrop) {
-                hideModal();
-            }
-        });
-        
-        // Handle form submission
-        submitReturnBtn.addEventListener('click', () => {
-            // Check form validity
-            const returnReason = document.getElementById('returnReason');
-            const termsAgreed = document.getElementById('termsAgreed');
-            const additionalDetails = document.getElementById('additionalDetails');
-            
-            if (!returnReason.value) {
-                returnReason.focus();
-                return;
-            }
-            
-            if (!termsAgreed.checked) {
-                termsAgreed.focus();
-                return;
-            }
-            
-            // Create return request data
-            const returnData = {
-                reason: returnReason.value,
-                additionalDetails: additionalDetails.value,
-                orderId: orderId, 
-                productId: productId,
-            };
-            
-            // Send the return request using fetch API
-            fetch('/profile/order/details/track/item/return', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(returnData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(data => {
-                // Display success message
-                modalContainer.innerHTML = `
-                    <div class="p-8 text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                            <i class="fas fa-check text-green-500 text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Return Request Submitted!</h3>
-                        <p class="text-gray-600 mb-6">Your return request has been received. We'll process it within 1-2 business days.</p>
-                        <button id="doneBtn" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors">
-                            Done
-                        </button>
-                    </div>
-                `;
-                
-                document.getElementById('doneBtn').addEventListener('click', hideModal);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Display error message (in production, you'd want more specific error handling)
-                showErrorToast('There was a problem submitting your return request. Please try again.');
-            });
-            
-            // Just for demo purposes - immediately show success
-            // In a real application, this would happen after the fetch promise resolves
-            modalContainer.innerHTML = `
-                <div class="p-8 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                        <i class="fas fa-check text-green-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Return Request Submitted!</h3>
-                    <p class="text-gray-600 mb-6">Your return request has been received. We'll process it within 1-2 business days.</p>
-                    <button id="doneBtn" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors">
-                        Done
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('doneBtn').addEventListener('click', hideModal);
-        });
 
         function openDeletePopup() {
             document.getElementById("deletePopup").classList.remove("hidden");

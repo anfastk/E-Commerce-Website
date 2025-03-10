@@ -527,6 +527,26 @@
                                             </td>
                                         </tr>
                                         {{end}}
+                                        {{if eq .Type "Refund"}}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{.Date}}
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-900">
+                                                {{.Description}}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-800 rounded-full">
+                                                    {{.Type}}
+                                                </span>
+                                            </td>
+                                            <td
+                                                class="px-6 py-4 whitespace-nowrap text-sm text-green-600 text-right font-medium">
+                                                +&#8377;{{printf "%.2f" .Amount}}
+                                            </td>
+                                        </tr>
+                                        {{end}}
                                         {{end}}
                                     </tbody>
                                 </table>
