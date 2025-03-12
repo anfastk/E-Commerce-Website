@@ -248,7 +248,7 @@ func ProceedToPayment(c *gin.Context) {
 		orderItems := FetchOrderItems(c, tx, orderID)
 
 		for _, ordItems := range orderItems {
-			if err := CODPayment(c, tx, userDetails.ID, ordItems.ID, ordItems.Total, "Cash On Delivery"); err != nil {
+			if err := CODPayment(c, tx, userDetails.ID, ordItems.OrderUID, ordItems.ID, ordItems.Total, "Cash On Delivery"); err != nil {
 				tx.Rollback()
 				paymentStatus = false
 				helper.RespondWithError(c, http.StatusInternalServerError, "Payment failed", "Something Went Wrong", "/checkout")

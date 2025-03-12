@@ -20,11 +20,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId uint, paymentAmount float64, method string) error {
+func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId string,order_item_id uint, paymentAmount float64, method string) error {
 	var paymentDetail models.PaymentDetail
 	paymentDetail = models.PaymentDetail{
 		UserID:        userId,
-		OrderItemID:   orderId,
+		OrderItemID:   order_item_id,
+		OrderId: orderId,
 		PaymentStatus: "Pending",
 		PaymentAmount: paymentAmount,
 		PaymentMethod: method,

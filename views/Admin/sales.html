@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 </head>
@@ -123,7 +122,7 @@
                     </svg>
                 </button>
                 <button onclick="downloadExcel()" style="background-color: #06B806;"
-                    class=" text-white py-2 px-4 rounded inline-flex items-center drop-shadow-md">
+                    class="text-white py-2 px-4 rounded inline-flex items-center drop-shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
                         <path fill="#fff"
                             d="M6 3v26h20V9.594l-.28-.313l-6-6l-.314-.28H6zm2 2h10v6h6v16H8zm12 1.438L22.563 9H20zM11 13v2h10v-2zm0 4v2h10v-2zm0 4v2h10v-2z" />
@@ -137,38 +136,31 @@
             </div>
         </div>
 
-        <!-- Filter Section -->
+        <!-- Stats Filter Section -->
         <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Stats Filter</h3>
             <div class="flex flex-col sm:flex-row items-center justify-between">
                 <div class="flex flex-wrap gap-2 mb-4 sm:mb-0">
-                    <button data-period="daily" onclick="filterData('daily')"
-                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
-                        Daily
-                    </button>
-                    <button data-period="weekly" onclick="filterData('weekly')"
-                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
-                        Weekly
-                    </button>
-                    <button data-period="monthly" onclick="filterData('monthly')"
-                        class="period-button px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-                        Monthly
-                    </button>
-                    <button data-period="yearly" onclick="filterData('yearly')"
-                        class="period-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">
-                        Yearly
-                    </button>
+                    <button data-period="today" onclick="filterStats('today')"
+                        class="stats-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Today</button>
+                    <button data-period="daily" onclick="filterStats('daily')"
+                        class="stats-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Daily</button>
+                    <button data-period="weekly" onclick="filterStats('weekly')"
+                        class="stats-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Weekly</button>
+                    <button data-period="monthly" onclick="filterStats('monthly')"
+                        class="stats-button px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Monthly</button>
+                    <button data-period="yearly" onclick="filterStats('yearly')"
+                        class="stats-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Yearly</button>
                 </div>
                 <div class="flex items-center">
                     <span class="mr-2 text-gray-700">Custom:</span>
-                    <input type="date" id="date-from"
+                    <input type="date" id="stats-date-from"
                         class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
                     <span class="mx-2">to</span>
-                    <input type="date" id="date-to"
+                    <input type="date" id="stats-date-to"
                         class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                    <button onclick="filterCustomDate()"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-                        Apply
-                    </button>
+                    <button onclick="filterStatsCustomDate()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Apply</button>
                 </div>
             </div>
         </div>
@@ -180,77 +172,101 @@
                     <div>
                         <p class="text-sm text-gray-500 uppercase">Total Revenue</p>
                         <h3 class="text-2xl font-bold text-gray-800"><span id="total-revenue">$0.00</span></h3>
-                        <p class="text-sm text-green-600 mt-2">
-                        </p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                         <i class="fas fa-dollar-sign text-xl text-blue-500"></i>
                     </div>
                 </div>
             </div>
-
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="text-sm text-gray-500 uppercase">Orders</p>
-                        <h3 class="text-2xl font-bold text-gray-800"><span id="order-count">0</span>
-                        </h3>
-                        <p class="text-sm text-green-600 mt-2">
-                        </p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="order-count">0</span></h3>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
                         <i class="fas fa-shopping-cart text-xl text-purple-500"></i>
                     </div>
                 </div>
             </div>
-
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="text-sm text-gray-500 uppercase">Average Order</p>
-                        <h3 class="text-2xl font-bold text-gray-800"><span id="average-order">$0.00</span>
-                        </h3>
-                        <p class="text-sm text-green-600 mt-2">
-                        </p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="average-order">$0.00</span></h3>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
                         <i class="fas fa-receipt text-xl text-teal-500"></i>
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="text-sm text-gray-500 uppercase">Discount Applied</p>
-                        <h3 class="text-2xl font-bold text-gray-800"><span id="total-discount">$0.00</span>
-                        </h3>
-                        <p class="text-sm text-green-600 mt-2">
-                        </p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="total-discount">$0.00</span></h3>
                     </div>
-                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
-                        <i class="fas fa-receipt text-xl text-teal-500"></i>
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-percent text-xl text-blue-500"></i>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-violet-500">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-sm text-gray-500 uppercase">Coupon Discount Applied</p>
+                        <p class="text-sm text-gray-500 uppercase">Coupon Discount</p>
                         <h3 class="text-2xl font-bold text-gray-800"><span id="coupon-discount">$0.00</span></h3>
-                        <p class="text-sm text-green-600 mt-2">
-                        </p>
                     </div>
-                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
-                        <i class="fas fa-receipt text-xl text-teal-500"></i>
+                    <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center">
+                        <i class="fas fa-ticket text-xl text-violet-500"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase">Total Amount (Pre-Discount)</p>
+                        <h3 class="text-2xl font-bold text-gray-800"><span id="total-amount">$0.00</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-xl text-blue-500"></i>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Charts Filter Section -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Charts Filter</h3>
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <div class="flex flex-wrap gap-2 mb-4 sm:mb-0">
+                    <button data-period="today" onclick="filterCharts('today')"
+                        class="charts-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Today</button>
+                    <button data-period="daily" onclick="filterCharts('daily')"
+                        class="charts-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Daily</button>
+                    <button data-period="weekly" onclick="filterCharts('weekly')"
+                        class="charts-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Weekly</button>
+                    <button data-period="monthly" onclick="filterCharts('monthly')"
+                        class="charts-button px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Monthly</button>
+                    <button data-period="yearly" onclick="filterCharts('yearly')"
+                        class="charts-button px-4 py-2 bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200 transition">Yearly</button>
+                </div>
+                <div class="flex items-center">
+                    <span class="mr-2 text-gray-700">Custom:</span>
+                    <input type="date" id="charts-date-from"
+                        class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <span class="mx-2">to</span>
+                    <input type="date" id="charts-date-to"
+                        class="border rounded p-2 mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <button onclick="filterChartsCustomDate()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Apply</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Sales Overview</h3>
                 <canvas id="salesChart"></canvas>
             </div>
@@ -271,28 +287,22 @@
                         <tr>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Order ID
-                            </th>
+                                Order ID</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Customer
-                            </th>
+                                Customer</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
-                            </th>
+                                Date</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Amount
-                            </th>
+                                Amount</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
+                                Status</th>
                         </tr>
                     </thead>
-                    <tbody id="orders-table-body">
-                    </tbody>
+                    <tbody id="orders-table-body"></tbody>
                 </table>
             </div>
             <div class="bg-gray-50 px-6 py-3 flex justify-between items-center">
@@ -300,138 +310,129 @@
                     Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span
                         class="font-medium">56</span> results
                 </div>
-                <div id="pagination" class="flex items-center space-x-2">
-                    <button
-                        class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-100">Previous</button>
-                    <button class="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">1</button>
-                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">2</button>
-                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">3</button>
-                    <button
-                        class="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">Next</button>
-                </div>
+                <div id="pagination" class="flex items-center space-x-2"></div>
             </div>
         </div>
     </main>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
     <script>
-        // Initialize global chart variables
         let salesChart = null;
         let categoriesChart = null;
-        let currentPeriod = 'monthly';
+        let statsPeriod = 'monthly';
+        let chartsPeriod = 'monthly';
 
-        // Initialize charts with sample data
         document.addEventListener('DOMContentLoaded', function () {
-            // Make sure Chart.js is loaded
             if (typeof Chart === 'undefined') {
-                console.error('Chart.js is not loaded. Please check your connection.');
+                console.error('Chart.js is not loaded.');
                 return;
             }
-
-            // Set initial active button
-            document.querySelectorAll('.period-button').forEach(btn => {
+            document.querySelectorAll('.stats-button').forEach(btn => {
                 if (btn.getAttribute('data-period') === 'monthly') {
                     btn.classList.remove('bg-indigo-100', 'text-indigo-800');
                     btn.classList.add('bg-indigo-600', 'text-white');
                 }
             });
-
-            // Fetch initial data from backend
-            fetchDataAndUpdateUI('monthly');
+            document.querySelectorAll('.charts-button').forEach(btn => {
+                if (btn.getAttribute('data-period') === 'monthly') {
+                    btn.classList.remove('bg-indigo-100', 'text-indigo-800');
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                }
+            });
+            fetchStats('monthly');
+            fetchCharts('monthly');
+            fetchRecentOrders();
         });
 
-        function fetchDataAndUpdateUI(period, fromDate = null, toDate = null) {
-            let url = `/sales/filter?period=${period}`;
-
-            // Add date parameters if provided
+        function fetchStats(period, fromDate = null, toDate = null) {
+            let url = `/sales/filter?period=${period}&type=stats&status=Delivered`;
             if (fromDate && toDate) {
-                url = `/sales/filter?fromDate=${fromDate}&toDate=${toDate}`;
+                url = `/sales/filter?period=custom&fromDate=${fromDate}&toDate=${toDate}&type=stats&status=Delivered`;
             }
-
-            // Show loading state
-            document.getElementById('total-revenue').textContent = 'Loading...';
-            document.getElementById('order-count').textContent = 'Loading...';
-
             fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // Store current period
-                    currentPeriod = period;
+                    statsPeriod = period;
+                    updateDashboardStats(data);
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        }
 
-                    // Update UI with fetched data
+        function fetchCharts(period, fromDate = null, toDate = null) {
+            let url = `/sales/filter?period=${period}&type=charts&status=Delivered`;
+            if (fromDate && toDate) {
+                url = `/sales/filter?period=custom&fromDate=${fromDate}&toDate=${toDate}&type=charts&status=Delivered`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    chartsPeriod = period;
                     initializeSalesChart(data.salesOverview);
                     initializeCategoriesChart(data.categorySales);
-                    updateDashboardStats(data);
-                    updateOrdersTable(data.recentOrders);
-
-                    console.log('Data loaded successfully:', data);
                 })
-                .catch(error => {
-                    console.error('Error loading dashboard data:', error);
-                    // Show error message
-                    alert('Failed to load data. Please try again later.');
+                .catch(error => console.error('Error fetching charts:', error));
+        }
 
-                    // Use sample data for demo purposes
-                    const sampleData = generateSampleData();
-                    initializeSalesChart(sampleData.salesOverview);
-                    initializeCategoriesChart(sampleData.categorySales);
-                    updateDashboardStats(sampleData);
-                    updateOrdersTable(sampleData.recentOrders);
-                });
+        function fetchRecentOrders(page = 1) {
+            fetch(`/sales/filter?page=${page}&type=orders`)
+                .then(response => response.json())
+                .then(data => {
+                    updateOrdersTable(data.recentOrders);
+                    updatePagination(data.currentPage, data.totalPages);
+                })
+                .catch(error => console.error('Error fetching orders:', error));
         }
 
         function initializeSalesChart(salesData) {
-            // Extract labels and datasets from the backend data
+            if (salesChart) salesChart.destroy();
             const labels = salesData.map(item => item.month);
-            const revenue = salesData.map(item => item.revenue);
-            const orders = salesData.map(item => item.orders);
-
-            // Check if there's an existing chart and destroy it
-            if (salesChart instanceof Chart) {
-                salesChart.destroy();
-            }
+            const revenueData = salesData.map(item => item.revenue);
+            const totalAmountData = salesData.map(item => item.totalAmount);
+            const ordersData = salesData.map(item => item.orders);
 
             const salesCtx = document.getElementById('salesChart').getContext('2d');
             salesChart = new Chart(salesCtx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Revenue',
-                        data: revenue,
-                        borderColor: 'rgb(79, 70, 229)',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }, {
-                        label: 'Orders',
-                        data: orders,
-                        borderColor: 'rgb(249, 115, 22)',
-                        backgroundColor: 'transparent',
-                        borderDash: [5, 5],
-                        tension: 0.4
-                    }]
+                    datasets: [
+                        {
+                            label: 'Revenue (₹)',
+                            data: revenueData,
+                            borderColor: 'rgb(79, 70, 229)',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Total Amount (₹)',
+                            data: totalAmountData,
+                            borderColor: 'rgb(16, 185, 129)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Orders Count',
+                            data: ordersData,
+                            borderColor: 'rgb(249, 115, 22)',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'top',
-                        },
+                        legend: { position: 'top' },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
                                     let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.dataset.label === 'Revenue') {
-                                        label += '$' + context.raw.toLocaleString();
+                                    if (label) label += ': ';
+                                    if (context.dataset.label.includes('Revenue') || context.dataset.label.includes('Total Amount')) {
+                                        label += '₹' + context.raw.toLocaleString('en-IN');
                                     } else {
                                         label += context.raw;
                                     }
@@ -441,16 +442,30 @@
                         }
                     },
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: chartsPeriod === 'today' ? 'Time (4-hour intervals)' :
+                                    chartsPeriod === 'daily' ? 'Date' :
+                                        chartsPeriod === 'weekly' ? 'Week' :
+                                            chartsPeriod === 'monthly' ? 'Month' : 'Year'
+                            },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function (value) {
-                                    if (value >= 1000) {
-                                        return '$' + value / 1000 + 'k';
-                                    }
-                                    return '$' + value;
-                                }
-                            }
+                            title: { display: true, text: 'Amount (₹)' },
+                            ticks: { callback: value => '₹' + value.toLocaleString('en-IN') }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Orders Count' },
+                            grid: { drawOnChartArea: false }
                         }
                     }
                 }
@@ -458,37 +473,21 @@
         }
 
         function initializeCategoriesChart(categoryData) {
-            // Extract labels and values from backend data
+            if (categoriesChart) categoriesChart.destroy();
             const labels = categoryData.map(item => item.category);
             const values = categoryData.map(item => item.amount);
-
-            // Check if there's an existing chart and destroy it
-            if (categoriesChart instanceof Chart) {
-                categoriesChart.destroy();
-            }
 
             const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
             categoriesChart = new Chart(categoriesCtx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: [
-                            'rgba(79, 70, 229, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(107, 114, 128, 0.8)'
-                        ]
-                    }]
+                    datasets: [{ data: values, backgroundColor: ['rgba(79, 70, 229, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(107, 114, 128, 0.8)'] }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
+                        legend: { position: 'bottom' },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
@@ -496,7 +495,7 @@
                                     const value = context.raw || 0;
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = Math.round((value / total) * 100);
-                                    return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                    return `${label}: ₹${value.toLocaleString('en-IN')} (${percentage}%)`;
                                 }
                             }
                         }
@@ -507,73 +506,81 @@
         }
 
         function updateDashboardStats(data) {
-            // Update summary statistics with proper formatting
-            document.getElementById('total-revenue').textContent = '$' + data.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('order-count').textContent = data.orderCount.toLocaleString();
-            document.getElementById('average-order').textContent = '$' + data.averageOrder.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('total-discount').textContent = '$' + data.discountApplied.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('coupon-discount').textContent = '$' + data.couponDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('total-revenue').textContent = '₹' + data.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('order-count').textContent = data.orderCount.toLocaleString('en-IN');
+            document.getElementById('average-order').textContent = '₹' + data.averageOrder.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('total-discount').textContent = '₹' + data.discountApplied.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('coupon-discount').textContent = '₹' + data.couponDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('total-amount').textContent = '₹' + data.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // Functions to handle data filtering
-        function filterData(period) {
-            // Update active button UI
-            document.querySelectorAll('.period-button').forEach(btn => {
-                if (btn.getAttribute('data-period') === period) {
-                    btn.classList.remove('bg-indigo-100', 'text-indigo-800');
-                    btn.classList.add('bg-indigo-600', 'text-white');
-                } else {
-                    btn.classList.remove('bg-indigo-600', 'text-white');
-                    btn.classList.add('bg-indigo-100', 'text-indigo-800');
-                }
+        function filterStats(period) {
+            document.querySelectorAll('.stats-button').forEach(btn => {
+                btn.classList.toggle('bg-indigo-600', btn.getAttribute('data-period') === period);
+                btn.classList.toggle('text-white', btn.getAttribute('data-period') === period);
+                btn.classList.toggle('bg-indigo-100', btn.getAttribute('data-period') !== period);
+                btn.classList.toggle('text-indigo-800', btn.getAttribute('data-period') !== period);
             });
-
-            // Clear custom date inputs
-            document.getElementById('date-from').value = '';
-            document.getElementById('date-to').value = '';
-
-            // Fetch filtered data and update UI
-            fetchDataAndUpdateUI(period);
+            document.getElementById('stats-date-from').value = '';
+            document.getElementById('stats-date-to').value = '';
+            fetchStats(period);
         }
 
-        function filterCustomDate() {
-            const fromDate = document.getElementById('date-from').value;
-            const toDate = document.getElementById('date-to').value;
-
+        function filterStatsCustomDate() {
+            const fromDate = document.getElementById('stats-date-from').value;
+            const toDate = document.getElementById('stats-date-to').value;
             if (!fromDate || !toDate) {
-                alert('Please select both start and end dates');
+                alert('Please select both dates');
                 return;
             }
-
-            // Validate date range
             if (new Date(fromDate) > new Date(toDate)) {
                 alert('Start date must be before end date');
                 return;
             }
-
-            // Reset period buttons UI
-            document.querySelectorAll('.period-button').forEach(btn => {
+            document.querySelectorAll('.stats-button').forEach(btn => {
                 btn.classList.remove('bg-indigo-600', 'text-white');
                 btn.classList.add('bg-indigo-100', 'text-indigo-800');
             });
+            fetchStats('custom', fromDate, toDate);
+        }
 
-            // Fetch filtered data and update UI
-            fetchDataAndUpdateUI('custom', fromDate, toDate);
+        function filterCharts(period) {
+            document.querySelectorAll('.charts-button').forEach(btn => {
+                btn.classList.toggle('bg-indigo-600', btn.getAttribute('data-period') === period);
+                btn.classList.toggle('text-white', btn.getAttribute('data-period') === period);
+                btn.classList.toggle('bg-indigo-100', btn.getAttribute('data-period') !== period);
+                btn.classList.toggle('text-indigo-800', btn.getAttribute('data-period') !== period);
+            });
+            document.getElementById('charts-date-from').value = '';
+            document.getElementById('charts-date-to').value = '';
+            fetchCharts(period);
+        }
+
+        function filterChartsCustomDate() {
+            const fromDate = document.getElementById('charts-date-from').value;
+            const toDate = document.getElementById('charts-date-to').value;
+            if (!fromDate || !toDate) {
+                alert('Please select both dates');
+                return;
+            }
+            if (new Date(fromDate) > new Date(toDate)) {
+                alert('Start date must be before end date');
+                return;
+            }
+            document.querySelectorAll('.charts-button').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-indigo-100', 'text-indigo-800');
+            });
+            fetchCharts('custom', fromDate, toDate);
         }
 
         function updateOrdersTable(orders) {
             const tableBody = document.getElementById('orders-table-body');
             tableBody.innerHTML = '';
-
             if (!orders || orders.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found for the selected period</td>
-                `;
-                tableBody.appendChild(row);
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found</td></tr>`;
                 return;
             }
-
             orders.forEach(order => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50';
@@ -581,11 +588,9 @@
                     <td class="px-6 py-4 whitespace-nowrap">${order.orderID}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.customer}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${formatDate(order.date)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">$${order.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">₹${order.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}">
-                            ${order.status}
-                        </span>
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}">${order.status}</span>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -594,103 +599,69 @@
 
         function formatDate(dateString) {
             const date = new Date(dateString);
-            if (isNaN(date.getTime())) {
-                return dateString; // Return the original string if invalid date
-            }
-            return date.toLocaleDateString();
+            return isNaN(date.getTime()) ? dateString : date.toLocaleDateString();
         }
 
         function getStatusColor(status) {
             switch (status.toLowerCase()) {
-                case 'completed':
-                    return 'bg-green-100 text-green-800';
-                case 'processing':
-                    return 'bg-blue-100 text-blue-800';
-                case 'pending':
-                    return 'bg-yellow-100 text-yellow-800';
-                case 'cancelled':
-                    return 'bg-red-100 text-red-800';
-                default:
-                    return 'bg-gray-100 text-gray-800';
+                case 'completed': return 'bg-green-100 text-green-800';
+                case 'processing': return 'bg-blue-100 text-blue-800';
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'cancelled': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
             }
         }
 
         function downloadExcel() {
-            // Get current filter parameters
-            const params = getCurrentFilterParams();
-            // Redirect to download endpoint
-            window.location.href = `/sales/download/report?format=excel&${params}`;
+            const statsParams = getStatsFilterParams();
+            window.location.href = `/sales/download/report?format=excel&${statsParams}&status=Delivered`;
         }
 
         function downloadPDF() {
-            // Get current filter parameters
-            const params = getCurrentFilterParams();
-            // Redirect to download endpoint
-            window.location.href = `/sales/download/report?format=pdf&${params}`;
+            const statsParams = getStatsFilterParams();
+            window.location.href = `/sales/download/report?format=pdf&${statsParams}&status=Delivered`;
         }
 
-        function getCurrentFilterParams() {
-            // Check if custom date range is being used
-            const fromDate = document.getElementById('date-from').value;
-            const toDate = document.getElementById('date-to').value;
-
+        function getStatsFilterParams() {
+            const fromDate = document.getElementById('stats-date-from').value;
+            const toDate = document.getElementById('stats-date-to').value;
             if (fromDate && toDate) {
                 return `fromDate=${fromDate}&toDate=${toDate}`;
             }
-
-            // Otherwise find which period button is active
-            let period = currentPeriod; // Use stored period
-            document.querySelectorAll('.period-button').forEach(btn => {
+            let period = statsPeriod;
+            document.querySelectorAll('.stats-button').forEach(btn => {
                 if (btn.classList.contains('bg-indigo-600')) {
                     period = btn.getAttribute('data-period');
                 }
             });
-
             return `period=${period}`;
         }
 
         function changePage(page) {
-            // Get current filter parameters
-            const params = getCurrentFilterParams();
-
-            // Fetch paginated data
-            fetch(`/sales-data?${params}&page=${page}`)
-                .then(response => response.json())
-                .then(data => {
-                    updateOrdersTable(data.recentOrders);
-                    updatePagination(data.currentPage, data.totalPages);
-                })
-                .catch(error => {
-                    console.error('Error changing page:', error);
-                    alert('Failed to load page data. Please try again.');
-                });
+            fetchRecentOrders(page);
         }
+
         function updatePagination(currentPage, totalPages) {
             const paginationContainer = document.getElementById('pagination');
             paginationContainer.innerHTML = '';
 
-            // Previous button
             const prevButton = document.createElement('button');
-            prevButton.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+            prevButton.className = 'px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-100';
             prevButton.textContent = 'Previous';
             prevButton.disabled = currentPage <= 1;
             prevButton.onclick = () => changePage(currentPage - 1);
             paginationContainer.appendChild(prevButton);
 
-            // Page numbers
             for (let i = 1; i <= totalPages; i++) {
                 const pageButton = document.createElement('button');
-                pageButton.className = i === currentPage
-                    ? 'relative inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-indigo-50'
-                    : 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+                pageButton.className = i === currentPage ? 'px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700' : 'px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100';
                 pageButton.textContent = i;
                 pageButton.onclick = () => changePage(i);
                 paginationContainer.appendChild(pageButton);
             }
 
-            // Next button
             const nextButton = document.createElement('button');
-            nextButton.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50';
+            nextButton.className = 'px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100';
             nextButton.textContent = 'Next';
             nextButton.disabled = currentPage >= totalPages;
             nextButton.onclick = () => changePage(currentPage + 1);

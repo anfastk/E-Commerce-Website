@@ -115,11 +115,11 @@
                     </a>
                     </button>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
@@ -226,7 +226,7 @@
 
                         <h2 class="text-xl font-bold mb-6">EDIT SHIPPING ADDRESS</h2>
 
-                        < id="editAddressForm" class="space-y-4" onsubmit="handleEditAddress(event)">
+                        <div id="editAddressForm" class="space-y-4" onsubmit="handleEditAddress(event)">
                             <!-- Form fields for Edit Address - Same structure but with pre-filled values -->
                             <input type="hidden" id="id" name="id">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -286,6 +286,7 @@
                             <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">UPDATE
                                 ADDRESS</button>
                             </form>
+                        </div>
                     </div>
                 </div>
 
