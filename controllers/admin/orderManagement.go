@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -377,6 +378,7 @@ func ApproveReturn(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 				return
 			}
+			lastBalance := wallet.Balance
 			wallet.Balance += refundAmount
 			if err := tx.Save(&wallet).Error; err != nil {
 				tx.Rollback()
@@ -384,7 +386,7 @@ func ApproveReturn(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN_" + uuid.New().String()
+			transactionID := "TXN-" + uuid.New().String()
 
 			walletTransaction := models.WalletTransaction{
 				UserID:        returnRequest.UserID,
@@ -394,7 +396,8 @@ func ApproveReturn(c *gin.Context) {
 				Type:          "Refund",
 				Receipt:       receiptID,
 				OrderId:       order.OrderUID,
-				TransactionID: transactionID,
+				LastBalance:   lastBalance,
+				TransactionID: strings.ToUpper(transactionID),
 				PaymentMethod: payment.PaymentMethod,
 			}
 			if err := tx.Create(&walletTransaction).Error; err != nil {

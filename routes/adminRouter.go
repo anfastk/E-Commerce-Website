@@ -99,4 +99,12 @@ func AdminRoutes(r *gin.Engine) {
 		sales.GET("/recent-orders", controllers.GetRecentOrdersUnfiltered) // New endpoint
 		sales.GET("/download/report", controllers.DownloadSalesReport)
 	}
+
+	wallet := r.Group("/admin/wallet")
+	wallet.Use(middleware.AuthMiddleware(RoleAdmin))
+	wallet.Use(middleware.NoCacheMiddleware())
+	{
+		wallet.GET("/management", controllers.ShowWalletManagement)
+		wallet.GET("/management/details/:id", controllers.ShowTransactionDetails)
+	}
 }

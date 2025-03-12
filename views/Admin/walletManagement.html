@@ -8,7 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/nav&sideBar.js" defer></script>
-
+    <!-- Add this in the <head> section of your HTML document -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
@@ -31,7 +34,7 @@
             <!-- Logo -->
             <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
         </div>
-        <nav class="flex-1">
+        <nav class="flex-1 ">
             <ul>
                 <li class="py-3 px-4 flex items-center space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -41,17 +44,18 @@
                     </svg>
                     <a href="#" class="text-base font-medium hover:text-blue-500">Dashboard</a>
                 </li>
-                <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
+                <li class="py-3 px-4  flex items-center space-x-2">
                     <!-- All Products Button with Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
-                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
-                            stroke-width="32" rx="28.87" ry="28.87" />
-                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
+                        fill="currentColour">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
                             stroke-width="32" d="M144 80h224m-256 48h288" />
                     </svg>
-                    <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
+                    <a href="/admin/products" class="text-base font-medium  ">All Products</a>
                 </li>
-                <li class="py-3 px-4 flex items-center">
+                <li class="py-3 px-4  flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
                         <path fill="currentColor" fill-rule="evenodd"
                             d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
@@ -82,13 +86,12 @@
                     </svg>
                     <a href="/admin/coupon" class="text-base font-medium text-white">Coupon Management</a>
                 </li>
-                <li class="py-3 px-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                        fill="currentColor">
+                <li class="py-3 px-4 bg-blue-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="black">
                         <path
                             d="M21 6h-2V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2ZM5 4h12v2H5V4Zm16 16H5V8h16v12Zm-4-7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
                     </svg>
-                    <a href="/admin/wallet/management" class="text-base font-medium hover:text-blue-500 pl-2">Wallet
+                    <a href="/admin/wallet/management" class="text-base font-medium text-black pl-2">Wallet
                         Management</a>
                 </li>
                 <li class="py-3 px-4 flex items-center">
@@ -164,148 +167,126 @@
                 </div>
         </header>
 
-        <!-- Breadcrumbs -->
-        <div class="mt-2 text-gray-500 mx-5 text-xs"><a href="/admin/products">All Prosucts</a> &gt; <a href="">Update
-                Main Product Details</a> </div>
+        <div class="container mx-auto px-4 py-6 max-w-6xl">
+            <!-- Header -->
+            <div class="mb-6">
+            </div>
 
-        <!-- Content -->
-        <main class="mx-5 flex-1">
+            <!-- Orders Card -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="p-4 border-b flex flex-col md:flex-row justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-800">Recent Transactions</h2>
+                    <div
+                        class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mt-3 md:mt-0 w-full md:w-auto">
+                        <div class="relative">
+                            <input type="text" placeholder="Search transactions..."
+                                class="pl-10 pr-4 py-2 border rounded-lg w-full md:w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <select class="border rounded-lg px-4 py-2 bg-white w-full md:w-auto">
+                            <option>All Transactions</option>
+                            <option>Deposits</option>
+                            <option>Withdrawals</option>
+                            <option>Transfers</option>
+                        </select>
+                    </div>
+                </div>
 
-            <div class="bg-gray-100  py-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">Update Product's Main Details</h2>
+                <!-- Table -->
+                <div class="overflow-x-none">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Transaction ID</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    User</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Type</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {{range .Data}}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{{.TransactionID}}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{.Date}}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <img src="{{.ProfilePic}}" alt="{{.Name}}" class="h-10 w-10 rounded-full object-contain">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{.Name}}</div>
+                                            <div class="text-sm text-gray-500">{{.Email}}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Types `Gift Send`}}  bg-violet-100 text-violet-800  {{else if eq .Types `Gift Received`}}  bg-emerald-100 text-emerald-800  {{else if eq .Types `Referral`}} bg-blue-100 text-blue-800 {{else if eq .Types `Debited`}} bg-red-100 text-red-800 {{else}} bg-green-100 text-green-800 {{end}}">{{.Types}}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium {{if or (eq .Types `Gift Send`) (eq .Types `Debited`)}}text-red-600{{else}}text-green-600{{end}} ">{{if or (eq .Types "Gift Send") (eq .Types "Debited")}} - &#8377;{{printf "%.2f" .Amount}}{{else}} + &#8377;{{printf "%.2f" .Amount}}{{end}}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span
+                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center justify-center pt-6">
+                                    <div class="flex space-x-2">
+                                        <a href="/admin/wallet/management/details/{{.ID}}" class="text-blue-600 hover:text-blue-900"><i
+                                                class="fas fa-eye"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{end}}
+                            <!-- Additional rows could be added here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-6 py-4 border-t flex justify-between items-center">
+                    <div class="text-sm text-gray-500">
+                        Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
+                            class="font-medium">42</span> transactions
+                    </div>
+                    <div class="flex space-x-2">
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">Previous</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-800 font-medium">1</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">2</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">3</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">...</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">5</button>
+                        <button
+                            class="px-3 py-1 border rounded-md text-sm bg-white hover:bg-gray-50 text-gray-500">Next</button>
+                    </div>
                 </div>
             </div>
-
-            <div class="flex-1 mt-6">
-                <!-- Form -->
-                <form id="productUpdateForm" class="bg-white p-8 rounded shadow w-full">
-                    <div class="grid lg:grid-cols-2 grid-cols-1 gap-8">
-                        <!-- Left Side -->
-                        <div>
-                            <div class="mb-4">
-                                <label class="block text-black mb-2">Product Name</label>
-                                <input type="text" id="productname" name="productname" value="{{.Details.ProductName}}"
-                                    class="w-full border border-black rounded px-4 py-2" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-black mb-2">Category</label>
-                                <select class="w-full border border-black rounded px-4 py-2" id="categoryid"
-                                    name="categoryid" required>
-                                    <option disabled selected value="{{.ID}}">{{.CategoryName.Name}}</option>
-                                    {{range .categories}}
-                                    <option value="{{.ID}}">{{.Name}}</option>
-                                    {{end}}
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-black mb-2">Brand Name</label>
-                                <input type="text" id="brandname" name="brandname"
-                                    class="w-full border border-black rounded px-4 py-2" value="{{.Details.BrandName}}"
-                                    required>
-                            </div>
-                        </div>
-                        <!-- Right Side -->
-                        <div>
-                            <div class="mb-4">
-                                <label class="block text-black mb-2">Cash on Delivery Available</label>
-                                <select id="iscodavailable" name="iscodavailable"
-                                    class="w-full border border-black rounded px-4 py-2" required>
-                                    <option value="true">YES</option>
-                                    <option value="false">NO</option>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-black mb-2">Return Available</label>
-                                <select id="isreturnable" name="isreturnable"
-                                    class="w-full border border-black rounded px-4 py-2" required>
-                                    <option value="true">YES</option>
-                                    <option value="false">NO</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Hidden input for product ID -->
-                    <input type="hidden" name="productId" id="productId" value="{{.Details.ID}}">
-                    <!-- Buttons -->
-                    <div class="flex justify-end space-x-4 mt-8">
-                        <button type="button" onclick="window.history.back()"
-                            class="bg-red-500 text-white px-6 py-2 rounded">Cancel</button>
-                        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded">UPDATE</button>
-                    </div>
-                </form>
-            </div>
-        </main>
+        </div>
     </div>
-    <script>
-        // Toast function
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-
-            // Set message
-            toastMessage.textContent = message;
-
-            // Set color based on type
-            const toastDiv = toast.firstElementChild;
-            if (type === 'success') {
-                toastDiv.classList.remove('bg-red-500');
-                toastDiv.classList.add('bg-green-500');
-            } else {
-                toastDiv.classList.remove('bg-green-500');
-                toastDiv.classList.add('bg-red-500');
-            }
-
-            // Show toast
-            toast.classList.remove('hidden');
-        }
-
-        // Form submission handler
-        document.getElementById('productUpdateForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            // Ensure productId is set before submission
-            const productId = document.getElementById('productId').value;
-            if (!productId) {
-                showToast('Product ID is missing', 'error');
-                return;
-            }
-
-            const formData = {
-                productname: document.getElementById('productname').value,
-                categoryid: document.getElementById('categoryid').value,
-                brandname: document.getElementById('brandname').value,
-                iscodavailable: document.getElementById('iscodavailable').value === 'true',
-                isreturnable: document.getElementById('isreturnable').value === 'true'
-            };
-
-            try {
-                const response = await fetch(`/admin/products/main/details/update/${productId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Show success message
-                    showToast(data.message || 'Product updated successfully', 'success');
-
-                    // Wait briefly to show the message before redirecting
-                    setTimeout(() => {
-                        window.location.href = `/admin/products/main/details?product_id=${productId}`;
-                    }, 1000);
-                } else {
-                    showToast(data.message || 'Error updating product', 'error');
-                }
-            } catch (error) {
-                showToast('Error updating product: ' + error.message, 'error');
-            }
-        });
-    </script>
 </body>
 
 </html>

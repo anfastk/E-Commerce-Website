@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"strings"
+
 	"github.com/google/uuid"
 )
 
@@ -18,5 +20,5 @@ func GenerateReferralCode() string {
 
 	uuidPart := uuid.New().String()[:4]
 
-	return fmt.Sprintf("%s-%s", uuidPart, randString)
+	return strings.ToUpper(fmt.Sprintf("%s-%s", uuidPart, randString))
 }

@@ -310,26 +310,27 @@ func calculateDateRange(filter Filter) (*time.Time, *time.Time) {
 		startDate = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 		endDate = startDate.AddDate(0, 0, 1).Add(-time.Second)
 	case "weekly":
-		startDate = now.AddDate(0, 0, -7*7) 
+		startDate = now.AddDate(0, 0, -7*7)
 		weekday := int(startDate.Weekday())
 		if weekday == 0 {
 			weekday = 7
 		}
-		startDate = startDate.AddDate(0, 0, -weekday+1) 
+		startDate = startDate.AddDate(0, 0, -weekday+1)
 		endDate = now
 	case "monthly":
 		startDate = now.AddDate(0, -7, 0)
 		startDate = time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, startDate.Location())
 		endDate = now
 	case "daily":
-		startDate = now.AddDate(0, 0, -6) 
-		endDate = now
+		// Set startDate to 7 days ago from midnight today, endDate to end of today
+		startDate = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).AddDate(0, 0, -7)
+		endDate = time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 999999999, now.Location())
 	case "yearly":
-		startDate = now.AddDate(-6, 0, 0) 
+		startDate = now.AddDate(-6, 0, 0)
 		startDate = time.Date(startDate.Year(), 1, 1, 0, 0, 0, 0, now.Location())
 		endDate = now
 	default:
-		startDate = now.AddDate(0, -7, 0) 
+		startDate = now.AddDate(0, -7, 0)
 		startDate = time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, startDate.Location())
 		endDate = now
 	}
@@ -337,76 +338,76 @@ func calculateDateRange(filter Filter) (*time.Time, *time.Time) {
 }
 
 func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.Time) []SalesOverviewDTO {
-    var results []SalesOverviewDTO
-    var groupBy, orderBy string
-    var labelFunc func(time.Time) string
+	var results []SalesOverviewDTO
+	var groupBy, orderBy string
+	var labelFunc func(time.Time) string
 
-    switch filter.Period {
-    case "today":
-        groupBy = "DATE_TRUNC('hour', orders.order_date)"
-        orderBy = "DATE_TRUNC('hour', orders.order_date)"
-        labelFunc = func(t time.Time) string {
-            hour := t.Hour() - (t.Hour() % 4)
-            return time.Date(t.Year(), t.Month(), t.Day(), hour, 0, 0, 0, t.Location()).Format("03PM")
-        }
-    case "weekly":
-        groupBy = "DATE_TRUNC('week', orders.order_date)"
-        orderBy = "DATE_TRUNC('week', orders.order_date)"
-        labelFunc = func(t time.Time) string {
-            weekStart := t.AddDate(0, 0, -int(t.Weekday())+1)
-            return weekStart.Format("Jan 02")
-        }
-    case "monthly":
-        groupBy = "DATE_TRUNC('month', orders.order_date)"
-        orderBy = "DATE_TRUNC('month', orders.order_date)"
-        labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
-    case "daily":
-        groupBy = "DATE_TRUNC('day', orders.order_date)"
-        orderBy = "DATE_TRUNC('day', orders.order_date)"
-        labelFunc = func(t time.Time) string { return t.Format("2006-01-02") }
-    case "yearly":
-        groupBy = "DATE_TRUNC('year', orders.order_date)"
-        orderBy = "DATE_TRUNC('year', orders.order_date)"
-        labelFunc = func(t time.Time) string { return t.Format("2006") }
-    case "custom":
-        daysDiff := endDate.Sub(*startDate).Hours() / 24
-        if daysDiff <= 1 {
-            groupBy = "DATE_TRUNC('hour', orders.order_date)"
-            orderBy = "DATE_TRUNC('hour', orders.order_date)"
-            labelFunc = func(t time.Time) string {
-                hour := t.Hour() - (t.Hour() % 4)
-                return time.Date(t.Year(), t.Month(), t.Day(), hour, 0, 0, 0, t.Location()).Format("03PM")
-            }
-        } else if daysDiff <= 7 {
-            groupBy = "DATE_TRUNC('day', orders.order_date)"
-            orderBy = "DATE_TRUNC('day', orders.order_date)"
-            labelFunc = func(t time.Time) string { return t.Format("2006-01-02") }
-        } else if daysDiff <= 180 {
-            groupBy = "DATE_TRUNC('week', orders.order_date)"
-            orderBy = "DATE_TRUNC('week', orders.order_date)"
-            labelFunc = func(t time.Time) string {
-                weekStart := t.AddDate(0, 0, -int(t.Weekday())+1)
-                return weekStart.Format("Jan 02")
-            }
-        } else {
-            groupBy = "DATE_TRUNC('month', orders.order_date)"
-            orderBy = "DATE_TRUNC('month', orders.order_date)"
-            labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
-        }
-    default:
-        groupBy = "DATE_TRUNC('month', orders.order_date)"
-        orderBy = "DATE_TRUNC('month', orders.order_date)"
-        labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
-    }
+	switch filter.Period {
+	case "today":
+		groupBy = "DATE_TRUNC('hour', orders.order_date)"
+		orderBy = "DATE_TRUNC('hour', orders.order_date)"
+		labelFunc = func(t time.Time) string {
+			hour := t.Hour() - (t.Hour() % 4)
+			return time.Date(t.Year(), t.Month(), t.Day(), hour, 0, 0, 0, t.Location()).Format("03PM")
+		}
+	case "weekly":
+		groupBy = "DATE_TRUNC('week', orders.order_date)"
+		orderBy = "DATE_TRUNC('week', orders.order_date)"
+		labelFunc = func(t time.Time) string {
+			weekStart := t.AddDate(0, 0, -int(t.Weekday())+1)
+			return weekStart.Format("Jan 02")
+		}
+	case "monthly":
+		groupBy = "DATE_TRUNC('month', orders.order_date)"
+		orderBy = "DATE_TRUNC('month', orders.order_date)"
+		labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
+	case "daily":
+		groupBy = "DATE_TRUNC('day', orders.order_date)"
+		orderBy = "DATE_TRUNC('day', orders.order_date)"
+		labelFunc = func(t time.Time) string { return t.Format("2006-01-02") }
+	case "yearly":
+		groupBy = "DATE_TRUNC('year', orders.order_date)"
+		orderBy = "DATE_TRUNC('year', orders.order_date)"
+		labelFunc = func(t time.Time) string { return t.Format("2006") }
+	case "custom":
+		daysDiff := endDate.Sub(*startDate).Hours() / 24
+		if daysDiff <= 1 {
+			groupBy = "DATE_TRUNC('hour', orders.order_date)"
+			orderBy = "DATE_TRUNC('hour', orders.order_date)"
+			labelFunc = func(t time.Time) string {
+				hour := t.Hour() - (t.Hour() % 4)
+				return time.Date(t.Year(), t.Month(), t.Day(), hour, 0, 0, 0, t.Location()).Format("03PM")
+			}
+		} else if daysDiff <= 7 {
+			groupBy = "DATE_TRUNC('day', orders.order_date)"
+			orderBy = "DATE_TRUNC('day', orders.order_date)"
+			labelFunc = func(t time.Time) string { return t.Format("2006-01-02") }
+		} else if daysDiff <= 180 {
+			groupBy = "DATE_TRUNC('week', orders.order_date)"
+			orderBy = "DATE_TRUNC('week', orders.order_date)"
+			labelFunc = func(t time.Time) string {
+				weekStart := t.AddDate(0, 0, -int(t.Weekday())+1)
+				return weekStart.Format("Jan 02")
+			}
+		} else {
+			groupBy = "DATE_TRUNC('month', orders.order_date)"
+			orderBy = "DATE_TRUNC('month', orders.order_date)"
+			labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
+		}
+	default:
+		groupBy = "DATE_TRUNC('month', orders.order_date)"
+		orderBy = "DATE_TRUNC('month', orders.order_date)"
+		labelFunc = func(t time.Time) string { return t.Format("Jan 2006") }
+	}
 
-    query := db.Model(&models.Order{}).
-        Select(fmt.Sprintf(`
+	query := db.Model(&models.Order{}).
+		Select(fmt.Sprintf(`
             %s as month,
             SUM(oi.total_amount) as total_amount,
             SUM(oi.total_revenue) - SUM(COALESCE(orders.coupon_discount_amount, 0)) as revenue,
             COUNT(DISTINCT orders.id) as orders
         `, groupBy)).
-        Joins(`
+		Joins(`
             JOIN (
                 SELECT 
                     order_id,
@@ -418,86 +419,116 @@ func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.T
             ) oi ON oi.order_id = orders.id
         `, filter.Status)
 
-    if startDate != nil && endDate != nil {
-        query = query.Where("orders.order_date BETWEEN ? AND ?", startDate, endDate)
-    }
+	if startDate != nil && endDate != nil {
+		query = query.Where("orders.order_date BETWEEN ? AND ?", startDate, endDate)
+	}
 
-    var tempResults []struct {
-        Month       time.Time
-        TotalAmount float64
-        Revenue     float64
-        Orders      int
-    }
-    query.Group(groupBy).Order(orderBy + " ASC").Scan(&tempResults)
+	var tempResults []struct {
+		Month       time.Time
+		TotalAmount float64
+		Revenue     float64
+		Orders      int
+	}
+	query.Group(groupBy).Order(orderBy + " ASC").Scan(&tempResults)
 
-    if filter.Period == "today" {
-        results = make([]SalesOverviewDTO, 6) 
-        today := time.Date(now.BeginningOfHour().Year(), now.BeginningOfHour().Month(), now.BeginningOfHour().Day(), 0, 0, 0, 0, now.BeginningOfHour().Location())
-        for i := 0; i < 6; i++ {
-            intervalStart := today.Add(time.Hour * time.Duration(i*4))
-            results[i] = SalesOverviewDTO{
-                Month: labelFunc(intervalStart),
-            }
-        }
-        for _, temp := range tempResults {
-            hour := temp.Month.Hour()
-            index := hour / 4
-            if index < 6 {
-                results[index].TotalAmount += temp.TotalAmount
-                results[index].Revenue += temp.Revenue
-                results[index].Orders += temp.Orders
-            }
-        }
-    } else if filter.Period == "weekly" || filter.Period == "monthly" {
-        expectedCount := 8
-        results = make([]SalesOverviewDTO, expectedCount)
-        start := *startDate
-        interval := time.Duration(7*24) * time.Hour
-        if filter.Period == "monthly" {
-            interval = 30 * 24 * time.Hour
-        }
-        
-        tempMap := make(map[string]SalesOverviewDTO)
-        for _, temp := range tempResults {
-            label := labelFunc(temp.Month)
-            tempMap[label] = SalesOverviewDTO{
-                Month:       label,
-                TotalAmount: temp.TotalAmount,
-                Revenue:     temp.Revenue,
-                Orders:      temp.Orders,
-            }
-        }
+	if filter.Period == "daily" {
+		// Ensure exactly 8 days (today + past 7 days)
+		results = make([]SalesOverviewDTO, 8)
+		today := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
+		start := today.AddDate(0, 0, -7)
+		dateMap := make(map[string]SalesOverviewDTO)
 
-        for i := 0; i < expectedCount; i++ {
-            var periodStart time.Time
-            if filter.Period == "weekly" {
-                periodStart = start.Add(time.Duration(i) * interval)
-                periodStart = periodStart.AddDate(0, 0, -int(periodStart.Weekday())+1)
-            } else {
-                periodStart = start.AddDate(0, i, 0)
-                periodStart = time.Date(periodStart.Year(), periodStart.Month(), 1, 0, 0, 0, 0, periodStart.Location())
-            }
-            label := labelFunc(periodStart)
-            if data, exists := tempMap[label]; exists {
-                results[i] = data
-            } else {
-                results[i] = SalesOverviewDTO{
-                    Month: label,
-                }
-            }
-        }
-    } else {
-        for _, temp := range tempResults {
-            results = append(results, SalesOverviewDTO{
-                Month:       labelFunc(temp.Month),
-                TotalAmount: temp.TotalAmount,
-                Revenue:     temp.Revenue,
-                Orders:      temp.Orders,
-            })
-        }
-    }
+		// Populate map with data from query
+		for _, temp := range tempResults {
+			label := labelFunc(temp.Month)
+			dateMap[label] = SalesOverviewDTO{
+				Month:       label,
+				TotalAmount: temp.TotalAmount,
+				Revenue:     temp.Revenue,
+				Orders:      temp.Orders,
+			}
+		}
 
-    return results
+		// Fill results with 8 days, using data if available
+		for i := 0; i < 8; i++ {
+			day := start.AddDate(0, 0, i)
+			label := labelFunc(day)
+			if data, exists := dateMap[label]; exists {
+				results[i] = data
+			} else {
+				results[i] = SalesOverviewDTO{
+					Month: label,
+				}
+			}
+		}
+	} else if filter.Period == "today" {
+		results = make([]SalesOverviewDTO, 6)
+		today := time.Date(now.BeginningOfHour().Year(), now.BeginningOfHour().Month(), now.BeginningOfHour().Day(), 0, 0, 0, 0, now.BeginningOfHour().Location())
+		for i := 0; i < 6; i++ {
+			intervalStart := today.Add(time.Hour * time.Duration(i*4))
+			results[i] = SalesOverviewDTO{
+				Month: labelFunc(intervalStart),
+			}
+		}
+		for _, temp := range tempResults {
+			hour := temp.Month.Hour()
+			index := hour / 4
+			if index < 6 {
+				results[index].TotalAmount += temp.TotalAmount
+				results[index].Revenue += temp.Revenue
+				results[index].Orders += temp.Orders
+			}
+		}
+	} else if filter.Period == "weekly" || filter.Period == "monthly" {
+		expectedCount := 8
+		results = make([]SalesOverviewDTO, expectedCount)
+		start := *startDate
+		interval := time.Duration(7*24) * time.Hour
+		if filter.Period == "monthly" {
+			interval = 30 * 24 * time.Hour
+		}
+
+		tempMap := make(map[string]SalesOverviewDTO)
+		for _, temp := range tempResults {
+			label := labelFunc(temp.Month)
+			tempMap[label] = SalesOverviewDTO{
+				Month:       label,
+				TotalAmount: temp.TotalAmount,
+				Revenue:     temp.Revenue,
+				Orders:      temp.Orders,
+			}
+		}
+
+		for i := 0; i < expectedCount; i++ {
+			var periodStart time.Time
+			if filter.Period == "weekly" {
+				periodStart = start.Add(time.Duration(i) * interval)
+				periodStart = periodStart.AddDate(0, 0, -int(periodStart.Weekday())+1)
+			} else {
+				periodStart = start.AddDate(0, i, 0)
+				periodStart = time.Date(periodStart.Year(), periodStart.Month(), 1, 0, 0, 0, 0, periodStart.Location())
+			}
+			label := labelFunc(periodStart)
+			if data, exists := tempMap[label]; exists {
+				results[i] = data
+			} else {
+				results[i] = SalesOverviewDTO{
+					Month: label,
+				}
+			}
+		}
+	} else {
+		for _, temp := range tempResults {
+			results = append(results, SalesOverviewDTO{
+				Month:       labelFunc(temp.Month),
+				TotalAmount: temp.TotalAmount,
+				Revenue:     temp.Revenue,
+				Orders:      temp.Orders,
+			})
+		}
+	}
+
+	return results
 }
 
 func getCategorySalesData(db *gorm.DB, startDate, endDate *time.Time, status string) []CategorySalesDTO {

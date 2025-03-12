@@ -7,6 +7,7 @@ type WalletTransaction struct {
 	UserID        uint     `gorm:"not null"`
 	WalletID      uint     `gorm:"not null"`
 	Amount        float64  `gorm:"not null"`
+	LastBalance float64 `gorm:"not null"`
 	Description   string   `gorm:"size:150"`
 	Type          string   `gorm:"size:50"`
 	Receipt       string   `gorm:"size:255"`

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
@@ -560,6 +561,7 @@ func CancelSpecificOrder(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 			return
 		}
+		lastBalance := wallet.Balance
 		wallet.Balance += refundAmount
 		if err := tx.Save(&wallet).Error; err != nil {
 			tx.Rollback()
@@ -567,7 +569,7 @@ func CancelSpecificOrder(c *gin.Context) {
 			return
 		}
 		receiptID := "rcpt_" + uuid.New().String()
-		transactionID := "TXN_" + uuid.New().String()
+		transactionID := "TXN-" + uuid.New().String()
 
 		walletTransaction := models.WalletTransaction{
 			UserID:        userID,
@@ -576,8 +578,9 @@ func CancelSpecificOrder(c *gin.Context) {
 			Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
 			Type:          "Refund",
 			Receipt:       receiptID,
-			OrderId:       order.OrderUID,
-			TransactionID: transactionID,
+			OrderId:       orderItems.OrderUID,
+			LastBalance:   lastBalance,
+			TransactionID: strings.ToUpper(transactionID),
 			PaymentMethod: payment.PaymentMethod,
 		}
 		if err := tx.Create(&walletTransaction).Error; err != nil {
@@ -748,6 +751,7 @@ func CancelAllOrderItems(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 			return
 		}
+		lastBalance := wallet.Balance
 		wallet.Balance += refundAmount
 		if err := tx.Save(&wallet).Error; err != nil {
 			tx.Rollback()
@@ -755,7 +759,7 @@ func CancelAllOrderItems(c *gin.Context) {
 			return
 		}
 		receiptID := "rcpt_" + uuid.New().String()
-		transactionID := "TXN_" + uuid.New().String()
+		transactionID := "TXN-" + uuid.New().String()
 
 		walletTransaction := models.WalletTransaction{
 			UserID:        userID,
@@ -765,7 +769,8 @@ func CancelAllOrderItems(c *gin.Context) {
 			Type:          "Refund",
 			Receipt:       receiptID,
 			OrderId:       order.OrderUID,
-			TransactionID: transactionID,
+			LastBalance:   lastBalance,
+			TransactionID: strings.ToUpper(transactionID),
 			PaymentMethod: paymentMethod,
 		}
 		if err := tx.Create(&walletTransaction).Error; err != nil {

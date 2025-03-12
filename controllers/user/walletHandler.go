@@ -193,16 +193,12 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request", "Invalid request format", "")
 		return
 	}
-
-	/* amount, err := strconv.Atoi(verifyRequest.Amount)
-	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Amount Enterd", "Enter Correct Amount", "")
-		return
-	} */
+	tx := config.DB.Begin()
 
 	var userDetails models.UserAuth
 
-	if err := config.DB.First(&userDetails, userID).Error; err != nil {
+	if err := tx.First(&userDetails, userID).Error; err != nil {
+		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/profile/order/details")
 		return
 	}
@@ -213,21 +209,25 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 	calculatedSignature := hex.EncodeToString(expectedSignature.Sum(nil))
 
 	if calculatedSignature != verifyRequest.Signature {
+		tx.Rollback()
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid signature", "Payment verification failed", "/profile/order/details")
 		return
 	}
 
 	var wallet models.Wallet
 
-	if err := config.DB.First(&wallet, "user_id = ?", userID).Error; err != nil {
+	if err := tx.First(&wallet, "user_id = ?", userID).Error; err != nil {
+		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Wallet not found", "")
 		return
 	}
 
 	actualAmount := verifyRequest.Amount / 100
 
+	lastBalace := wallet.Balance
 	wallet.Balance += actualAmount
-	if err := config.DB.Save(&wallet).Error; err != nil {
+	if err := tx.Save(&wallet).Error; err != nil {
+		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Amount Addung Failed", "Something Went Wrong", "")
 		return
 	}
@@ -242,14 +242,17 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 		Receipt:       receiptID,
 		OrderId:       verifyRequest.OrderID,
 		TransactionID: verifyRequest.PaymentID,
+		LastBalance:   lastBalace,
 		PaymentMethod: "RazorPay",
 	}
 
-	if err := config.DB.Create(&createHistory).Error; err != nil {
+	if err := tx.Create(&createHistory).Error; err != nil {
+		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Adding Failed", "Something Went Wrong", "")
 		return
 	}
 
+	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Payment verified successfully",

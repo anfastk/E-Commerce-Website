@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -207,6 +208,7 @@ func CheckForReferrer(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
 				return
 			}
+			lastBalace := referrerWallet.Balance
 			referrerWallet.Balance += 250
 			if saveErr := tx.Save(&referrerWallet).Error; saveErr != nil {
 				tx.Rollback()
@@ -214,7 +216,7 @@ func CheckForReferrer(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN_" + uuid.New().String()
+			transactionID := "TXN-" + uuid.New().String()
 			createReferrerWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      referrerWallet.ID,
@@ -222,7 +224,8 @@ func CheckForReferrer(c *gin.Context) {
 				Description:   fmt.Sprintf("Referral Bonus - " + joineDetails.FullName + " Joined"),
 				Type:          "Referral",
 				Receipt:       receiptID,
-				TransactionID: transactionID,
+				LastBalance:   lastBalace,
+				TransactionID: strings.ToUpper(transactionID),
 			}
 			if createErr := tx.Create(&createReferrerWalletHistory).Error; createErr != nil {
 				tx.Rollback()
@@ -235,6 +238,7 @@ func CheckForReferrer(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
 				return
 			}
+			lastBalaces := joineeWallet.Balance
 			joineeWallet.Balance += 100
 			if saveErr := tx.Save(&joineeWallet).Error; saveErr != nil {
 				tx.Rollback()
@@ -247,6 +251,7 @@ func CheckForReferrer(c *gin.Context) {
 				Amount:        100,
 				Description:   fmt.Sprintf("Referral Bonus - " + userauth.FullName + " Added You"),
 				Type:          "Referral",
+				LastBalance:   lastBalaces,
 				Receipt:       receiptID,
 				TransactionID: transactionID,
 			}
@@ -294,6 +299,7 @@ func CheckForJoinee(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
 				return
 			}
+			lastBalance := joineeWallet.Balance
 			joineeWallet.Balance += 100
 			if saveErr := tx.Save(&joineeWallet).Error; saveErr != nil {
 				tx.Rollback()
@@ -301,7 +307,7 @@ func CheckForJoinee(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN_" + uuid.New().String()
+			transactionID := "TXN-" + uuid.New().String()
 			createJoineeWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      joineeWallet.ID,
@@ -309,7 +315,8 @@ func CheckForJoinee(c *gin.Context) {
 				Description:   fmt.Sprintf("Referral Bonus - " + userauth.FullName + " Added You"),
 				Type:          "Referral",
 				Receipt:       receiptID,
-				TransactionID: transactionID,
+				LastBalance:   lastBalance,
+				TransactionID: strings.ToUpper(transactionID),
 			}
 			if createErr := tx.Create(&createJoineeWalletHistory).Error; createErr != nil {
 				tx.Rollback()
@@ -345,6 +352,7 @@ func CheckForJoinee(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusInternalServerError, "Referrer Details Not Found", "Something Went Wrong", "")
 				return
 			}
+			lastBalances := referrerWallet.Balance
 			referrerWallet.Balance += 250
 			if saveErr := tx.Save(&referrerWallet).Error; saveErr != nil {
 				tx.Rollback()
@@ -358,6 +366,7 @@ func CheckForJoinee(c *gin.Context) {
 				Description:   fmt.Sprintf("Referral Bonus - " + userauth.FullName + " Joined"),
 				Type:          "Referral",
 				Receipt:       receiptID,
+				LastBalance:   lastBalances,
 				TransactionID: transactionID,
 			}
 			if createErr := tx.Create(&createReferrerWalletHistory).Error; createErr != nil {
