@@ -119,6 +119,134 @@
         .apply-btn:focus:not(:active)::after {
             animation: ripple 1s ease-out;
         }
+
+        /* Disabled payment option styling */
+        .payment-option.disabled {
+            position: relative;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            opacity: 0.75;
+            cursor: not-allowed !important;
+            overflow: hidden;
+        }
+
+        /* Diagonal striped overlay */
+        .payment-option.disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(-45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(243, 244, 246, 0.8) 10px,
+                    rgba(243, 244, 246, 0.8) 20px);
+            pointer-events: none;
+        }
+
+        /* Red diagonal "Unavailable" banner */
+        .payment-option.disabled::before {
+            content: 'Unavailable';
+            position: absolute;
+            background-color: rgba(239, 68, 68, 0.8);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.5;
+            width: 120px;
+            top: 15px;
+            right: -30px;
+            transform: rotate(45deg);
+            z-index: 2;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Icon greying within disabled option */
+        .payment-option.disabled .payment-title {
+            color: #9ca3af;
+        }
+
+        .payment-option.disabled i,
+        .payment-option.disabled svg {
+            opacity: 0.5;
+        }
+
+        /* Custom tooltip on hover */
+        .payment-option.disabled {
+            transition: all 0.3s ease;
+        }
+
+        .payment-option.disabled:hover .disabled-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        .disabled-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .disabled-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+
+        /* Accessibility focus indicator */
+        .payment-option.disabled:focus-visible {
+            outline: 2px solid #d1d5db;
+            outline-offset: 2px;
+        }
+
+        /* Shake animation when clicking on disabled option */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-4px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        .payment-option.disabled.shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
     </style>
 </head>
 
@@ -153,11 +281,11 @@
                         </button>
                     </a>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
@@ -216,6 +344,8 @@
                     <input type="hidden" id="couponID" value="{{.CouponID}}">
                     <input type="hidden" id="couponCode" value="{{.CouponCode}}">
                     <input type="hidden" id="couponDiscount" value="{{.CouponDiscount}}">
+                    <input type="hidden" id="total" value="{{.Total}}">
+                    <input type="hidden" id="isCodAvailable" value="{{.IsCodAvailable}}">
 
                     <!-- Wallet Balance -->
                     <div class="mb-6">
@@ -350,7 +480,8 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Coupon Discount</span>
-                        <span class="text-blue-600">-&#8377;{{if .CouponDiscount}}{{printf "%.2f" .CouponDiscount}}{{else}}00{{end}}</span>
+                        <span class="text-blue-600">-&#8377;{{if .CouponDiscount}}{{printf "%.2f"
+                            .CouponDiscount}}{{else}}00{{end}}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Shipping</span>
@@ -498,74 +629,312 @@
         setInterval(updateDeliveryDate, 1000);
 
 
-        // Get all payment options and the wallet input
-        const paymentOptions = document.querySelectorAll('.payment-option');
-        const walletInput = document.querySelector('.wallet-input');
-        let selectedPaymentMethod = null;
+        // Get necessary elements and data from HTML
+        document.addEventListener('DOMContentLoaded', () => {
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const walletInput = document.querySelector('.wallet-input');
+            const walletPaymentOption = document.getElementById('walletPayment');
+            const codPaymentOption = document.getElementById('codPayment');
+            const walletBalanceDisplay = walletPaymentOption.querySelector('.payment-title');
+            const walletMessageDisplay = walletPaymentOption.querySelector('.flex.items-center.gap-1');
+            const giftCardInput = document.querySelector('.wallet-input input');
+            const applyButton = document.querySelector('.apply-btn');
 
-        // Set up event listeners for each payment option
-        paymentOptions.forEach(option => {
-            option.addEventListener('click', function () {
-                // Remove selected class from all options
-                paymentOptions.forEach(opt => {
-                    opt.classList.remove('selected');
-                    opt.classList.remove('just-selected');
-                    opt.querySelector('.custom-radio').classList.remove('selected');
+            // Get data from hidden inputs
+            const total = parseFloat(document.getElementById('total').value) || 0;
+            const isCodAvailable = document.getElementById('isCodAvailable').value === 'true';
+
+            // Ensure wallet input is visible initially if needed
+            if (walletInput) {
+                // Make sure wallet input is properly initialized
+                walletInput.style.display = 'block';
+            }
+
+            // Fetch wallet balance initially
+            fetchWalletBalance();
+
+            // Function to fetch wallet balance via AJAX
+            function fetchWalletBalance() {
+                fetch('/checkout/check/wallet/balance', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch wallet balance');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        updateWalletDisplay(data.balance);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching wallet balance:', error);
+                        updateWalletDisplay(0); // Default to 0 if there's an error
+                    });
+            }
+
+            // Function to update wallet display based on balance
+            function updateWalletDisplay(balance) {
+
+                // Update the wallet balance text
+                walletBalanceDisplay.textContent = `Wallet Balance ₹ ${balance.toFixed(2)}${balance < total ? ' Unavailable' : ''}`;
+
+                // Check if wallet balance is sufficient
+                if (balance < total) {
+                    // Disable wallet payment option - add 'disabled' class to match COD style
+                    walletPaymentOption.classList.add('disabled');
+                    walletPaymentOption.style.cursor = 'not-allowed';
+
+                    // Update message to show insufficient balance
+                    walletMessageDisplay.innerHTML = `
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z"></path>
+                </svg>
+                Insufficient balance.
+            `;
+
+                    // Show gift card input when balance is less than total
+                    if (walletInput) {
+                        walletInput.classList.add('active');
+
+                        // Force show the input by setting inline styles
+                        walletInput.style.maxHeight = '200px';
+                        walletInput.style.opacity = '1';
+                        walletInput.style.transform = 'translateY(0)';
+
+                    }
+
+                    // If this was selected, choose another payment method
+                    if (selectedPaymentMethod === 'Wallet') {
+                        // Find the first available payment method
+                        const availableMethod = document.querySelector('.payment-option:not(.disabled)');
+                        if (availableMethod) {
+                            availableMethod.click();
+                        }
+                    }
+                } else {
+                    // Enable wallet payment option
+                    walletPaymentOption.classList.remove('disabled');
+                    walletPaymentOption.style.cursor = 'pointer';
+
+                    // Update message to show wallet is available
+                    walletMessageDisplay.innerHTML = `
+                Available 
+            `;
+
+                    // Hide gift card input if balance is sufficient
+                    if (walletInput) {
+                        walletInput.classList.remove('active');
+
+                        // Reset inline styles
+                        walletInput.style.maxHeight = '';
+                        walletInput.style.opacity = '';
+                        walletInput.style.transform = '';
+                    }
+                }
+            }
+
+            // Check COD availability
+            if (!isCodAvailable) {
+                // Disable COD payment option
+                codPaymentOption.classList.add('disabled');
+                codPaymentOption.style.cursor = 'not-allowed';
+            }
+
+            // Apply gift card functionality
+            applyButton.addEventListener('click', function () {
+                const giftCardCode = giftCardInput.value.trim();
+
+                if (!giftCardCode) {
+                    showErrorToast('Please enter a gift card code');
+                    return;
+                }
+
+                // Show loading state
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                this.disabled = true;
+
+                // Send AJAX request to apply gift card
+                fetch('/user/wallet/apply-gift-card', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: giftCardCode
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw new Error(err.message || 'Invalid gift card code'); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Show success message
+                        showSuccessToast(data.message || 'Gift card applied successfully');
+
+                        // Clear input field
+                        giftCardInput.value = '';
+
+                        // Fetch updated wallet balance
+                        fetchWalletBalance();
+                    })
+                    .catch(error => {
+                        showErrorToast(error.message || 'Failed to apply gift card');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        this.innerHTML = 'Apply';
+                        this.disabled = false;
+                    });
+            });
+
+            // Set up event listeners for each payment option
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    // Check if this option is disabled
+                    if (this.classList.contains('disabled')) {
+                        return;
+                    }
+
+                    // Remove selected class from all options
+                    paymentOptions.forEach(opt => {
+                        opt.classList.remove('selected');
+                        opt.classList.remove('just-selected');
+                        opt.querySelector('.custom-radio').classList.remove('selected');
+                    });
+
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    this.classList.add('just-selected');
+                    this.querySelector('.custom-radio').classList.add('selected');
+
+                    // Store the selected payment method
+                    selectedPaymentMethod = this.getAttribute('data-value');
+
+                    // Toggle wallet input visibility
+                    if (this.id === 'walletPayment') {
+                        const walletBalance = parseFloat(walletBalanceDisplay.textContent.match(/₹\s+([\d.]+)/)[1]);
+
+                        if (walletBalance < total) {
+                            walletInput.classList.add('active');
+
+                            // Force show the input
+                            walletInput.style.maxHeight = '200px';
+                            walletInput.style.opacity = '1';
+                            walletInput.style.transform = 'translateY(0)';
+
+                        } else {
+                            walletInput.classList.remove('active');
+
+                            // Reset inline styles
+                            walletInput.style.maxHeight = '';
+                            walletInput.style.opacity = '';
+                            walletInput.style.transform = '';
+                        }
+                    } else {
+                        walletInput.classList.remove('active');
+
+                        // Reset inline styles
+                        walletInput.style.maxHeight = '';
+                        walletInput.style.opacity = '';
+                        walletInput.style.transform = '';
+                    }
+
+                    // Remove the pulse animation class after animation completes
+                    setTimeout(() => {
+                        this.classList.remove('just-selected');
+                    }, 800);
+                });
+            });
+
+            // Add hover effects
+            paymentOptions.forEach(option => {
+                option.addEventListener('mouseenter', function () {
+                    if (!this.classList.contains('selected') && !this.classList.contains('disabled')) {
+                        this.style.backgroundColor = '#f9fafb';
+                    }
                 });
 
-                // Add selected class to clicked option
-                this.classList.add('selected');
-                this.classList.add('just-selected');
-                this.querySelector('.custom-radio').classList.add('selected');
+                option.addEventListener('mouseleave', function () {
+                    if (!this.classList.contains('selected')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
 
-                // Store the selected payment method
-                selectedPaymentMethod = this.getAttribute('data-value');
+            // Helper functions for showing toasts
+            function showErrorToast(message) {
+                console.error('Error:', message);
+                // Add your toast implementation here
+            }
 
-                // Toggle wallet input visibility
-                if (this.id === 'walletPayment') {
+            function showSuccessToast(message) {
+                console.log('Success:', message);
+                // Add your toast implementation here
+            }
+
+            // Set default selection (first available payment method)
+            const availableMethod = document.querySelector('.payment-option:not(.disabled)');
+            if (availableMethod) {
+                availableMethod.click();
+            }
+
+            // Add tooltips to disabled payment options
+            const disabledOptions = document.querySelectorAll('.payment-option.disabled');
+
+            // Add tooltip elements to each disabled option
+            disabledOptions.forEach(option => {
+                // Extract the reason for disability
+                let reasonText = "This payment option is unavailable";
+
+                // Get specific messages
+                if (option.id === 'walletPayment') {
+                    reasonText = "Insufficient wallet balance";
+                } else if (option.id === 'codPayment') {
+                    reasonText = "Cash on Delivery is not available for this order";
+                }
+
+                // Create tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'disabled-tooltip';
+                tooltip.textContent = reasonText;
+                option.appendChild(tooltip);
+
+                // Add shake effect when clicked
+                option.addEventListener('click', function () {
+                    if (this.classList.contains('disabled')) {
+                        this.classList.add('shake');
+                        setTimeout(() => {
+                            this.classList.remove('shake');
+                        }, 500);
+                    }
+                });
+            });
+
+            // Force check the wallet balance and update UI after a small delay
+            setTimeout(() => {
+                const walletBalance = parseFloat(walletBalanceDisplay.textContent.match(/₹\s+([\d.]+)/)[1]) || 0;
+
+                if (walletBalance < total) {
                     walletInput.classList.add('active');
-                } else {
-                    walletInput.classList.remove('active');
+
+                    // Force show the input
+                    walletInput.style.maxHeight = '200px';
+                    walletInput.style.opacity = '1';
+                    walletInput.style.transform = 'translateY(0)';
                 }
-
-                // Remove the pulse animation class after animation completes
-                setTimeout(() => {
-                    this.classList.remove('just-selected');
-                }, 800);
-            });
-        });
-
-        // Add hover effects
-        paymentOptions.forEach(option => {
-            option.addEventListener('mouseenter', function () {
-                if (!this.classList.contains('selected')) {
-                    this.style.backgroundColor = '#f9fafb';
-                }
-            });
-
-            option.addEventListener('mouseleave', function () {
-                if (!this.classList.contains('selected')) {
-                    this.style.backgroundColor = '';
-                }
-            });
-        });
-
-        // Set default selection (wallet)
-        document.getElementById('walletPayment').click();
-
-        // Add ripple effect to amount buttons
-        const amountButtons = document.querySelectorAll('.wallet-input button');
-        amountButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                this.classList.add('active');
-                setTimeout(() => {
-                    this.classList.remove('active');
-                }, 300);
-            });
+            }, 100);
         });
 
         // Process payment function
         document.getElementById('proceedToPay').addEventListener('click', function () {
+            console.log('Selected Payment Method:', selectedPaymentMethod);
+            console.log('Address ID:', document.getElementById('addressId').value);
             let addressIdElement = document.getElementById('addressId');
             let couponIDElement = document.getElementById('couponID');
             let couponCodeElement = document.getElementById('couponCode');
@@ -589,12 +958,12 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                     paymentMethod: selectedPaymentMethod,
-                    addressId: addressId ,
-                    couponCode:couponCode,
-                    couponId:couponID,
-                    couponDiscountAmount:couponDiscount
-                    }),
+                    paymentMethod: selectedPaymentMethod,
+                    addressId: addressId,
+                    couponCode: couponCode,
+                    couponId: couponID,
+                    couponDiscountAmount: couponDiscount
+                }),
             })
                 .then(response => {
                     if (!response.ok) {
@@ -607,6 +976,9 @@
                         initializeRazorpay(data);
                     }
                     else if (selectedPaymentMethod === 'COD') {
+                        window.location.href = '/order/success';
+                    }
+                    else if (selectedPaymentMethod === 'Wallet') {
                         window.location.href = '/order/success';
                     }
                 })
@@ -683,7 +1055,6 @@
                         }
                     })
                     .then(data => {
-                        if (data) console.log('Response:', data);
                     })
                     .catch(error => console.error('Error:', error));
 

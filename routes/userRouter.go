@@ -93,6 +93,7 @@ func UserRouter(r *gin.Engine) {
 		checkout.POST("/payment", controllers.PaymentPage)
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
 		checkout.POST("/check/coupon", controllers.CheckCoupon)
+		checkout.GET("/check/wallet/balance", controllers.FetchWalletBalance)
 	}
 
 	wishlist := r.Group("/wishlist")

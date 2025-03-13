@@ -20,12 +20,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId string,order_item_id uint, paymentAmount float64, method string) error {
+func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId string, order_item_id uint, paymentAmount float64, method string) error {
 	var paymentDetail models.PaymentDetail
 	paymentDetail = models.PaymentDetail{
 		UserID:        userId,
 		OrderItemID:   order_item_id,
-		OrderId: orderId,
+		OrderId:       orderId,
 		PaymentStatus: "Pending",
 		PaymentAmount: paymentAmount,
 		PaymentMethod: method,
@@ -35,6 +35,32 @@ func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId string,order_i
 		return errors.New("Payment Creation Failed")
 	}
 	return nil
+}
+
+func FetchWalletBalance(c *gin.Context) {
+	userIDInterface, exists := c.Get("userid")
+	if !exists {
+		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
+		return
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
+		return
+	}
+
+	var walletDetails models.Wallet
+	if err := config.DB.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"balance": walletDetails.Balance,
+		"code":    http.StatusOK,
+	})
 }
 
 func CreateRazorpayOrder(c *gin.Context, amount float64) (map[string]interface{}, error) {

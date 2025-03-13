@@ -11,6 +11,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func PaymentPage(c *gin.Context) {
@@ -175,6 +176,7 @@ func PaymentPage(c *gin.Context) {
 		"CouponDiscount":  request.CouponDiscountAmount,
 		"ProductDiscount": productDiscount,
 		"TotalDiscount":   TotalDiscount,
+		"IsCodAvailable":  total < 75000,
 		"Total":           total,
 		"code":            http.StatusOK,
 	})
@@ -300,6 +302,66 @@ func ProceedToPayment(c *gin.Context) {
 				"address": address.Address,
 				"user_id": userDetails.ID,
 			},
+		})
+	case "Wallet":
+		tx := config.DB.Begin()
+		var coupon models.ReservedCoupon
+		tx.First(&coupon, paymentRequest.CouponId)
+		couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
+		if err != nil {
+			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+			return
+		}
+		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
+		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
+		orderItems := FetchOrderItems(c, tx, orderID)
+
+		for _, orderItem := range orderItems {
+
+			receiptID := "rcpt-" + uuid.New().String()
+			transactionID := "TXN-" + uuid.New().String()
+
+			createPayment := models.PaymentDetail{
+				UserID:        userID,
+				OrderItemID:   orderItem.ID,
+				PaymentStatus: "Completed",
+				PaymentAmount: total,
+				PaymentMethod: "Razorpay",
+				OrderId:       RazorPayOrderID,
+				TransactionID: transactionID,
+				Receipt:       receiptID,
+			}
+
+			if err := tx.Create(&createPayment).Error; err != nil {
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Payment creation failed", "Something Went Wrong", "/cart")
+				return
+			}
+
+			var orderedItem models.OrderItem
+			if err := tx.First(&orderedItem, orderItem.ID).Error; err != nil {
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Order not found", "")
+				return
+			}
+
+			orderedItem.OrderStatus = "Confirmed"
+			if err := tx.Save(&orderedItem).Error; err != nil {
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Failed to update order", "")
+				return
+			}
+			DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
+		}
+		ClearCart(c, tx, reservedMap)
+		tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
+		tx.Commit()
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "OK",
+			"message":  "Payment processed",
+			"redirect": "/order/success",
+			"code":     http.StatusOK,
 		})
 
 	default:

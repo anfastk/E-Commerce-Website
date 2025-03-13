@@ -22,6 +22,7 @@ type WalletGiftCard struct {
 	RedeemedAt      time.Time
 	TransactionType string   `gorm:"size:50"`
 	TransactionID   string   `gorm:"size:100"`
-	UserAuth        UserAuth `gorm:"foreignKey:UserID"`
+	Sender          UserAuth `gorm:"foreignKey:UserID"`
+	Reciver         UserAuth `gorm:"foreignKey:RedeemedUserID"`
 	WalletDetail    Wallet   `gorm:"foreignKey:WalletID"`
 }
