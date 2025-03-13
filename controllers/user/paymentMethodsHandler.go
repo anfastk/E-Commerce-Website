@@ -156,7 +156,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 	}
 	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
+	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime,couponDiscountAmount)
 	orderItems := FetchOrderItems(c, tx, orderID)
 	var OrderItemIDs []int
 	for _, item := range orderItems {
@@ -170,7 +170,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 			UserID:        userID,
 			OrderItemID:   orderItem.ID,
 			PaymentStatus: "Completed",
-			PaymentAmount: total,
+			PaymentAmount: orderItem.Total,
 			PaymentMethod: "Razorpay",
 			OrderId:       RazorPayOrderID,
 			TransactionID: verifyRequest.PaymentID,
@@ -265,7 +265,7 @@ func PaymentFailureHandler(c *gin.Context) {
 	}
 	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
+	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime,couponDiscountAmount)
 	orderItems := FetchOrderItems(c, tx, orderID)
 	var OrderItemIDs []int
 	for _, item := range orderItems {

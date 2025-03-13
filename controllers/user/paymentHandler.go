@@ -233,20 +233,21 @@ func ProceedToPayment(c *gin.Context) {
 	}
 	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
 
+	var coupon models.ReservedCoupon
+	config.DB.First(&coupon, paymentRequest.CouponId)
+	couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
+	if err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+		return
+	}
+
 	switch paymentRequest.PaymentMethod {
 	case "COD":
 		paymentStatus := true
 		tx := config.DB.Begin()
-		var coupon models.ReservedCoupon
-		tx.First(&coupon, paymentRequest.CouponId)
-		couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
-		if err != nil {
-			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
-			return
-		}
 		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
+		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 		orderItems := FetchOrderItems(c, tx, orderID)
 
 		for _, ordItems := range orderItems {
@@ -273,7 +274,7 @@ func ProceedToPayment(c *gin.Context) {
 
 	case "Razorpay":
 		address := FetchAddressByIDAndUserID(c, userID, paymentRequest.AddressID)
-		razorpayOrder, err := CreateRazorpayOrder(c, total)
+		razorpayOrder, err := CreateRazorpayOrder(c, total-couponDiscountAmount)
 		if err != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create Razorpay order", "Something Went Wrong", "/checkout")
 			return
@@ -290,7 +291,7 @@ func ProceedToPayment(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
-			"amount":   total * 100,
+			"amount":   total - couponDiscountAmount *100,
 			"currency": "INR",
 			"key_id":   config.RAZORPAY_KEY_ID,
 			"prefill": gin.H{
@@ -305,17 +306,22 @@ func ProceedToPayment(c *gin.Context) {
 		})
 	case "Wallet":
 		tx := config.DB.Begin()
-		var coupon models.ReservedCoupon
-		tx.First(&coupon, paymentRequest.CouponId)
-		couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
-		if err != nil {
-			helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
+		var walletDetails models.Wallet
+		if err := tx.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Not Found", "Something Went Wrong", "/cart")
 			return
 		}
 		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime)
+		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 		orderItems := FetchOrderItems(c, tx, orderID)
+
+		var orderDetails models.Order
+		if err := tx.First(&orderDetails, orderID).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
+			return
+		}
 
 		for _, orderItem := range orderItems {
 
@@ -326,9 +332,9 @@ func ProceedToPayment(c *gin.Context) {
 				UserID:        userID,
 				OrderItemID:   orderItem.ID,
 				PaymentStatus: "Completed",
-				PaymentAmount: total,
-				PaymentMethod: "Razorpay",
-				OrderId:       RazorPayOrderID,
+				PaymentAmount: orderItem.Total,
+				PaymentMethod: "Wallet",
+				OrderId:       orderDetails.OrderUID,
 				TransactionID: transactionID,
 				Receipt:       receiptID,
 			}
@@ -342,18 +348,46 @@ func ProceedToPayment(c *gin.Context) {
 			var orderedItem models.OrderItem
 			if err := tx.First(&orderedItem, orderItem.ID).Error; err != nil {
 				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Order not found", "")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
 				return
 			}
 
 			orderedItem.OrderStatus = "Confirmed"
 			if err := tx.Save(&orderedItem).Error; err != nil {
 				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Failed to update order", "")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Something Went Wrong", "")
 				return
 			}
 			DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
 		}
+
+		lastBalance := walletDetails.Balance
+		walletDetails.Balance -= total
+		if err := tx.Save(&walletDetails).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update wallet details", "Failed to update order", "")
+			return
+		}
+		walletReceiptID := "rcpt-" + uuid.New().String()
+		walletTransactionID := "TXN-" + uuid.New().String()
+		walletHistory := models.WalletTransaction{
+			UserID:        userID,
+			WalletID:      walletDetails.ID,
+			Amount:        total,
+			LastBalance:   lastBalance,
+			Description:   "Product Purchase ORD ID" + orderDetails.OrderUID,
+			Type:          "Debited",
+			Receipt:       walletReceiptID,
+			OrderId:       orderDetails.OrderUID,
+			TransactionID: walletTransactionID,
+			PaymentMethod: "Wallet",
+		}
+		if err := tx.Create(&walletHistory).Error; err != nil {
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Creation Failed", "Something Went Wrong", "/cart")
+			return
+		}
+
 		ClearCart(c, tx, reservedMap)
 		tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
 		tx.Commit()

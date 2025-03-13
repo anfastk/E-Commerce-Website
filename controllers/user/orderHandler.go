@@ -114,7 +114,7 @@ func TrackingPage(c *gin.Context) {
 			isAllOrderCancel = false
 			break
 		}
-		if count >= 2 {
+		if count >= 1 {
 			isAllOrderCancel = true
 		}
 	}
@@ -184,7 +184,7 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 	}
 	return order.ID
 }
-func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.ReservedStock, shippingCharge float64, orderID uint, userID uint, currentTime time.Time) {
+func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.ReservedStock, shippingCharge float64, orderID uint, userID uint, currentTime time.Time, couponDiscount float64) {
 	for _, item := range reservedProducts {
 		orderUID := helper.GenerateOrderID()
 		discountAmount, _, _ := helper.DiscountCalculation(item.ProductVariant.ProductID, item.ProductVariant.CategoryID, item.ProductVariant.RegularPrice, item.ProductVariant.SalePrice)
@@ -194,7 +194,7 @@ func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.Res
 		if salePrice > 1000 {
 			shippingCharge = 0
 		}
-		total := salePrice + tax + shippingCharge
+		total := salePrice + tax + shippingCharge - couponDiscount
 		var firstImage string
 
 		var firstVariantImage models.ProductVariantsImage
