@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!isValid) {
       // Show toast with all error messages
-      window.toast.error('Please fix the following errors:\n' + errorMessages.join('\n'));
+      showErrorToast('Please fix the following errors:\n' + errorMessages.join('\n'));
       return;
     }
 
@@ -97,18 +97,18 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         hideLoader();
         if (data.code === 200) {
-          window.toast.success(data.message || 'Variant added successfully!');
+          showSuccessToast(data.message || 'Variant added successfully!');
           setTimeout(() => {
             window.location.href = data.redirect || '/admin/products';
           }, 1000);
         } else {
-          window.toast.error(data.message || 'Error adding variant');
+          showErrorToast(data.message || 'Error adding variant');
         }
       })
       .catch(error => {
         hideLoader();
         console.error('Error:', error);
-        window.toast.error('Error adding variant. Please try again.');
+        showErrorToast('Error adding variant. Please try again.');
       });
   });
 
@@ -143,18 +143,18 @@ function handleFileUpload(input, previewContainerId) {
   const variantIndex = Array.from(document.querySelectorAll('.variant-form')).indexOf(variantForm);
 
   if (files.length < MIN_IMAGES) {
-    window.toast.error(`You must upload at least ${MIN_IMAGES} image`, 'error');
+    showErrorToast(`You must upload at least ${MIN_IMAGES} image`);
     return;
   }
 
   // File validation
   for (let file of files) {
     if (!file.type.startsWith('image/')) {
-      window.toast.error('Please upload only image files', 'error');
+      showErrorToast('Please upload only image files');
       return;
     }
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      window.toast.error('Image size should not exceed 5MB', 'error');
+      showErrorToast('Image size should not exceed 5MB');
       return;
     }
   }
@@ -201,7 +201,7 @@ function removePreview(inputId, previewContainerId, previewElement, variantIndex
   if (fileIndex > -1) {
     filesArray.splice(fileIndex, 1);
     variantFiles.set(variantIndex, filesArray);
-    window.toast.success('Image removed successfully', 'success');
+    showSuccessToast('Image removed successfully');
   }
 }
 
@@ -270,7 +270,7 @@ function saveCrop() {
     currentImageElement.style.background = 'transparent';
 
     cancelCrop();
-    window.toast.success('Image cropped successfully', 'success');
+    showSuccessToast('Image cropped successfully');
   }, 'image/png', 1.0);
 }
 

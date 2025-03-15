@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 </head>
@@ -41,11 +42,11 @@
                         </button>
                     </a>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
@@ -145,7 +146,8 @@
                             </svg>
                             Shopping Cart
                         </a>
-                        <a href="/profile/wallet" class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                        <a href="/profile/wallet"
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -174,18 +176,18 @@
                             Manage Address
                         </a>
                         <a href="/profile/referral"
-                        class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <g class="user-add-outline">
-                                <g fill="currentColor" fill-rule="evenodd" class="Vector" clip-rule="evenodd">
-                                    <path
-                                        d="M9.5 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 2a4 4 0 1 0 0-8a4 4 0 0 0 0 8m8.975-4a1 1 0 0 1 1 1v1.475h1.475a1 1 0 1 1 0 2h-1.475v1.475a1 1 0 1 1-2 0v-1.475H16a1 1 0 1 1 0-2h1.475V9a1 1 0 0 1 1-1M3.354 15.176C4.311 13.836 5.77 13 7.643 13h3.714c1.873 0 3.332.837 4.289 2.176C16.577 16.479 17 18.202 17 20a1 1 0 1 1-2 0c0-1.516-.36-2.793-.981-3.661c-.595-.832-1.457-1.339-2.662-1.339H7.643c-1.205 0-2.067.507-2.662 1.339c-.62.868-.981 2.145-.981 3.66a1 1 0 1 1-2 0c0-1.797.422-3.52 1.354-4.823" />
-                                    <path d="M2 20a1 1 0 0 1 1-1h12.969a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1" />
+                            class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <g class="user-add-outline">
+                                    <g fill="currentColor" fill-rule="evenodd" class="Vector" clip-rule="evenodd">
+                                        <path
+                                            d="M9.5 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 2a4 4 0 1 0 0-8a4 4 0 0 0 0 8m8.975-4a1 1 0 0 1 1 1v1.475h1.475a1 1 0 1 1 0 2h-1.475v1.475a1 1 0 1 1-2 0v-1.475H16a1 1 0 1 1 0-2h1.475V9a1 1 0 0 1 1-1M3.354 15.176C4.311 13.836 5.77 13 7.643 13h3.714c1.873 0 3.332.837 4.289 2.176C16.577 16.479 17 18.202 17 20a1 1 0 1 1-2 0c0-1.516-.36-2.793-.981-3.661c-.595-.832-1.457-1.339-2.662-1.339H7.643c-1.205 0-2.067.507-2.662 1.339c-.62.868-.981 2.145-.981 3.66a1 1 0 1 1-2 0c0-1.797.422-3.52 1.354-4.823" />
+                                        <path d="M2 20a1 1 0 0 1 1-1h12.969a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1" />
+                                    </g>
                                 </g>
-                            </g>
-                        </svg>
-                        Refer & Earn
-                    </a>
+                            </svg>
+                            Refer & Earn
+                        </a>
                         <a href="/profile/settings"
                             class="p-2 text-gray-600 hover:bg-gray-50 rounded flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -391,7 +393,18 @@
         </div>
     </footer>
     <!-- Toast container -->
-    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
 
     <script>
         document.getElementById('profileForm').addEventListener('submit', async function (e) {
@@ -419,26 +432,15 @@
                 });
 
                 if (response.ok) {
-                    showToast('Profile updated successfully!', 'bg-green-500');
+                    showSuccessToast('Profile updated successfully!');
                 } else {
                     throw new Error('Failed to update profile');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Failed to update profile. Please try again.', 'bg-red-500');
+                showErrorToast('Failed to update profile. Please try again.');
             }
         });
-
-        function showToast(message, bgColor) {
-            let toast = document.getElementById("toast");
-            toast.textContent = message;
-            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
-            toast.classList.remove("hidden");
-
-            setTimeout(() => {
-                toast.classList.add("hidden");
-            }, 3000);
-        }
         let cropper;
         const modal = document.getElementById('cropperModal');
         const imageInput = document.getElementById('imageInput');
@@ -520,6 +522,7 @@
             }, 'image/jpeg');
         }
     </script>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

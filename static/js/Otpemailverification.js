@@ -1,8 +1,3 @@
-window.toast = {
-  success: (message) => getToast().success(message),
-  error: (message) => getToast().error(message)
-};
-
 // OTP Management
 function moveFocus(current, nextId) {
   if (current.value.length === current.maxLength && nextId) {
@@ -32,7 +27,7 @@ async function handleSubmit(event) {
     const data = await response.json();
 
     if (response.ok) {
-      window.toast.success(data.message||'OTP verified successfully!');
+      showSuccessToast(data.message||'OTP verified successfully!');
       // Delay redirect to show success message
       setTimeout(() => {
         window.location.href = '/user/login';
@@ -41,7 +36,7 @@ async function handleSubmit(event) {
       // Handle different error cases
       switch (data.error) {
         case 'INVALID_OTP':
-          window.toast.error(data.message||'Invalid OTP. Please try again.');
+          showErrorToast(data.message||'Invalid OTP. Please try again.');
           // Clear OTP fields
           [1, 2, 3, 4, 5, 6].forEach(num => {
             document.getElementById(`otp${num}`).value = '';
@@ -49,18 +44,18 @@ async function handleSubmit(event) {
           document.getElementById('otp1').focus();
           break;
         case 'OTP_EXPIRED':
-          window.toast.error(data.message||'OTP has expired. Please request a new one.');
+          showErrorToast(data.message||'OTP has expired. Please request a new one.');
           // Show resend button immediately
           timeLeft = 0;
           timerElement.classList.add('hidden');
           resendButton.classList.remove('hidden');
           break;
         default:
-          window.toast.error(data.message || 'Verification failed. Please try again.');
+          showErrorToast(data.message || 'Verification failed. Please try again.');
       }
     }
   } catch (error) {
-    window.toast.error(data.message||'Network error. Please check your connection.');
+    showErrorToast(data.message||'Network error. Please check your connection.');
   }
 
   return false;
@@ -93,7 +88,7 @@ async function resendOTP() {
     const data = await response.json();
 
     if (response.ok) {
-      window.toast.success(data.message||'OTP resent successfully!');
+      showSuccessToast(data.message||'OTP resent successfully!');
       timeLeft = 30;
       resendButton.classList.add('hidden');
       timerElement.classList.remove('hidden');
@@ -104,10 +99,10 @@ async function resendOTP() {
       });
       document.getElementById('otp1').focus();
     } else {
-      window.toast.error(data.message || 'Failed to resend OTP. Please try again.');
+      showErrorToast(data.message || 'Failed to resend OTP. Please try again.');
     }
   } catch (error) {
-    window.toast.error(data.message||'Network error. Please check your connection.');
+    showErrorToast(data.message||'Network error. Please check your connection.');
   }
 }
 

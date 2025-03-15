@@ -9,15 +9,23 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/nav&sideBar.js" defer></script>
     <!-- Add this in the <head> section of your HTML document -->
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
-    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
-        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
-            <span id="toast-message"></span>
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
         </div>
     </div>
     <!-- Sidebar -->
@@ -223,13 +231,15 @@
                         <tbody class="divide-y divide-gray-200">
                             {{range .Data}}
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{{.TransactionID}}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                                    {{.TransactionID}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{.Date}}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
-                                            <img src="{{.ProfilePic}}" alt="{{.Name}}" class="h-10 w-10 rounded-full object-contain">
+                                            <img src="{{.ProfilePic}}" alt="{{.Name}}"
+                                                class="h-10 w-10 rounded-full object-contain">
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">{{.Name}}</div>
@@ -241,7 +251,10 @@
                                     <span
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Types `Gift Send`}}  bg-violet-100 text-violet-800  {{else if eq .Types `Gift Received`}}  bg-emerald-100 text-emerald-800  {{else if eq .Types `Referral`}} bg-blue-100 text-blue-800 {{else if eq .Types `Debited`}} bg-red-100 text-red-800 {{else}} bg-green-100 text-green-800 {{end}}">{{.Types}}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium {{if or (eq .Types `Gift Send`) (eq .Types `Debited`)}}text-red-600{{else}}text-green-600{{end}} ">{{if or (eq .Types "Gift Send") (eq .Types "Debited")}} - &#8377;{{printf "%.2f" .Amount}}{{else}} + &#8377;{{printf "%.2f" .Amount}}{{end}}
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium {{if or (eq .Types `Gift Send`) (eq .Types `Debited`)}}text-red-600{{else}}text-green-600{{end}} ">
+                                    {{if or (eq .Types "Gift Send") (eq .Types "Debited")}} - &#8377;{{printf "%.2f"
+                                    .Amount}}{{else}} + &#8377;{{printf "%.2f" .Amount}}{{end}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
@@ -250,8 +263,8 @@
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center justify-center pt-6">
                                     <div class="flex space-x-2">
-                                        <a href="/admin/wallet/management/details/{{.ID}}" class="text-blue-600 hover:text-blue-900"><i
-                                                class="fas fa-eye"></i></a>
+                                        <a href="/admin/wallet/management/details/{{.ID}}"
+                                            class="text-blue-600 hover:text-blue-900"><i class="fas fa-eye"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -287,6 +300,7 @@
             </div>
         </div>
     </div>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

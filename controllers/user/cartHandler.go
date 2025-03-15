@@ -65,7 +65,7 @@ func ShowCart(c *gin.Context) {
 				if createErr := config.DB.Model(&activeCartItems[i].Item).Updates(map[string]interface{}{
 					"quantity": activeCartItems[i].Item.Quantity,
 				}).Error; createErr != nil {
-					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
+					helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Something Went Wrong", "")
 					return
 				}
 			}
@@ -172,7 +172,7 @@ func AddToCart(c *gin.Context) {
 	}
 
 	var cartItems models.CartItem
-	if err := tx.First(&cartItems, "product_id = ? AND product_variant_id = ? AND cart_id = ?", product.ProductID,product.ID, cart.ID).Error; err != nil {
+	if err := tx.First(&cartItems, "product_id = ? AND product_variant_id = ? AND cart_id = ?", product.ProductID, product.ID, cart.ID).Error; err != nil {
 		cartItems = models.CartItem{
 			CartID:           cart.ID,
 			ProductID:        product.ProductID,

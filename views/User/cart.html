@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 </head>
 
 <body class="bg-gray-50">
@@ -39,11 +40,11 @@
                         </button>
                     </a>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
@@ -116,6 +117,7 @@
                                     </div>
                                 </a>
                                 <div class="flex items-center gap-4">
+                                    {{if .Item.Quantity}}
                                     <div class="flex items-center border rounded">
                                         <button class="px-3 py-1 hover:bg-gray-100"
                                             onclick="updateQuantity(`{{.Item.ID}}`, 'decrease')">-</button>
@@ -123,6 +125,10 @@
                                         <button class="px-3 py-1 hover:bg-gray-100"
                                             onclick="updateQuantity(`{{.Item.ID}}`, 'increase')">+</button>
                                     </div>
+
+                                    {{else}}
+                                    <p>Out Of Stock</p>
+                                    {{end}}
                                     <button class="text-red-500" onclick="deleteCartItem(`{{.Item.ID}}`)">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -155,24 +161,33 @@
                             <span class="font-bold">TOTAL</span>
                             <span class="total-amount font-bold">₹{{.Total}}</span>
                         </div>
-                        <a href="/checkout">
-                            <button
-                                class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
-                                PROCEED TO CHECKOUT
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </button>
-                        </a>
+                        <button id="checkoutButton"
+                            class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
+                            PROCEED TO CHECKOUT
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 {{end}}
             </div>
         </div>
     </div>
-    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
 
     <div class="empty-cart-view" style="display: none;">
         <div class=" flex items-center justify-center">
@@ -385,37 +400,18 @@
                         updateCartTotalAndCount();
 
                         // Show success toast message
-                        showToast("Item added to cart!", "bg-green-500");
+                        showSuccessToast("Item added to cart!");
 
                         // Optional: Remove page reload if not necessary
                         window.location.reload();
                     } else {
-                        showToast(data.message || "Failed to add item", "bg-red-500");
+                        showErrorToast(data.message || "Failed to add item");
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('An error occurred while adding the item to cart', "bg-red-500");
+                    showErrorToast('An error occurred while adding the item to cart');
                 });
-        }
-
-        // Toast notification function
-        function showToast(message, bgColor) {
-            let toast = document.getElementById("toast");
-
-            if (!toast) {
-                toast = document.createElement("div");
-                toast.id = "toast";
-                document.body.appendChild(toast);
-            }
-
-            toast.textContent = message;
-            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
-            toast.classList.remove("hidden");
-
-            setTimeout(() => {
-                toast.classList.add("hidden");
-            }, 3000);
         }
 
         function updateCartItemsSection(data) {
@@ -489,7 +485,42 @@
         document.addEventListener('DOMContentLoaded', function () {
             updateCartTotalAndCount();
         });
+
+        document.getElementById('checkoutButton').addEventListener('click', function () {
+            // Create a fetch POST request
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add any other headers you need
+                },
+                // Add any body data if needed
+                // body: JSON.stringify({ key: 'value' })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // If response is not OK, parse as JSON to get the error message
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Error processing checkout');
+                        });
+                    }
+                    // If response is OK, get the HTML content
+                    return response.text();
+                })
+                .then(html => {
+                    // Replace the current page content with the new HTML
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(error => {
+                    // Show only the error message in alert box
+                    alert(error.message);
+                });
+        });
     </script>
+    <script src="/static/js/toastMain.js"></script>
+
 </body>
 
 </html>

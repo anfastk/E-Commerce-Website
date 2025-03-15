@@ -12,9 +12,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 </head>
 
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -228,7 +242,7 @@
             const missingFields = requiredFields.filter(field => !document.getElementById(field).value.trim());
 
             if (missingFields.length > 0) {
-                window.toast.error('Please fill in all required fields');
+                showErrorToast('Please fill in all required fields');
                 return;
             }
 
@@ -238,17 +252,17 @@
             const stockQuantity = parseInt(document.getElementById('stock-quantity').value, 10);
 
             if (isNaN(regularPrice) || regularPrice < 0) {
-                window.toast.error('Please enter a valid regular price');
+                showErrorToast('Please enter a valid regular price');
                 return;
             }
 
             if (salePrice && (isNaN(salePrice) || salePrice < 0)) {
-                window.toast.error('Please enter a valid sale price');
+                showErrorToast('Please enter a valid sale price');
                 return;
             }
 
             if (isNaN(stockQuantity) || stockQuantity < 0) {
-                window.toast.error('Please enter a valid stock quantity');
+                showErrorToast('Please enter a valid stock quantity');
                 return;
             }
 
@@ -266,7 +280,7 @@
             };
 
             try {
-                window.toast.success('Updating product...');
+                showSuccessToast('Updating product...');
 
                 const response = await fetch(`/admin/products/variant/detail/update/${productId}`, {
                     method: 'PATCH',
@@ -277,29 +291,29 @@
                 });
 
                 if (response.ok) {
-                    window.toast.success('Product updated successfully');
+                    showSuccessToast('Product updated successfully');
                     // Add delay before redirect to show success message
                     setTimeout(() => {
                         window.location.href = `/admin/products/variant/detail?variant_id=${productId}`;
                     }, 1500);
                 } else {
                     const errorData = await response.json();
-                    window.toast.error(errorData.message || 'Failed to update product');
+                    showErrorToast(errorData.message || 'Failed to update product');
 
                     // If it's a validation error, show specific messages
                     if (errorData.validationErrors) {
                         Object.entries(errorData.validationErrors).forEach(([field, message]) => {
-                            window.toast.error(`${field}: ${message}`);
+                            showErrorToast(`${field}: ${message}`);
                         });
                     }
                 }
             } catch (error) {
                 console.error('Update error:', error);
-                window.toast.error('Error updating product. Please check your connection and try again.');
+                showErrorToast('Error updating product. Please check your connection and try again.');
             }
         });
     </script>
-    <script src="/static/js/toast.js"></script>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

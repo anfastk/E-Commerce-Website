@@ -13,12 +13,20 @@
         rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 </head>
 
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
-    <div id="toast" class="fixed hidden top-20 left-[60%] transform -translate-x-1/2">
-        <div class="bg-green-500 text-white px-6 py-3 rounded shadow-lg">
-            <span id="toast-message"></span>
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
         </div>
     </div>
     <!-- Sidebar -->
@@ -680,7 +688,7 @@
 
                 if (response.ok) {
                     const actionMessage = isDeleted ? 'recovered' : 'deleted';
-                    showToast(`Product successfully ${actionMessage}`, 'success');
+                    showSuccessToast(`Product successfully ${actionMessage}`);
 
                     // Wait briefly then reload
                     setTimeout(() => {
@@ -688,61 +696,12 @@
                     }, 500);
                 } else {
                     const actionMessage = isDeleted ? 'recovering' : 'deleting';
-                    showToast(`Error ${actionMessage} product`, 'error');
+                    showErrorToast(`Error ${actionMessage} product`);
                 }
             } catch (error) {
-                showToast('An error occurred while updating the product', 'error');
+                showErrorToast('An error occurred while updating the product');
             }
         }
-
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-
-            // Set message
-            toastMessage.textContent = message;
-
-            // Set color based on type
-            const toastDiv = toast.firstElementChild;
-            if (type === 'success') {
-                toastDiv.classList.remove('bg-red-500');
-                toastDiv.classList.add('bg-green-500');
-            } else {
-                toastDiv.classList.remove('bg-green-500');
-                toastDiv.classList.add('bg-red-500');
-            }
-
-            // Show toast
-            toast.classList.remove('hidden');
-
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-        // Sample Chart.js Sales Chart
-        /* const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Sales',
-                    data: [12000, 19000, 15000, 22000, 16000, 25000],
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Product Sales Trend'
-                    }
-                }
-            }
-        }); */
         document.addEventListener("DOMContentLoaded", function () {
             let startDateInput = document.getElementById("updateStartDate");
             let endDateInput = document.getElementById("updateEndDate");
@@ -763,16 +722,12 @@
 
             let startDateFormatted = convertToDateInputFormat(startDateRaw);
             let endDateFormatted = convertToDateInputFormat(endDateRaw);
-
-            console.log("Formatted Start Date:", startDateFormatted);
-            console.log("Formatted End Date:", endDateFormatted);
-
             startDateInput.value = startDateFormatted;
             endDateInput.value = endDateFormatted;
         });
 
     </script>
-    <script src="/static/js/toast.js"></script>
+    <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
     <script src="/static/js/mainProductDetails.js" defer></script>
 </body>

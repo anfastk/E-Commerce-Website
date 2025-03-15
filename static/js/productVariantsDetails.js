@@ -49,7 +49,7 @@ specificationsForm.addEventListener("submit", function (event) {
             return response.json();
         })
         .then(data => {
-            window.toast.success('Specifications saved successfully!');
+            showSuccessToast('Specifications saved successfully!');
 
             // Clear form and close modal after successful submission
             setTimeout(() => {
@@ -62,7 +62,7 @@ specificationsForm.addEventListener("submit", function (event) {
         })
         .catch(error => {
             console.error('Error:', error);
-            window.toast.error('Failed to save specifications. Please try again.');
+            showErrorToast('Failed to save specifications. Please try again.');
         });
 });
 
@@ -125,18 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseData = await response.json();
 
             if (response.ok) {
-                window.toast.success('Specifications updated successfully!');
+                showSuccessToast('Specifications updated successfully!');
                 setTimeout(() => {
                     popupModal.classList.add('hidden');
                     window.location.reload();
                 }, 1500);
             } else {
-                window.toast.error(responseData.error || 'Failed to update specifications');
+                showErrorToast(responseData.error || 'Failed to update specifications');
                 console.error('Submission failed', responseData);
             }
         } catch (error) {
             console.error('Error:', error);
-            window.toast.error('An error occurred while updating specifications');
+            showErrorToast('An error occurred while updating specifications');
         }
     });
 });
@@ -155,7 +155,7 @@ function deleteSpecification(specificationId, productId) {
     })
         .then(response => {
             if (response.ok) {
-                window.toast.success('Specification deleted successfully!');
+                showSuccessToast('Specification deleted successfully!');
                 setTimeout(() => {
                     // Remove the specification item from the DOM
                     const specificationItem = document.querySelector(`.Specifications-item[data-desc-id="${descId}"]`);
@@ -166,13 +166,13 @@ function deleteSpecification(specificationId, productId) {
                     window.location.href = `/admin/products/variant/detail?variant_id=${prodId}`;
                 }, 1500);
             } else {
-                window.toast.error('Failed to delete specification');
+                showErrorToast('Failed to delete specification');
                 console.error('Failed to delete specification');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            window.toast.error('An error occurred while deleting specification');
+            showErrorToast('An error occurred while deleting specification');
         });
 }
 
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const productId = document.getElementById('product-id').value;
 
         if (!previewImg) {
-            window.toast.error('Please upload an image first');
+            showErrorToast('Please upload an image first');
             return;
         }
 
@@ -262,17 +262,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.filename) {
-                            window.toast.success('Image uploaded successfully');
+                            showSuccessToast('Image uploaded successfully');
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1500);
                         } else {
-                            window.toast.error('Upload failed. Please try again.');
+                            showErrorToast('Upload failed. Please try again.');
                         }
                     })
                     .catch(error => {
                         console.error('Upload error:', error);
-                        window.toast.error('Upload failed. Please check your connection and try again.');
+                        showErrorToast('Upload failed. Please check your connection and try again.');
                     });
             });
     }
@@ -282,13 +282,13 @@ document.addEventListener('DOMContentLoaded', function () {
         previewContainer.innerHTML = '';
 
         if (files.length > 1) {
-            window.toast.error('Please upload only one image');
+            showErrorToast('Please upload only one image');
             return;
         }
 
         const file = files[0];
         if (!file.type.startsWith('image/')) {
-            window.toast.error('Please upload only image files');
+            showErrorToast('Please upload only image files');
             return;
         }
 
@@ -306,10 +306,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
             previewContainer.appendChild(preview);
-            window.toast.success('Image loaded successfully.');
+            showSuccessToast('Image loaded successfully.');
         };
         reader.onerror = function () {
-            window.toast.error('Error reading file. Please try again.');
+            showErrorToast('Error reading file. Please try again.');
         };
         reader.readAsDataURL(file);
     }
@@ -344,14 +344,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 transparent: true
             });
         } catch (error) {
-            window.toast.error('Error initializing crop tool. Please try again.');
+            showErrorToast('Error initializing crop tool. Please try again.');
             cancelCrop();
         }
     }
 
     function saveCrop() {
         if (!cropper) {
-            window.toast.error('Crop tool not initialized. Please try again.');
+            showErrorToast('Crop tool not initialized. Please try again.');
             return;
         }
 
@@ -372,10 +372,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 imgPreview.src = URL.createObjectURL(croppedFile);
 
                 cancelCrop();
-                window.toast.success('Image cropped successfully');
+                showSuccessToast('Image cropped successfully');
             }, 'image/png', 1.0);
         } catch (error) {
-            window.toast.error('Error cropping image. Please try again.');
+            showErrorToast('Error cropping image. Please try again.');
             cancelCrop();
         }
     }
@@ -441,9 +441,9 @@ function handleSubmit(event) {
                 throw new Error('Network response was not ok');
             }
             if (isRecovery) {
-                window.toast.success('Product deleted successfully!');
+                showSuccessToast('Product deleted successfully!');
             } else {
-                window.toast.success('Product recovered successfully!');
+                showSuccessToast('Product recovered successfully!');
             }
             // Optionally refresh the page or update UI
             setTimeout(() => {
@@ -453,9 +453,9 @@ function handleSubmit(event) {
         .catch(error => {
             console.error('Error:', error);
             if (isRecovery) {
-                window.toast.error('Failed to recover product. Please try again.');
+                showErrorToast('Failed to recover product. Please try again.');
             } else {
-                window.toast.error('Failed to delete product. Please try again.');
+                showErrorToast('Failed to delete product. Please try again.');
             }
         });
 }

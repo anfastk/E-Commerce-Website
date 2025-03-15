@@ -6,12 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Laptix Admin Category Management</title>
   <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+  <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/static/js/nav&sideBar.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
+  <div class="toast-container z-40 fixed top-0 right-4">
+    <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+        <div class="toast-content flex items-center">
+            <div class="toast-icon mr-2">
+                <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+            </div>
+            <div class="toast-message text-gray-800">This is a toast message</div>
+        </div>
+        <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+    </div>
+</div>
+
   <!-- Sidebar -->
   <aside id="sidebar"
     class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -641,14 +655,14 @@
           editModal.classList.add('hidden');
 
           // Optional: Show success message
-          alert('Category updated successfully!');
+          showSuccessToast('Category updated successfully!');
         } else {
           // Handle error
-          alert('Failed to update category');
+          showErrorToast('Failed to update category');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while updating the category');
+        showErrorToast('An error occurred while updating the category');
       }
     });
 
@@ -668,11 +682,11 @@
             window.location.reload(); // Adjust redirect as needed
           } else {
             // Handle error
-            alert('Failed to delete category');
+            showErrorToast('Failed to delete category');
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('An error occurred while deleting the category');
+          showErrorToast('An error occurred while deleting the category');
         }
       }
     });
@@ -724,7 +738,7 @@
       const endDate = new Date(formData.endDate);
 
       if (startDate > endDate) {
-        alert('Start date must be before or equal to end date');
+        showErrorToast('Start date must be before or equal to end date');
         return;
       }
 
@@ -744,14 +758,14 @@
         })
         .then(data => {
           // Handle successful response
-          alert('Offer added successfully!');
+          showSuccessToast('Offer added successfully!');
           closeAddOfferModal();
           window.location.reload();
         })
         .catch(error => {
           // Handle errors
           console.error('Error:', error);
-          alert('Failed to add offer. Please try again.');
+          showErrorToast('Failed to add offer. Please try again.');
         });
     });
     // Include the JavaScript from the previous artifact here
@@ -781,15 +795,15 @@
 
           if (response.ok) {
             const result = await response.json();
-            alert('Offer updated successfully!');
+            showSuccessToast('Offer updated successfully!');
             closeEditOfferModal();
           } else {
             const errorData = await response.json();
-            alert(`Error updating offer: ${errorData.message || 'Something went wrong'}`);
+            showErrorToast(`Error updating offer: ${errorData.message || 'Something went wrong'}`);
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('An error occurred while updating the offer');
+          showErrorToast('An error occurred while updating the offer');
         }
       });
     });
@@ -835,19 +849,20 @@
         });
 
         if (response.ok) {
-          alert('Offer deleted successfully');
+          showSuccessToast('Offer deleted successfully');
           closeDeleteOfferModal();
           window.location.reload(); // or update the page as needed
         } else {
           const errorData = await response.json();
-          alert(`Failed to delete offer: ${errorData.message || 'Unknown error'}`);
+          showErrorToast(`Failed to delete offer: ${errorData.message || 'Unknown error'}`);
         }
       } catch (error) {
         console.error('Error deleting offer:', error);
-        alert('An error occurred while deleting the offer');
+        showErrorToast('An error occurred while deleting the offer');
       }
     }
   </script>
+      <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

@@ -387,26 +387,6 @@
     </main>
   </div>
   <script>
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toast-message');
-
-      // Set message
-      toastMessage.textContent = message;
-
-      // Set color based on type
-      const toastDiv = toast.firstElementChild;
-      if (type === 'success') {
-        toastDiv.classList.remove('bg-red-500');
-        toastDiv.classList.add('bg-green-500');
-      } else {
-        toastDiv.classList.remove('bg-green-500');
-        toastDiv.classList.add('bg-red-500');
-      }
-
-      // Show toast
-      toast.classList.remove('hidden');
-    }
 
     async function handleEditSubmit(event) {
       event.preventDefault();
@@ -434,7 +414,7 @@
         }
 
         // Show success message
-        showToast(result.message || 'Category updated successfully', 'success');
+        showSuccessToast(result.message || 'Category updated successfully');
 
         // Close the popup
         document.getElementById('edit-popup').classList.add('hidden');
@@ -446,7 +426,7 @@
 
       } catch (error) {
         console.error('Error updating category:', error);
-        showToast(error.message || 'Failed to update category. Please try again.', 'error');
+        showErrorToast(error.message || 'Failed to update category. Please try again.');
       }
     }
 
@@ -481,20 +461,21 @@
 
         if (response.ok) {
           // Show success message
-          showToast(data.message || 'Status updated successfully', 'success');
+          showSuccessToast(data.message || 'Status updated successfully');
 
           // Wait briefly then reload
           setTimeout(() => {
             location.reload();
           }, 1000);
         } else {
-          showToast(data.message || 'Error updating status', 'error');
+          showErrorToast(data.message || 'Error updating status');
         }
       } catch (error) {
-        showToast('An error occurred while updating status', 'error');
+        showErrorToast('An error occurred while updating status');
       }
     }
   </script>
+      <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

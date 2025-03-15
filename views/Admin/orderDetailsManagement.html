@@ -9,9 +9,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
     <script src="/static/js/productpage.js" defer></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 </head>
 
 <body class="bg-white min-h-screen flex flex-col lg:flex-row">
+
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
     <!-- Sidebar -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
@@ -572,14 +586,14 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert(`Return request ${action}ed successfully!`);
+                    showErrorToast(`Return request ${action}ed successfully!`);
                     closeModal();
                     // Optionally refresh the page or update the UI
                     // location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert(`Error ${action}ing return request. Please try again.`);
+                    showErrorToast(`Error ${action}ing return request. Please try again.`);
                 });
         }
 
@@ -617,7 +631,7 @@
 
             if (!orderId) {
                 console.error('Order ID not found from URL or data attribute');
-                showToast('Order ID not found. Please check the URL or page data.', true);
+                showErrorToast('Order ID not found. Please check the URL or page data.');
                 return;
             }
 
@@ -683,7 +697,7 @@
 
                 // Show message if no further status changes are allowed
                 if (allowedNextStatuses.length === 0) {
-                    showToast('No further status changes are allowed for this order', true);
+                    showErrorToast('No further status changes are allowed for this order');
                 }
             }
 
@@ -718,17 +732,6 @@
                 }
             });
 
-            // Show toast message function
-            function showToast(message, isError = false) {
-                statusUpdateToast.textContent = message;
-                statusUpdateToast.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-                statusUpdateToast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-                statusUpdateToast.classList.remove('hidden');
-
-                setTimeout(() => {
-                    statusUpdateToast.classList.add('hidden');
-                }, 3000);
-            }
 
             // Form submission handler
             form.addEventListener('submit', async function (e) {
@@ -738,7 +741,7 @@
                 const orderId = this.querySelector('input[name="orderId"]').value;
 
                 if (!orderId) {
-                    showToast('Order ID not found. Please refresh the page.', true);
+                    showErrorToast('Order ID not found. Please refresh the page.');
                     return;
                 }
 
@@ -746,14 +749,14 @@
                 const currentStatus = currentStatusElement.textContent.trim();
 
                 if (!status) {
-                    showToast('Please select a status', true);
+                    showErrorToast('Please select a status');
                     return;
                 }
 
                 // Validate status flow
                 const allowedNextStatuses = statusFlow[currentStatus] || [];
                 if (!allowedNextStatuses.includes(status)) {
-                    showToast(`Cannot update status from ${currentStatus} to ${status}`, true);
+                    showErrorToast(`Cannot update status from ${currentStatus} to ${status}`);
                     return;
                 }
 
@@ -761,7 +764,7 @@
                 if (status === 'Delivered' && paymentMethod === 'Cash On Delivery') {
                     const paymentConfirmed = confirm('Has the customer paid the cash on delivery amount?');
                     if (!paymentConfirmed) {
-                        showToast('Please collect payment before marking as delivered', true);
+                        showErrorToast('Please collect payment before marking as delivered');
                         return;
                     }
                 }
@@ -777,7 +780,7 @@
                 if (status === 'Cancel') {
                     const cancelReason = cancelReasonSelect.value;
                     if (!cancelReason) {
-                        showToast('Please select a cancellation reason', true);
+                        showErrorToast('Please select a cancellation reason');
                         return;
                     }
                     data.cancelReason = cancelReason;
@@ -785,7 +788,7 @@
                     if (cancelReason === 'other') {
                         const otherReason = otherReasonText.value.trim();
                         if (!otherReason) {
-                            showToast('Please specify the cancellation reason', true);
+                            showErrorToast('Please specify the cancellation reason');
                             return;
                         }
                         data.otherReason = otherReason;
@@ -823,7 +826,7 @@
                         successMessage = `Order status has been updated to ${status} successfully!`;
                     }
 
-                    showToast(successMessage);
+                    showSuccessToast(successMessage);
 
                     // Refresh the page after a short delay
                     setTimeout(() => {
@@ -832,7 +835,7 @@
 
                 } catch (error) {
                     console.error('Error updating order status:', error);
-                    showToast('Failed to update order status. Please try again.', true);
+                    showErrorToast('Failed to update order status. Please try again.');
                 } finally {
                     // Reset button state
                     submitButton.disabled = false;
@@ -844,22 +847,9 @@
             // Initialize status options
             updateStatusOptions();
         });
-
-        // Global showToast function for use before DOM is fully loaded
-        function showToast(message, isError = false) {
-            const statusUpdateToast = document.getElementById('statusUpdateToast');
-            if (!statusUpdateToast) return;
-
-            statusUpdateToast.textContent = message;
-            statusUpdateToast.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-            statusUpdateToast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-            statusUpdateToast.classList.remove('hidden');
-
-            setTimeout(() => {
-                statusUpdateToast.classList.add('hidden');
-            }, 3000);
-        }
     </script>
+    <script src="/static/js/toastMain.js"></script>
+
 </body>
 
 </html>

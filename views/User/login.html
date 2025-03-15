@@ -7,30 +7,23 @@
     <title>Login - LAPTIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
-    <style>
-        .toast {
-            position: fixed;
-            top: 90px;
-            left: 42%;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: white;
-            z-index: 1000;
-        }
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 
-        .toast.error {
-            background-color: #ff4444;
-            /* Red for errors */
-        }
-
-        .toast.success {
-            background-color: #00C851;
-            /* Green for success */
-        }
-    </style>
 </head>
 
 <body class="bg-gray-100 font-sans">
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
     <header class="p-6 bg-white shadow">
         <div class="container mx-auto text-center">
             <h1 class="text-3xl font-bold logo-font">LAPTIX</h1>
@@ -94,7 +87,6 @@
             <p>&copy; 2025 LAPTIX, Inc.</p>
         </div>
     </footer>
-    <div id="toast-containers"></div>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function (event) {
@@ -121,43 +113,22 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "success") {
-                        window.toast.success(data.message || 'Login successful!');
+                        showSuccessToast(data.message || 'Login successful!');
                         setTimeout(() => {
                             window.location.href = '/'; // Redirect to home page
                         }, 1000); // Wait for 1 second before redirecting
                     } else {
-                        window.toast.error(data.error || 'Login failed. Please try again.');
+                        showErrorToast(data.error || 'Login failed. Please try again.');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    window.toast.error('An error occurred. Please try again.');
+                    showErrorToast('An error occurred. Please try again.');
                 });
         });
-        // Function to display toast messages
-        function showToast(message, type = 'error') {
-            const toastContainer = document.getElementById('toast-containers');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
 
-            setTimeout(() => {
-                toast.remove();
-            }, 5000); // Remove toast after 5 seconds
-        }
-
-        // Check for error messages in the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const errorMessage = urlParams.get('error');
-
-        if (errorMessage) {
-            // Decode the error message (replace '+' with ' ')
-            const decodedErrorMessage = errorMessage.replace(/\+/g, ' ');
-            showToast(decodedErrorMessage, 'error');
-        }
     </script>
-    <script src="/static/js/toast.js"></script>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

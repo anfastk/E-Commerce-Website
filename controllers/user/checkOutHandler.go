@@ -37,7 +37,7 @@ func ShowCheckoutPage(c *gin.Context) {
 	}
 
 	for _, item := range cartItems {
-		if item.ProductVariant.StockQuantity < item.Quantity {
+		if item.ProductVariant.StockQuantity < item.Quantity || item.ProductVariant.StockQuantity == 0 || item.Quantity == 0 {
 			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/cart")
 			return
 		}

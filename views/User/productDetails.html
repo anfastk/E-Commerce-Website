@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacBook Pro Offer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/productPage.css" type="text/css" />
     <script src="/static/js/productpage.js" defer></script>
@@ -138,11 +139,11 @@
                         </button>
                     </a>
                     <a href="/wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
-                            </svg>
-                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
                     <a href="/profile">
                         <button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -268,9 +269,9 @@
                 <p class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                     ₹{{printf "%.2f" .product.SalePrice}} <span class="line-through text-gray-500 text-lg">₹
                         {{printf "%.2f" .product.RegularPrice}}</span>
-                        {{if .product.OfferPercentage}}
-                        <span class="text-red-500">{{.product.OfferPercentage}}% OFF</span>
-                        {{else}}
+                    {{if .product.OfferPercentage}}
+                    <span class="text-red-500">{{.product.OfferPercentage}}% OFF</span>
+                    {{else}}
                     {{end}}
                 </p>
                 <!-- <div class="bg-red-500 text-white rounded px-4 py-1 inline-block text-sm font-semibold mb-4">New Year
@@ -291,7 +292,7 @@
                         class="w-full md:flex-grow h-full bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition">
                         BUY NOW
                     </button>
-                
+
                     <!-- Add to Cart Button -->
                     <form action="/cart/add/{{.product.ID}}" method="post" class="cart-form w-full md:flex-grow">
                         <button
@@ -300,13 +301,14 @@
                         </button>
                     </form>
                 </div>
-                
 
-                
+
+
 
                 <div
                     class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-gray-500 mt-4">
-                    <form action="/wishlist/add/{{.product.ID}}" method="post"><button type="submit" class="text-sm font-medium hover:underline">Add to Wishlist</button></form>
+                    <form action="/wishlist/add/{{.product.ID}}" method="post"><button type="submit"
+                            class="text-sm font-medium hover:underline">Add to Wishlist</button></form>
                     <span class="hidden md:block">|</span>
                     <button class="text-sm font-medium hover:underline">Share product:</button>
                     <div class="flex space-x-2">
@@ -469,8 +471,18 @@
             </div>
         </div>
     </footer>
-    <div id="toast" class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg"></div>
-
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
     <script>
         document.querySelectorAll('.cart-form').forEach(form => {
             form.addEventListener('submit', async function (e) {
@@ -485,28 +497,20 @@
                     });
 
                     if (response.ok) {
-                        showToast("Item added to cart!", "bg-green-500");
+                        showSuccessToast("Item added to cart!");
                     } else {
                         throw new Error("Failed to add item");
                     }
                 } catch (error) {
                     console.error("Error:", error);
-                    showToast("Error adding item to cart!", "bg-red-500");
+                    showErrorToast("Login First");
+                    location.href = "/user/login"
                 }
             });
         });
-
-        function showToast(message, bgColor) {
-            let toast = document.getElementById("toast");
-            toast.textContent = message;
-            toast.className = `fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg ${bgColor}`;
-            toast.classList.remove("hidden");
-
-            setTimeout(() => {
-                toast.classList.add("hidden");
-            }, 3000);
-        }
     </script>
+    <script src="/static/js/toastMain.js"></script>
+
 </body>
 
 </html>

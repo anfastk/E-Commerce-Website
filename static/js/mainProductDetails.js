@@ -381,7 +381,7 @@ if (updateOfferForm) {
                 throw new Error('Network response was not ok');
             })
             .then(data => {
-                alert('Offer updated successfully!');
+                showSuccessToast('Offer updated successfully!');
                 closeModal();
 
                 // Optionally refresh the page or update the UI
@@ -389,7 +389,7 @@ if (updateOfferForm) {
             })
             .catch(error => {
                 console.error('Error updating offer:', error);
-                alert('Failed to update offer. Please try again.');
+                showErrorToast('Failed to update offer. Please try again.');
             });
     });
 }
@@ -444,7 +444,7 @@ if (updateOfferForm) {
                 })
                 .catch(error => {
                     console.error('Error deleting product:', error);
-                    alert('Failed to delete product. Please try again.');
+                    showErrorToast('Failed to delete product. Please try again.');
                 });
             }
         });
