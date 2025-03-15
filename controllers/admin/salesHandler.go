@@ -251,7 +251,7 @@ func GetSalesDashboardData(filter Filter) (SalesDashboardDTO, error) {
 	query := db.Model(&models.Order{}).
 		Select(`
             SUM(oi.total_amount) as total_amount,
-            SUM(oi.total_revenue) - SUM(COALESCE(orders.coupon_discount_amount, 0)) as total_revenue,
+            SUM(orders.total_amount) as total_revenue,
             COUNT(DISTINCT orders.id) as order_count,
             SUM(oi.discount_applied) as discount_applied,
             SUM(COALESCE(orders.coupon_discount_amount, 0)) as coupon_discount
@@ -261,7 +261,6 @@ func GetSalesDashboardData(filter Filter) (SalesDashboardDTO, error) {
                 SELECT 
                     order_id,
                     SUM(sub_total + tax) as total_amount,
-                    SUM(total) as total_revenue,
                     SUM(product_regular_price - product_sale_price) as discount_applied
                 FROM order_items 
                 WHERE order_status = ?
@@ -322,7 +321,6 @@ func calculateDateRange(filter Filter) (*time.Time, *time.Time) {
 		startDate = time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, startDate.Location())
 		endDate = now
 	case "daily":
-		// Set startDate to 7 days ago from midnight today, endDate to end of today
 		startDate = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).AddDate(0, 0, -7)
 		endDate = time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 999999999, now.Location())
 	case "yearly":
@@ -432,13 +430,11 @@ func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.T
 	query.Group(groupBy).Order(orderBy + " ASC").Scan(&tempResults)
 
 	if filter.Period == "daily" {
-		// Ensure exactly 8 days (today + past 7 days)
 		results = make([]SalesOverviewDTO, 8)
 		today := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
 		start := today.AddDate(0, 0, -7)
 		dateMap := make(map[string]SalesOverviewDTO)
 
-		// Populate map with data from query
 		for _, temp := range tempResults {
 			label := labelFunc(temp.Month)
 			dateMap[label] = SalesOverviewDTO{
@@ -449,7 +445,6 @@ func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.T
 			}
 		}
 
-		// Fill results with 8 days, using data if available
 		for i := 0; i < 8; i++ {
 			day := start.AddDate(0, 0, i)
 			label := labelFunc(day)
@@ -621,7 +616,7 @@ func generateExcelReport(data SalesDashboardDTO, fileName string) ([]byte, strin
 	f.NewSheet(summarySheet)
 	f.DeleteSheet("Sheet1")
 
-	f.SetCellValue(summarySheet, "A1", "Sales Dashboard Summary")
+	f.SetCellValue(summarySheet, "A1", "Sales Summary")
 	f.SetCellValue(summarySheet, "A3", "Metric")
 	f.SetCellValue(summarySheet, "B3", "Value")
 	f.SetCellValue(summarySheet, "A4", "Total Amount")
@@ -688,7 +683,7 @@ func generatePDFReport(data SalesDashboardDTO, fileName string) ([]byte, string,
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
-	pdf.Cell(190, 10, "Sales Dashboard Report")
+	pdf.Cell(190, 10, "Sales Report")
 	pdf.Ln(15)
 
 	pdf.SetFont("Arial", "B", 12)

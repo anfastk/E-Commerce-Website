@@ -82,7 +82,7 @@
                 if (response.ok) {
                     // Successful login - Redirect to dashboard
                     console.log('Login successful:', result);
-                    window.location.href = '/admin/products/';
+                    window.location.href = '/admin/dashboard/';
                 } else {
                     // Display error messages under respective fields
                     if (result.error.includes("Email")) {

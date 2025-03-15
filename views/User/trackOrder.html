@@ -146,10 +146,10 @@
                 </div>
                 <div class="flex items-center space-x-2 mt-2 sm:mt-0">
                     {{if not (or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") (eq .OrderItem.OrderStatus "Cancelled"))}}
-                    <button
+                    <a href="/profile/order/details/track/invoices/{{.Order.ID}}"
                         class="inline-flex items-center bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition border border-blue-400 backdrop-blur-md ">
                         <i class="fas fa-download mr-2"></i> Download Invoice
-                    </button>
+                </a>
                     {{end}}
                     {{if .isAllOrderCancel}}
 

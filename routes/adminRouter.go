@@ -107,4 +107,14 @@ func AdminRoutes(r *gin.Engine) {
 		wallet.GET("/management", controllers.ShowWalletManagement)
 		wallet.GET("/management/details/:id", controllers.ShowTransactionDetails)
 	}
+
+	adminDashboard := r.Group("/admin/dashboard")
+	adminDashboard.Use(middleware.AuthMiddleware(RoleAdmin))
+	adminDashboard.Use(middleware.NoCacheMiddleware())
+	{
+		adminDashboard.GET("/", controllers.DashboardHandler)
+		adminDashboard.GET("/stats", controllers.StatsHandler)
+		adminDashboard.GET("/orders", controllers.OrdersHandler)
+		adminDashboard.GET("/charts", controllers.ChartsHandler)
+	}
 }

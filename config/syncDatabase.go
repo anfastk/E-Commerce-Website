@@ -19,4 +19,5 @@ func SyncDatabase() {
 		log.Fatalf("Failed to migrate models: %v",err)
 	}
 	log.Println("Models migrated")
+	DownloadLogo()
 }

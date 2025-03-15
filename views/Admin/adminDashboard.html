@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laptix Admin Category Management</title>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <script src="/static/js/nav&sideBar.js" defer></script>
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        .card-stats {
+            transition: all 0.3s ease;
+        }
+
+        .card-stats:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .date-filter {
+            position: relative;
+        }
+
+        .date-filter-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            z-index: 10;
+        }
+
+        .date-filter:hover .date-filter-dropdown {
+            display: block;
+        }
+
+        .custom-date-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+
+        .custom-date-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            margin: 15% auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+        <div class="py-6 px-4 flex items-center justify-start space-x-4">
+            <!-- Hamburger Menu for Small Screens inside Sidebar -->
+            <button class="lg:hidden text-white" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
+        </div>
+        <nav class="flex-1">
+            <ul>
+                <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="bg-black">
+                        <path
+                            d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2" />
+                    </svg>
+                    <a href="/admin/dashboard" class="text-base font-medium  text-black ">Dashboard</a>
+                </li>
+                <li class="py-3 px-4 flex items-center space-x-2">
+                    <!-- All Products Button with Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
+                        fill="currentColor">
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87" />
+                        <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
+                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                    </svg>
+                    <a href="/admin/products" class="text-base font-medium hover:text-blue-500">All Products</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor" fill-rule="evenodd"
+                            d="M14.25 2.5a.25.25 0 0 0-.25-.25H7A2.75 2.75 0 0 0 4.25 5v14A2.75 2.75 0 0 0 7 21.75h10A2.75 2.75 0 0 0 19.75 19V9.147a.25.25 0 0 0-.25-.25H15a.75.75 0 0 1-.75-.75zm.75 9.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5zm0 4a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1 0-1.5z"
+                            clip-rule="evenodd" />
+                        <path fill="currentColor"
+                            d="M15.75 2.824c0-.184.193-.301.336-.186q.182.147.323.342l3.013 4.197c.068.096-.006.22-.124.22H16a.25.25 0 0 1-.25-.25z" />
+                    </svg>
+                    <a href="/admin/orderlist" class="text-base font-medium hover:text-blue-500">Order List</a>
+                </li>
+                <li class="py-3 px-4  flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M12 12.75c3.942 0 7.987 2.563 8.249 7.712a.75.75 0 0 1-.71.787c-2.08.106-11.713.171-15.077 0a.75.75 0 0 1-.711-.787C4.013 15.314 8.058 12.75 12 12.75m0-9a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 0 0 0-7.5" />
+                    </svg>
+                    <a href="/admin/users" class="text-base font-medium hover:text-blue-500">User Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2" />
+                    </svg>
+                    <a href="/admin/category" class="text-base font-medium hover:text-blue-500">Category Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="currentColor"
+                            d="M14.8 8L16 9.2L9.2 16L8 14.8zM4 4h16c1.11 0 2 .89 2 2v4a2 2 0 1 0 0 4v4c0 1.11-.89 2-2 2H4a2 2 0 0 1-2-2v-4c1.11 0 2-.89 2-2a2 2 0 0 0-2-2V6a2 2 0 0 1 2-2m0 2v2.54a3.994 3.994 0 0 1 0 6.92V18h16v-2.54a3.994 3.994 0 0 1 0-6.92V6zm5.5 2c.83 0 1.5.67 1.5 1.5S10.33 11 9.5 11S8 10.33 8 9.5S8.67 8 9.5 8m5 5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5" />
+                    </svg>
+                    <a href="/admin/coupon" class="text-base font-medium hover:text-blue-500">Coupon Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M21 6h-2V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2ZM5 4h12v2H5V4Zm16 16H5V8h16v12Zm-4-7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+                    </svg>
+                    <a href="/admin/wallet/management" class="text-base font-medium hover:text-blue-500 pl-2">Wallet
+                        Management</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
+                        <path fill="currentColor"
+                            d="M30 6V4h-3V2h-2v2h-1c-1.103 0-2 .898-2 2v2c0 1.103.897 2 2 2h4v2h-6v2h3v2h2v-2h1c1.103 0 2-.897 2-2v-2c0-1.102-.897-2-2-2h-4V6zm-6 14v2h2.586L23 25.586l-2.292-2.293a1 1 0 0 0-.706-.293H20a1 1 0 0 0-.706.293L14 28.586L15.414 30l4.587-4.586l2.292 2.293a1 1 0 0 0 1.414 0L28 23.414V26h2v-6zM4 30H2v-5c0-3.86 3.14-7 7-7h6c1.989 0 3.89.85 5.217 2.333l-1.49 1.334A5 5 0 0 0 15 20H9c-2.757 0-5 2.243-5 5zm8-14a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-12a5 5 0 1 1 0 10a5 5 0 0 1 0-10" />
+                    </svg>
+                    <a href="/sales" class="text-base font-medium hover:text-blue-500">Sales</a>
+                </li>
+                <li class="py-3 px-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M7.05 6.462a2 2 0 0 0 2.63-1.519l.32-1.72a9 9 0 0 1 3.998 0l.322 1.72a2 2 0 0 0 2.63 1.519l1.649-.58a9 9 0 0 1 2.001 3.46l-1.33 1.14a2 2 0 0 0 0 3.037l1.33 1.139a9 9 0 0 1-2.001 3.46l-1.65-.58a2 2 0 0 0-2.63 1.519L14 20.777a9 9 0 0 1-3.998 0l-.322-1.72a2 2 0 0 0-2.63-1.519l-1.649.58a9 9 0 0 1-2.001-3.46l1.33-1.14a2 2 0 0 0 0-3.036L3.4 9.342a9 9 0 0 1 2-3.46zM12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <a href="/admin/settings" class="text-base font-medium hover:text-blue-500">Settings</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Top Navigation -->
+        <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-10 ">
+            <!-- Hamburger Menu for Small Screens (Main Header) -->
+            <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Logo -->
+            <h1 class="text-2xl font-bold tracking-wide logo-font block lg:hidden">LAPTIX</h1>
+
+            <div class="flex-grow lg:flex-grow-0"></div>
+            <!-- Right-aligned buttons -->
+            <div class="flex items-center space-x-4 ml-auto">
+                <!-- Search Button -->
+                <button id="search-button" onclick="toggleSearchBar()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <g fill="none" fill-rule="evenodd">
+                            <path
+                                d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                            <path fill="currentColor"
+                                d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0" />
+                        </g>
+                    </svg>
+                </button>
+
+                <!-- Search Bar Container -->
+                <div id="search-bar-container"
+                    class="hidden flex items-center border-2 border-blue-500 rounded-xl px-4 py-2 space-x-4">
+                    <!-- Search Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M12.9 14.32a8 8 0 111.414-1.415l4.387 4.387a1 1 0 01-1.414 1.415l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+
+                    <!-- Input Field -->
+                    <input id="search-input" type="text" placeholder="Search..."
+                        class="outline-none bg-transparent text-lg" />
+                    <!-- Clear Button -->
+                    <button onclick="clearSearch()" class="text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-6">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
+            </div>
+
+            <!-- Stats Section with Filter -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Statistics</h2>
+                    <div class="relative date-filter">
+                        <button id="statsPeriodBtn"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
+                            <span class="mr-2">Monthly</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div
+                            class="date-filter-dropdown bg-white shadow-lg rounded-lg border border-gray-200 py-2 w-36">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="daily">Daily</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="weekly">Weekly</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-indigo-50 text-indigo-600"
+                                data-period="monthly">Monthly</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="yearly">Yearly</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="custom">Custom</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
+                    <div id="totalAmountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="orderCountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="revenueCard" class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="avgOrderValueCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="userCountCard" class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="productsCountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="categoryCountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="cancelledOrderCountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100"></div>
+                    <div id="totalDiscountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    </div>
+                    <div id="couponDiscountCard"
+                        class="card-stats bg-white rounded-xl shadow-sm p-6 border border-gray-100"></div>
+                </div>
+            </div>
+
+            <!-- Sales Graph -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Sales Overview</h2>
+                    <div class="relative date-filter">
+                        <button id="salesPeriodBtn"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
+                            <span class="mr-2">Monthly</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div
+                            class="date-filter-dropdown bg-white shadow-lg rounded-lg border border-gray-200 py-2 w-36">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="daily">Daily</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="weekly">Weekly</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-indigo-50 text-indigo-600"
+                                data-period="monthly">Monthly</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="yearly">Yearly</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                data-period="custom">Custom</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- Best Selling Products -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Best Selling Products</h2>
+                        <div class="relative date-filter">
+                            <button id="productsPeriodBtn"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium transition flex items-center">
+                                <span class="mr-1">Monthly</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div
+                                class="date-filter-dropdown bg-white shadow-lg rounded-lg border border-gray-200 py-2 w-32">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="daily">Daily</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="weekly">Weekly</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-indigo-50 text-indigo-600"
+                                    data-period="monthly">Monthly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="yearly">Yearly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="custom">Custom</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Best Selling Categories -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Best Selling Categories</h2>
+                        <div class="relative date-filter">
+                            <button id="categoriesPeriodBtn"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium transition flex items-center">
+                                <span class="mr-1">Monthly</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div
+                                class="date-filter-dropdown bg-white shadow-lg rounded-lg border border-gray-200 py-2 w-32">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="daily">Daily</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="weekly">Weekly</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-indigo-50 text-indigo-600"
+                                    data-period="monthly">Monthly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="yearly">Yearly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="custom">Custom</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoriesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Best Selling Brands -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Best Selling Brands</h2>
+                        <div class="relative date-filter">
+                            <button id="brandsPeriodBtn"
+                                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium transition flex items-center">
+                                <span class="mr-1">Monthly</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div
+                                class="date-filter-dropdown bg-white shadow-lg rounded-lg border border-gray-200 py-2 w-32">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="daily">Daily</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="weekly">Weekly</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-indigo-50 text-indigo-600"
+                                    data-period="monthly">Monthly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="yearly">Yearly</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    data-period="custom">Custom</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="brandsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Recent Orders</h2>
+                    <a href="/admin/orderlist" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View All Orders</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table id="recentOrdersTable" class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Order ID</th>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Customer</th>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Products</th>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount</th>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date</th>
+                                <th
+                                    class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersBody" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Custom Date Modals -->
+            <div id="statsCustomModal" class="custom-date-modal">
+                <div class="custom-date-content">
+                    <h3 class="text-lg font-bold mb-4">Custom Date Range</h3>
+                    <input type="date" id="statsCustomStart" class="w-full mb-2 p-2 border rounded">
+                    <input type="date" id="statsCustomEnd" class="w-full mb-4 p-2 border rounded">
+                    <div class="flex justify-between">
+                        <button id="statsCustomApply"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Apply</button>
+                        <button id="statsCustomCancel"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="salesCustomModal" class="custom-date-modal">
+                <div class="custom-date-content">
+                    <h3 class="text-lg font-bold mb-4">Custom Date Range</h3>
+                    <input type="date" id="salesCustomStart" class="w-full mb-2 p-2 border rounded">
+                    <input type="date" id="salesCustomEnd" class="w-full mb-4 p-2 border rounded">
+                    <div class="flex justify-between">
+                        <button id="salesCustomApply"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Apply</button>
+                        <button id="salesCustomCancel"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="productsCustomModal" class="custom-date-modal">
+                <div class="custom-date-content">
+                    <h3 class="text-lg font-bold mb-4">Custom Date Range</h3>
+                    <input type="date" id="productsCustomStart" class="w-full mb-2 p-2 border rounded">
+                    <input type="date" id="productsCustomEnd" class="w-full mb-4 p-2 border rounded">
+                    <div class="flex justify-between">
+                        <button id="productsCustomApply"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Apply</button>
+                        <button id="productsCustomCancel"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="categoriesCustomModal" class="custom-date-modal">
+                <div class="custom-date-content">
+                    <h3 class="text-lg font-bold mb-4">Custom Date Range</h3>
+                    <input type="date" id="categoriesCustomStart" class="w-full mb-2 p-2 border rounded">
+                    <input type="date" id="categoriesCustomEnd" class="w-full mb-4 p-2 border rounded">
+                    <div class="flex justify-between">
+                        <button id="categoriesCustomApply"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Apply</button>
+                        <button id="categoriesCustomCancel"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="brandsCustomModal" class="custom-date-modal">
+                <div class="custom-date-content">
+                    <h3 class="text-lg font-bold mb-4">Custom Date Range</h3>
+                    <input type="date" id="brandsCustomStart" class="w-full mb-2 p-2 border rounded">
+                    <input type="date" id="brandsCustomEnd" class="w-full mb-4 p-2 border rounded">
+                    <div class="flex justify-between">
+                        <button id="brandsCustomApply"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Apply</button>
+                        <button id="brandsCustomCancel"
+                            class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+    <script>
+        // Initialize charts
+        const salesChart = new Chart(document.getElementById('salesChart').getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Sales', data: [], borderColor: 'rgb(79, 70, 229)', fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const productsChart = new Chart(document.getElementById('productsChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+
+        const categoriesChart = new Chart(document.getElementById('categoriesChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+
+        const brandsChart = new Chart(document.getElementById('brandsChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+
+        // Function to fetch and update stats
+        function updateStats(period = 'monthly', startDate = null, endDate = null) {
+            let url = `/admin/dashboard/stats?period=${period}`;
+            if (period === 'custom' && startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalAmountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Total Amount</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">₹${data.total_amount.toLocaleString()}</h3>
+                            </div>
+                            <div class="bg-blue-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-dollar-sign text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('orderCountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Order Count</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">${data.order_count}</h3>
+                            </div>
+                            <div class="bg-purple-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-shopping-cart text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('revenueCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Revenue</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">₹${data.revenue.toLocaleString()}</h3>
+                            </div>
+                            <div class="bg-green-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('avgOrderValueCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Avg. Order Value</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">₹${data.avg_order_value.toFixed(2)}</h3>
+                            </div>
+                            <div class="bg-yellow-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-tags text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('userCountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">User Count</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">${data.user_count.toLocaleString()}</h3>
+                            </div>
+                            <div class="bg-indigo-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-users text-indigo-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('productsCountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Products Count</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">${data.products_count}</h3>
+                            </div>
+                            <div class="bg-teal-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-box text-teal-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('categoryCountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Category Count</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">${data.category_count}</h3>
+                            </div>
+                            <div class="bg-orange-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-layer-group text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('cancelledOrderCountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Cancelled Orders</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">${data.cancelled_order_count}</h3>
+                            </div>
+                            <div class="bg-red-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('totalDiscountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Total Discount</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">₹${data.total_discount.toLocaleString()}</h3>
+                            </div>
+                            <div class="bg-red-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-percentage text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('couponDiscountCard').innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Coupon Discount</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">₹${data.coupon_discount.toLocaleString()}</h3>
+                            </div>
+                            <div class="bg-pink-100 rounded-full h-12 w-12 flex items-center justify-center">
+                                <i class="fas fa-ticket-alt text-pink-600 text-xl"></i>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        }
+
+        // Function to fetch and update recent orders
+        function updateOrders() {
+            fetch('/admin/dashboard/orders')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('ordersBody');
+                    tbody.innerHTML = '';
+                    data.orders.forEach(order => {
+                        const statusColor = {
+                            'Delivered': 'bg-green-100 text-green-800',
+                            'Shipped': 'bg-blue-100 text-blue-800',
+                            'Pending': 'bg-yellow-100 text-yellow-800',
+                            'Cancelled': 'bg-red-100 text-red-800'
+                        };
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.order_id}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.customer}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.products}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${order.amount.toLocaleString()}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.date}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor[order.status] || 'bg-gray-100 text-gray-800'}">${order.status}</span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(error => console.error('Error fetching orders:', error));
+        }
+
+        // Function to update sales chart
+        function updateSalesChart(period = 'monthly', startDate = null, endDate = null) {
+            let url = `/admin/dashboard/charts?period=${period}&section=sales`;
+            if (period === 'custom' && startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    salesChart.data.labels = Object.keys(data.sales);
+                    salesChart.data.datasets[0].data = Object.values(data.sales);
+                    salesChart.update();
+                })
+                .catch(error => console.error('Error fetching sales chart:', error));
+        }
+
+        // Function to update products chart
+        function updateProductsChart(period = 'monthly', startDate = null, endDate = null) {
+            let url = `/admin/dashboard/charts?period=${period}&section=products`;
+            if (period === 'custom' && startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    productsChart.data.labels = Object.keys(data.products);
+                    productsChart.data.datasets[0].data = Object.values(data.products);
+                    productsChart.data.datasets[0].backgroundColor = [
+                        'rgba(79, 70, 229, 0.9)', 'rgba(59, 130, 246, 0.9)', 'rgba(16, 185, 129, 0.9)',
+                        'rgba(245, 158, 11, 0.9)', 'rgba(239, 68, 68, 0.9)', 'rgba(168, 85, 247, 0.9)',
+                        'rgba(236, 72, 153, 0.9)', 'rgba(249, 115, 22, 0.9)', 'rgba(99, 102, 241, 0.9)',
+                        'rgba(6, 182, 212, 0.9)'
+                    ];
+                    productsChart.update();
+                })
+                .catch(error => console.error('Error fetching products chart:', error));
+        }
+
+        // Function to update categories chart
+        function updateCategoriesChart(period = 'monthly', startDate = null, endDate = null) {
+            let url = `/admin/dashboard/charts?period=${period}&section=categories`;
+            if (period === 'custom' && startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    categoriesChart.data.labels = Object.keys(data.categories);
+                    categoriesChart.data.datasets[0].data = Object.values(data.categories);
+                    categoriesChart.data.datasets[0].backgroundColor = [
+                        'rgba(16, 185, 129, 0.9)', 'rgba(59, 130, 246, 0.9)', 'rgba(245, 158, 11, 0.9)',
+                        'rgba(239, 68, 68, 0.9)', 'rgba(168, 85, 247, 0.9)', 'rgba(236, 72, 153, 0.9)',
+                        'rgba(249, 115, 22, 0.9)', 'rgba(79, 70, 229, 0.9)', 'rgba(6, 182, 212, 0.9)',
+                        'rgba(99, 102, 241, 0.9)'
+                    ];
+                    categoriesChart.update();
+                })
+                .catch(error => console.error('Error fetching categories chart:', error));
+        }
+
+        // Function to update brands chart
+        function updateBrandsChart(period = 'monthly', startDate = null, endDate = null) {
+            let url = `/admin/dashboard/charts?period=${period}&section=brands`;
+            if (period === 'custom' && startDate && endDate) {
+                url += `&start_date=${startDate}&end_date=${endDate}`;
+            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    brandsChart.data.labels = Object.keys(data.brands);
+                    brandsChart.data.datasets[0].data = Object.values(data.brands);
+                    brandsChart.data.datasets[0].backgroundColor = [
+                        'rgba(239, 68, 68, 0.9)', 'rgba(59, 130, 246, 0.9)', 'rgba(16, 185, 129, 0.9)',
+                        'rgba(245, 158, 11, 0.9)', 'rgba(168, 85, 247, 0.9)', 'rgba(236, 72, 153, 0.9)',
+                        'rgba(79, 70, 229, 0.9)', 'rgba(249, 115, 22, 0.9)', 'rgba(6, 182, 212, 0.9)',
+                        'rgba(99, 102, 241, 0.9)'
+                    ];
+                    brandsChart.update();
+                })
+                .catch(error => console.error('Error fetching brands chart:', error));
+        }
+
+        // Function to close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Event Listeners for Stats
+        document.querySelectorAll('#statsPeriodBtn + .date-filter-dropdown a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const period = e.target.getAttribute('data-period');
+                document.getElementById('statsPeriodBtn').querySelector('span').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+                if (period === 'custom') {
+                    document.getElementById('statsCustomModal').style.display = 'block';
+                } else {
+                    updateStats(period);
+                }
+            });
+        });
+
+        document.getElementById('statsCustomApply').addEventListener('click', () => {
+            const startDate = document.getElementById('statsCustomStart').value;
+            const endDate = document.getElementById('statsCustomEnd').value;
+            if (startDate && endDate) {
+                updateStats('custom', startDate, endDate);
+                closeModal('statsCustomModal');
+            }
+        });
+
+        document.getElementById('statsCustomCancel').addEventListener('click', () => closeModal('statsCustomModal'));
+
+        // Event Listeners for Sales Chart
+        document.querySelectorAll('#salesPeriodBtn + .date-filter-dropdown a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const period = e.target.getAttribute('data-period');
+                document.getElementById('salesPeriodBtn').querySelector('span').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+                if (period === 'custom') {
+                    document.getElementById('salesCustomModal').style.display = 'block';
+                } else {
+                    updateSalesChart(period);
+                }
+            });
+        });
+
+        document.getElementById('salesCustomApply').addEventListener('click', () => {
+            const startDate = document.getElementById('salesCustomStart').value;
+            const endDate = document.getElementById('salesCustomEnd').value;
+            if (startDate && endDate) {
+                updateSalesChart('custom', startDate, endDate);
+                closeModal('salesCustomModal');
+            }
+        });
+
+        document.getElementById('salesCustomCancel').addEventListener('click', () => closeModal('salesCustomModal'));
+
+        // Event Listeners for Products Chart
+        document.querySelectorAll('#productsPeriodBtn + .date-filter-dropdown a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const period = e.target.getAttribute('data-period');
+                document.getElementById('productsPeriodBtn').querySelector('span').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+                if (period === 'custom') {
+                    document.getElementById('productsCustomModal').style.display = 'block';
+                } else {
+                    updateProductsChart(period);
+                }
+            });
+        });
+
+        document.getElementById('productsCustomApply').addEventListener('click', () => {
+            const startDate = document.getElementById('productsCustomStart').value;
+            const endDate = document.getElementById('productsCustomEnd').value;
+            if (startDate && endDate) {
+                updateProductsChart('custom', startDate, endDate);
+                closeModal('productsCustomModal');
+            }
+        });
+
+        document.getElementById('productsCustomCancel').addEventListener('click', () => closeModal('productsCustomModal'));
+
+        // Event Listeners for Categories Chart
+        document.querySelectorAll('#categoriesPeriodBtn + .date-filter-dropdown a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const period = e.target.getAttribute('data-period');
+                document.getElementById('categoriesPeriodBtn').querySelector('span').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+                if (period === 'custom') {
+                    document.getElementById('categoriesCustomModal').style.display = 'block';
+                } else {
+                    updateCategoriesChart(period);
+                }
+            });
+        });
+
+        document.getElementById('categoriesCustomApply').addEventListener('click', () => {
+            const startDate = document.getElementById('categoriesCustomStart').value;
+            const endDate = document.getElementById('categoriesCustomEnd').value;
+            if (startDate && endDate) {
+                updateCategoriesChart('custom', startDate, endDate);
+                closeModal('categoriesCustomModal');
+            }
+        });
+
+        document.getElementById('categoriesCustomCancel').addEventListener('click', () => closeModal('categoriesCustomModal'));
+
+        // Event Listeners for Brands Chart
+        document.querySelectorAll('#brandsPeriodBtn + .date-filter-dropdown a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const period = e.target.getAttribute('data-period');
+                document.getElementById('brandsPeriodBtn').querySelector('span').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+                if (period === 'custom') {
+                    document.getElementById('brandsCustomModal').style.display = 'block';
+                } else {
+                    updateBrandsChart(period);
+                }
+            });
+        });
+
+        document.getElementById('brandsCustomApply').addEventListener('click', () => {
+            const startDate = document.getElementById('brandsCustomStart').value;
+            const endDate = document.getElementById('brandsCustomEnd').value;
+            if (startDate && endDate) {
+                updateBrandsChart('custom', startDate, endDate);
+                closeModal('brandsCustomModal');
+            }
+        });
+
+        document.getElementById('brandsCustomCancel').addEventListener('click', () => closeModal('brandsCustomModal'));
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.custom-date-modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-date-content')) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Initial load
+        updateStats();
+        updateOrders();
+        updateSalesChart();
+        updateProductsChart();
+        updateCategoriesChart();
+        updateBrandsChart();
+    </script>
+</body>
+
+</html>

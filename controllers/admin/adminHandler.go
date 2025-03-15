@@ -25,7 +25,7 @@ func ShowLoginPage(c *gin.Context) {
         })
 
         if err == nil && token.Valid {
-            c.Redirect(http.StatusSeeOther, "/admin/products")
+            c.Redirect(http.StatusSeeOther, "/admin/dashboard")
             return
         }
     }

@@ -18,6 +18,5 @@ type ShippingAddress struct {
 	City      string   `gorm:"size:100"`
 	PinCode   string   `gorm:"not null"`
 	IsDefault bool     `gorm:"default:false"`
-	Order     Order    `gorm:"foreignKey:OrderID;references:ID"`
 	UserAuth  UserAuth `gorm:"foreignKey:UserID;references:ID"`
 }
