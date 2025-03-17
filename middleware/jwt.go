@@ -115,6 +115,9 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 		c.Next()
 	}
 }
+func GetJwtKey() []byte {
+    return JwtSecretKey
+}
 
 func NoCacheMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

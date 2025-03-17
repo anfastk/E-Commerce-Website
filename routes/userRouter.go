@@ -19,7 +19,7 @@ func UserRouter(r *gin.Engine) {
 	r.GET("/", middleware.NoCacheMiddleware(), controllers.UserHome)
 	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
 	r.GET("/products/details/:id", middleware.NoCacheMiddleware(), controllers.ShowProductDetail)
-	r.POST("/products/filter", controllers.FilterProducts)
+	r.GET("/products/filter", controllers.FilterProducts)
 	r.POST("/checkout/payment/verify", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
 	r.GET("/order/success", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
 	r.POST("/order/failed", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)

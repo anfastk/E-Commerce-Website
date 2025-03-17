@@ -127,7 +127,7 @@
                                     </div>
 
                                     {{else}}
-                                    <p>Out Of Stock</p>
+                                    <p class="text-red-500 text-lg font-bold">Out Of Stock</p>
                                     {{end}}
                                     <button class="text-red-500" onclick="deleteCartItem(`{{.Item.ID}}`)">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
@@ -233,50 +233,100 @@
         <h2 class="text-2xl font-semibold text-gray-800 mb-8">You May Also Like</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Product Card 1 -->
+            <!-- Product Card -->
             {{range .Suggestion}}
-            <div class="bg-white shadow-lg rounded-lg p-4 relative group">
-                <a href="/products/details/{{.ID}}">
-                    <span
-                        class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded z-10">-13%</span>
-                    <div class="relative">
-                        {{if len .Images}}
-                        <img src="{{index .Images 0}}" alt="{{.ProductName}}" class="w-full h-[262px] object-contain">
-                        {{end}}
-                        <button
-                            class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                </a>
-                <div class="mt-4">
-                    <a href="/products/details/{{.ID}}">
+            <div
+                class="max-w-xs bg-white rounded-xl shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full">
+                <!-- Product Image -->
+                <div class="relative flex justify-center h-64">
+                    <img src="{{.Images}}" alt="Product" class="w-3/4 h-full object-contain">
 
-                        <h3 class="text-gray-800 font-medium mb-2">{{.ProductName}}</h3>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="line-through text-gray-500">&#8377; {{printf "%.2f"
-                                    .RegularPrice}}</span>
-                                <span class="font-bold text-gray-900">&#8377; {{printf "%.2f" .SalePrice}}</span>
-                            </div>
-                    </a>
-                    <!-- Replace your existing add to cart button with this -->
-                    <button onclick="addToCart('{{.ID}}'); return false;" class="text-gray-600 hover:text-gray-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                    <!-- Discount Tag -->
+                    <div
+                        class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        {{if gt .OfferPersentage 5}}{{.OfferPersentage}}% OFF {{else}}SALE{{end}}
+                    </div>
+
+                    <!-- Wishlist Button -->
+                    <button
+                        class="wishlist-btn absolute top-3 right-3 bg-white bg-opacity-80 rounded-full p-2 shadow-md hover:bg-red-50 transition-all duration-300 group"
+                        data-id="{{.ID}}" data-in-wishlist="{{.IsInWishlist}}"
+                        onclick="toggleWishlist(this); return false;">
+                        <svg class="w-5 h-5 transition-colors duration-300 {{if .IsInWishlist}}text-red-500{{else}}text-gray-500{{end}}"
+                            fill="{{if .IsInWishlist}}currentColor{{else}}none{{end}}" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                            </path>
                         </svg>
                     </button>
                 </div>
+
+                <!-- Product Info -->
+                <div class="p-5 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span
+                                class="text-xs font-medium text-indigo-500 uppercase tracking-wider">{{.CategoryName}}</span>
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight mt-1 line-clamp-2">{{.ProductName}}
+                            </h3>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm text-gray-400 line-through">₹{{printf "%.2f" .RegularPrice}}</span>
+                            <span class="text-xl font-bold text-gray-800">₹{{printf "%.2f" .SalePrice}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="flex items-center space-x-1 mb-4">
+                        <div class="flex text-yellow-400">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                </path>
+                            </svg>
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                </path>
+                            </svg>
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                </path>
+                            </svg>
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                </path>
+                            </svg>
+                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="text-xs text-gray-500">(128)</span>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <div class="flex space-x-2 mt-auto">
+                        <button onclick="addToCart('{{.ID}}'); return false;"
+                            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md">
+                            <div class="flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                                Add to Cart
+                            </div>
+                        </button>
+                    </div>
+                </div>
             </div>
+            {{end}}
         </div>
-        {{end}}
-    </div>
     </div>
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
@@ -345,6 +395,71 @@
     </footer>
     <!-- Frontend HTML (Add this script section at the bottom of your page) -->
     <script>
+        function toggleWishlist(btn) {
+            const productId = btn.getAttribute('data-id');
+            const isInWishlist = btn.getAttribute('data-in-wishlist') === 'true';
+
+            // Get the SVG element
+            const svgIcon = btn.querySelector('svg');
+
+            // Set the URL based on current state
+            const url = isInWishlist ? `/wishlist/remove/${productId}` : `/wishlist/add/${productId}`;
+
+            // Add a loading state
+            btn.classList.add('animate-pulse');
+
+            // Make the AJAX request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update the button state
+                    btn.setAttribute('data-in-wishlist', !isInWishlist);
+
+                    // Update the heart icon with animation
+                    if (isInWishlist) {
+                        // Remove from wishlist animation
+                        svgIcon.classList.remove('text-red-500');
+                        svgIcon.classList.add('text-gray-500');
+                        svgIcon.setAttribute('fill', 'none');
+
+                        // Add a quick pulse effect
+                        svgIcon.classList.add('animate-ping');
+                        setTimeout(() => {
+                            svgIcon.classList.remove('animate-ping');
+                        }, 300);
+                    } else {
+                        // Add to wishlist animation
+                        svgIcon.classList.remove('text-gray-500');
+                        svgIcon.classList.add('text-red-500');
+                        svgIcon.setAttribute('fill', 'currentColor');
+
+                        // Add heart beat animation
+                        svgIcon.classList.add('animate-bounce');
+                        setTimeout(() => {
+                            svgIcon.classList.remove('animate-bounce');
+                        }, 500);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Revert to original state if there's an error
+                })
+                .finally(() => {
+                    // Remove loading state
+                    btn.classList.remove('animate-pulse');
+                });
+        }
         function updateCartTotalAndCount() {
             fetch('/cart/total')
                 .then(response => response.json())
@@ -402,8 +517,10 @@
                         // Show success toast message
                         showSuccessToast("Item added to cart!");
 
-                        // Optional: Remove page reload if not necessary
-                        window.location.reload();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+
                     } else {
                         showErrorToast(data.message || "Failed to add item");
                     }
@@ -515,7 +632,7 @@
                 })
                 .catch(error => {
                     // Show only the error message in alert box
-                    alert(error.message);
+                    showErrorToast(error.message);
                 });
         });
     </script>

@@ -277,49 +277,200 @@
                 <!-- <div class="bg-red-500 text-white rounded px-4 py-1 inline-block text-sm font-semibold mb-4">New Year
                     Offer</div> -->
 
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-1">Color</label>
-                    <div class="flex items-center space-x-4">
-                        <button
-                            class="w-8 h-8 bg-orange-500 rounded-full border-2 border-gray-400 focus:ring-2 ring-orange-400"></button>
-                        <button class="w-8 h-8 bg-gray-300 rounded-full border-2 border-gray-400"></button>
+                <div class="my-4">
+                    <label class="block text-gray-800 font-bold mb-3 text-lg">Select Your Perfect Variant</label>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="/products/details/{{.product.ID}}">
+                            {{if gt .product.Stock 0}}
+                            <div
+                                class="relative border-2 border-blue-500 rounded-lg p-2 cursor-pointer w-40 shadow-md hover:shadow-lg transition-all duration-300">
+                                <div class="bg-white p-3 rounded flex flex-col items-center">
+                                    <div class="bg-white mb-2 w-full flex justify-center">
+                                        <img src="{{index .product.Images 0}}" alt="Navy Blue Headphones"
+                                            class="mb-1" />
+                                    </div>
+                                    <p class="font-bold text-sm text-blue-800">{{.product.Color}}</p>
+                                    {{if .product.Ram}}
+                                    <p class="text-xs bg-gray-100 rounded-full px-2 py-1 my-1 font-medium">
+                                        {{.product.Storage}} + {{.product.Ram}}</p>
+                                    {{else}}
+                                    {{end}}
+                                    {{if gt .product.Stock 5}}
+                                    {{else}}
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div
+                                            class="bg-red-100 bg-opacity-70 px-3 py-1 rounded-full text-xs font-bold text-red-600 shadow border border-red-500">
+                                            {{.product.Stock}} Stock Left
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f"
+                                        .product.RegularPrice}}
+                                    </p>
+                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f" .product.SalePrice}}
+                                    </p>
+                                    <span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-1">{{.product.OfferPercentage}}%
+                                        OFF</span>
+                                </div>
+                                <div
+                                    class="absolute -top-2 -right-2 bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center shadow-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            {{else}}
+                            <div class="relative border-2 border-gray-200 rounded-lg p-2 w-40 opacity-80">
+                                <div class="bg-white p-3 rounded flex flex-col items-center">
+                                    <div class="bg-white  mb-2 w-full flex justify-center">
+                                        <img src="{{index .product.Images 0}}" alt="Purple Headphones" class="mb-1" />
+                                    </div>
+                                    <p class="font-bold text-sm text-purple-800">{{.product.Color}}</p>
+                                    <p class="text-xs bg-gray-100 rounded-full px-2 py-1 my-1 font-medium">
+                                        {{.product.Storage}} +
+                                        {{.product.Ram}}</p>
+                                    <p class="text-red-500 text-xs font-medium mt-1">Currently unavailable</p>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center cursor-not-allowed">
+                                    <div
+                                        class="bg-white bg-opacity-70 px-3 py-1 rounded-full text-xs font-bold text-red-600 shadow">
+                                        Out of Stock
+                                    </div>
+                                </div>
+                            </div>
+                            {{end}}
+                        </a>
+                        {{range .otherVariantDetails}}
+                        <a href="/products/details/{{.ID}}" class=" hover:border-2 hover:border-blue-500">
+                            {{if gt .Stock 0}}
+                            <div class="relative border-2 border-gray-200 rounded-lg p-2 w-40 opacity-80">
+                                <div class="bg-white p-3 rounded flex flex-col items-center">
+                                    <div class="bg-white mb-2 w-full flex justify-center">
+                                        <img src="{{.Images }}" alt="Purple Headphones" class="mb-1" />
+                                    </div>
+                                    <p class="font-bold text-sm text-purple-800">{{.Color}}</p>
+                                    <p class="text-xs bg-gray-100 rounded-full px-2 py-1 my-1 font-medium">{{.Rom}} +
+                                        {{.Ram}}</p>
+                                    <p class="text-red-500 text-xs font-medium mt-1">Currently unavailable</p>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center cursor-not-allowed">
+                                    <div
+                                        class="bg-white bg-opacity-70 px-3 py-1 rounded-full text-xs font-bold text-red-600 shadow">
+                                        Out of Stock
+                                    </div>
+                                </div>
+                            </div>
+                            {{else}}
+                            <div
+                                class="relative border-2 border-blue-500 rounded-lg p-2 cursor-pointer w-40 shadow-md hover:shadow-lg transition-all duration-300">
+                                <div class="bg-white p-3 rounded flex flex-col items-center">
+                                    <div class="bg-white mb-2 w-full flex justify-center">
+                                        <img src="{{.Image}}" alt="Product Image" class="mb-1" />
+                                    </div>
+                                    <p class="font-bold text-sm text-blue-800">{{.Color}}</p>
+                                    {{if .product.Ram}}
+                                    <p class="text-xs bg-gray-100 rounded-full px-2 py-1 my-1 font-medium">
+                                        {{.Rom}} + {{.Ram}}</p>
+                                    {{else}}
+                                    {{end}}
+                                    {{if gt .Stock 5}}
+                                    {{else}}
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div
+                                            class="bg-red-100 bg-opacity-70 px-3 py-1 rounded-full text-xs font-bold text-red-600 shadow border border-red-500">
+                                            {{.Stock}} Stock Left
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f" .RegularPrice}}
+                                    </p>
+                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f" .SalePrice}}</p>
+                                    <span
+                                        class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-1">{{.OfferPercentage}}%
+                                        OFF</span>
+                                </div>
+                                <div
+                                    class="absolute -top-2 -right-2 bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center shadow-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            {{end}}
+                        </a>
+                        {{end}}
                     </div>
                 </div>
 
                 <div class="flex flex-col md:flex-row md:items-stretch space-y-4 md:space-y-0 md:space-x-4 mb-4">
                     <!-- Buy Now Button -->
-                    <button
+                    <!-- <button
                         class="w-full md:flex-grow h-full bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition">
                         BUY NOW
-                    </button>
+                    </button> -->
 
-                    <!-- Add to Cart Button -->
-                    <form action="/cart/add/{{.product.ID}}" method="post" class="cart-form w-full md:flex-grow">
+                    {{if gt .product.Stock 0}}
+                    {{if .product.IsInCart}}
+                    <a href="/cart" class="cart-form w-full md:flex-grow">
                         <button
-                            class="w-full h-full border border-black text-black text-center px-6 py-3 rounded-md font-bold hover:bg-gray-100 transition">
+                            class="w-full md:flex-grow h-full bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 mr-2 relative z-10 text-white group-hover:animate-pulse" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                <circle cx="9" cy="19" r="1" />
+                                <circle cx="15" cy="19" r="1" />
+                            </svg>
+                            GO TO CART
+                        </button>
+                    </a>
+                    {{else}}
+                    <!-- Form with data-product-id attribute instead of action -->
+                    <form data-product-id="{{.product.ID}}" class="cart-form w-full md:flex-grow">
+                        <button type="submit"
+                            class="w-full md:flex-grow h-full bg-black text-white text-center px-6 py-3 rounded-md font-bold hover:bg-gray-800 transition flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
                             ADD TO CART
                         </button>
                     </form>
+                    {{end}}
+                    {{else}}
+                    <button
+                        class="w-full py-3 px-4 bg-gray-300 text-gray-600 font-medium rounded-md cursor-not-allowed flex items-center justify-center space-x-2 hover:bg-gray-300 focus:outline-none"
+                        disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Out of Stock</span>
+                    </button>
+                    {{end}}
                 </div>
-
-
-
 
                 <div
                     class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-gray-500 mt-4">
+                    {{if .product.IsInWishlist}}
+                    <form action="/wishlist/remove/{{.product.ID}}" method="post"><button type="submit"
+                            class="text-sm font-medium hover:underline">Remove From Wishlist</button></form>
+                    {{else}}
                     <form action="/wishlist/add/{{.product.ID}}" method="post"><button type="submit"
                             class="text-sm font-medium hover:underline">Add to Wishlist</button></form>
-                    <span class="hidden md:block">|</span>
-                    <button class="text-sm font-medium hover:underline">Share product:</button>
-                    <div class="flex space-x-2">
-                        <button class="w-6 h-6 bg-gray-200 rounded-full"></button>
-                        <button class="w-6 h-6 bg-gray-200 rounded-full"></button>
-                        <button class="w-6 h-6 bg-gray-200 rounded-full"></button>
-                    </div>
+                    {{end}}
                 </div>
             </div>
-
-
         </div>
 
     </div>
@@ -484,28 +635,165 @@
         </div>
     </div>
     <script>
-        document.querySelectorAll('.cart-form').forEach(form => {
-            form.addEventListener('submit', async function (e) {
-                e.preventDefault(); // Prevent normal form submission
+        document.addEventListener('DOMContentLoaded', function () {
+            // Select all forms with cart-form class
+            document.querySelectorAll('.cart-form').forEach(form => {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault(); // Prevent normal form submission
 
-                let formData = new FormData(this);
+                    // Get product ID from data attribute
+                    const productId = this.getAttribute('data-product-id');
 
-                try {
-                    const response = await fetch(this.action, {
-                        method: 'POST',
-                        body: formData
-                    });
+                    // If no product ID (like in the "GO TO CART" link), let normal navigation happen
+                    if (!productId) return true;
 
-                    if (response.ok) {
-                        showSuccessToast("Item added to cart!");
-                    } else {
-                        throw new Error("Failed to add item");
+                    try {
+                        // Set up button state for loading
+                        const button = this.querySelector('button');
+                        const originalText = button.innerHTML;
+                        button.disabled = true;
+                        button.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Adding...';
+
+                        // Make AJAX request
+                        const response = await fetch(`/cart/add/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        // Process response
+                        if (response.ok) {
+                            const data = await response.json();
+
+                            // Update cart counter if it exists (optional)
+                            const cartCounter = document.querySelector('.cart-count');
+                            if (cartCounter && data.cartCount) {
+                                cartCounter.textContent = data.cartCount;
+                                cartCounter.classList.remove('hidden');
+                            }
+
+                            // Show success message
+                            showSuccessToast("Item added to cart!");
+
+                            // Transform button to "GO TO CART"
+                            button.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-2 relative z-10 text-white group-hover:animate-pulse" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            <circle cx="9" cy="19" r="1" />
+                            <circle cx="15" cy="19" r="1" />
+                        </svg>
+                        GO TO CART
+                    `;
+
+                            // Change form to link behavior
+                            form.removeEventListener('submit', arguments.callee);
+                            form.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                window.location.href = '/cart';
+                            });
+
+                        } else {
+                            // Server returned an error
+                            const errorData = await response.json();
+                            if (response.status === 401) {
+                                // Unauthorized - redirect to login
+                                showErrorToast("Please login first");
+                                setTimeout(() => {
+                                    window.location.href = "/user/login";
+                                }, 1500);
+                            } else {
+                                // Other error
+                                showErrorToast(errorData.message || "Failed to add item");
+                                button.disabled = false;
+                                button.innerHTML = originalText;
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        showErrorToast("Something went wrong. Please try again.");
+
+                        // Reset button state
+                        const button = this.querySelector('button');
+                        button.disabled = false;
+                        button.innerHTML = originalText;
                     }
-                } catch (error) {
-                    console.error("Error:", error);
-                    showErrorToast("Login First");
-                    location.href = "/user/login"
-                }
+                });
+            });
+        });
+        // Add this JavaScript to your page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Find all wishlist forms on the page
+            const wishlistForms = document.querySelectorAll('form[action^="/wishlist/"]');
+
+            // Add AJAX handling to each form
+            wishlistForms.forEach(form => {
+                form.addEventListener('submit', function (event) {
+                    // Prevent default form submission
+                    event.preventDefault();
+
+                    // Get the action URL from the form
+                    const url = form.getAttribute('action');
+                    // Get the button element
+                    const button = form.querySelector('button');
+                    // Store original button text
+                    const originalButtonText = button.textContent;
+
+                    // Set button to loading state
+                    button.disabled = true;
+                    button.textContent = 'Processing...';
+
+                    // Create fetch request
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'  // Include cookies in the request
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Show success message
+                            showSuccessToast(data.message || 'Wishlist updated successfully');
+
+                            // Toggle button text based on action
+                            if (url.includes('/add/')) {
+                                button.textContent = 'Remove From Wishlist';
+                                form.setAttribute('action', url.replace('/add/', '/remove/'));
+                            } else {
+                                button.textContent = 'Add to Wishlist';
+                                form.setAttribute('action', url.replace('/remove/', '/add/'));
+                            }
+
+                            // Update any wishlist count indicators if needed
+                            const wishlistCountElements = document.querySelectorAll('.wishlist-count');
+                            if (wishlistCountElements.length > 0 && data.count !== undefined) {
+                                wishlistCountElements.forEach(el => {
+                                    el.textContent = data.count;
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Show error message
+                            showErrorToast('Login First');
+                            console.error('Error:', error);
+                            // Reset button to original state
+                            button.textContent = originalButtonText;
+                        })
+                        .finally(() => {
+                            // Re-enable button
+                            button.disabled = false;
+                        });
+                });
             });
         });
     </script>

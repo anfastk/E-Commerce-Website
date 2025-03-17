@@ -88,9 +88,26 @@
             animation: pulse-light 2s ease-in-out infinite;
         }
 
+        .wishlist-btn.active {
+            background-color: #fff1f2;
+        }
+
+        .heart-icon {
+            transition: all 0.3s ease;
+        }
+
+        .heart-icon.active {
+            color: #ef4444;
+            fill: #ef4444;
+        }
+
+        .wishlist-btn:hover .heart-icon:not(.active) {
+            color: #ec4899;
+            fill: none;
+        }
+
         .heart-icon:hover {
             animation: heartBeat 1s ease-in-out;
-            fill: rgba(236, 72, 153, 0.3);
         }
 
         @keyframes heartBeat {
@@ -124,15 +141,11 @@
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <button class="hover:text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -163,10 +176,7 @@
                             </svg>
                         </button>
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -174,8 +184,6 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
@@ -189,7 +197,7 @@
     <!-- Breadcrumb and Search Section -->
     <div class="container mx-auto px-4 py-4">
         <nav class="text-sm text-gray-600">
-            <a href="/" class="hover:underline">Home</a> &gt; <span><a href="/products">Products</a></span>
+            <a href="/" class="hover:underline">Home</a> > <span><a href="/products">Products</a></span>
         </nav>
         <h1 class="text-2xl font-semibold mt-2">Our Collection Of Products</h1>
         <div class="mt-4 flex items-center">
@@ -214,13 +222,9 @@
                     Clear All Filters
                 </button>
             </div>
-
             <ul class="space-y-2">
                 <li><input type="radio" name="sort" value="relevance" id="relevance" onchange="checkFilters()" /> <label
                         for="relevance">Relevance</label></li>
-                <!-- <li><input type="radio" name="sort" value="popularity" id="popularity" onchange="checkFilters()" />
-                    <label for="popularity">Popularity</label> -->
-                </li>
                 <li><input type="radio" name="sort" value="price-low" id="price-low" onchange="checkFilters()" /> <label
                         for="price-low">Price – Low to High</label></li>
                 <li><input type="radio" name="sort" value="price-high" id="price-high" onchange="checkFilters()" />
@@ -229,7 +233,6 @@
                 <li><input type="radio" name="sort" value="newest" id="newest" onchange="checkFilters()" /> <label
                         for="newest">Newest First</label></li>
             </ul>
-
             <h2 class="text-xl font-semibold mt-6 mb-4">Categories</h2>
             <ul class="space-y-2">
                 {{range .Category}}
@@ -237,18 +240,15 @@
                         for="cat-{{.}}">{{.}}</label></li>
                 {{end}}
             </ul>
-
             <h2 class="text-xl font-semibold mt-6 mb-4">Price Range</h2>
             <ul class="space-y-2">
-                <li><input type="checkbox" id="price-1" onchange="checkFilters()" /> <label for="price-1">&#8377;1000 -
-                        &#8377;50000+</label></li>
-                <li><input type="checkbox" id="price-2" onchange="checkFilters()" /> <label for="price-2">&#8377;50000 -
-                        &#8377;100000+</label></li>
-                <li><input type="checkbox" id="price-3" onchange="checkFilters()" /> <label for="price-3">&#8377;100000
-                        -
-                        &#8377;500000+</label></li>
+                <li><input type="checkbox" id="price-1" onchange="checkFilters()" /> <label for="price-1">₹1000 -
+                        ₹50000+</label></li>
+                <li><input type="checkbox" id="price-2" onchange="checkFilters()" /> <label for="price-2">₹50000 -
+                        ₹100000+</label></li>
+                <li><input type="checkbox" id="price-3" onchange="checkFilters()" /> <label for="price-3">₹100000 -
+                        ₹500000+</label></li>
             </ul>
-
             <h2 class="text-xl font-semibold mt-6 mb-4">Discount</h2>
             <ul class="space-y-2">
                 <li><input type="checkbox" id="disc-10" onchange="checkFilters()" /> <label for="disc-10">10% Off or
@@ -264,13 +264,11 @@
                 <li><input type="checkbox" id="disc-75" onchange="checkFilters()" /> <label for="disc-75">75% Off or
                         more</label></li>
             </ul>
-
             <h2 class="text-xl font-semibold mt-6 mb-4">Availability</h2>
             <ul class="space-y-2">
                 <li><input type="checkbox" id="stock" onchange="checkFilters()" /> <label for="stock">Include Out of
                         Stock</label></li>
             </ul>
-
             <h2 class="text-xl font-semibold mt-6 mb-4">Brand Name</h2>
             <ul class="space-y-2">
                 {{range .Brand}}
@@ -313,7 +311,6 @@
                         </svg>
                     </button>
                 </div>
-
                 <h2 class="text-lg font-semibold mb-4">Sort by</h2>
                 <ul class="space-y-2">
                     <li><input type="checkbox" /> Relevance</li>
@@ -322,20 +319,17 @@
                     <li><input type="checkbox" /> Price – High to Low</li>
                     <li><input type="checkbox" /> Newest First</li>
                 </ul>
-
                 <h2 class="text-lg font-semibold mt-6 mb-4">Categories</h2>
                 <ul class="space-y-2">
                     <li><input type="checkbox" /> Lorem Ipsum (3)</li>
                     <li><input type="checkbox" /> Lorem Ipsum (3)</li>
                     <li><input type="checkbox" /> Lorem Ipsum (3)</li>
                 </ul>
-
                 <h2 class="text-lg font-semibold mt-6 mb-4">Price Range</h2>
                 <ul class="space-y-2">
                     <li><input type="checkbox" /> $20.00 - $50.00</li>
                     <li><input type="checkbox" /> $50.00 - $100.00</li>
                 </ul>
-
                 <button onclick="toggleFilterPopup()" class="mt-4 w-full bg-black text-white py-2 rounded-lg">Apply
                     Filters</button>
             </div>
@@ -344,112 +338,119 @@
         <!-- Product Cards -->
         <div class="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 z-0">
             {{range .data}}
-            <a href="/products/details/{{.ID}}"
-                class="block transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[450px] overflow-hidden group">
-                    <!-- Ribbon offer design -->
-                    <div
-                        class="sale-ribbon absolute -left-10 top-5 bg-gradient-to-r from-red-600 to-red-500 text-white py-1 px-12 transform rotate-[-45deg] z-10 shadow-md overflow-hidden">
-                        <span class="font-bold relative z-10 text-shadow">SALE!</span>
-
-                        <!-- Glossy shine effect - animated reflection -->
-                        <div class="shine-effect absolute inset-0 w-full h-full"></div>
-
-                        <!-- Additional glossy highlight at the top -->
-                        <div class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent">
+            <div class="block transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                <a href="/products/details/{{.ID}}">
+                    <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[450px] overflow-hidden group">
+                        <div
+                            class="sale-ribbon absolute -left-10 top-5 bg-gradient-to-r from-red-600 to-red-500 text-white py-1 px-12 transform rotate-[-45deg] z-10 shadow-md overflow-hidden">
+                            <span class="font-bold relative z-10 text-shadow">SALE!</span>
+                            <div class="shine-effect absolute inset-0 w-full h-full"></div>
+                            <div
+                                class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent">
+                            </div>
+                            <div class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border"></div>
                         </div>
-
-                        <!-- Pulsing border effect -->
-                        <div class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border"></div>
-                    </div>
-
-                    <!-- Wishlist button -->
-                    <form action="/wishlist/add/{{.ID}}" method="post">
-                        <button type="submit"
-                            class="absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-110 hover:bg-pink-50 hover:shadow-xl">
+                        <button
+                            class="wishlist-btn absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-110 {{if .IsInWishlist}}active{{end}}"
+                            data-id="{{.ID}}" data-in-wishlist="{{.IsInWishlist}}">
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-gray-400 group-hover:text-pink-500 transition-colors duration-300 heart-icon"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                class="h-6 w-6 heart-icon {{if .IsInWishlist}}active{{end}}"
+                                fill="{{if .IsInWishlist}}currentColor{{else}}none{{end}}" viewBox="0 0 24 24"
+                                stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                         </button>
-                    </form>
-
-                    <!-- Product image with hover zoom effect -->
-                    <div class="rounded-lg w-full h-2/3 flex items-center justify-center overflow-hidden">
-                        {{if len .Images}}
-                        <img src="{{index .Images 0}}" alt="{{.ProductName}}"
-                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
-                        {{else}}
-                        <img src="" alt="Default Image"
-                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
-                        {{end}}
-                    </div>
-
-                    <!-- Product details with enhanced styling -->
-                    <h2 class="mt-4 text-gray-800 font-semibold text-base text-center truncate">{{.ProductName}}</h2>
-                    <div class="mt-2 text-center">
-                        <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f" .RegularPrice}}</span>
-                        <span class="text-black font-bold text-lg ml-2">&#8377;{{printf "%.2f" .SalePrice}}</span>
-                    </div>
-
-                    <!-- Ratings stars -->
-                    <div class="flex justify-center mt-1">
-                        <div class="flex text-yellow-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                        <div class="rounded-lg w-full h-2/3 flex items-center justify-center overflow-hidden">
+                            {{if .Images}}
+                            <img src="{{index .Images}}" alt="{{.ProductName}}"
+                                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
+                            {{else}}
+                            <img src="" alt="Default Image"
+                                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
+                            {{end}}
                         </div>
-                    </div>
-
-                    <!-- Add to Cart button with improved styling and hover effect -->
-                    <form class="cart-form" action="/cart/add/{{.ID}}" method="POST">
-                        <button type="submit"
-                            class="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105 overflow-hidden group">
+                        <h2 class="mt-4 text-gray-800 font-semibold text-base text-center truncate">{{.ProductName}}
+                        </h2>
+                        <div class="mt-2 text-center">
+                            <span class="line-through text-gray-400 text-sm">₹{{printf "%.2f" .RegularPrice}}</span>
+                            <span class="text-black font-bold text-lg ml-2">₹{{printf "%.2f" .SalePrice}}</span>
+                        </div>
+                        <div class="flex justify-center mt-1">
+                            <div class="flex text-yellow-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                        </div>
+                        {{if .IsInStock}}
+                        <button
+                            class="w-full py-3 px-4 bg-gray-300 text-gray-600 font-medium rounded-md cursor-not-allowed flex items-center justify-center space-x-2 hover:bg-gray-300 focus:outline-none"
+                            disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Out of Stock</span>
+                        </button>
+                        {{else}}
+                        <a {{if .IsInCart}}href="/cart" {{else}}href="#" {{end}}
+                            class="cart-btn absolute bottom-4 left-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105 overflow-hidden group"
+                            data-id="{{.ID}}" data-in-cart="{{.IsInCart}}">
                             <span
                                 class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 to-blue-500/30 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></span>
+
+                            {{if .IsInCart}}
+                            <!-- Bag Icon for items in cart -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            {{else}}
+                            <!-- Cart Icon for items not in cart -->
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            <span class="relative z-10">Add to Cart</span>
-                        </button>
-                    </form>
+                            {{end}}
 
-
-                    <!-- Decorative accent border -->
-                    <div
-                        class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 group-hover:h-2 transition-all duration-300">
+                            <span class="relative z-10">{{if .IsInCart}}Go to Cart{{else}}Add to Cart{{end}}</span>
+                        </a>
+                        {{end}}
+                        <div
+                            class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 group-hover:h-2 transition-all duration-300">
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            </div>
             {{end}}
-            <!-- Add more product cards as needed -->
         </div>
     </div>
 
@@ -514,11 +515,11 @@
                 </div>
             </div>
             <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
-                <p>&copy; 2025 LAPTIX, Inc</p>
+                <p>© 2025 LAPTIX, Inc</p>
             </div>
         </div>
-
     </footer>
+
     <div class="toast-container z-40 fixed top-0 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
@@ -531,9 +532,9 @@
             <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
         </div>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Wait a bit to ensure the page is fully loaded
             setTimeout(() => {
                 if (window.location.hash) {
                     let target = document.querySelector(window.location.hash);
@@ -541,34 +542,9 @@
                         target.scrollIntoView({ behavior: "smooth", block: "start" });
                     }
                 }
-            }, 300); // Delay to ensure proper scrolling
+            }, 300);
         });
-        document.querySelectorAll('.cart-form').forEach(form => {
-            form.addEventListener('submit', async function (e) {
-                e.preventDefault(); // Prevent normal form submission
 
-                let formData = new FormData(this);
-                let actionUrl = this.action; // Ensure action URL is correctly fetched
-
-                try {
-                    const response = await fetch(actionUrl, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        showSuccessToast("Item added to cart!");
-                    } else {
-                        throw new Error("Failed to add item");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    showErrorToast("Login First");
-                    location.href = "/user/login"
-                }
-            });
-        });
-        // Frontend filtering and search implementation
         let currentFilters = {
             search: '',
             sort: '',
@@ -579,7 +555,6 @@
             includeOutOfStock: false
         };
 
-        // Debounce function implementation
         function debounce(func, wait) {
             let timeout;
             return function (...args) {
@@ -588,53 +563,51 @@
             };
         }
 
-        // Debounced version of applyFilters for search
         const debouncedSearch = debounce(applyFilters, 300);
 
-        // Update search input to trigger filtering with debounce
-        document.querySelector('input[type="text"]').addEventListener('input', (e) => {
-            currentFilters.search = e.target.value;
-            debouncedSearch(); // Use debounced version for search
-        });
+        function buildQueryString() {
+            const params = new URLSearchParams();
+            if (currentFilters.search) params.set('search', currentFilters.search);
+            if (currentFilters.sort) params.set('sort', currentFilters.sort);
+            if (currentFilters.categories.length > 0) {
+                currentFilters.categories.forEach(cat => params.append('categories', cat));
+            }
+            if (currentFilters.priceRanges.length > 0) {
+                currentFilters.priceRanges.forEach(pr => params.append('priceRanges', pr));
+            }
+            if (currentFilters.discounts.length > 0) {
+                currentFilters.discounts.forEach(disc => params.append('discounts', disc));
+            }
+            if (currentFilters.brands.length > 0) {
+                currentFilters.brands.forEach(brand => params.append('brands', brand));
+            }
+            if (currentFilters.includeOutOfStock) {
+                params.set('includeOutOfStock', 'true');
+            }
+            return params.toString();
+        }
 
-        // Update filters when checkboxes/radio buttons change
         function checkFilters() {
             const clearFilterBtn = document.getElementById('clearFilterBtn');
-
-            // Update sort
             const selectedSort = document.querySelector('input[name="sort"]:checked');
             currentFilters.sort = selectedSort ? selectedSort.value : '';
-
-            // Update categories
             currentFilters.categories = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
                 .map(cb => cb.id.replace('cat-', ''));
-
-            // Update price ranges
             currentFilters.priceRanges = Array.from(document.querySelectorAll('input[id^="price-"]:checked'))
                 .map(cb => cb.id.replace('price-', ''));
-
-            // Update discounts
             currentFilters.discounts = Array.from(document.querySelectorAll('input[id^="disc-"]:checked'))
                 .map(cb => parseInt(cb.id.replace('disc-', '')));
-
-            // Update brands
             currentFilters.brands = Array.from(document.querySelectorAll('input[id^="brand-"]:checked'))
                 .map(cb => cb.id.replace('brand-', ''));
-
-            // Update stock status
             currentFilters.includeOutOfStock = document.getElementById('stock').checked;
-
-            // Show/hide clear filters button
             const anyFilterSelected = Object.values(currentFilters).some(val =>
                 Array.isArray(val) ? val.length > 0 : Boolean(val)
             );
             clearFilterBtn.classList.toggle('hidden', !anyFilterSelected);
-
-            applyFilters(); // Use regular version for other filters
+            applyFilters();
         }
 
         function clearFilters() {
-            // Reset all filters
             currentFilters = {
                 search: '',
                 sort: '',
@@ -644,31 +617,27 @@
                 brands: [],
                 includeOutOfStock: false
             };
-
-            // Clear form elements
-            document.querySelector('input[type="text"]').value = '';
+            const searchInput = document.querySelector('input[type="text"]');
+            if (searchInput) searchInput.value = '';
             document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
-
-            // Hide clear button
             document.getElementById('clearFilterBtn').classList.add('hidden');
-
-            // Reload the page to show default products
-            window.location.reload();
+            window.history.pushState({}, document.title, '/products');
+            location.reload();
         }
 
         async function applyFilters() {
             try {
-                const response = await fetch('/products/filter', {
-                    method: 'POST',
+                const queryString = buildQueryString();
+                const url = queryString ? `/products?${queryString}` : '/products';
+                window.history.pushState({}, '', url);
+                const response = await fetch(`/products/filter?${queryString}`, {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(currentFilters)
+                    }
                 });
-
                 if (!response.ok) throw new Error('Failed to fetch filtered products');
-
                 const data = await response.json();
                 updateProductDisplay(data.data);
             } catch (error) {
@@ -688,71 +657,249 @@
                 return;
             }
             const productHTML = products.map(product => {
-                // Safely access properties with default values
-                const id = product?.id;
-                const name = product?.product_name;
-                const regularPrice = product?.regular_price || 0;
-                const salePrice = product?.sale_price || 0;
-                const image = product?.images[0]
-
+                const id = product?.id || product?.ID;
+                const name = product?.product_name || product?.ProductName;
+                const regularPrice = product?.regular_price || product?.RegularPrice || 0;
+                const salePrice = product?.sale_price || product?.SalePrice || 0;
+                const image = product?.images;
+                const isInCart = product?.is_in_cart || product?.IsInCart || false;
+                const isInWishlist = product?.is_in_wishlist || product?.IsInWishlist || false;
+                const isInStock = product?.is_in_stock || product?.IsInStock || false;
                 return `
+        <div class="block transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
             <a href="/products/details/${id}">
-                <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[400px]">
-                    <button
-                        class="absolute top-2 right-2 text-gray-500 hover:text-black transition-colors duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                        </svg>
-                    </button>
-
-                    <div class="rounded-lg w-full h-2/3 flex items-center justify-center">
-                        ${image
-                        ? `<img src="${image}" alt="${name}" class="w-full h-full object-contain">`
-                        : `<img src="" alt="Default Image" class="w-full h-full object-contain">`
-                    }
-                    </div>
-
-                    <h2 class="mt-4 text-gray-800 font-semibold text-base text-center">${name}</h2>
-                    <div class="mt-2 text-center">
-                        <span class="line-through text-gray-400 text-sm">₹${Number(regularPrice).toFixed(2)}</span>
-                        <span class="text-black font-bold text-lg ml-2">₹${Number(salePrice).toFixed(2)}</span>
-                    </div>
-
-                    <form action="/cart/add/${id}" method="post" class="cart-form">
-                        <button type="submit"
-                            class="absolute bottom-4 left-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <span>Add to Cart</span>
-                        </button>
-                    </form>
+            <div class="w-full bg-white shadow-lg rounded-lg p-4 relative h-[450px] overflow-hidden group">
+                <div class="sale-ribbon absolute -left-10 top-5 bg-gradient-to-r from-red-600 to-red-500 text-white py-1 px-12 transform rotate-[-45deg] z-10 shadow-md overflow-hidden">
+                    <span class="font-bold relative z-10 text-shadow">SALE!</span>
+                    <div class="shine-effect absolute inset-0 w-full h-full"></div>
+                    <div class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent"></div>
+                    <div class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border"></div>
                 </div>
+                <button 
+                    class="wishlist-btn absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-110 ${isInWishlist ? 'active' : ''}"
+                    data-id="${id}"
+                    data-in-wishlist="${isInWishlist}"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 heart-icon ${isInWishlist ? 'active' : ''}"
+                        fill="${isInWishlist ? 'currentColor' : 'none'}"
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor">
+                        <path stroke-linecap="round" 
+                            stroke-linejoin="round" 
+                            stroke-width="2" 
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </button>
+                <div class="rounded-lg w-full h-2/3 flex items-center justify-center overflow-hidden">
+                    ${image
+                        ? `<img src="${image}" alt="${name}" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">`
+                        : `<img src="" alt="Default Image" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">`
+                    }
+                </div>
+                <h2 class="mt-4 text-gray-800 font-semibold text-base text-center truncate">${name}</h2>
+                <div class="mt-2 text-center">
+                    <span class="line-through text-gray-400 text-sm">₹${Number(regularPrice).toFixed(2)}</span>
+                    <span class="text-black font-bold text-lg ml-2">₹${Number(salePrice).toFixed(2)}</span>
+                </div>
+                <div class="flex justify-center mt-1">
+                    <div class="flex text-yellow-400">
+                        ${'<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>'.repeat(5)}
+                    </div>
+                </div>
+                ${!isInStock
+                        ? ` <button
+        class="w-full py-3 px-4 bg-gray-300 text-gray-600 font-medium rounded-md cursor-not-allowed flex items-center justify-center space-x-2 hover:bg-gray-300 focus:outline-none"
+        disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Out of Stock</span>
+    </button>`
+                        : `<a ${isInCart ? 'href="/cart"' : 'href="#"'}
+        class="cart-btn absolute bottom-4 left-4 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105 overflow-hidden group"
+        data-id="${id}"
+        data-in-cart="${isInCart}"
+    >
+        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 to-blue-500/30 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></span>
+        ${isInCart
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+           </svg>`
+                            : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+           </svg>`
+                        }
+        <span class="relative z-10">${isInCart ? 'Go to Cart' : 'Add to Cart'}</span>
+    </a>`
+                    }
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 group-hover:h-2 transition-all duration-300"></div>
+            </div>
             </a>
+        </div>
         `;
             }).join('');
 
             productGrid.innerHTML = productHTML;
+            attachCartListeners();
+            attachWishlistListeners();
         }
 
-        // Initialize event listeners
+        function attachCartListeners() {
+            document.querySelectorAll('.cart-btn').forEach(button => {
+                button.removeEventListener('click', handleCartClick); // Remove existing listeners to prevent duplicates
+                button.addEventListener('click', handleCartClick);
+            });
+        }
+
+        function handleCartClick(e) {
+            const button = e.currentTarget;
+            if (button.getAttribute('data-in-cart') === 'true') {
+                return; // Let the link to /cart work normally
+            }
+            e.preventDefault();
+            const productId = button.getAttribute('data-id');
+
+            fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        button.setAttribute('data-in-cart', 'true');
+                        button.setAttribute('href', '/cart');
+                        button.innerHTML = `
+                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 to-blue-500/30 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span class="relative z-10">Go to Cart</span>
+            `;
+                        showSuccessToast('Item added to cart!');
+                    } else {
+                        throw new Error('Failed to add to cart');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorToast('Login First');
+                    location.href = '/user/login';
+                });
+        }
+
+        function attachWishlistListeners() {
+            document.querySelectorAll('.wishlist-btn').forEach(button => {
+                button.addEventListener('click', async function (e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent card click
+
+                    const productId = this.getAttribute('data-id');
+                    const isInWishlist = this.getAttribute('data-in-wishlist') === 'true';
+                    const url = isInWishlist ? `/wishlist/remove/${productId}` : `/wishlist/add/${productId}`;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const svg = this.querySelector('.heart-icon');
+                            if (isInWishlist) {
+                                this.setAttribute('data-in-wishlist', 'false');
+                                this.classList.remove('active');
+                                svg.classList.remove('active');
+                                svg.setAttribute('fill', 'none');
+                                showSuccessToast('Removed from wishlist!');
+                            } else {
+                                this.setAttribute('data-in-wishlist', 'true');
+                                this.classList.add('active');
+                                svg.classList.add('active');
+                                svg.setAttribute('fill', 'currentColor');
+                                showSuccessToast('Added to wishlist!');
+                            }
+                        } else {
+                            throw new Error('Failed to update wishlist');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showErrorToast('Login First');
+                        location.href = '/user/login';
+                    }
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Add input event listener to search box with debouncing
             const searchInput = document.querySelector('input[type="text"]');
             if (searchInput) {
                 searchInput.addEventListener('input', (e) => {
                     currentFilters.search = e.target.value;
-                    debouncedSearch(); // Use debounced version for search
+                    debouncedSearch();
                 });
             }
+            const urlParams = new URLSearchParams(window.location.search);
+            currentFilters.search = urlParams.get('search') || '';
+            currentFilters.sort = urlParams.get('sort') || '';
+            currentFilters.categories = urlParams.getAll('categories');
+            currentFilters.priceRanges = urlParams.getAll('priceRanges');
+            currentFilters.discounts = urlParams.getAll('discounts').map(d => parseInt(d));
+            currentFilters.brands = urlParams.getAll('brands');
+            currentFilters.includeOutOfStock = urlParams.get('includeOutOfStock') === 'true';
+            if (currentFilters.search) document.querySelector('input[type="text"]').value = currentFilters.search;
+            if (currentFilters.sort) {
+                const sortInput = document.querySelector(`input[value="${currentFilters.sort}"]`);
+                if (sortInput) sortInput.checked = true;
+            }
+            currentFilters.categories.forEach(cat => {
+                const el = document.querySelector(`#cat-${cat}`);
+                if (el) el.checked = true;
+            });
+            currentFilters.priceRanges.forEach(pr => {
+                const el = document.querySelector(`#price-${pr}`);
+                if (el) el.checked = true;
+            });
+            currentFilters.discounts.forEach(disc => {
+                const el = document.querySelector(`#disc-${disc}`);
+                if (el) el.checked = true;
+            });
+            currentFilters.brands.forEach(brand => {
+                const el = document.querySelector(`#brand-${brand}`);
+                if (el) el.checked = true;
+            });
+            document.getElementById('stock').checked = currentFilters.includeOutOfStock;
+            const anyFilterSelected = Object.values(currentFilters).some(val =>
+                Array.isArray(val) ? val.length > 0 : Boolean(val)
+            );
+            document.getElementById('clearFilterBtn').classList.toggle('hidden', !anyFilterSelected);
+            if (anyFilterSelected) {
+                applyFilters();
+            }
+            attachCartListeners();
+            attachWishlistListeners();
         });
+
+        window.onpopstate = function () {
+            location.reload();
+        };
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        function toggleFilterPopup() {
+            const filterPopup = document.getElementById('filter-popup');
+            filterPopup.classList.toggle('hidden');
+        }
     </script>
     <script src="/static/js/toastMain.js"></script>
-
 </body>
 
 </html>

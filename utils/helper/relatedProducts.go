@@ -6,13 +6,15 @@ import (
 )
 
 type productsResponse struct {
-	ID              uint     `json:"id"`
-	ProductName     string   `json:"product_name"`
-	ProductSummary  string   `json:"product_summary"`
-	SalePrice       float64  `json:"sale_price"`
-	RegularPrice    float64  `json:"regular_price"`
-	OfferPercentage int      `json:"offer_persentage"`
-	Images          []string `json:"images"`
+	ID              uint    `json:"id"`
+	ProductName     string  `json:"product_name"`
+	ProductSummary  string  `json:"product_summary"`
+	SalePrice       float64 `json:"sale_price"`
+	RegularPrice    float64 `json:"regular_price"`
+	OfferPercentage int     `json:"offer_percentage"`
+	Images          string  `json:"images"`
+	IsInCart        bool    `json:"is_in_cart"`
+	IsInWishlist    bool    `json:"is_in_wishlist"`
 }
 
 func RelatedProducts(categoryID uint) ([]productsResponse, error) {
@@ -27,10 +29,6 @@ func RelatedProducts(categoryID uint) ([]productsResponse, error) {
 	var response []productsResponse
 	for _, product := range products {
 		discountAmount, TotalPercentage, _ := DiscountCalculation(product.ID, product.CategoryID, product.RegularPrice, product.SalePrice)
-		var images []string
-		for _, image := range product.VariantsImages {
-			images = append(images, image.ProductVariantsImages)
-		}
 		response = append(response, productsResponse{
 			ID:              product.ID,
 			ProductName:     product.ProductName,
@@ -38,8 +36,39 @@ func RelatedProducts(categoryID uint) ([]productsResponse, error) {
 			SalePrice:       product.SalePrice - discountAmount,
 			RegularPrice:    product.RegularPrice,
 			OfferPercentage: int(TotalPercentage),
-			Images:          images,
+			Images:          product.VariantsImages[0].ProductVariantsImages,
 		})
 	}
 	return response, nil
+}
+
+func CheckCartAndWishlist(products []productsResponse, userID uint) []productsResponse {
+	var cartItems []models.CartItem
+	var wishlistItems []models.WishlistItem
+
+	config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?)", userID).Find(&cartItems)
+
+	config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?)", userID).Find(&wishlistItems)
+
+	cartMap := make(map[uint]bool)
+	wishlistMap := make(map[uint]bool)
+
+	for _, item := range cartItems {
+		cartMap[item.ProductVariantID] = true
+	}
+
+	for _, item := range wishlistItems {
+		wishlistMap[item.ProductVariantID] = true
+	}
+
+	for i, product := range products {
+		if cartMap[product.ID] {
+			products[i].IsInCart = true
+		}
+		if wishlistMap[product.ID] {
+			products[i].IsInWishlist = true
+		}
+	}
+
+	return products
 }

@@ -6,22 +6,31 @@ import (
 	"strconv"
 
 	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 func ShowCart(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
+	tokenString, err := c.Cookie("jwtTokensUser")
+	var userID uint
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
+	if err == nil && tokenString != "" {
+		claims := &middleware.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return middleware.GetJwtKey(), nil
+		})
+
+		if err == nil && token.Valid && claims.Role == "User" {
+			userID = claims.UserId
+
+			var user models.UserAuth
+			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
+				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
+			}
+		}
 	}
 
 	type CartItemWithDiscount struct {
@@ -77,26 +86,29 @@ func ShowCart(c *gin.Context) {
 		productIDs = append(productIDs, cartItem.ProductID)
 	}
 	type suggestion struct {
-		ID              uint     `json:"id"`
-		ProductName     string   `json:"product_name"`
-		RegularPrice    float64  `json:"regular_price"`
-		SalePrice       float64  `json:"sale_price"`
-		OfferPersentage int      `jso:"offer_persentage"`
-		Images          []string `json:"images"`
+		ID              uint    `json:"id"`
+		ProductName     string  `json:"product_name"`
+		RegularPrice    float64 `json:"regular_price"`
+		SalePrice       float64 `json:"sale_price"`
+		OfferPersentage int     `jso:"offer_persentage"`
+		Images          string  `json:"images"`
+		CategoryName    string  `json:"category_name"`
+		IsInWishlist    bool    `json:"is_in_wishlist"`
 	}
+
 	var suggestionProduct []models.ProductVariantDetails
 	if len(productIDs) == 0 {
 		result := config.DB.Limit(4).
 			Preload("VariantsImages", "is_deleted = ? ", false).
-			Where("is_deleted = ? AND stock_quantity != ?", false, 0).
+			Where("is_deleted = ? AND stock_quantity > ?", false, 0).
 			Find(&suggestionProduct)
 		if result.Error != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch ", "product variants", "")
 			return
 		}
 	} else {
-		result := config.DB.Limit(4).Preload("VariantsImages", "is_deleted = ?", false).
-			Where("is_deleted = ? AND id NOT IN ? AND stock_quantity != ?", false, productIDs, 0).
+		result := config.DB.Limit(4).Preload("VariantsImages").Preload("Category").
+			Where("is_deleted = ? AND id NOT IN ? AND stock_quantity > ?", false, productIDs, 0).
 			Find(&suggestionProduct)
 		if result.Error != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")
@@ -105,11 +117,12 @@ func ShowCart(c *gin.Context) {
 	}
 	var suggest []suggestion
 	for _, variant := range suggestionProduct {
-		var images []string
-		for _, img := range variant.VariantsImages {
-			images = append(images, img.ProductVariantsImages)
+		var wishlistItems models.WishlistItem
+		IsInWishlist := true
+		if err := config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?) AND product_variant_id = ?", userID, variant.ID).First(&wishlistItems).Error; err != nil {
+			IsInWishlist = false
 		}
-		DiscountAmount, TotalPercentage, _ := helper.DiscountCalculation(variant.ID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
+		DiscountAmount, TotalPercentage, _ := helper.DiscountCalculation(variant.ProductID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
 
 		suggest = append(suggest, suggestion{
 			ID:              variant.ID,
@@ -117,7 +130,9 @@ func ShowCart(c *gin.Context) {
 			RegularPrice:    variant.RegularPrice,
 			SalePrice:       variant.SalePrice - DiscountAmount,
 			OfferPersentage: int(TotalPercentage),
-			Images:          images,
+			Images:          variant.VariantsImages[0].ProductVariantsImages,
+			CategoryName:    variant.Category.Name,
+			IsInWishlist:    IsInWishlist,
 		})
 	}
 

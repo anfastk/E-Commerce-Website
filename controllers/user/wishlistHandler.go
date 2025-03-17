@@ -169,8 +169,9 @@ func RemoveFromWishlist(c *gin.Context) {
 	itemID := c.Param("id")
 
 	var wishlistItem models.WishlistItem
-	if err := config.DB.First(&wishlistItem, "id = ? AND wishlist_id = ?", itemID, wishlist.ID).Error; err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Inavlid request", "Inavlid request", "")
+	if err := config.DB.First(&wishlistItem, "product_variant_id = ? AND wishlist_id = ?", itemID, wishlist.ID).Error; err != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Inavlid request", "Something Went Wrong", "")
+		return
 	}
 
 	if err := config.DB.Unscoped().
