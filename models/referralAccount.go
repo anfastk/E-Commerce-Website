@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type ReferralAccount struct {
 	gorm.Model
-	UserID         uint `gorm:"not null"`
+	UserID         uint `gorm:"not null;index"`
 	Count          uint
 	Balance        float64
 	UserAuth       UserAuth         `gorm:"foreignKey:UserID;references:ID"`

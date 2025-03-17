@@ -6,8 +6,8 @@ import (
 
 type ShippingAddress struct {
 	gorm.Model
-	UserID    uint
-	OrderID   uint
+	UserID    uint     `gorm:"not null;index"`
+	OrderID   uint     `gorm:"not null;index"`
 	FirstName string   `gorm:"size:100"`
 	LastName  string   `gorm:"size:100"`
 	Mobile    string   `gorm:"size:15"`

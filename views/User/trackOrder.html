@@ -218,8 +218,13 @@
                 {{if eq .OrderItem.OrderStatus "Delivered"}}
                 <p>Delivered On: <span class="format-date" data-date="{{.DeliveryDate}}" data-format="long"></span>
                 </p>
+                {{if .IsReturnAvailable}}
                 <p>Return Period Ends: <span class="format-date" data-date="{{.ReturnDate}}" data-format="long"></span>
                 </p>
+                {{else}}       
+                <p>Return Window Closed On : <span class="format-date" data-date="{{.ReturnDate}}" data-format="long"></span>
+                </p>
+                {{end}}
                 {{else if eq .OrderItem.OrderStatus "Cancelled"}}
                 <p>Cancelled On: <span class="format-date" data-date="{{.CancelDate}}" data-format="long"></span></p>
                 {{else if eq .OrderItem.OrderStatus "Returned"}}
@@ -355,6 +360,7 @@
                                     <h3 class="font-medium">{{.OrderItem.ProductVariantDetails.ProductName}}</h3>
                                     <p class="text-gray-600">Quantity: {{.OrderItem.Quantity}}</p>
                                     <div class="flex space-x-2 mt-2">
+                                        {{if .IsReturnAvailable}}
                                         {{if .IsDelivered}}
                                         {{if .isAlreadyRequested}}
                                         {{else}}
@@ -458,7 +464,7 @@
 
                                         {{else}}
                                         {{end}}
-
+                                        {{end}}
                                         <!-- Modal for cancel reason -->
                                         <div id="cancelModal"
                                             class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-50 transition-opacity duration-300"

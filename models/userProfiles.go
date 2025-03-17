@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type UserProfile struct {
 	gorm.Model
-	UserID   uint     `gorm:"unique"`
+	UserID   uint     `gorm:"unique;not null;index"`
 	Mobile   string   `gorm:"unique;size:15" json:"number"`
 	Country  string   `gorm:"size:100" json:"user_country"`
 	State    string   `gorm:"size:100" json:"user_state"`

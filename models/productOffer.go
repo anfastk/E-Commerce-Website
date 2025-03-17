@@ -13,7 +13,7 @@ type ProductOffer struct {
 	OfferPercentage float64       `json:"discountpercentage"`
 	StartDate       time.Time     `gorm:"not null"`
 	EndDate         time.Time     `gorm:"not null"`
-	ProductID       uint          `gorm:"unique;not null" json:"productid"`
+	ProductID       uint          `gorm:"unique;index;not null" json:"productid"`
 	Status          string        `gorm:"not null"`
 	Product         ProductDetail `gorm:"foreignKey:ProductID"`
 }

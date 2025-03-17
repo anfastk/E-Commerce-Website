@@ -7,8 +7,9 @@
     <title>Profile</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <style>
-        /* Custom animations */
+        /* [Previous CSS remains unchanged] */
         @keyframes custom-shine {
             0% {
                 transform: translateX(-100%);
@@ -57,7 +58,6 @@
             }
         }
 
-        /* Apply animations correctly */
         .black-cart-button {
             animation: float 3s ease-in-out infinite;
         }
@@ -68,10 +68,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.3) 50%,
-                    rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
             animation: custom-shine 3s infinite;
         }
 
@@ -82,10 +79,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.3) 50%,
-                    rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
             animation: ribbon-shine 3s infinite;
         }
 
@@ -93,7 +87,6 @@
             animation: heartbeat 1.5s infinite;
         }
 
-        /* Wishlist specific styles */
         .empty-wishlist-image {
             animation: float 4s ease-in-out infinite;
         }
@@ -131,19 +124,16 @@
 </head>
 
 <body class="bg-gray-50">
-    <div class="bg-black py-4 sticky top-0 z-50 ">
+    <div class="bg-black py-4 sticky top-0 z-50">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+            <!-- [Header content remains unchanged] -->
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
-                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <button class="hover:text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -172,12 +162,8 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -185,21 +171,19 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
-                    <a href="#" class="hover:text-gray-600">Whishlist</a>
+                    <a href="#" class="hover:text-gray-600">Wishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
     </div>
+
     <div class="wishlist-header pt-3 px-4 sm:px-6 lg:px-8 mb-6">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -207,32 +191,27 @@
                     <h1 class="text-3xl font-bold text-gray-800">My Wishlist</h1>
                     <p class="text-gray-600 mt-1">Items you've saved for later</p>
                 </div>
-
                 <div class="flex items-center space-x-4">
                     <div class="bg-white shadow-md rounded-lg px-4 py-2 flex items-center">
                         <span class="text-gray-800 font-medium">Total Items:</span>
                         <span id="wishlist-count"
                             class="ml-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">{{.Count}}</span>
                     </div>
-
-                    <form action="/wishlist/all/products/move/cart" method="post">
-                        <button id="move-all-to-cart" type="submit"
-                            class="move-all-btn text-white rounded-lg px-6 py-3 font-medium flex items-center relative">
-                            <div class="custom-shine-element"></div>
-                            <span class="relative z-10 flex items-center">
-                                <i class="fas fa-shopping-cart mr-2"></i>
-                                Move All to Cart
-                            </span>
-                        </button>
-                    </form>
+                    <button id="move-all-to-cart"
+                        class="move-all-btn text-white rounded-lg px-6 py-3 font-medium flex items-center relative"
+                        onclick="handleMoveAllToCart(event)">
+                        <div class="custom-shine-element"></div>
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Move All to Cart
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Wishlist Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <!-- Empty wishlist state -->
         <div id="empty-wishlist" class="hidden flex flex-col items-center justify-center py-16 my-24">
             <h3 class="text-2xl font-semibold text-gray-800 mt-6">Your wishlist is empty</h3>
             <p class="text-gray-600 mt-2 text-center max-w-md">Start saving items you love by clicking the heart icon on
@@ -243,7 +222,6 @@
             </a>
         </div>
 
-        <!-- Wishlist items -->
         <div id="wishlist-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {{range .Data}}
             <div class="wishlist-card bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
@@ -253,7 +231,6 @@
                             {{.DiscountPercentage}}% OFF</div>
                     </div>
                     <form action="/wishlist/remove/{{.ProductID}}" method="post">
-
                         <button type="submit"
                             class="z-20 absolute top-2 right-2 bg-white p-2 rounded-full shadow hover:bg-red-50 animate-heartbeat">
                             <i class="fas fa-trash-alt text-red-500"></i>
@@ -269,9 +246,8 @@
                 <div class="p-4">
                     <h3 class="text-lg font-semibold truncate">{{.ProductName}}</h3>
                     <div class="mt-2 flex items-center space-x-2">
-                        <span class="text-black font-bold text-lg">&#8377;{{printf "%.2f" .ProductSalePrice}}</span>
-                        <span class="line-through text-gray-400 text-sm">&#8377;{{printf "%.2f"
-                            .ProductRegularPrice}}</span>
+                        <span class="text-black font-bold text-lg">₹{{printf "%.2f" .ProductSalePrice}}</span>
+                        <span class="line-through text-gray-400 text-sm">₹{{printf "%.2f" .ProductRegularPrice}}</span>
                     </div>
                     {{if .IsStockAvailable}}
                     {{if .IsInCart}}
@@ -296,8 +272,8 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">
+        <!-- [Footer content remains unchanged] -->
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
@@ -306,18 +282,10 @@
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-x"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-youtube"></i>
-                        </a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-x"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div>
@@ -357,19 +325,29 @@
                 </div>
             </div>
             <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
-                <p>&copy; 2025 LAPTIX, Inc</p>
+                <p>© 2025 LAPTIX, Inc</p>
             </div>
         </div>
     </footer>
-    <script>
-        // wishlist.js - Handles all wishlist functionality
 
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Check if wishlist has items
             const wishlistItems = document.getElementById('wishlist-items');
             const emptyWishlist = document.getElementById('empty-wishlist');
-
-            // Show empty state if no items are present
             if (wishlistItems && wishlistItems.children.length === 0) {
                 wishlistItems.classList.add('hidden');
                 emptyWishlist.classList.remove('hidden');
@@ -380,13 +358,9 @@
             removeForms.forEach(form => {
                 form.addEventListener('submit', function (event) {
                     event.preventDefault();
-
                     const wishlistId = form.action.split('/').pop();
                     const wishlistCard = form.closest('.wishlist-card');
-
-                    // Show confirmation dialog
                     if (confirm('Are you sure you want to remove this item from your wishlist?')) {
-                        // Send AJAX request to remove item
                         fetch(form.action, {
                             method: 'POST',
                             headers: {
@@ -395,58 +369,47 @@
                             }
                         })
                             .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
+                                if (!response.ok) throw new Error('Network response was not ok');
                                 return response.json();
                             })
                             .then(data => {
                                 if (data.success) {
-                                    // Remove the item with animation
                                     wishlistCard.classList.add('fade-out');
-                                    location.reload();
-
-                                    // After animation completes, remove the element
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1250);
                                     setTimeout(() => {
                                         wishlistCard.remove();
-
-                                        // Check if wishlist is now empty
                                         if (wishlistItems.children.length === 0) {
                                             wishlistItems.classList.add('hidden');
                                             emptyWishlist.classList.remove('hidden');
                                         }
-
-                                        // Show success notification
-                                        showNotification('Item removed from wishlist', 'success');
+                                        showSuccessToast('Item removed from wishlist', 'success');
                                     }, 300);
                                 } else {
-                                    showNotification('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
-                                    location.reload();
-
+                                    showSuccessToast('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1250);
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                showNotification('An error occurred while removing the item', 'error');
+                                showSuccessToast('An error occurred while removing the item', 'error');
                             });
                     }
                 });
             });
 
-            // Handle "Move to Cart" forms
+            // Handle individual "Move to Cart" forms
             const moveToCartForms = document.querySelectorAll('form[action^="/wishlist/products/move/cart/"]');
             moveToCartForms.forEach(form => {
                 form.addEventListener('submit', function (event) {
                     event.preventDefault();
-
                     const wishlistId = form.action.split('/').pop();
                     const button = form.querySelector('button');
-
-                    // Disable button and show loading state
                     button.disabled = true;
                     button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
-
-                    // Send AJAX request to move item to cart
                     fetch(form.action, {
                         method: 'POST',
                         headers: {
@@ -455,165 +418,153 @@
                         }
                     })
                         .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
+                            if (!response.ok) throw new Error('Network response was not ok');
                             return response.json();
                         })
                         .then(data => {
                             if (data.success) {
-                                // Update button to "Go to Cart"
                                 const wishlistCard = form.closest('.wishlist-card');
                                 const buttonContainer = form.parentElement;
-
-                                // Replace form with link
                                 buttonContainer.innerHTML = `
-                        <a href="/cart" 
-                           class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
-                           <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
-                        </a>
-                    `;
-
-                                // Update cart counter in navbar if it exists
+                                <a href="/cart" 
+                                   class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                   <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
+                                </a>
+                            `;
                                 const cartCounter = document.querySelector('.cart-counter');
                                 if (cartCounter && data.cartCount) {
                                     cartCounter.textContent = data.cartCount;
                                     cartCounter.classList.remove('hidden');
                                 }
-
-                                // Show success notification
-                                showNotification('Item added to your cart', 'success');
-                                location.reload();
-
+                                showSuccessToast('Item added to your cart', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1250);
                             } else {
-                                // Reset button state
                                 button.disabled = false;
                                 button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-
-                                // Show error notification
-                                showNotification(data.message || 'Failed to add item to cart', 'error');
-                                location.reload();
-
+                                showSuccessToast(data.message || 'Failed to add item to cart', 'error');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1250);
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-
-                            // Reset button state
                             button.disabled = false;
                             button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-
-                            showNotification('An error occurred while adding to cart', 'error');
+                            showSuccessToast('An error occurred while adding to cart', 'error');
                         });
                 });
             });
 
-            // Notification handler function
-            function showNotification(message, type = 'info') {
-                // Check if notification container exists, if not create it
-                let notificationContainer = document.getElementById('notification-container');
-                if (!notificationContainer) {
-                    notificationContainer = document.createElement('div');
-                    notificationContainer.id = 'notification-container';
-                    notificationContainer.className = 'fixed bottom-4 right-4 z-50 flex flex-col space-y-2';
-                    document.body.appendChild(notificationContainer);
-                }
-
-                // Create notification element
-                const notification = document.createElement('div');
-                notification.className = `px-4 py-3 rounded-lg shadow-lg flex items-center justify-between min-w-72 transform transition-all duration-300 translate-x-full`;
-
-                // Set notification type specific styles
-                switch (type) {
-                    case 'success':
-                        notification.classList.add('bg-green-500', 'text-white');
-                        notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-check-circle mr-2"></i>
-                        <span>${message}</span>
-                    </div>
-                    <button class="ml-4 text-white focus:outline-none">
-                        <i class="fas fa-times"></i>
-                    </button>
+            // Handle "Move All to Cart" functionality
+            window.handleMoveAllToCart = function (event) {
+                event.preventDefault();
+                const button = document.getElementById('move-all-to-cart');
+                button.disabled = true;
+                button.innerHTML = `
+                    <span class="relative z-10 flex items-center">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        Moving...
+                    </span>
                 `;
-                        break;
-                    case 'error':
-                        notification.classList.add('bg-red-500', 'text-white');
-                        notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-circle mr-2"></i>
-                        <span>${message}</span>
-                    </div>
-                    <button class="ml-4 text-white focus:outline-none">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                        break;
-                    default:
-                        notification.classList.add('bg-blue-500', 'text-white');
-                        notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        <span>${message}</span>
-                    </div>
-                    <button class="ml-4 text-white focus:outline-none">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                }
+                fetch('/wishlist/all/products/move/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        button.disabled = false;
+                        button.innerHTML = `
+                        <div class="custom-shine-element"></div>
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Move All to Cart
+                        </span>
+                    `;
+                        if (data.success) {
+                            const wishlistItems = document.getElementById('wishlist-items');
+                            const emptyWishlist = document.getElementById('empty-wishlist');
+                            document.querySelectorAll('.black-cart-button').forEach(btn => {
+                                const container = btn.parentElement.parentElement;
+                                container.innerHTML = `
+                                <a href="/cart" 
+                                   class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                   <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
+                                </a>
+                            `;
+                            });
+                            const wishlistCount = document.getElementById('wishlist-count');
+                            if (wishlistCount && data.remainingCount !== undefined) {
+                                wishlistCount.textContent = data.remainingCount;
+                            }
+                            if (data.remainingCount === 0) {
+                                wishlistItems.classList.add('hidden');
+                                emptyWishlist.classList.remove('hidden');
+                            }
+                            showSuccessToast(data.message || 'Items moved to cart successfully', 'success');
+                            if (data.cartCount) {
+                                const cartCounter = document.querySelector('.cart-counter');
+                                if (cartCounter) {
+                                    cartCounter.textContent = data.cartCount;
+                                    cartCounter.classList.remove('hidden');
+                                }
+                            }
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1250);
+                        } else {
+                            showSuccessToast(data.message || 'Failed to move items to cart', 'error');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1250);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        button.disabled = false;
+                        button.innerHTML = `
+                        <div class="custom-shine-element"></div>
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Move All to Cart
+                        </span>
+                    `;
+                        showSuccessToast('An error occurred while moving items to cart', 'error');
+                    });
+            };
 
-                // Add to container
-                notificationContainer.appendChild(notification);
-
-                // Animate in
-                setTimeout(() => {
-                    notification.classList.remove('translate-x-full');
-                }, 10);
-
-                // Set up close button
-                const closeButton = notification.querySelector('button');
-                closeButton.addEventListener('click', () => {
-                    closeNotification(notification);
-                });
-
-                // Auto-close after 5 seconds
-                setTimeout(() => {
-                    closeNotification(notification);
-                }, 5000);
-
-                function closeNotification(notificationElement) {
-                    notificationElement.classList.add('translate-x-full', 'opacity-0');
-                    setTimeout(() => {
-                        notificationElement.remove();
-                    }, 300);
-                }
-            }
-
-            // Add animation styles to the document
+            // Animation styles
             const styleElement = document.createElement('style');
             styleElement.textContent = `
-        .fade-out {
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: opacity 300ms, transform 300ms;
-        }
-        
-        .animate-heartbeat {
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            5% { transform: scale(1.1); }
-            10% { transform: scale(1); }
-            15% { transform: scale(1.1); }
-            20% { transform: scale(1); }
-            100% { transform: scale(1); }
-        }
-    `;
+                .fade-out {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                    transition: opacity 300ms, transform 300ms;
+                }
+                .animate-heartbeat {
+                    animation: heartbeat 1.5s ease-in-out infinite;
+                }
+                @keyframes heartbeat {
+                    0% { transform: scale(1); }
+                    5% { transform: scale(1.1); }
+                    10% { transform: scale(1); }
+                    15% { transform: scale(1.1); }
+                    20% { transform: scale(1); }
+                    100% { transform: scale(1); }
+                }
+            `;
             document.head.appendChild(styleElement);
         });
     </script>
+    <script src="/static/js/toastMain.js"></script>
 </body>
 
 </html>

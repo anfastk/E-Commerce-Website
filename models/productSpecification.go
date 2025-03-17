@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type ProductSpecification struct {
 	gorm.Model
-	ProductVariantID   uint                  `gorm:"not null"`
+	ProductVariantID   uint                  `gorm:"not null;index"`
 	SpecificationKey   string                `gorm:"not null;size:255" json:"specificationkey"`
 	SpecificationValue string                `gorm:"not null;size:255" json:"specificationvalue"`
 	IsDeleted          bool                  `gorm:"default:false"`

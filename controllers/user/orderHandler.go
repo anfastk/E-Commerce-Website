@@ -33,6 +33,7 @@ func TrackingPage(c *gin.Context) {
 	var orderItem models.OrderItem
 	if err := config.DB.Preload("ProductVariantDetails").
 		Preload("ProductVariantDetails.VariantsImages").
+		Preload("ProductVariantDetails.Product").
 		First(&orderItem, "id = ? AND user_id = ?", orderID, userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Order items Not found", "Something Went Wrong", "")
 		return
@@ -124,6 +125,17 @@ func TrackingPage(c *gin.Context) {
 		isAlreadyRequested = false
 	}
 
+	currentTime := time.Now()
+	deliveryDate := orderItem.DeliveryDate
+	daysSinceDelivery := currentTime.Sub(deliveryDate).Hours() / 24
+	if daysSinceDelivery > 7 {
+		orderItem.ReturnableStatus = false
+	}
+	if err := config.DB.Save(&orderItem).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product", "Something Went Wrong", "")
+		return
+	}
+
 	c.HTML(http.StatusOK, "trackOrder.html", gin.H{
 		"status":                  "success",
 		"message":                 "Order details fetched successfully",
@@ -135,6 +147,7 @@ func TrackingPage(c *gin.Context) {
 		"IsDelivered":             isDelivered,
 		"ProductDiscount":         productDiscount,
 		"TotalDiscount":           totalDiscount,
+		"IsReturnAvailable":       orderItem.ProductVariantDetails.Product.IsReturnable && orderItem.ReturnableStatus,
 		"isAllOrderCancel":        isAllOrderCancel,
 		"isAlreadyRequested":      isAlreadyRequested,
 		"IsCancelSpecificOrder":   IsCancelSpecificOrder,

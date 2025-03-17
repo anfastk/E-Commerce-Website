@@ -6,8 +6,8 @@ import (
 
 type PaymentDetail struct {
 	gorm.Model
-	UserID        uint      `gorm:"not null"`
-	OrderItemID   uint      `gorm:"not null"`
+	UserID        uint      `gorm:"not null;index"`
+	OrderItemID   uint      `gorm:"not null;index"`
 	PaymentStatus string    `gorm:"type:varchar(255);default:'Pending'" json:"status"`
 	PaymentAmount float64   `gorm:"type:numeric(10,2)"`
 	Receipt       string    `gorm:"size:255"`

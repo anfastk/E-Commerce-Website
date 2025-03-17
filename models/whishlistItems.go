@@ -6,9 +6,9 @@ import (
 
 type WishlistItem struct {
 	gorm.Model
-	WishlistID            uint
-	ProductVariantID      uint
-	ProductID             uint
+	WishlistID            uint                  `gorm:"not null;index"`
+	ProductVariantID      uint                  `gorm:"not null;index"`
+	ProductID             uint                  `gorm:"not null;index"`
 	ProductVariantDetails ProductVariantDetails `gorm:"foreignkey:ProductVariantID"`
 	ProductDetail         ProductDetail         `gorm:"foreignkey:ProductID"`
 }

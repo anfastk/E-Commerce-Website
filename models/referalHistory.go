@@ -6,8 +6,8 @@ import (
 
 type ReferalHistory struct {
 	gorm.Model
-	ReferralID      uint            `gorm:"not null"`
-	JoinedUserId    uint            `gorm:"not null"`
+	ReferralID      uint            `gorm:"not null;index"`
+	JoinedUserId    uint            `gorm:"not null;index"`
 	Status          string          `gorm:"type:varchar(10);default:'Pending'"`
 	Reward          float64         `gorm:"not null"`
 	JoinedUser      UserAuth        `gorm:"foreignKey:JoinedUserId;references:ID"`

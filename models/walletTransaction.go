@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 type WalletTransaction struct {
 	gorm.Model
-	UserID        uint     `gorm:"not null"`
-	WalletID      uint     `gorm:"not null"`
+	UserID        uint     `gorm:"not null;index"`
+	WalletID      uint     `gorm:"not null;index"`
 	Amount        float64  `gorm:"not null"`
-	LastBalance float64 `gorm:"not null"`
+	LastBalance   float64  `gorm:"not null"`
 	Description   string   `gorm:"size:150"`
 	Type          string   `gorm:"size:50"`
 	Receipt       string   `gorm:"size:255"`

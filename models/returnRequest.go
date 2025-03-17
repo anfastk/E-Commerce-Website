@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 type ReturnRequest struct {
 	gorm.Model
-	RequestUID            string                `gorm:"not null"`
-	OrderItemID           uint                  `gorm:"not null"`
-	ProductVariantID      uint                  `gorm:"not null"`
-	UserID                uint                  `gorm:"not null"`
+	RequestUID            string                `gorm:"not null;index"`
+	OrderItemID           uint                  `gorm:"not null;index"`
+	ProductVariantID      uint                  `gorm:"not null;index"`
+	UserID                uint                  `gorm:"not null;index"`
 	Reason                string                `gorm:"not null"`
 	AdditionalDetails     string                `gorm:"not null"`
 	AdminNotes            string              

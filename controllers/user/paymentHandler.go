@@ -158,6 +158,23 @@ func PaymentPage(c *gin.Context) {
 
 	TotalDiscount := totalDiscount + request.CouponDiscountAmount
 	total := (salePrice + tax) - request.CouponDiscountAmount
+	IsCodAvailable := true
+
+	for _, itm := range cartItems {
+		var productDetail models.ProductDetail
+		if err := config.DB.First(&productDetail, itm.ProductID).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Prduct Not Found", "Something Went Wrong", "/checkout")
+			return
+		}
+		if !productDetail.IsCODAvailable {
+			IsCodAvailable = false
+			break
+		}
+	}
+
+	if total > 75000 {
+		IsCodAvailable = false
+	}
 
 	tx.Commit()
 	CheckForReferrer(c)
@@ -176,7 +193,7 @@ func PaymentPage(c *gin.Context) {
 		"CouponDiscount":  request.CouponDiscountAmount,
 		"ProductDiscount": productDiscount,
 		"TotalDiscount":   TotalDiscount,
-		"IsCodAvailable":  total < 75000,
+		"IsCodAvailable":  IsCodAvailable,
 		"Total":           total,
 		"code":            http.StatusOK,
 	})
@@ -291,7 +308,7 @@ func ProceedToPayment(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
-			"amount":   total - couponDiscountAmount *100,
+			"amount":   total - couponDiscountAmount*100,
 			"currency": "INR",
 			"key_id":   config.RAZORPAY_KEY_ID,
 			"prefill": gin.H{

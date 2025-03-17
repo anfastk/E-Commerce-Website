@@ -6,9 +6,9 @@ import (
 
 type CartItem struct {
 	gorm.Model
-	CartID           uint                  `gorm:"not null"`
-	ProductID        uint                  `gorm:"not null"`
-	ProductVariantID uint                  `gorm:"not null"`
+	CartID           uint                  `gorm:"not null;index"`
+	ProductID        uint                  `gorm:"not null;index"`
+	ProductVariantID uint                  `gorm:"not null;index"`
 	Quantity         int                   `gorm:"not null"`
 	Cart             Cart                  `gorm:"foreignKey:CartID;constraint:OnDelete:CASCADE"`
 	ProductDetail    ProductDetail         `gorm:"foreignKey:ProductID"`

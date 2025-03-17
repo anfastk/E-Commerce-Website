@@ -8,22 +8,22 @@ import (
 
 type OrderItem struct {
 	gorm.Model
-	OrderID               uint                  `gorm:"not null"`
-	UserID                uint                  `gorm:"not null"`
-	ProductVariantID      uint                  `gorm:"not null"`
-	Quantity              int                   `gorm:"not null"`
+	OrderID               uint                  `gorm:"not null;index"`
+	UserID                uint                  `gorm:"not null;index"`
+	ProductVariantID      uint                  `gorm:"not null;index"`
+	Quantity              int                   `gorm:"not null;index"`
 	ProductImage          string                `gorm:"not null"`
-	ProductName           string                `gorm:"not null"`
+	ProductName           string                `gorm:"not null;index"`
 	ProductSummary        string                `gorm:"not null"`
 	ProductCategory       string                `gorm:"not null"`
-	ProductRegularPrice   float64               `gorm:"type:numeric(10,2);not null"`
-	ProductSalePrice      float64               `gorm:"type:numeric(10,2);not null"`
-	SubTotal              float64               `gorm:"type:numeric(10,2)" json:"subtotal"`
-	Tax                   float64               `gorm:"type:numeric(10,2)" json:"tax"`
-	Total                 float64               `gorm:"type:numeric(10,2)" json:"total"`
-	OrderStatus           string                `gorm:"type:varchar(255);default:'Pending'" json:"status"`
-	IsDelivered           bool                  `gorm:"default:false"`
-	ExpectedDeliveryDate  time.Time             `gorm:"not null"`
+	ProductRegularPrice   float64               `gorm:"index;type:numeric(10,2);not null"`
+	ProductSalePrice      float64               `gorm:"index;type:numeric(10,2);not null"`
+	SubTotal              float64               `gorm:"index;type:numeric(10,2)" json:"subtotal"`
+	Tax                   float64               `gorm:"index;type:numeric(10,2)" json:"tax"`
+	Total                 float64               `gorm:"index;type:numeric(10,2)" json:"total"`
+	OrderStatus           string                `gorm:"index;type:varchar(255);index;default:'Pending'" json:"status"`
+	IsDelivered           bool                  `gorm:"index;default:false"`
+	ExpectedDeliveryDate  time.Time             `gorm:"index;not null"`
 	ReturnableStatus      bool                  `gorm:"default:true"`
 	OrderUID              string                `gorm:"unique,not null" json:"orderuid"`
 	Reason				  string

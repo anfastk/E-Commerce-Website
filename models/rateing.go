@@ -6,8 +6,8 @@ import (
 
 type Rating struct {
 	gorm.Model
-	UserID        uint          `json:"rateing_user"`
-	ProductID     uint          `json:"rateing_product"`
+	UserID        uint           `gorm:"not null;index" json:"rateing_user"`
+	ProductID     uint           `gorm:"not null;index" json:"rateing_product"`
 	Value         float64       `json:"rateing"`
 	UserAuth      UserAuth      `gorm:"foreignKey:UserID;references:ID"`
 	ProductDetail ProductDetail `gorm:"foreignKey:ProductID;references:ID"`

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -546,6 +547,7 @@ func OrderDetails(c *gin.Context) {
 		ReturnDate           string  `json:"returndate"`
 		ReturnableDate       string  `json:"returnabledate"`
 		CancelDate           string  `json:"canceldate"`
+		IsReturnable         bool    `json:"is_returnable"`
 		ExpectedDeliveryDate string  `json:"expecteddeliverydate"`
 	}
 
@@ -578,6 +580,18 @@ func OrderDetails(c *gin.Context) {
 			return
 		}
 		for i, item := range orderItems {
+
+			currentTime := time.Now()
+			deliveryDate := item.DeliveryDate
+			daysSinceDelivery := currentTime.Sub(deliveryDate).Hours() / 24
+			if daysSinceDelivery > 7 {
+				item.ReturnableStatus = false
+			}
+			if err := config.DB.Save(&item).Error; err != nil {
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product", "Something Went Wrong", "")
+				return
+			}
+
 			var payment models.PaymentDetail
 			if payErr := config.DB.First(&payment, "user_id = ? AND order_item_id = ?", userID, item.ID).Error; payErr != nil {
 				helper.RespondWithError(c, http.StatusInternalServerError, "Payment details Not found", "Something Went Wrong", "")
@@ -606,6 +620,7 @@ func OrderDetails(c *gin.Context) {
 				DeliveryDate:         formattedDeliveryDate,
 				ReturnDate:           formattedReturnDate,
 				CancelDate:           formattedCancelDate,
+				IsReturnable:         item.ReturnableStatus,
 				ExpectedDeliveryDate: formattedExpectedDeliveryDate,
 			}
 			orderResponses = append(orderResponses, orderResponse)
