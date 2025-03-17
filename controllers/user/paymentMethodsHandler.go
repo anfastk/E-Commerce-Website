@@ -38,17 +38,8 @@ func CODPayment(c *gin.Context, tx *gorm.DB, userId uint, orderId string, order_
 }
 
 func FetchWalletBalance(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var walletDetails models.Wallet
 	if err := config.DB.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
@@ -88,17 +79,8 @@ var RazorPayOrderID string
 
 func VerifyRazorpayPayment(c *gin.Context) {
 	currentTime := time.Now()
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var verifyRequest struct {
 		PaymentID string `json:"razorpay_payment_id"`
@@ -210,17 +192,8 @@ func VerifyRazorpayPayment(c *gin.Context) {
 
 func PaymentFailureHandler(c *gin.Context) {
 	currentTime := time.Now()
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var verifyRequest struct {
 		PaymentID string `json:"razorpay_payment_id"`
@@ -316,17 +289,8 @@ func PaymentFailureHandler(c *gin.Context) {
 }
 
 func VerifyPayNowRazorpayPayment(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var verifyRequest struct {
 		PaymentID   string `json:"razorpay_payment_id"`

@@ -16,18 +16,8 @@ import (
 )
 
 func TrackingPage(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
-
+	
+	userID := helper.FetchUserID(c)
 	orderID := c.Param("id")
 
 	var orderItem models.OrderItem
@@ -278,17 +268,8 @@ func SaveOrderAddress(c *gin.Context, tx *gorm.DB, orderID uint, userID uint, ad
 }
 
 func ClearCart(c *gin.Context, tx *gorm.DB, ordered map[uint]int) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var cart models.Cart
 
@@ -315,17 +296,8 @@ func ClearCart(c *gin.Context, tx *gorm.DB, ordered map[uint]int) {
 }
 
 func ShowSuccessPage(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	today := time.Now().Format("2006-01-02")
 	var order models.Order
@@ -457,17 +429,8 @@ func DeleteReservedItems(c *gin.Context, tx *gorm.DB, productVariantID uint, use
 }
 
 func CancelSpecificOrder(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	orderItemID := c.Param("id")
 	var inputReason struct {
@@ -669,17 +632,8 @@ func CancelSpecificOrder(c *gin.Context) {
 }
 
 func CancelAllOrderItems(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	orderID := c.Param("id")
 	var inputReason struct {
@@ -849,17 +803,8 @@ func CancelAllOrderItems(c *gin.Context) {
 }
 
 func ReturnOrder(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var input struct {
 		Reason            string `json:"reason" binding:"required"`

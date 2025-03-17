@@ -29,17 +29,8 @@ func CreateWallet(c *gin.Context, userID uint) {
 }
 
 func WalletHandler(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	type TransactionHistoryWallet struct {
 		Date        string  `json:"date"`
@@ -96,17 +87,8 @@ func WalletHandler(c *gin.Context) {
 }
 
 func AddMoneyTOWalltet(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var addMoneyInput struct {
 		PaymentMethod string  `json:"paymentMethod"`
@@ -170,17 +152,8 @@ func AddMoneyTOWalltet(c *gin.Context) {
 }
 
 func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var verifyRequest struct {
 		PaymentID string  `json:"razorpay_payment_id"`

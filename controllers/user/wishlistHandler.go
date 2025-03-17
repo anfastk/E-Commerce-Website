@@ -11,17 +11,8 @@ import (
 )
 
 func ShowWishlist(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusUnauthorized, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	type responce struct {
 		WishListID          uint
@@ -88,17 +79,8 @@ func ShowWishlist(c *gin.Context) {
 }
 
 func AddToWishlist(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusUnauthorized, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
 
@@ -149,17 +131,9 @@ func AddToWishlist(c *gin.Context) {
 }
 
 func RemoveFromWishlist(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
 	var wishlist models.Wishlist
 	if err := config.DB.First(&wishlist, "user_id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Wishlist Not Found", "Something Went Wrong", "")
@@ -189,17 +163,8 @@ func RemoveFromWishlist(c *gin.Context) {
 }
 
 func WishlistTOCart(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
 
@@ -268,17 +233,9 @@ func WishlistTOCart(c *gin.Context) {
 }
 
 func WishlistAllTOCart(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
 	tx := config.DB.Begin()
 	var wishlist models.Wishlist
 	if err := tx.First(&wishlist, "user_id = ?", userID).Error; err != nil {

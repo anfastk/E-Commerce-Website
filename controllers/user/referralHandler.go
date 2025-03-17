@@ -13,17 +13,8 @@ import (
 )
 
 func ShowReferralPage(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var userauth models.UserAuth
 	if err := config.DB.First(&userauth, userID).Error; err != nil {
@@ -152,17 +143,8 @@ func AddReferral(c *gin.Context) {
 }
 
 func CheckForReferrer(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
 
@@ -267,17 +249,8 @@ func CheckForReferrer(c *gin.Context) {
 }
 
 func CheckForJoinee(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
 

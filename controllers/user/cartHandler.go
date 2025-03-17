@@ -1,37 +1,18 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/anfastk/E-Commerce-Website/config"
-	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
 func ShowCart(c *gin.Context) {
-	tokenString, err := c.Cookie("jwtTokensUser")
-	var userID uint
 
-	if err == nil && tokenString != "" {
-		claims := &middleware.Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return middleware.GetJwtKey(), nil
-		})
-
-		if err == nil && token.Valid && claims.Role == "User" {
-			userID = claims.UserId
-
-			var user models.UserAuth
-			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
-				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
-			}
-		}
-	}
+	userID := helper.FetchUserID(c)
 
 	type CartItemWithDiscount struct {
 		Item          models.CartItem
@@ -143,17 +124,8 @@ func ShowCart(c *gin.Context) {
 }
 
 func AddToCart(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
-
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var cart models.Cart
 	tx := config.DB.Begin()
@@ -276,17 +248,8 @@ func CartItemUpdate(c *gin.Context) {
 }
 
 func ShowCartTotal(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
+	userID := helper.FetchUserID(c)
 
 	var subTotal float64
 	var total float64
@@ -306,7 +269,6 @@ func ShowCartTotal(c *gin.Context) {
 		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
 		subTotal += items.ProductVariant.RegularPrice * float64(items.Quantity)
 		total += (items.ProductVariant.SalePrice - discountAmount) * float64(items.Quantity)
-		fmt.Println(subTotal, total, int(subTotal-total))
 
 	}
 	cartDiscountAmount := subTotal - total
@@ -323,17 +285,8 @@ func ShowCartTotal(c *gin.Context) {
 	})
 }
 func CartCount(c *gin.Context) int {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return 0
-	}
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return 0
-	}
+	userID := helper.FetchUserID(c)
 
 	var count int
 	var cart models.Cart
@@ -361,17 +314,8 @@ func CartCount(c *gin.Context) int {
 }
 
 func DeleteCartItems(c *gin.Context) {
-	userIDInterface, exists := c.Get("userid")
-	if !exists {
-		helper.RespondWithError(c, http.StatusBadRequest, "Unauthorized", "Login First", "")
-		return
-	}
+	userID := helper.FetchUserID(c)
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user ID type", "Something Went Wrong", "")
-		return
-	}
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
 		helper.RespondWithError(c, http.StatusBadRequest, "Cart Not Found", "Something Went Wrong", "")

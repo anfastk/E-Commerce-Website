@@ -46,8 +46,8 @@ func ShowProductsAdmin(c *gin.Context) {
 			images = append(images, img.ProductVariantsImages)
 		}
 
-		categoryName := "Uncategorized" // Default value
-		if variant.Category.ID != 0 {   // Check if category exists
+		categoryName := "Uncategorized" 
+		if variant.Category.ID != 0 {  
 			categoryName = variant.Category.Name
 		}
 

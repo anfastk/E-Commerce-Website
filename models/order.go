@@ -8,7 +8,7 @@ import (
 
 type Order struct {
 	gorm.Model
-	OrderUID             string          `gorm:"not null"`
+	OrderUID             string          `gorm:"index;not null"`
 	UserID               uint            `gorm:"not null;index"`
 	SubTotal             float64         `gorm:"index;type:numeric(10,2)"`
 	TotalProductDiscount float64         `gorm:"type:numeric(10,2)"`

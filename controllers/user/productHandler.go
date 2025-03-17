@@ -67,24 +67,8 @@ type ProductVariantResponse struct {
 }
 
 func ShowProducts(c *gin.Context) {
-	tokenString, err := c.Cookie("jwtTokensUser")
-	var userID uint
-
-	if err == nil && tokenString != "" {
-		claims := &middleware.Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return middleware.GetJwtKey(), nil
-		})
-
-		if err == nil && token.Valid && claims.Role == "User" {
-			userID = claims.UserId
-
-			var user models.UserAuth
-			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
-				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
-			}
-		}
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var cartItems []models.CartItem
 	var wishlistItems []models.WishlistItem
@@ -166,24 +150,8 @@ func ShowProducts(c *gin.Context) {
 }
 
 func FilterProducts(c *gin.Context) {
-	tokenString, err := c.Cookie("jwtTokensUser")
-	var userID uint
-
-	if err == nil && tokenString != "" {
-		claims := &middleware.Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return middleware.GetJwtKey(), nil
-		})
-
-		if err == nil && token.Valid && claims.Role == "User" {
-			userID = claims.UserId
-
-			var user models.UserAuth
-			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
-				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
-			}
-		}
-	}
+	
+	userID := helper.FetchUserID(c)
 
 	var cartItems []models.CartItem
 	var wishlistItems []models.WishlistItem
@@ -347,24 +315,7 @@ type SpecificationResponse struct {
 
 func ShowProductDetail(c *gin.Context) {
 
-	tokenString, err := c.Cookie("jwtTokensUser")
-	var userID uint
-
-	if err == nil && tokenString != "" {
-		claims := &middleware.Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return middleware.GetJwtKey(), nil
-		})
-
-		if err == nil && token.Valid && claims.Role == "User" {
-			userID = claims.UserId
-
-			var user models.UserAuth
-			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
-				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
-			}
-		}
-	}
+	userID := helper.FetchUserID(c)
 
 	productID := c.Param("id")
 

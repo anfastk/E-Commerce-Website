@@ -92,15 +92,12 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
-	// Page width calculation for centering
-	pageWidth := 210.0 // A4 width in mm
+	pageWidth := 210.0 
 
-	// Logo on left top corner
 	if _, err := os.Stat(config.CompanyConfig.LogoFilePath); err == nil {
 		pdf.Image(config.CompanyConfig.LogoFilePath, 10, 10, 40, 0, false, "", 0, "")
 	}
 
-	// Invoice heading centered on the page
 	pdf.SetFont("Arial", "B", 20)
 	title := "INVOICE"
 	titleWidth := pdf.GetStringWidth(title)
@@ -108,7 +105,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.Cell(titleWidth, 10, title)
 	pdf.Ln(20)
 
-	// Left column - Order Details
 	pdf.SetFont("Arial", "B", 12)
 	pdf.SetXY(10, 40)
 	pdf.Cell(80, 10, "ORDER DETAILS")
@@ -125,7 +121,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.Cell(80, 6, fmt.Sprintf("Payment Method: %s", order.PaymentMethod)) */
 	pdf.Ln(10)
 
-	// Company Details (now positioned under Order Details)
 	pdf.SetFont("Arial", "B", 12)
 	pdf.SetX(10)
 	pdf.Cell(90, 10, "COMPANY DETAILS")
@@ -145,7 +140,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.Cell(90, 6, "Email: "+config.CompanyConfig.Email)
 	pdf.Ln(10)
 
-	// Shipping Address (moved down to accommodate company details)
 	pdf.SetFont("Arial", "B", 12)
 	pdf.SetX(10)
 	pdf.Cell(90, 10, "SHIPPING ADDRESS")
@@ -177,16 +171,13 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	}
 	pdf.Ln(10)
 
-	// Product Details Table
 	pdf.SetFont("Arial", "B", 12)
 	pdf.Cell(190, 10, "PRODUCT DETAILS")
 	pdf.Ln(10)
 
-	// Table Headers with borders
 	pdf.SetFillColor(240, 240, 240)
 	pdf.SetFont("Arial", "B", 10)
 
-	// Create table header with borders
 	pdf.CellFormat(75, 8, "Product", "1", 0, "L", true, 0, "")
 	pdf.CellFormat(20, 8, "Quantity", "1", 0, "C", true, 0, "")
 	pdf.CellFormat(25, 8, "Price", "1", 0, "R", true, 0, "")
@@ -194,7 +185,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.CellFormat(20, 8, "Tax", "1", 0, "R", true, 0, "")
 	pdf.CellFormat(25, 8, "Total", "1", 1, "R", true, 0, "")
 
-	// Table Rows
 	pdf.SetFont("Arial", "", 10)
 	var subtotal float64
 	var totalDiscount float64
@@ -202,7 +192,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 
 	for _, item := range orderItems {
 		product := products[item.ProductVariantID]
-		// Calculate values
 		regularPrice := item.ProductRegularPrice
 		discountPrice := item.ProductSalePrice
 		discount := regularPrice - discountPrice
@@ -212,12 +201,10 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 
 		lineTotal := (discountPrice + taxAmount) * quantity
 
-		// Update totals
 		subtotal += regularPrice * quantity
 		totalDiscount += order.TotalProductDiscount
 		totalTax += taxAmount
 
-		// Print row with borders using CellFormat
 		pdf.CellFormat(75, 8, product.ProductName, "1", 0, "L", false, 0, "")
 		pdf.CellFormat(20, 8, strconv.Itoa(item.Quantity), "1", 0, "C", false, 0, "")
 		pdf.CellFormat(25, 8, fmt.Sprintf("%.2f", regularPrice), "1", 0, "R", false, 0, "")
@@ -228,13 +215,11 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 
 	pdf.Ln(10)
 
-	// Order Summary
 	pdf.SetFont("Arial", "B", 12)
 	pdf.Cell(190, 10, "ORDER SUMMARY")
 	pdf.Ln(8)
 
 	pdf.SetFont("Arial", "", 10)
-	// Summary table
 	leftColWidth := 150.0
 	rightColWidth := 40.0
 
@@ -247,13 +232,11 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.CellFormat(leftColWidth, 6, "Tax:", "", 0, "R", false, 0, "")
 	pdf.CellFormat(rightColWidth, 6, fmt.Sprintf("%.2f", totalTax), "", 1, "R", false, 0, "")
 
-	// Add coupon discount if available
 	if order.CouponDiscountAmount > 0 {
 		pdf.CellFormat(leftColWidth, 6, "Coupon Discount:", "", 0, "R", false, 0, "")
 		pdf.CellFormat(rightColWidth, 6, fmt.Sprintf("%.2f", order.CouponDiscountAmount), "", 1, "R", false, 0, "")
 	}
 
-	// Shipping charge (with strike-through if free)
 	pdf.CellFormat(leftColWidth, 6, "Shipping Charge:", "", 0, "R", false, 0, "")
 	if order.ShippingCharge == 0 {
 		pdf.CellFormat(rightColWidth, 6, "FREE", "", 1, "R", false, 0, "")
@@ -265,19 +248,16 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 		shippingCharge = 100
 	}
 
-	// Total Discount
 	totalAllDiscounts := totalDiscount + order.CouponDiscountAmount + shippingCharge
 	pdf.CellFormat(leftColWidth, 6, "Total Discount:", "", 0, "R", false, 0, "")
 	pdf.CellFormat(rightColWidth, 6, fmt.Sprintf("%.2f", totalAllDiscounts), "", 1, "R", false, 0, "")
 
-	// Total Amount (Final)
 	pdf.SetFont("Arial", "B", 12)
 	pdf.CellFormat(leftColWidth, 8, "Total Amount:", "T", 0, "R", false, 0, "")
 	pdf.CellFormat(rightColWidth, 8, fmt.Sprintf("%.2f", order.TotalAmount), "T", 1, "R", false, 0, "")
 
 	pdf.Ln(15)
 
-	// Thank You Message
 	pdf.SetFont("Arial", "B", 12)
 	thankYouMsg := "Thank You For Shopping With Us!"
 	msgWidth := pdf.GetStringWidth(thankYouMsg)
@@ -285,7 +265,6 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	pdf.Cell(msgWidth, 10, thankYouMsg)
 	pdf.Ln(8)
 
-	// Contact Information
 	pdf.SetFont("Arial", "", 10)
 	contactMsg := "Contact Us At laptixinfo@gmail.com for any queries."
 	contactWidth := pdf.GetStringWidth(contactMsg)

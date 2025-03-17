@@ -46,6 +46,7 @@ func ShowOrderManagent(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders detail", "Something Went Wrong", "")
 			return
 		}
+		
 		var userDetails models.UserAuth
 		if err := config.DB.First(&userDetails, "id = ?", orderDetails.UserID).Error; err != nil {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch userdetail", "Something Went Wrong", "")

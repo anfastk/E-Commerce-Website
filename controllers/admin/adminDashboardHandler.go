@@ -22,7 +22,7 @@ func StatsHandler(c *gin.Context) {
 	endDate := c.Query("end_date")
 
 	var startTime, endTime time.Time
-	now := time.Now().UTC() // Use UTC for consistent time handling
+	now := time.Now().UTC() 
 
 	switch period {
 	case "daily":
@@ -42,8 +42,8 @@ func StatsHandler(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
 			return
 		}
-		endTime = endTime.Add(24*time.Hour - time.Second) // Include full end day
-	default: // monthly
+		endTime = endTime.Add(24*time.Hour - time.Second) 
+	default: 
 		startTime = now.AddDate(0, -1, 0).Truncate(24 * time.Hour)
 		endTime = now
 	}
@@ -53,7 +53,6 @@ func StatsHandler(c *gin.Context) {
 	var products []models.ProductDetail
 	var categories []models.Categories
 
-	// Total Amount and Order Count
 	if err := config.DB.Where("order_date BETWEEN ? AND ?", startTime, endTime).Find(&orders).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
 		return
@@ -63,7 +62,6 @@ func StatsHandler(c *gin.Context) {
 		totalAmount += order.TotalAmount
 	}
 
-	// Revenue (only delivered orders)
 	var revenue float64
 	config.DB.Raw(`
 		SELECT SUM(total_amount) 
@@ -72,20 +70,16 @@ func StatsHandler(c *gin.Context) {
 		AND id IN (SELECT order_id FROM order_items WHERE order_status = 'Delivered')`,
 		startTime, endTime).Scan(&revenue)
 
-	// User Count
 	config.DB.Where("created_at BETWEEN ? AND ?", startTime, endTime).Find(&users)
 	userCount := len(users)
 
-	// Products and Categories Count
 	config.DB.Find(&products)
 	config.DB.Find(&categories)
 
-	// Cancelled Orders
 	var cancelledCount int64
 	config.DB.Model(&models.OrderItem{}).Where("order_status = 'Cancelled' AND created_at BETWEEN ? AND ?",
 		startTime, endTime).Count(&cancelledCount)
 
-	// Discounts
 	var totalDiscount, couponDiscount float64
 	config.DB.Raw("SELECT SUM(total_discount) FROM orders WHERE order_date BETWEEN ? AND ?",
 		startTime, endTime).Scan(&totalDiscount)
@@ -161,7 +155,7 @@ func ChartsHandler(c *gin.Context) {
 			return
 		}
 		endTime = endTime.Add(24*time.Hour - time.Second)
-	default: // monthly
+	default:
 		startTime = now.AddDate(0, -1, 0).Truncate(24 * time.Hour)
 		endTime = now
 	}
