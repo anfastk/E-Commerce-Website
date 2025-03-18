@@ -293,12 +293,14 @@
                                                     class="text-black hover:underline  line-clamp-2 max-w-[825px]">
                                                     {{.ProductSummary}}
                                                 </a>
-                                                {{if not .IsReturnable }}
-                                                <div class="text-sm text-gray-600 mt-1">Return window closed on
-                                                    {{.ReturnDate}}</div>
-                                                {{else if eq .OrderStatus "Delivered"}}
+                                                
+                                                {{ if eq .OrderStatus "Delivered"}}
                                                 <div class="text-sm text-gray-600 mt-1">Return window will be closed on
                                                     {{.ReturnDate}}</div>
+                                                    {{if not .IsReturnable }}
+                                                <div class="text-sm text-gray-600 mt-1">Return window closed on
+                                                    {{.ReturnDate}}</div>
+                                                    {{end}}
                                                 {{else if eq .OrderStatus "Failed"}}
                                                 <div class="text-sm text-gray-600 mt-1"></div>
                                                 {{else if eq .OrderStatus "Returned"}}
@@ -373,10 +375,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
     <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-20">

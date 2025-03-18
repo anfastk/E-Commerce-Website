@@ -22,7 +22,7 @@ func StatsHandler(c *gin.Context) {
 	endDate := c.Query("end_date")
 
 	var startTime, endTime time.Time
-	now := time.Now().UTC() 
+	now := time.Now().UTC()
 
 	switch period {
 	case "daily":
@@ -42,8 +42,8 @@ func StatsHandler(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
 			return
 		}
-		endTime = endTime.Add(24*time.Hour - time.Second) 
-	default: 
+		endTime = endTime.Add(24*time.Hour - time.Second)
+	default:
 		startTime = now.AddDate(0, -1, 0).Truncate(24 * time.Hour)
 		endTime = now
 	}
