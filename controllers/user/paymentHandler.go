@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,7 +17,7 @@ import (
 )
 
 func PaymentPage(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var request struct {
@@ -199,7 +201,7 @@ var paymentRequest struct {
 }
 
 func ProceedToPayment(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	if err := c.ShouldBind(&paymentRequest); err != nil {
@@ -325,7 +327,8 @@ func ProceedToPayment(c *gin.Context) {
 		for _, orderItem := range orderItems {
 
 			receiptID := "rcpt-" + uuid.New().String()
-			transactionID := "TXN-" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			createPayment := models.PaymentDetail{
 				UserID:        userID,
@@ -368,7 +371,9 @@ func ProceedToPayment(c *gin.Context) {
 			return
 		}
 		walletReceiptID := "rcpt-" + uuid.New().String()
-		walletTransactionID := "TXN-" + uuid.New().String()
+		rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+		walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
 		walletHistory := models.WalletTransaction{
 			UserID:        userID,
 			WalletID:      walletDetails.ID,
@@ -404,7 +409,7 @@ func ProceedToPayment(c *gin.Context) {
 }
 
 func PayNow(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var PayNowRequest struct {

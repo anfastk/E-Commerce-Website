@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -387,7 +388,8 @@ func ApproveReturn(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN-" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			walletTransaction := models.WalletTransaction{
 				UserID:        returnRequest.UserID,

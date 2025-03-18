@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -13,7 +15,7 @@ import (
 )
 
 func ShowReferralPage(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var userauth models.UserAuth
@@ -143,7 +145,7 @@ func AddReferral(c *gin.Context) {
 }
 
 func CheckForReferrer(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
@@ -198,7 +200,8 @@ func CheckForReferrer(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN-" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 			createReferrerWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      referrerWallet.ID,
@@ -249,7 +252,7 @@ func CheckForReferrer(c *gin.Context) {
 }
 
 func CheckForJoinee(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
@@ -280,7 +283,8 @@ func CheckForJoinee(c *gin.Context) {
 				return
 			}
 			receiptID := "rcpt_" + uuid.New().String()
-			transactionID := "TXN-" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 			createJoineeWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      joineeWallet.ID,

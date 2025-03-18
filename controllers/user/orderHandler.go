@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ import (
 )
 
 func TrackingPage(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 	orderID := c.Param("id")
 
@@ -141,6 +142,7 @@ func TrackingPage(c *gin.Context) {
 		"isAllOrderCancel":        isAllOrderCancel,
 		"isAlreadyRequested":      isAlreadyRequested,
 		"IsCancelSpecificOrder":   IsCancelSpecificOrder,
+		"PaymentDate":             payment.CreatedAt.Format("January 02, 2006 at 03:04 PM"),
 		"OrderDate":               orderItem.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
 		"ExpectedDeliveryDate":    orderItem.ExpectedDeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
 		"ReturnDate":              orderItem.ReturnDate.Format("2006-01-02T15:04:05.000-07:00"),
@@ -268,7 +270,7 @@ func SaveOrderAddress(c *gin.Context, tx *gorm.DB, orderID uint, userID uint, ad
 }
 
 func ClearCart(c *gin.Context, tx *gorm.DB, ordered map[uint]int) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var cart models.Cart
@@ -296,7 +298,7 @@ func ClearCart(c *gin.Context, tx *gorm.DB, ordered map[uint]int) {
 }
 
 func ShowSuccessPage(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	today := time.Now().Format("2006-01-02")
@@ -429,7 +431,7 @@ func DeleteReservedItems(c *gin.Context, tx *gorm.DB, productVariantID uint, use
 }
 
 func CancelSpecificOrder(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	orderItemID := c.Param("id")
@@ -545,7 +547,8 @@ func CancelSpecificOrder(c *gin.Context) {
 			return
 		}
 		receiptID := "rcpt_" + uuid.New().String()
-		transactionID := "TXN-" + uuid.New().String()
+		rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+		transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 		walletTransaction := models.WalletTransaction{
 			UserID:        userID,
@@ -632,7 +635,7 @@ func CancelSpecificOrder(c *gin.Context) {
 }
 
 func CancelAllOrderItems(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	orderID := c.Param("id")
@@ -726,7 +729,8 @@ func CancelAllOrderItems(c *gin.Context) {
 			return
 		}
 		receiptID := "rcpt_" + uuid.New().String()
-		transactionID := "TXN-" + uuid.New().String()
+		rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+		transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 		walletTransaction := models.WalletTransaction{
 			UserID:        userID,
@@ -762,7 +766,6 @@ func CancelAllOrderItems(c *gin.Context) {
 		if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
 			Updates(map[string]interface{}{
 				"coupon_code":            gorm.Expr("NULL"),
-				"coupon_id":              gorm.Expr("NULL"),
 				"coupon_discount_amount": gorm.Expr("NULL"),
 				"is_coupon_applied":      false,
 			}).Error; err != nil {
@@ -803,7 +806,7 @@ func CancelAllOrderItems(c *gin.Context) {
 }
 
 func ReturnOrder(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var input struct {

@@ -386,7 +386,7 @@
                                         showSuccessToast('Item removed from wishlist', 'success');
                                     }, 300);
                                 } else {
-                                    showSuccessToast('Failed to remove item: ' + (data.message || 'Unknown error'), 'error');
+                                    showSuccessToast(data.message);
                                     setTimeout(() => {
                                         location.reload();
                                     }, 1250);

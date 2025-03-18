@@ -15,7 +15,7 @@ import (
 )
 
 func ProfileDetails(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var authDetails models.UserAuth
@@ -101,7 +101,7 @@ func ProfileUpdate(c *gin.Context) {
 }
 
 func ProfileImageUpdate(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	tx := config.DB.Begin()
@@ -154,7 +154,7 @@ func ProfileImageUpdate(c *gin.Context) {
 }
 
 func Settings(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var userDetails models.UserAuth
@@ -169,7 +169,7 @@ func Settings(c *gin.Context) {
 }
 
 func ManageAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var authDetails models.UserAuth
@@ -190,7 +190,7 @@ func ManageAddress(c *gin.Context) {
 }
 
 func ShowAddAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var userauth models.UserAuth
@@ -204,7 +204,7 @@ func ShowAddAddress(c *gin.Context) {
 }
 
 func AddAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var addAddress struct {
@@ -249,7 +249,7 @@ func AddAddress(c *gin.Context) {
 }
 
 func ShowEditAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	id := c.Param("id")
@@ -271,7 +271,7 @@ func ShowEditAddress(c *gin.Context) {
 }
 
 func EditAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var UpdateAddress struct {
@@ -320,7 +320,7 @@ func EditAddress(c *gin.Context) {
 }
 
 func SetAsDefaultAddress(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	addressID := c.Param("id")
@@ -365,7 +365,7 @@ func DeleteAddress(c *gin.Context) {
 }
 
 func ShowChangePassword(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	var userAuth models.UserAuth
@@ -426,12 +426,13 @@ func ChangePassword(c *gin.Context) {
 }
 
 func OrderDetails(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	type OrderResponse struct {
 		Slno                 int     `json:"slno"`
 		ID                   uint    `json:"id"`
+		OrderID              uint    `json:"order_id"`
 		ProductId            uint    `json:"productid"`
 		FirstName            string  `json:"firstname"`
 		LastName             string  `json:"lastname"`
@@ -506,6 +507,7 @@ func OrderDetails(c *gin.Context) {
 			orderResponse := OrderResponse{
 				Slno:                 i + 1,
 				ID:                   item.ID,
+				OrderID:              item.OrderID,
 				ProductId:            item.ProductVariantID,
 				FirstName:            shippingAddress.FirstName,
 				LastName:             shippingAddress.LastName,
@@ -537,7 +539,7 @@ func OrderDetails(c *gin.Context) {
 }
 
 func OrderHistory(c *gin.Context) {
-	
+
 	userID := helper.FetchUserID(c)
 
 	type OrderHistoryResponse struct {

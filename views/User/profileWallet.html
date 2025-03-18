@@ -324,7 +324,7 @@
                                             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <span class="text-gray-500">&#8377;</span>
                                         </div>
-                                        <input type="number" id="amount" name="amount"
+                                        <input type="number" id="customAmountInput" name="amount"
                                             class="pl-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5"
                                             placeholder="0.00" min="1">
                                     </div>
@@ -676,21 +676,16 @@
         </div>
     </footer>
     <script>
-        // Get the raw amount from the rendered HTML
+        // Format wallet balance on page load
         let amountElement = document.getElementById("amount");
-        let rawAmount = amountElement.innerText.replace("₹", "").trim(); // Remove ₹ and trim spaces
-
-        // Convert to float
+        let rawAmount = amountElement.innerText.replace("₹", "").trim();
         let amount = parseFloat(rawAmount);
-
-        // Format the amount using Intl.NumberFormat for Indian currency
         let formattedAmount = new Intl.NumberFormat('en-IN', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(amount);
+        amountElement.innerHTML = `₹${formattedAmount}`;
 
-        // Update the element with formatted value
-        amountElement.innerHTML = `&#8377;${formattedAmount}`;
         // Toggle forms visibility
         document.getElementById('addMoneyBtn').addEventListener('click', function () {
             document.getElementById('addMoneyForm').classList.remove('hidden');
@@ -710,147 +705,115 @@
             document.getElementById('giftCardForm').classList.add('hidden');
         });
 
-        // Quick amount buttons
+        // Wallet form logic
         document.addEventListener('DOMContentLoaded', function () {
             // Get elements
             const amountButtons = document.querySelectorAll('.amount-btn');
             const otherAmountBtn = document.getElementById('otherAmountBtn');
             const customAmountSection = document.getElementById('customAmountSection');
-            const amountInput = document.getElementById('amount');
+            const amountInput = document.getElementById('customAmountInput'); // Updated ID
             const selectedAmountField = document.getElementById('selectedAmount');
             const submitButton = document.getElementById('submitButton');
             const cancelButton = document.getElementById('cancelAddMoney');
             const statusMessage = document.getElementById('statusMessage');
 
-
-            // Function to hide status message
-            function hideStatus() {
-                statusMessage.classList.add('hidden');
-            }
-
-            // Function to enable submit button
+            // Helper functions
             function enableSubmitButton() {
                 submitButton.disabled = false;
                 submitButton.classList.remove('opacity-50');
             }
 
-            // Function to disable submit button
             function disableSubmitButton() {
                 submitButton.disabled = true;
                 submitButton.classList.add('opacity-50');
             }
 
-            // Handle amount button selection
+            function resetForm() {
+                amountInput.value = '';
+                document.getElementById('payment-method').selectedIndex = 0;
+                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
+                customAmountSection.classList.add('hidden');
+                selectedAmountField.value = '';
+                disableSubmitButton();
+                submitButton.textContent = 'Add Money';
+                statusMessage.classList.add('hidden');
+            }
+
+            // Initialize button as disabled
+            disableSubmitButton();
+
+            // Handle predefined amount buttons
             amountButtons.forEach(button => {
                 button.addEventListener('click', function () {
-                    // Remove active class from all buttons
                     amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
                     otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
-
-                    // Add active class to clicked button
                     this.classList.add('bg-blue-500', 'text-white');
-
-                    // Hide custom amount section
                     customAmountSection.classList.add('hidden');
-
-                    // Set the selected amount
-                    const amount = this.getAttribute('data-amount');
-                    selectedAmountField.value = amount;
-
-                    // Enable submit button
+                    selectedAmountField.value = this.getAttribute('data-amount');
                     enableSubmitButton();
-
-                    // Hide any previous status messages
-                    hideStatus();
+                    statusMessage.classList.add('hidden');
                 });
             });
 
-            // Handle "Other" button click
+            // Handle "Other" button
             otherAmountBtn.addEventListener('click', function () {
-                // Remove active class from all buttons
                 amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
-
-                // Add active class to Other button
                 this.classList.add('bg-blue-500', 'text-white');
-
-                // Show custom amount section
                 customAmountSection.classList.remove('hidden');
-
-                // Focus on amount input
-                amountInput.focus();
-
-                // Reset the amount input
                 amountInput.value = '';
-
-                // Clear the selected amount until user enters a value
                 selectedAmountField.value = '';
-
-                // Disable submit button until a valid amount is entered
+                amountInput.focus();
                 disableSubmitButton();
-
-                // Hide any previous status messages
-                hideStatus();
+                statusMessage.classList.add('hidden');
             });
 
-            // Validate custom amount input
-            amountInput.addEventListener('input', validateCustomAmount);
-            amountInput.addEventListener('change', validateCustomAmount);
-
-            // Separate validation function to avoid code duplication
+            // Validate custom amount
             function validateCustomAmount() {
-                // Get the value and trim any whitespace
-                let value = amountInput.value.trim();
-
-                // Parse as float
+                const value = amountInput.value.trim();
                 const amount = parseFloat(value);
-
-                // Check if valid amount (not empty, is a number, and ≥ 1)
                 if (value && !isNaN(amount) && amount >= 1) {
-                    // Set the hidden field value
-                    selectedAmountField.value = amount.toString();
-                    // Enable the submit button
+                    selectedAmountField.value = amount;
                     enableSubmitButton();
                 } else {
-                    // Invalid amount, clear hidden field
                     selectedAmountField.value = '';
-                    // Disable the submit button
                     disableSubmitButton();
                 }
             }
 
-            // Handle submit button click - completely separated from form submission
-            submitButton.addEventListener('click', function () {
-                // When "Other" option is selected, get the latest value directly from the input
-                if (!customAmountSection.classList.contains('hidden')) {
-                    const customValue = amountInput.value.trim();
-                    const customAmount = parseFloat(customValue);
+            // Attach event listeners to amountInput
+            if (amountInput) {
+                amountInput.addEventListener('input', function () {
+                    validateCustomAmount();
+                });
 
-                    if (customValue && !isNaN(customAmount) && customAmount >= 1) {
-                        selectedAmountField.value = customAmount.toString();
-                    }
+                amountInput.addEventListener('change', function () {
+                    validateCustomAmount();
+                });
+            } else {
+                console.error("customAmountInput element not found!");
+            }
+
+            // Handle submit button click
+            submitButton.addEventListener('click', function () {
+                if (!customAmountSection.classList.contains('hidden')) {
+                    validateCustomAmount();
                 }
 
                 const amount = selectedAmountField.value;
-                const paymentMethod = document.getElementById('payment-method').value;
-
-                // Ensure we have a valid amount
                 if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) < 1) {
                     showErrorToast('Please select or enter a valid amount');
                     return;
                 }
 
-                // Disable the submit button to prevent multiple submissions
                 disableSubmitButton();
                 submitButton.textContent = 'Processing...';
 
-                // Prepare data for submission
                 const data = {
                     amount: parseFloat(amount),
-                    paymentMethod: paymentMethod
+                    paymentMethod: document.getElementById('payment-method').value
                 };
 
-
-                // Send AJAX request
                 fetch('/profile/wallet/add/amount', {
                     method: 'POST',
                     headers: {
@@ -868,46 +831,27 @@
                     .then(data => {
                         showSuccessToast("Payment initiated successfully!");
                         initializeRazorpay(data);
-                        // Reset the form after success
                         setTimeout(() => {
                             resetForm();
-                            hideStatus();
-                            // If you want to hide the form after success
                             document.getElementById('addMoneyForm').classList.add('hidden');
                         }, 3000);
                     })
                     .catch(error => {
-                        showErrorToast('Failed to add money. Please try again.', true);
-
-                        // Re-enable the submit button
+                        console.error("Payment initiation failed:", error);
+                        showErrorToast('Failed to add money. Please try again.');
                         enableSubmitButton();
                         submitButton.textContent = 'Add Money';
                     });
             });
 
-            // Function to reset the form
-            function resetForm() {
-                // Reset all form fields
-                amountInput.value = '';
-                document.getElementById('payment-method').selectedIndex = 0;
-
-                // Reset UI state
-                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
-                otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
-                customAmountSection.classList.add('hidden');
-                selectedAmountField.value = '';
-                disableSubmitButton();
-                submitButton.textContent = 'Add Money';
-            }
-
             // Handle cancel button
             cancelButton.addEventListener('click', function () {
                 document.getElementById('addMoneyForm').classList.add('hidden');
                 resetForm();
-                hideStatus();
             });
         });
 
+        // Razorpay integration
         function initializeRazorpay(data) {
             const options = {
                 key: data.key_id,
@@ -918,7 +862,6 @@
                 image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
                 order_id: data.order_id,
                 handler: function (response) {
-                    // Handle successful payment
                     verifyPayment({
                         razorpay_payment_id: response.razorpay_payment_id,
                         razorpay_order_id: response.razorpay_order_id,
@@ -936,28 +879,20 @@
                 },
                 modal: {
                     ondismiss: function () {
-                        const payButton = document.getElementById('proceedToPay');
-                        payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
-                        payButton.disabled = false;
                         showErrorToast("Payment cancelled");
+                        document.getElementById('submitButton').textContent = 'Add Money';
+                        enableSubmitButton();
                     }
                 },
-                // Add retry configuration to prevent retry option
                 retry: {
-                    enabled: false  // Disable retry functionality
+                    enabled: false
                 }
             };
 
             const rzp = new Razorpay(options);
-
-            // Add payment failed handler
             rzp.on('payment.failed', function (response) {
                 showErrorToast("Payment Failed");
-                setTimeout(function () {
-                    showErrorToast("Payment Failed");
-                }, 3000);
             });
-
             rzp.open();
         }
 
@@ -977,17 +912,45 @@
                     showSuccessToast("Amount Added Successfully");
                     setTimeout(() => {
                         window.location.reload();
-                    }, 3000); // 3000 milliseconds = 3 seconds
+                    }, 3000);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Verification error:', error);
                     showErrorToast(error.message || "An error occurred while verifying the payment.");
-
-                    // Reset button state
-                    const payButton = document.getElementById('proceedToPay');
-                    payButton.innerHTML = '<span>Proceed to Pay</span><i class="fas fa-arrow-right ml-2"></i>';
-                    payButton.disabled = false;
+                    document.getElementById('submitButton').textContent = 'Add Money';
+                    enableSubmitButton();
                 });
+        }
+
+        // Toast functions
+        function showSuccessToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.querySelector('.toast-message');
+            const successIcon = document.querySelector('.toast-icon-success');
+            const errorIcon = document.querySelector('.toast-icon-error');
+            toastMessage.textContent = message;
+            successIcon.classList.remove('hidden');
+            errorIcon.classList.add('hidden');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                successIcon.classList.add('hidden');
+            }, 3000);
+        }
+
+        function showErrorToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.querySelector('.toast-message');
+            const successIcon = document.querySelector('.toast-icon-success');
+            const errorIcon = document.querySelector('.toast-icon-error');
+            toastMessage.textContent = message;
+            successIcon.classList.add('hidden');
+            errorIcon.classList.remove('hidden');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                errorIcon.classList.add('hidden');
+            }, 3000);
         }
     </script>
     <script src="/static/js/toastMain.js"></script>
