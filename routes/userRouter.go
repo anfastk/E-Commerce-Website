@@ -11,38 +11,31 @@ var RoleUser = "User"
 func UserRouter(r *gin.Engine) {
 
 	auth := r.Group("/auth")
-	auth.Use(middleware.NoCacheMiddleware())
 	{
 		auth.GET("/google/login", controllers.InitiateGoogleAuth)
 		auth.GET("/google/callback", controllers.HandleGoogleCallback)
+		auth.GET("/signup", controllers.ShowSignup)
+		auth.POST("/signup", controllers.SignUp)
+		auth.GET("/signup/otp", controllers.SendOtp)
+		auth.GET("/signup/verifyotp", controllers.ShowOtpVerifyPage)
+		auth.POST("/signup/verifyotp", controllers.VerifyOtp)
+		auth.POST("/signup/otp/resend", controllers.ResendOTP)
+		auth.GET("/login", controllers.ShowLogin)
+		auth.POST("/login", controllers.UserLoginHandler)
+		auth.GET("/forgot/password", controllers.ForgotPasswordEmail)
+		auth.POST("/forgot/password", controllers.ForgotUserEmail)
+		auth.POST("/reset/password", controllers.PasswordReset)
+		auth.POST("/logout", middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
 	}
-	r.GET("/", middleware.NoCacheMiddleware(), controllers.UserHome)
-	r.GET("/products", middleware.NoCacheMiddleware(), controllers.ShowProducts)
-	r.GET("/products/details/:id", middleware.NoCacheMiddleware(), controllers.ShowProductDetail)
+	r.GET("/", controllers.UserHome)
+	r.GET("/products", controllers.ShowProducts)
+	r.GET("/products/details/:id", controllers.ShowProductDetail)
 	r.GET("/products/filter", controllers.FilterProducts)
-	r.POST("/checkout/payment/verify", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
-	r.GET("/order/success", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
-	r.POST("/order/failed", middleware.NoCacheMiddleware(), middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)
-
-	user := r.Group("/user")
-	user.Use(middleware.NoCacheMiddleware())
-	{
-		user.GET("/signup", controllers.ShowSignup)
-		user.POST("/signup", controllers.SignUp)
-		user.GET("/signup/otp", controllers.SendOtp)
-		user.GET("/signup/verifyotp", controllers.ShowOtpVerifyPage)
-		user.POST("/signup/verifyotp", controllers.VerifyOtp)
-		user.POST("/signup/otp/resend", controllers.ResendOTP)
-		user.GET("/login", controllers.ShowLogin)
-		user.POST("/login", controllers.UserLoginHandler)
-		user.GET("/forgot/password", controllers.ForgotPasswordEmail)
-		user.POST("/forgot/password", controllers.ForgotUserEmail)
-		user.POST("/reset/password", controllers.PasswordReset)
-		user.POST("/logout", middleware.AuthMiddleware(RoleUser), controllers.UserLogoutHandler)
-	}
+	r.POST("/checkout/payment/verify", middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
+	r.GET("/order/success", middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
+	r.POST("/order/failed", middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)
 
 	userProfile := r.Group("/profile")
-	userProfile.Use(middleware.NoCacheMiddleware())
 	userProfile.Use(middleware.AuthMiddleware(RoleUser))
 	{
 		userProfile.GET("/", controllers.ProfileDetails)
@@ -75,11 +68,10 @@ func UserRouter(r *gin.Engine) {
 	}
 
 	cart := r.Group("/cart")
-	cart.Use(middleware.NoCacheMiddleware())
 	cart.Use(middleware.AuthMiddleware(RoleUser))
 	{
 		cart.GET("/", controllers.ShowCart)
-		cart.GET("/total", controllers.ShowCartTotal)
+		cart.POST("/total", controllers.ShowCartTotal)
 		cart.POST("/add/:id", controllers.AddToCart)
 		cart.POST("/update/quantity/:id", controllers.CartItemUpdate)
 		cart.POST("/delete/:id", controllers.DeleteCartItems)
@@ -87,10 +79,9 @@ func UserRouter(r *gin.Engine) {
 	}
 
 	checkout := r.Group("/checkout")
-	checkout.Use(middleware.NoCacheMiddleware())
 	checkout.Use(middleware.AuthMiddleware(RoleUser))
 	{
-		checkout.POST("/", controllers.ShowCheckoutPage)
+		checkout.GET("/", controllers.ShowCheckoutPage)
 		checkout.POST("/payment", controllers.PaymentPage)
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
 		checkout.POST("/check/coupon", controllers.CheckCoupon)
@@ -98,7 +89,6 @@ func UserRouter(r *gin.Engine) {
 	}
 
 	wishlist := r.Group("/wishlist")
-	wishlist.Use(middleware.NoCacheMiddleware())
 	wishlist.Use(middleware.AuthMiddleware(RoleUser))
 	{
 		wishlist.GET("/", controllers.ShowWishlist)
@@ -107,4 +97,6 @@ func UserRouter(r *gin.Engine) {
 		wishlist.POST("/all/products/move/cart", controllers.WishlistAllTOCart)
 		wishlist.POST("/remove/:id", controllers.RemoveFromWishlist)
 	}
+
+	r.NoRoute(controllers.Handle404Error)
 }

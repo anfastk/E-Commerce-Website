@@ -7,8 +7,10 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func ListCategory(c *gin.Context) {
@@ -20,9 +22,12 @@ func ListCategory(c *gin.Context) {
 		ProductCount int
 	}
 
+	logger.Log.Info("Requested TO Open Category Management Page")
+
 	var categories []models.Categories
 	if err := config.DB.Find(&categories).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Failed to fetch categories", "")
+		logger.Log.Error("Failed to fetch categories", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch categories", "Something Went Wrong", "")
 		return
 	}
 	var (
@@ -48,6 +53,7 @@ func ListCategory(c *gin.Context) {
 		}
 	}
 	categoryCount := len(categories)
+	logger.Log.Info("Admin Open Category Management Successfully")
 	c.HTML(http.StatusOK, "categoryManagement.html", gin.H{
 		"categories":          responce,
 		"CategoryCount":       categoryCount,
@@ -59,21 +65,28 @@ func ListCategory(c *gin.Context) {
 func AddCategory(c *gin.Context) {
 	c.Request.ParseForm()
 
+	logger.Log.Info("Requested TO Add Category")
+
 	var category models.Categories
 	if err := c.ShouldBind(&category); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
+		logger.Log.Error("Invaild Data Entered", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data Entered", "Invalid data Entered", "")
 		return
 	}
 
 	if category.Name == "" {
+		logger.Log.Error("Category Name Is Required")
 		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
 		return
 	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category", "Failed to create category", "")
+		logger.Log.Error("Failed To Create Category", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category", "Something Went Wrong", "")
 		return
 	}
+
+	logger.Log.Info("Categoty Created Successfully")
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
@@ -83,35 +96,45 @@ func AddCategory(c *gin.Context) {
 }
 
 func EditCategory(c *gin.Context) {
+	logger.Log.Info("Requested To Edit Category")
 	categoryID := c.Param("id")
 
 	if categoryID == "" {
-		helper.RespondWithError(c, http.StatusBadRequest, "Category ID is missing", "Category ID is missing", "")
+		logger.Log.Error("Category ID Is Missing")
+		helper.RespondWithError(c, http.StatusBadRequest, "Category ID is missing", "Something Went Wrong", "")
 		return
 	}
 
 	if _, err := strconv.ParseInt(categoryID, 10, 64); err != nil {
+		logger.Log.Error("Invalid Category ID", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Category ID", "Invalid Category ID", "")
 		return
 	}
 
 	var category models.Categories
 
+	logger.Log.Info("Category requested", zap.String("CategoryID", categoryID))
+
 	if err := config.DB.First(&category, categoryID).Error; err != nil {
+		logger.Log.Error("Failed To Fetch Category,Category not found", zap.String("CategoryID", categoryID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Category not found", "Category not found", "")
 		return
 	}
 
+	logger.Log.Info("Category viewed", zap.String("CategoryID", categoryID))
+
 	if err := c.Bind(&category); err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Failed to bind form data", "Failed to bind form data", "")
+		logger.Log.Error("Failed to bind data", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to bind form data", "Invalid input data", "")
 		return
 	}
 
 	if err := config.DB.Model(&category).Where("id = ?", categoryID).Updates(category).Error; err != nil {
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category", "Failed to update category", "")
+		logger.Log.Error("Failed to update category", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category", "Something Went Wrong", "")
 		return
 	}
-
+	logger.Log.Info("Categoty Updated Successfully")
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
 		"message": "Category updated successfully",
@@ -120,37 +143,49 @@ func EditCategory(c *gin.Context) {
 }
 
 func DeleteCategory(c *gin.Context) {
+	logger.Log.Info("Requested To Change Category Status")
 	var category models.Categories
 	categoryID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID", "Invalid category ID", "")
+		logger.Log.Error("Invalid Category ID", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid category ID", "Soemthing Wewnt Wrong", "")
 		return
 	}
 
 	tx := config.DB.Begin()
 
-	// Find the category
+	logger.Log.Info("Category Requested", zap.Uint64("CategoryID", categoryID))
+
 	if err := tx.Unscoped().First(&category, categoryID).Error; err != nil {
 		tx.Rollback()
+		logger.Log.Error("Failed To Fetch Category", zap.Uint64("CategoryID", categoryID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Category not found", "Category not found", "")
 		return
 	}
 
+	logger.Log.Info("Category Viewed", zap.Uint64("CategoryID", categoryID))
+
 	category.IsDeleted = !category.IsDeleted
 	if category.IsDeleted {
+		logger.Log.Info("Blocked Successfully")
 		category.Status = "Blocked"
 	} else {
+		logger.Log.Info("Active Successfully")
 		category.Status = "Active"
 	}
 
 	if err := tx.Save(&category).Error; err != nil {
+		logger.Log.Error("Failed To Update Category Status", zap.Error(err))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category status", "Failed to update category status", "")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update category status", "Something Went Wrong", "")
 		return
 	}
 
+	logger.Log.Info("Requested To Change Product Status", zap.Uint64("CategoryID", categoryID))
+
 	var product models.ProductDetail
 	if err := tx.Unscoped().First(&product, "category_id = ?", categoryID).Error; err != nil {
+		logger.Log.Error("Failed To Fetch Category", zap.Uint64("CategoryID", categoryID), zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid input data", "Invalid input data", "")
 		return
@@ -168,17 +203,20 @@ func DeleteCategory(c *gin.Context) {
 
 	if err := tx.Unscoped().Model(&models.ProductDetail{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
 		tx.Rollback()
+		logger.Log.Error("Failed To Update Product Status", zap.Uint64("CategoryID", categoryID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product", "Failed to update product", "")
 		return
 	}
 
 	if err := tx.Unscoped().Model(&models.ProductVariantDetails{}).Where("category_id = ?", categoryID).Updates(updateData).Error; err != nil {
+		logger.Log.Error("Failed To Update Product Variant Status", zap.Uint64("CategoryID", categoryID), zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update product variants", "Failed to update product variants", "")
 		return
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		logger.Log.Error("Failed To Commit Transaction", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction commit failed", "Transaction commit failed", "")
 		return
 	}
@@ -187,6 +225,8 @@ func DeleteCategory(c *gin.Context) {
 	if !category.IsDeleted {
 		message = "Category recovered successfully"
 	}
+
+	logger.Log.Info(message)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
@@ -198,11 +238,16 @@ func DeleteCategory(c *gin.Context) {
 func ShowCategoryDetails(c *gin.Context) {
 	categoryID := c.Param("id")
 
+	logger.Log.Info("Category Requested", zap.String("CategoryID", categoryID))
+
 	var category models.Categories
 	if err := config.DB.First(&category, categoryID).Error; err != nil {
+		logger.Log.Error("Failed To Fetch Category", zap.String("CategoryID", categoryID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Categoey not found", "Something Weint Wrong", "")
 		return
 	}
+
+	logger.Log.Info("Category Viewed", zap.String("CategoryID", categoryID))
 
 	var product []models.ProductVariantDetails
 	config.DB.Preload("VariantsImages").Find(&product, "category_id = ?", categoryID)

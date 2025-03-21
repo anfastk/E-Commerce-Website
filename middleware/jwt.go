@@ -62,7 +62,11 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 
 		if err != nil || tokenString == "" {
 			if requiredRole == "Admin" || requiredRole == "User" {
-				redirectPath := fmt.Sprintf("/%s/login", strings.ToLower(requiredRole))
+				role := strings.ToLower(requiredRole)
+				if requiredRole == "User" {
+					role = "auth"
+				}
+				redirectPath := fmt.Sprintf("/%s/login", role)
 				c.Redirect(http.StatusSeeOther, redirectPath)
 			} else {
 				c.JSON(http.StatusUnauthorized, gin.H{
@@ -117,13 +121,4 @@ func AuthMiddleware(requiredRole string) gin.HandlerFunc {
 }
 func GetJwtKey() []byte {
     return JwtSecretKey
-}
-
-func NoCacheMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("Cache-Control", "no-cache, no-store, must-revalidate,max-age=0")
-		c.Header("Pragma", "no-cache")
-		c.Header("Expires", "0")
-		c.Next()
-	}
 }

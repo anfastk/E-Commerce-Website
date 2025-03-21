@@ -1,102 +1,128 @@
 package controllers
 
 import (
-    "fmt"
-    "net/http"
-    "time"
+	"fmt"
+	"net/http"
+	"time"
 
-    "github.com/anfastk/E-Commerce-Website/config"
-    "github.com/anfastk/E-Commerce-Website/models"
-    "github.com/anfastk/E-Commerce-Website/utils/helper"
-    "github.com/gin-gonic/gin"
-    "gorm.io/gorm"
+	"github.com/anfastk/E-Commerce-Website/config"
+	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 func ListUsers(c *gin.Context) {
-    var users []models.UserAuth
-    if err := config.DB.Unscoped().Order("id ASC").Find(&users).Error; err != nil {
-        helper.RespondWithError(c, http.StatusInternalServerError, "Could not fetch users", "Could not fetch users", "")
-        return
-    }
-    c.HTML(http.StatusOK, "user_management.html", gin.H{
-        "users": users,
-    })
+	logger.Log.Info("Requested to list users")
+
+	var users []models.UserAuth
+	if err := config.DB.Unscoped().Order("id ASC").Find(&users).Error; err != nil {
+		logger.Log.Error("Failed to fetch users", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Could not fetch users", "Could not fetch users", "")
+		return
+	}
+
+	logger.Log.Info("Users fetched successfully", zap.Int("userCount", len(users)))
+	c.HTML(http.StatusOK, "user_management.html", gin.H{
+		"users": users,
+	})
 }
 
 func BlockUser(c *gin.Context) {
-    id := c.Param("id")
-    var user models.UserAuth
-    if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
-        helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
-        return
-    }
+	logger.Log.Info("Requested to block/unblock user")
 
-    if user.IsDeleted {
-        helper.RespondWithError(c, http.StatusBadRequest, "Can't unblock the user. The user's account is deleted.", "Can't unblock the user. The user's account is deleted.", "")
-        return
-    }
+	id := c.Param("id")
+	var user models.UserAuth
+	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
+		logger.Log.Error("User not found", zap.String("userID", id), zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
 
-    if user.IsBlocked {
-        user.IsBlocked = false
-        user.Status = "Active"
-        c.JSON(http.StatusOK, gin.H{
-            "status":  "Success",
-            "message": "User's account unblocked",
-            "code":    http.StatusOK,
-        })
-    } else {
-        user.IsBlocked = true
-        user.Status = "Blocked"
-        c.JSON(http.StatusOK, gin.H{
-            "status":  "Success",
-            "message": "User's account blocked",
-            "code":    http.StatusOK,
-        })
-    }
+	if user.IsDeleted {
+		logger.Log.Warn("Attempted to unblock deleted user", zap.String("userID", id))
+		helper.RespondWithError(c, http.StatusBadRequest, "Can't unblock the user. The user's account is deleted.", "Can't unblock the user. The user's account is deleted.", "")
+		return
+	}
 
-    if err := config.DB.Save(&user).Error; err != nil {
-        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to block/unblock user", "Failed to block/unblock user", "")
-    }
+	var message string
+	if user.IsBlocked {
+		user.IsBlocked = false
+		user.Status = "Active"
+		message = "User's account unblocked"
+	} else {
+		user.IsBlocked = true
+		user.Status = "Blocked"
+		message = "User's account blocked"
+	}
+
+	if err := config.DB.Save(&user).Error; err != nil {
+		logger.Log.Error("Failed to update user block status",
+			zap.String("userID", id),
+			zap.Bool("isBlocked", user.IsBlocked),
+			zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to block/unblock user", "Failed to block/unblock user", "")
+		return
+	}
+
+	logger.Log.Info("User block status updated successfully",
+		zap.String("userID", id),
+		zap.Bool("isBlocked", user.IsBlocked))
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": message,
+		"code":    http.StatusOK,
+	})
 }
 
 func DeleteUser(c *gin.Context) {
-    id := c.Param("id")
-    var user models.UserAuth
+	logger.Log.Info("Requested to delete/restore user")
 
-    if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
-        helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
-        return
-    }
+	id := c.Param("id")
+	var user models.UserAuth
 
-    user.IsDeleted = !user.IsDeleted
-    if user.IsDeleted {
-        user.Status = "Deleted"
-        user.IsBlocked = true
-        user.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
-    } else {
-        user.Status = "Active"
-        user.IsBlocked = false
-        user.DeletedAt = gorm.DeletedAt{}
-    }
+	if err := config.DB.Unscoped().First(&user, "id = ?", id).Error; err != nil {
+		logger.Log.Error("User not found", zap.String("userID", id), zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
 
-    if err := config.DB.Save(&user).Error; err != nil {
-        action := "delete"
-        if !user.IsDeleted {
-            action = "restore"
-        }
-        errMsg := fmt.Sprintf("Failed to %s user", action)
-        helper.RespondWithError(c, http.StatusInternalServerError, errMsg, errMsg, "")
-        return
-    }
+	user.IsDeleted = !user.IsDeleted
+	var message string
+	if user.IsDeleted {
+		user.Status = "Deleted"
+		user.IsBlocked = true
+		user.DeletedAt = gorm.DeletedAt{Time: time.Now(), Valid: true}
+		message = "User deleted successfully"
+	} else {
+		user.Status = "Active"
+		user.IsBlocked = false
+		user.DeletedAt = gorm.DeletedAt{}
+		message = "User restored successfully"
+	}
 
-    message := "User deleted successfully"
-    if !user.IsDeleted {
-        message = "User restored successfully"
-    }
+	if err := config.DB.Save(&user).Error; err != nil {
+		action := "delete"
+		if !user.IsDeleted {
+			action = "restore"
+		}
+		errMsg := fmt.Sprintf("Failed to %s user", action)
+		logger.Log.Error("Failed to update user delete status",
+			zap.String("userID", id),
+			zap.String("action", action),
+			zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, errMsg, errMsg, "")
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{
-        "status":  "OK",
-        "message": message,
-        "code":    http.StatusOK,
-    })
+	logger.Log.Info("User delete status updated successfully",
+		zap.String("userID", id),
+		zap.Bool("isDeleted", user.IsDeleted))
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "OK",
+		"message": message,
+		"code":    http.StatusOK,
+	})
 }

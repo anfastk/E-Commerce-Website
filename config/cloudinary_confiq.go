@@ -1,10 +1,11 @@
 package config
 
 import (
-	"log"
 	"os"
 
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/cloudinary/cloudinary-go/v2"
+	"go.uber.org/zap"
 )
 
 func InitCloudinary() *cloudinary.Cloudinary {
@@ -14,7 +15,12 @@ func InitCloudinary() *cloudinary.Cloudinary {
 	Cld, err := cloudinary.NewFromParams(cloudName, apiKey, apiSecret)
 
 	if err != nil {
-		log.Fatalf("Failed to initialize Cloudinary: %v", err)
+		logger.Log.Error("Failed to initialize Cloudinary", zap.Error(err))
+		IsConfigErr = false
+		ConfigErr = err
+		return nil
 	}
+	IsConfigErr = true
+	ConfigErr = nil
 	return Cld
 }

@@ -10,15 +10,19 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 func PaymentPage(c *gin.Context) {
+	logger.Log.Info("Requested payment page")
 
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var request struct {
 		AddressID            string  `json:"addressId"`
@@ -32,62 +36,101 @@ func PaymentPage(c *gin.Context) {
 	err := tx.Where("is_confirmed = ? AND reserve_till >= ?", false, time.Now()).
 		Find(&expiredReservations).Error
 	if err != nil {
+		logger.Log.Error("Failed to find expired reservations", zap.Error(err))
 		tx.Rollback()
 		log.Println("Error finding expired reservations:", err)
 		return
 	}
+
 	for _, reservation := range expiredReservations {
 		var coupon models.ReservedCoupon
-		tx.First(&coupon, reservation.ReservedCouponID)
-		tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID)
-		tx.Unscoped().Delete(&coupon)
+		if err := tx.First(&coupon, reservation.ReservedCouponID).Error; err != nil {
+			logger.Log.Warn("Failed to fetch reserved coupon",
+				zap.Uint("reservedCouponID", reservation.ReservedCouponID),
+				zap.Error(err))
+		}
+		if err := tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID).Error; err != nil {
+			logger.Log.Error("Failed to update coupon users count",
+				zap.Uint("couponID", coupon.CouponID),
+				zap.Error(err))
+		}
+		if err := tx.Unscoped().Delete(&coupon).Error; err != nil {
+			logger.Log.Warn("Failed to delete reserved coupon",
+				zap.Uint("reservedCouponID", reservation.ReservedCouponID),
+				zap.Error(err))
+		}
 		if err := tx.Exec(
 			"UPDATE product_variant_details SET stock_quantity = stock_quantity + ? WHERE id = ?",
 			reservation.Quantity, reservation.ProductVariantID,
 		).Error; err != nil {
+			logger.Log.Error("Failed to release stock",
+				zap.Uint("productVariantID", reservation.ProductVariantID),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed releasing stock", "Something Went Wrong", "")
 			tx.Rollback()
 			return
 		}
 		if err := tx.Unscoped().Delete(&reservation).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete  released stock", "Something Went Wrong", "")
+			logger.Log.Error("Failed to delete released stock",
+				zap.Uint("reservationID", reservation.ID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete released stock", "Something Went Wrong", "")
 			tx.Rollback()
 			return
 		}
+		logger.Log.Info("Expired reservation cleaned up",
+			zap.Uint("reservationID", reservation.ID))
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		logger.Log.Error("Failed to bind request data", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Binding the data", "Binding the data", "")
 		return
 	}
 
 	var address models.UserAddress
 	if err := tx.First(&address, "id = ? AND user_id = ?", request.AddressID, userID).Error; err != nil {
+		logger.Log.Error("Address not found",
+			zap.String("addressID", request.AddressID),
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusBadRequest, "Address not found", "Address not found", "")
-	}
-
-	type CartItemWithDiscount struct {
-		Item          models.CartItem
-		DiscountPrice float64
+		return
 	}
 
 	shippingCharge := 100
 	_, cartItems, err := services.FetchCartItems(userID)
 	if err != nil {
+		logger.Log.Error("Failed to fetch cart items",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Cart Error", err.Error(), "/cart")
 		return
 	}
+
+	if len(cartItems) == 0 {
+		logger.Log.Warn("Cart is empty", zap.Uint("userID", userID))
+		helper.RespondWithError(c, http.StatusNotFound, "Cart is empty", "Cart is empty", "/cart")
+		return
+	}
+
 	var couponId uint
 	if request.CouponId != 0 {
 		var coupon models.Coupon
-		if productErr := tx.First(&coupon, request.CouponId).Error; productErr != nil {
+		if err := tx.First(&coupon, request.CouponId).Error; err != nil {
+			logger.Log.Error("Coupon not found",
+				zap.Int("couponID", request.CouponId),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Coupon not found", "Something Went Wrong", "/checkout")
 			return
 		}
 		coupon.UsersUsedCount += 1
 		if err := tx.Save(&coupon).Error; err != nil {
+			logger.Log.Error("Failed to reserve coupon",
+				zap.Int("couponID", request.CouponId),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusConflict, "Failed to Reserve coupon", "Something Went Wrong", "/checkout")
 			return
@@ -100,63 +143,80 @@ func PaymentPage(c *gin.Context) {
 			CouponID:             uint(request.CouponId),
 		}
 		if err := tx.Create(&reserveCoupon).Error; err != nil {
+			logger.Log.Error("Failed to create reserved coupon",
+				zap.String("couponCode", request.CouponCode),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to coupon reserved stock", "Something Went Wrong", "/checkout")
 			return
 		}
 		couponId = reserveCoupon.ID
+		logger.Log.Info("Coupon reserved",
+			zap.Uint("reservedCouponID", couponId),
+			zap.String("couponCode", request.CouponCode))
 	}
 
 	for _, item := range cartItems {
-		if item.ProductVariant.StockQuantity < item.Quantity {
+		if item.ProductDetails.StockQuantity < item.CartItem.Quantity {
+			logger.Log.Warn("Stock unavailable",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Int("stockQty", int(item.CartItem.ProductVariant.StockQuantity)),
+				zap.Int("requestedQty", int(item.CartItem.Quantity)))
 			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/checkout")
 			return
 		}
 		var product models.ProductVariantDetails
-		if productErr := tx.First(&product, item.ProductID).Error; productErr != nil {
+		if err := tx.First(&product, item.CartItem.ProductID).Error; err != nil {
+			logger.Log.Error("Product not found",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Product not found", "Something Went Wrong", "/checkout")
 			return
 		}
-		product.StockQuantity -= item.Quantity
+		product.StockQuantity -= item.CartItem.Quantity
 		if err := tx.Save(&product).Error; err != nil {
+			logger.Log.Error("Failed to reserve stock",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusConflict, "Failed to Reserve stock", "Something Went Wrong", "/checkout")
 			return
 		}
 		reserveStock := models.ReservedStock{
 			UserID:           userID,
-			ProductVariantID: item.ProductID,
-			Quantity:         item.Quantity,
+			ProductVariantID: item.CartItem.ProductID,
+			Quantity:         item.CartItem.Quantity,
 			ReservedAt:       time.Now(),
 			ReserveTill:      time.Now().Add(15 * time.Minute),
 			IsConfirmed:      false,
 			ReservedCouponID: couponId,
 		}
 		if err := tx.Create(&reserveStock).Error; err != nil {
+			logger.Log.Error("Failed to store reserved stock",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to store reserved stock", "Something Went Wrong", "/checkout")
 			return
 		}
+		logger.Log.Info("Stock reserved",
+			zap.Uint("productID", item.CartItem.ProductID),
+			zap.Int("quantity", int(item.CartItem.Quantity)))
 	}
-	var CartItems []CartItemWithDiscount
-	for _, items := range cartItems {
-		discountAmount, _, _ := helper.DiscountCalculation(items.ProductID, items.ProductVariant.CategoryID, items.ProductVariant.RegularPrice, items.ProductVariant.SalePrice)
-		CartItems = append(CartItems, CartItemWithDiscount{
-			Item:          items,
-			DiscountPrice: items.ProductVariant.SalePrice - discountAmount,
-		})
-	}
-	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
 
+	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
 	TotalDiscount := totalDiscount + request.CouponDiscountAmount
 	total := (salePrice + tax) - request.CouponDiscountAmount
-	IsCodAvailable := true
 
+	IsCodAvailable := true
 	for _, itm := range cartItems {
 		var productDetail models.ProductDetail
-		if err := config.DB.First(&productDetail, itm.ProductID).Error; err != nil {
-			helper.RespondWithError(c, http.StatusInternalServerError, "Prduct Not Found", "Something Went Wrong", "/checkout")
+		if err := config.DB.First(&productDetail, itm.CartItem.ProductID).Error; err != nil {
+			logger.Log.Error("Product detail not found",
+				zap.Uint("productID", itm.CartItem.ProductID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusInternalServerError, "Product Not Found", "Something Went Wrong", "/checkout")
 			return
 		}
 		if !productDetail.IsCODAvailable {
@@ -164,20 +224,26 @@ func PaymentPage(c *gin.Context) {
 			break
 		}
 	}
-
 	if total > 75000 {
 		IsCodAvailable = false
 	}
 
 	tx.Commit()
-	CheckForReferrer(c)
-	CheckForJoinee(c)
+	var referralDetails models.ReferralAccount
+	if err := config.DB.First(&referralDetails, "user_id = ?", userID).Error; err == nil {
+		CheckForReferrer(c)
+		CheckForJoinee(c)
+	}
 
+	logger.Log.Info("Payment page loaded successfully",
+		zap.Uint("userID", userID),
+		zap.Float64("total", total),
+		zap.Int("itemCount", len(cartItems)))
 	c.HTML(http.StatusOK, "paymentPage.html", gin.H{
 		"status":          "OK",
 		"message":         "Checkout fetch success",
 		"Address":         address,
-		"CartItem":        CartItems,
+		"CartItem":        cartItems,
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
 		"Tax":             tax,
@@ -201,43 +267,73 @@ var paymentRequest struct {
 }
 
 func ProceedToPayment(c *gin.Context) {
+	logger.Log.Info("Proceeding to payment")
 
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	if err := c.ShouldBind(&paymentRequest); err != nil {
+		logger.Log.Error("Failed to bind payment request", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Request Not Found", "")
 		return
 	}
 
 	var userDetails models.UserAuth
-
 	if err := config.DB.First(&userDetails, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/cart")
 		return
 	}
 
 	currentTime := time.Now()
-
 	cart := FetchCartByUserID(c, userDetails.ID)
+	if cart == nil {
+		return // Error already logged and responded in FetchCartByUserID
+	}
 
 	cartItems := FetchCartItemByCartID(c, cart.ID)
+	if cartItems == nil {
+		return // Error already logged and responded in FetchCartItemByCartID
+	}
 
 	if len(cartItems) == 0 {
+		logger.Log.Warn("Cart is empty", zap.Uint("userID", userID))
 		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Add Product in Your Cart", "/cart")
 		return
 	}
+
 	reservedProducts := FetchReservedProducts(c, userID)
+	if reservedProducts == nil {
+		return // Error already logged and responded in FetchReservedProducts
+	}
 
 	if len(reservedProducts) != len(cartItems) {
+		logger.Log.Error("Mismatch between cart items and reserved products",
+			zap.Int("cartItemCount", len(cartItems)),
+			zap.Int("reservedProductCount", len(reservedProducts)))
 		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 11", "Something Went Wrong", "/cart")
 		return
 	}
+
 	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
+	if reservedMap == nil {
+		return // Error already logged and responded in ReservedProductCheck
+	}
 
 	var coupon models.ReservedCoupon
-	config.DB.First(&coupon, paymentRequest.CouponId)
+	if err := config.DB.First(&coupon, paymentRequest.CouponId).Error; err != nil {
+		logger.Log.Warn("Reserved coupon not found",
+			zap.String("couponID", paymentRequest.CouponId),
+			zap.Error(err))
+	}
+
 	couponDiscountAmount, err := strconv.ParseFloat(paymentRequest.CouponDiscountAmount, 64)
 	if err != nil {
+		logger.Log.Error("Failed to parse coupon discount amount",
+			zap.String("couponDiscountAmount", paymentRequest.CouponDiscountAmount),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Coverting Failed", "Something Went Wrong", "/cart")
 		return
 	}
@@ -247,12 +343,21 @@ func ProceedToPayment(c *gin.Context) {
 		paymentStatus := true
 		tx := config.DB.Begin()
 		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+		if orderID == 0 {
+			return // Error already logged and responded in CreateOrder
+		}
 		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 		orderItems := FetchOrderItems(c, tx, orderID)
+		if orderItems == nil {
+			return // Error already logged and responded in FetchOrderItems
+		}
 
 		for _, ordItems := range orderItems {
 			if err := CODPayment(c, tx, userDetails.ID, ordItems.OrderUID, ordItems.ID, ordItems.Total, "Cash On Delivery"); err != nil {
+				logger.Log.Error("COD payment failed",
+					zap.Uint("orderItemID", ordItems.ID),
+					zap.Error(err))
 				tx.Rollback()
 				paymentStatus = false
 				helper.RespondWithError(c, http.StatusInternalServerError, "Payment failed", "Something Went Wrong", "/checkout")
@@ -264,8 +369,15 @@ func ProceedToPayment(c *gin.Context) {
 		if paymentStatus {
 			ClearCart(c, tx, reservedMap)
 		}
-		tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
+		if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
+			logger.Log.Warn("Failed to delete reserved coupon",
+				zap.String("couponID", paymentRequest.CouponId),
+				zap.Error(err))
+		}
 		tx.Commit()
+		logger.Log.Info("COD payment processed successfully",
+			zap.Uint("userID", userID),
+			zap.Uint("orderID", orderID))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"message":  "Payment processed",
@@ -275,20 +387,30 @@ func ProceedToPayment(c *gin.Context) {
 
 	case "Razorpay":
 		address := FetchAddressByIDAndUserID(c, userID, paymentRequest.AddressID)
+		if address == nil {
+			return // Error already logged and responded in FetchAddressByIDAndUserID
+		}
 		razorpayOrder, err := CreateRazorpayOrder(c, total-couponDiscountAmount)
 		if err != nil {
+			logger.Log.Error("Failed to create Razorpay order",
+				zap.Float64("amount", total-couponDiscountAmount),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create Razorpay order", "Something Went Wrong", "/checkout")
 			return
 		}
 
 		razorpayOrderID, ok := razorpayOrder["id"].(string)
 		if !ok {
+			logger.Log.Error("Failed to extract Razorpay order ID",
+				zap.Any("razorpayOrder", razorpayOrder))
 			log.Println("Failed to extract order ID from Razorpay response:", razorpayOrder)
 			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
 			return
 		}
 		RazorPayOrderID = razorpayOrderID
-
+		logger.Log.Info("Razorpay payment initiated",
+			zap.String("razorpayOrderID", razorpayOrderID),
+			zap.Float64("amount", total-couponDiscountAmount))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
@@ -305,29 +427,42 @@ func ProceedToPayment(c *gin.Context) {
 				"user_id": userDetails.ID,
 			},
 		})
+
 	case "Wallet":
 		tx := config.DB.Begin()
 		var walletDetails models.Wallet
 		if err := tx.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+			logger.Log.Error("Wallet not found",
+				zap.Uint("userID", userID),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Not Found", "Something Went Wrong", "/cart")
 			return
 		}
+
 		orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+		if orderID == 0 {
+			return // Error already logged and responded in CreateOrder
+		}
 		SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
 		CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 		orderItems := FetchOrderItems(c, tx, orderID)
+		if orderItems == nil {
+			return // Error already logged and responded in FetchOrderItems
+		}
 
 		var orderDetails models.Order
 		if err := tx.First(&orderDetails, orderID).Error; err != nil {
+			logger.Log.Error("Order not found",
+				zap.Uint("orderID", orderID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
 			return
 		}
 
 		for _, orderItem := range orderItems {
-
 			receiptID := "rcpt-" + uuid.New().String()
-			rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+			rand.Seed(time.Now().UnixNano())
 			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			createPayment := models.PaymentDetail{
@@ -340,8 +475,10 @@ func ProceedToPayment(c *gin.Context) {
 				TransactionID: transactionID,
 				Receipt:       receiptID,
 			}
-
 			if err := tx.Create(&createPayment).Error; err != nil {
+				logger.Log.Error("Failed to create payment",
+					zap.Uint("orderItemID", orderItem.ID),
+					zap.Error(err))
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusInternalServerError, "Payment creation failed", "Something Went Wrong", "/cart")
 				return
@@ -349,6 +486,9 @@ func ProceedToPayment(c *gin.Context) {
 
 			var orderedItem models.OrderItem
 			if err := tx.First(&orderedItem, orderItem.ID).Error; err != nil {
+				logger.Log.Error("Order item not found",
+					zap.Uint("orderItemID", orderItem.ID),
+					zap.Error(err))
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
 				return
@@ -356,6 +496,9 @@ func ProceedToPayment(c *gin.Context) {
 
 			orderedItem.OrderStatus = "Confirmed"
 			if err := tx.Save(&orderedItem).Error; err != nil {
+				logger.Log.Error("Failed to update order item status",
+					zap.Uint("orderItemID", orderItem.ID),
+					zap.Error(err))
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update order", "Something Went Wrong", "")
 				return
@@ -366,12 +509,16 @@ func ProceedToPayment(c *gin.Context) {
 		lastBalance := walletDetails.Balance
 		walletDetails.Balance -= total
 		if err := tx.Save(&walletDetails).Error; err != nil {
+			logger.Log.Error("Failed to update wallet balance",
+				zap.Uint("userID", userID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update wallet details", "Failed to update order", "")
 			return
 		}
+
 		walletReceiptID := "rcpt-" + uuid.New().String()
-		rand.Seed(time.Now().UnixNano()) // Ensure different seeds
+		rand.Seed(time.Now().UnixNano())
 		walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 		walletHistory := models.WalletTransaction{
@@ -387,14 +534,25 @@ func ProceedToPayment(c *gin.Context) {
 			PaymentMethod: "Wallet",
 		}
 		if err := tx.Create(&walletHistory).Error; err != nil {
+			logger.Log.Error("Failed to create wallet transaction",
+				zap.Uint("userID", userID),
+				zap.Error(err))
 			tx.Rollback()
 			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Creation Failed", "Something Went Wrong", "/cart")
 			return
 		}
 
 		ClearCart(c, tx, reservedMap)
-		tx.Unscoped().Delete(&coupon, paymentRequest.CouponId)
+		if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
+			logger.Log.Warn("Failed to delete reserved coupon",
+				zap.String("couponID", paymentRequest.CouponId),
+				zap.Error(err))
+		}
 		tx.Commit()
+		logger.Log.Info("Wallet payment processed successfully",
+			zap.Uint("userID", userID),
+			zap.Uint("orderID", orderID),
+			zap.Float64("amount", total))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"message":  "Payment processed",
@@ -403,14 +561,18 @@ func ProceedToPayment(c *gin.Context) {
 		})
 
 	default:
+		logger.Log.Warn("Invalid payment method",
+			zap.String("method", paymentRequest.PaymentMethod))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Payment Method", "Invalid Payment Method", "/checkout")
 		return
 	}
 }
 
 func PayNow(c *gin.Context) {
+	logger.Log.Info("Requested pay now")
 
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var PayNowRequest struct {
 		Method      string `json:"method"`
@@ -419,56 +581,87 @@ func PayNow(c *gin.Context) {
 	}
 
 	if err := c.ShouldBind(&PayNowRequest); err != nil {
+		logger.Log.Error("Failed to bind pay now request", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Request Not Found", "/profile/order/details")
 		return
 	}
 
 	var userDetails models.UserAuth
-
 	if err := config.DB.First(&userDetails, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/cart")
 		return
 	}
 
 	if PayNowRequest.Method == "" || PayNowRequest.OrderItemID == "" {
+		logger.Log.Error("Missing required fields in pay now request",
+			zap.String("method", PayNowRequest.Method),
+			zap.String("orderItemID", PayNowRequest.OrderItemID))
 		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Request Not Found", "/profile/order/details")
 		return
 	}
+
 	switch PayNowRequest.Method {
 	case "Razorpay":
 		var orderItems models.OrderItem
 		if err := config.DB.First(&orderItems, PayNowRequest.OrderItemID).Error; err != nil {
-			helper.RespondWithError(c, http.StatusNotFound, "Order Item Not Fount", "Something Went Wrong", "/profile/order/details")
+			logger.Log.Error("Order item not found",
+				zap.String("orderItemID", PayNowRequest.OrderItemID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusNotFound, "Order Item Not Found", "Something Went Wrong", "/profile/order/details")
 			return
 		}
+
 		var order models.Order
 		if err := config.DB.First(&order, orderItems.OrderID).Error; err != nil {
-			helper.RespondWithError(c, http.StatusNotFound, "Order Not Fount", "Something Went Wrong", "/profile/order/details")
+			logger.Log.Error("Order not found",
+				zap.Uint("orderID", orderItems.OrderID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusNotFound, "Order Not Found", "Something Went Wrong", "/profile/order/details")
 			return
 		}
+
 		addressId, adErr := strconv.Atoi(PayNowRequest.AddressID)
 		if adErr != nil {
+			logger.Log.Error("Invalid address ID",
+				zap.String("addressID", PayNowRequest.AddressID),
+				zap.Error(adErr))
 			helper.RespondWithError(c, http.StatusBadRequest, "Invalid Address", "Something Went Wrong", "/profile/order/details")
 			return
 		}
+
 		var address models.ShippingAddress
 		if err := config.DB.First(&address, "id = ?", addressId).Error; err != nil {
+			logger.Log.Error("Address not found",
+				zap.Int("addressID", addressId),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusNotFound, "Address Not Found", "Something Went Wrong", "/profile/order/details")
 			return
 		}
 
 		razorpayOrder, err := CreateRazorpayOrder(c, order.TotalAmount)
 		if err != nil {
+			logger.Log.Error("Failed to create Razorpay order",
+				zap.Float64("amount", order.TotalAmount),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create Razorpay order", "Something Went Wrong", "/profile/order/details")
 			return
 		}
 
 		razorpayOrderID, ok := razorpayOrder["id"].(string)
 		if !ok {
+			logger.Log.Error("Failed to extract Razorpay order ID",
+				zap.Any("razorpayOrder", razorpayOrder))
 			log.Println("Failed to extract order ID from Razorpay response:", razorpayOrder)
 			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
 			return
 		}
+
+		logger.Log.Info("Razorpay pay now initiated",
+			zap.String("razorpayOrderID", razorpayOrderID),
+			zap.Uint("orderItemID", orderItems.ID))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
@@ -487,8 +680,9 @@ func PayNow(c *gin.Context) {
 		})
 
 	default:
+		logger.Log.Warn("Invalid payment method for pay now",
+			zap.String("method", PayNowRequest.Method))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Payment Method", "Invalid Payment Method", "/profile/order/details")
 		return
 	}
-
 }

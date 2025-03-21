@@ -424,15 +424,15 @@
                     </div>
                     {{range .CartItem}}
                     <div class="flex items-center gap-4 p-4  rounded-lg border border-gray-200 mt-1">
-                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages }}"
+                        <img src="{{.ProductImage}}"
                             alt="Laptop Stand" class="w-20 h-20 object-contain">
                         <div class="flex flex-col">
-                            <p class="text-sm font-medium">{{ .Item.ProductVariant.ProductSummary }}</p>
+                            <p class="text-sm font-medium">{{ .ProductDetails.ProductSummary }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{ .Item.Quantity }} ×</span>
+                                <span class="text-sm">{{ .CartItem.Quantity }} ×</span>
                                 <span class="font-medium text-sm">&#8377; {{ .DiscountPrice }}</span>
                                 <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
-                                    .Item.ProductVariant.RegularPrice }}</span>
+                                    .ProductDetails.RegularPrice }}</span>
                             </div>
                         </div>
                     </div>
@@ -448,15 +448,15 @@
                 <div class="space-y-4 mb-6">
                     {{range .CartItem}}
                     <div class="flex gap-4">
-                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                        <img src="{{.ProductImage}}"
                             alt="Camera" class="w-16 h-16 object-contain">
                         <div>
-                            <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
+                            <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{.Item.Quantity}} ×</span>
+                                <span class="text-sm">{{.CartItem.Quantity}} ×</span>
                                 <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice }}</span>
                                 <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f"
-                                    .Item.ProductVariant.RegularPrice}}</span>
+                                    .ProductDetails.RegularPrice}}</span>
                             </div>
                         </div>
                     </div>
@@ -757,7 +757,7 @@
                 this.disabled = true;
 
                 // Send AJAX request to apply gift card
-                fetch('/user/wallet/apply-gift-card', {
+                fetch('/auth/wallet/apply-gift-card', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

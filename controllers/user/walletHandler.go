@@ -4,17 +4,20 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
 	"net/http"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 func CreateWallet(c *gin.Context, userID uint) {
+	logger.Log.Info("Creating wallet", zap.Uint("userID", userID))
+
 	var wallet models.Wallet
 	if err := config.DB.First(&wallet, "user_id = ?", userID).Error; err != nil {
 		userWallet := models.Wallet{
@@ -22,15 +25,27 @@ func CreateWallet(c *gin.Context, userID uint) {
 			Balance: 0,
 		}
 		if createErr := config.DB.Create(&userWallet).Error; createErr != nil {
+			logger.Log.Error("Failed to create wallet",
+				zap.Uint("userID", userID),
+				zap.Error(createErr))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Creation Failed", "Something Went Wrong", "")
 			return
 		}
+		logger.Log.Info("Wallet created successfully",
+			zap.Uint("userID", userID),
+			zap.Uint("walletID", userWallet.ID))
+	} else {
+		logger.Log.Debug("Wallet already exists",
+			zap.Uint("userID", userID),
+			zap.Uint("walletID", wallet.ID))
 	}
 }
 
 func WalletHandler(c *gin.Context) {
-	
+	logger.Log.Info("Fetching wallet details")
+
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	type TransactionHistoryWallet struct {
 		Date        string  `json:"date"`
@@ -41,24 +56,36 @@ func WalletHandler(c *gin.Context) {
 
 	var userauth models.UserAuth
 	if err := config.DB.First(&userauth, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
+
 	CreateWallet(c, userID)
+
 	var walletDetails models.Wallet
 	if err := config.DB.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+		logger.Log.Error("Wallet not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
 		return
 	}
 
-	var walletTransactons []models.WalletTransaction
-	if err := config.DB.Order("created_at DESC").Find(&walletTransactons, "user_id = ? AND wallet_id = ?", userID, walletDetails.ID).Error; err != nil {
+	var walletTransactions []models.WalletTransaction
+	if err := config.DB.Order("created_at DESC").Find(&walletTransactions, "user_id = ? AND wallet_id = ?", userID, walletDetails.ID).Error; err != nil {
+		logger.Log.Error("Failed to fetch wallet transactions",
+			zap.Uint("userID", userID),
+			zap.Uint("walletID", walletDetails.ID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Something Went Wrong", "")
 		return
 	}
 
 	var history []TransactionHistoryWallet
-	for _, his := range walletTransactons {
+	for _, his := range walletTransactions {
 		row := TransactionHistoryWallet{
 			Date:        his.CreatedAt.Format("Jan 02, 2006"),
 			Description: his.Description,
@@ -70,12 +97,24 @@ func WalletHandler(c *gin.Context) {
 
 	var referralDetails models.ReferralAccount
 	if err := config.DB.First(&referralDetails, "user_id = ?", userID).Error; err != nil {
-		CreateCart(c, userauth.ID)
+		logger.Log.Warn("Referral account not found, creating new",
+			zap.Uint("userID", userID))
+		CreateReferralAccount(c, userauth.ID)
+		// Re-fetch after creation
+		if err := config.DB.First(&referralDetails, "user_id = ?", userID).Error; err != nil {
+			logger.Log.Error("Failed to fetch newly created referral account",
+				zap.Uint("userID", userID),
+				zap.Error(err))
+		}
 	}
 
 	CheckForReferrer(c)
 	CheckForJoinee(c)
 
+	logger.Log.Info("Wallet details loaded",
+		zap.Uint("userID", userID),
+		zap.Uint("walletID", walletDetails.ID),
+		zap.Int("transactionCount", len(history)))
 	c.HTML(http.StatusOK, "profileWallet.html", gin.H{
 		"status":             "success",
 		"message":            "Order details fetched successfully",
@@ -87,8 +126,10 @@ func WalletHandler(c *gin.Context) {
 }
 
 func AddMoneyTOWalltet(c *gin.Context) {
-	
+	logger.Log.Info("Adding money to wallet")
+
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var addMoneyInput struct {
 		PaymentMethod string  `json:"paymentMethod"`
@@ -96,23 +137,24 @@ func AddMoneyTOWalltet(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&addMoneyInput); err != nil {
+		logger.Log.Error("Failed to bind add money data", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data", "Enter All Fields Correctly", "")
 		return
 	}
 
 	var userauth models.UserAuth
 	if err := config.DB.First(&userauth, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
 		return
 	}
 
-	/* amount, err := strconv.Atoi(addMoneyInput.Amount)
-	if err != nil {
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Amount Enterd", "Enter Correct Amount", "")
-		return
-	} */
-
 	if addMoneyInput.PaymentMethod == "" || addMoneyInput.Amount == 0 {
+		logger.Log.Warn("Invalid payment method or amount",
+			zap.String("paymentMethod", addMoneyInput.PaymentMethod),
+			zap.Float64("amount", addMoneyInput.Amount))
 		helper.RespondWithError(c, http.StatusBadRequest, "Request Not Found", "Enter All Fields Correctly", "/profile/order/details")
 		return
 	}
@@ -121,17 +163,26 @@ func AddMoneyTOWalltet(c *gin.Context) {
 	case "Razorpay":
 		razorpayOrder, err := CreateRazorpayOrder(c, addMoneyInput.Amount)
 		if err != nil {
+			logger.Log.Error("Failed to create Razorpay order",
+				zap.Uint("userID", userID),
+				zap.Float64("amount", addMoneyInput.Amount),
+				zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create Razorpay order", "Something Went Wrong", "/profile/order/details")
 			return
 		}
 
 		razorpayOrderID, ok := razorpayOrder["id"].(string)
 		if !ok {
-			log.Println("Failed to extract order ID from Razorpay response:", razorpayOrder)
+			logger.Log.Error("Failed to extract Razorpay order ID",
+				zap.Any("razorpayResponse", razorpayOrder))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Invalid Razorpay response", "Something Went Wrong", "/checkout")
 			return
 		}
 
+		logger.Log.Info("Razorpay order created",
+			zap.Uint("userID", userID),
+			zap.String("orderID", razorpayOrderID),
+			zap.Float64("amount", addMoneyInput.Amount))
 		c.JSON(http.StatusOK, gin.H{
 			"status":   "OK",
 			"order_id": razorpayOrderID,
@@ -145,15 +196,19 @@ func AddMoneyTOWalltet(c *gin.Context) {
 		})
 
 	default:
+		logger.Log.Warn("Unsupported payment method",
+			zap.String("paymentMethod", addMoneyInput.PaymentMethod),
+			zap.Uint("userID", userID))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Payment Method", "Invalid Payment Method", "/profile/order/details")
 		return
-
 	}
 }
 
 func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
-	
+	logger.Log.Info("Verifying Razorpay payment for wallet")
+
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var verifyRequest struct {
 		PaymentID string  `json:"razorpay_payment_id"`
@@ -163,14 +218,18 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&verifyRequest); err != nil {
+		logger.Log.Error("Failed to bind verification data", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request", "Invalid request format", "")
 		return
 	}
+
 	tx := config.DB.Begin()
 
 	var userDetails models.UserAuth
-
 	if err := tx.First(&userDetails, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/profile/order/details")
 		return
@@ -182,26 +241,35 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 	calculatedSignature := hex.EncodeToString(expectedSignature.Sum(nil))
 
 	if calculatedSignature != verifyRequest.Signature {
+		logger.Log.Warn("Invalid payment signature",
+			zap.Uint("userID", userID),
+			zap.String("orderID", verifyRequest.OrderID),
+			zap.String("paymentID", verifyRequest.PaymentID))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid signature", "Payment verification failed", "/profile/order/details")
 		return
 	}
 
 	var wallet models.Wallet
-
 	if err := tx.First(&wallet, "user_id = ?", userID).Error; err != nil {
+		logger.Log.Error("Wallet not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusNotFound, "Wallet not found", "Wallet not found", "")
 		return
 	}
 
 	actualAmount := verifyRequest.Amount / 100
-
-	lastBalace := wallet.Balance
+	lastBalance := wallet.Balance
 	wallet.Balance += actualAmount
 	if err := tx.Save(&wallet).Error; err != nil {
+		logger.Log.Error("Failed to update wallet balance",
+			zap.Uint("walletID", wallet.ID),
+			zap.Float64("amount", actualAmount),
+			zap.Error(err))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Amount Addung Failed", "Something Went Wrong", "")
+		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Amount Adding Failed", "Something Went Wrong", "")
 		return
 	}
 
@@ -215,17 +283,26 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 		Receipt:       receiptID,
 		OrderId:       verifyRequest.OrderID,
 		TransactionID: verifyRequest.PaymentID,
-		LastBalance:   lastBalace,
+		LastBalance:   lastBalance,
 		PaymentMethod: "RazorPay",
 	}
 
 	if err := tx.Create(&createHistory).Error; err != nil {
+		logger.Log.Error("Failed to create wallet transaction",
+			zap.Uint("walletID", wallet.ID),
+			zap.String("transactionID", verifyRequest.PaymentID),
+			zap.Error(err))
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Adding Failed", "Something Went Wrong", "")
 		return
 	}
 
 	tx.Commit()
+	logger.Log.Info("Wallet payment verified and updated",
+		zap.Uint("userID", userID),
+		zap.Uint("walletID", wallet.ID),
+		zap.String("paymentID", verifyRequest.PaymentID),
+		zap.Float64("amount", actualAmount))
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Payment verified successfully",

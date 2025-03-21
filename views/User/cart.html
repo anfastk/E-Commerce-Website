@@ -97,38 +97,37 @@
 
                     {{range .CartItem}}
                     <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row gap-6"
-                        data-cart-item="{{.Item.ID}}">
-                        {{if len .Item.ProductVariant.VariantsImages}}
-                        <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages }}"
-                            alt="{{.Item.ProductVariant.ProductName}}" class="w-24 h-24 object-contain">
+                        data-cart-item="{{.CartItem.ID}}">
+                        {{if .ProductImage}}
+                        <img src="{{.ProductImage}}" alt="{{.ProductDetail.ProductName}}"
+                            class="w-24 h-24 object-contain">
                         {{end}}
                         <div class="flex-grow">
-                            <a href="/products/details/{{.Item.ProductVariant.ID}}">
-                                <h3 class="font-bold mb-2">{{ .Item.ProductVariant.Category.Name }}</h3>
-                                <p class="text-sm text-gray-600 mb-4">{{ .Item.ProductVariant.ProductSummary }}</p>
+                            <a href="/products/details/{{.ProductDetail.ID}}">
+                                <h3 class="font-bold mb-2">{{ .ProductDetail.Category.Name }}</h3>
+                                <p class="text-sm text-gray-600 mb-4">{{ .ProductDetail.ProductSummary }}</p>
                             </a>
                             <div class="flex items-center justify-between">
-                                <a href="/products/details/{{.Item.ProductVariant.ID}}">
+                                <a href="/products/details/{{.ProductDetail.ID}}">
                                     <div class="flex items-center gap-4">
                                         <p class="line-through text-gray-400">&#8377;{{
-                                            .Item.ProductVariant.RegularPrice }}</p>
+                                            .ProductDetail.RegularPrice }}</p>
                                         <p class="font-bold">&#8377;{{ .DiscountPrice }}</p>
                                     </div>
                                 </a>
                                 <div class="flex items-center gap-4">
-                                    {{if .Item.Quantity}}
+                                    {{if or (eq .Status "Unavailable") (eq .Status "Out Of Stock")}}
+                                    <p class="text-red-500 text-lg font-bold">{{.Status}}</p>
+                                    {{else}}
                                     <div class="flex items-center border rounded">
                                         <button class="px-3 py-1 hover:bg-gray-100"
-                                            onclick="updateQuantity(`{{.Item.ID}}`, 'decrease')">-</button>
-                                        <span class="px-3 py-1 border-x quantity-display">{{.Item.Quantity}}</span>
+                                            onclick="updateQuantity(`{{.CartItem.ID}}`, 'decrease')">-</button>
+                                        <span class="px-3 py-1 border-x quantity-display">{{.CartItem.Quantity}}</span>
                                         <button class="px-3 py-1 hover:bg-gray-100"
-                                            onclick="updateQuantity(`{{.Item.ID}}`, 'increase')">+</button>
+                                            onclick="updateQuantity(`{{.CartItem.ID}}`, 'increase')">+</button>
                                     </div>
-
-                                    {{else}}
-                                    <p class="text-red-500 text-lg font-bold">Out Of Stock</p>
                                     {{end}}
-                                    <button class="text-red-500" onclick="deleteCartItem(`{{.Item.ID}}`)">
+                                    <button class="text-red-500" onclick="deleteCartItem(`{{.CartItem.ID}}`)">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -160,7 +159,7 @@
                             <span class="font-bold">TOTAL</span>
                             <span class="total-amount font-bold">₹{{.Total}}</span>
                         </div>
-                        <button id="checkoutButton"
+                        <a href="/checkout"
                             class="w-full bg-black text-white py-4 rounded-lg flex items-center justify-center gap-2">
                             PROCEED TO CHECKOUT
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -168,7 +167,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
-                        </button>
+                        </a>
                     </div>
                 </div>
                 {{end}}
@@ -460,7 +459,9 @@
                 });
         }
         function updateCartTotalAndCount() {
-            fetch('/cart/total')
+            fetch('/cart/total', {
+                method: 'POST',
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "OK") {
@@ -602,38 +603,7 @@
             updateCartTotalAndCount();
         });
 
-        document.getElementById('checkoutButton').addEventListener('click', function () {
-            // Create a fetch POST request
-            fetch('/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add any other headers you need
-                },
-                // Add any body data if needed
-                // body: JSON.stringify({ key: 'value' })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        // If response is not OK, parse as JSON to get the error message
-                        return response.json().then(errorData => {
-                            throw new Error(errorData.message || 'Error processing checkout');
-                        });
-                    }
-                    // If response is OK, get the HTML content
-                    return response.text();
-                })
-                .then(html => {
-                    // Replace the current page content with the new HTML
-                    document.open();
-                    document.write(html);
-                    document.close();
-                })
-                .catch(error => {
-                    // Show only the error message in alert box
-                    showErrorToast(error.message);
-                });
-        });
+
     </script>
     <script src="/static/js/toastMain.js"></script>
 

@@ -1,9 +1,9 @@
 package config
 
 import (
-	"log"
-
 	models "github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"go.uber.org/zap"
 )
 
 func SyncDatabase() {
@@ -16,9 +16,13 @@ func SyncDatabase() {
 		&models.WishlistItem{}, &models.PaymentDetail{}, &models.WalletTransaction{}, &models.ReferralAccount{}, &models.ReferalHistory{}, &models.ReturnRequest{},
 	)
 	if err != nil {
-		log.Fatalf("Failed to migrate models: %v", err)
+		logger.Log.Error("Failed to migrate models", zap.Error(err))
+		IsConfigErr = false
+		ConfigErr = err
 	}
-	log.Println("Models migrated")
 	DB.Exec("CREATE INDEX idx_order_items_created_at_product_variant_id ON order_items (created_at, product_variant_id)")
+	logger.Log.Info("Models migrated")
 	DownloadLogo()
+	IsConfigErr = true
+	ConfigErr = nil
 }

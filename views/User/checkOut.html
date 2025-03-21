@@ -380,16 +380,16 @@
                         <!-- Product 1 -->
                         {{range .CartItem}}
                         <div class="flex gap-4">
-                            <img src="{{ (index .Item.ProductVariant.VariantsImages 0).ProductVariantsImages  }}"
+                            <img src="{{.ProductImage}}"
                                 alt="Camera" class="w-16 h-16 object-contain rounded">
                             <div>
-                                <p class="text-sm">{{ .Item.ProductVariant.ProductName }}</p>
+                                <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-sm">{{.Item.Quantity}} ×</span>
+                                    <span class="text-sm">{{.CartItem.Quantity}} ×</span>
                                     <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice}}</span>
                                     <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf
                                         "%.2f"
-                                        .Item.ProductVariant.RegularPrice}}</span>
+                                        .ProductDetails.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
@@ -558,7 +558,7 @@
             </div>
         </div>
     </footer>
-    <div class="toast-container z-40 fixed top-0 right-4">
+    <div class="toast-container z-40 fixed top-24 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
                 <div class="toast-icon mr-2">
@@ -758,10 +758,6 @@
             total: parseIndianNumber(rawTotal)
         };
 
-        // For debugging - check if values are parsed correctly
-        console.log("Original values:", originalValues);
-
-        // Current values (will be updated when coupons are applied)
         let currentValues = { ...originalValues };
         let appliedCoupon = null;
         let couponDiscountAmount = 0;
@@ -853,7 +849,6 @@
                     productDiscount: originalValues.productDiscount
                 };
 
-                console.log("Sending to backend:", data);
 
                 // Call your backend API
                 const response = await fetch('/checkout/check/coupon', {
@@ -864,11 +859,9 @@
                     body: JSON.stringify(data),
                 });
 
-                console.log("Response status:", response.status);
 
                 // Parse the response JSON
                 const result = await response.json();
-                console.log("Response data:", result);
 
                 // Check if the response indicates success (status is 'ok' or code is 200)
                 if (response.ok && (result.status === 'ok' || result.code === 200)) {

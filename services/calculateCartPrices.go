@@ -1,11 +1,10 @@
 package services
 
 import (
-	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 )
 
-func CalculateCartPrices(cartItems []models.CartItem) (float64, float64, float64, float64, float64, int) {
+func CalculateCartPrices(cartItems []CartItemDetailWithDiscount) (float64, float64, float64, float64, float64, int) {
 	var (
 		regularPrice    float64
 		salePrice       float64
@@ -16,9 +15,9 @@ func CalculateCartPrices(cartItems []models.CartItem) (float64, float64, float64
 	shippingCharge := 100
 
 	for _, item := range cartItems {
-		discountAmount, _, _ := helper.DiscountCalculation(item.ProductID, item.ProductVariant.CategoryID, item.ProductVariant.RegularPrice, item.ProductVariant.SalePrice)
-		regularPrice += item.ProductVariant.RegularPrice * float64(item.Quantity)
-		salePrice += (item.ProductVariant.SalePrice - discountAmount) * float64(item.Quantity)
+		discountAmount, _, _ := helper.DiscountCalculation(item.CartItem.ProductID, item.ProductDetails.CategoryID, item.ProductDetails.RegularPrice, item.ProductDetails.SalePrice)
+		regularPrice += item.ProductDetails.RegularPrice * float64(item.CartItem.Quantity)
+		salePrice += (item.ProductDetails.SalePrice - discountAmount) * float64(item.CartItem.Quantity)
 	}
 
 	tax = (salePrice * 18) / 100

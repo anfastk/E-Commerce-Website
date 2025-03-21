@@ -10,7 +10,6 @@ var RoleAdmin = "Admin"
 
 func AdminRoutes(r *gin.Engine) {
 	admin := r.Group("/admin")
-	admin.Use(middleware.NoCacheMiddleware())
 	{
 		admin.GET("/login", controllers.ShowLoginPage)
 		admin.POST("/login", controllers.AdminLoginHandler)
@@ -20,7 +19,6 @@ func AdminRoutes(r *gin.Engine) {
 	// Admin Product Managemant
 	product := r.Group("/admin/products")
 	product.Use(middleware.AuthMiddleware(RoleAdmin))
-	product.Use(middleware.NoCacheMiddleware())
 	{
 		product.GET("/", controllers.ShowProductsAdmin)
 		product.GET("/main/add", controllers.ShowAddMainProduct)
@@ -49,7 +47,6 @@ func AdminRoutes(r *gin.Engine) {
 	// Admin User Managemant
 	adminUser := r.Group("/admin/users")
 	adminUser.Use(middleware.AuthMiddleware(RoleAdmin))
-	adminUser.Use(middleware.NoCacheMiddleware())
 	{
 		adminUser.GET("/", controllers.ListUsers)
 		adminUser.POST("/:id/block", controllers.BlockUser)
@@ -58,7 +55,6 @@ func AdminRoutes(r *gin.Engine) {
 	// Admin Category Managemant
 	category := r.Group("/admin/category")
 	category.Use(middleware.AuthMiddleware(RoleAdmin))
-	category.Use(middleware.NoCacheMiddleware())
 	{
 		category.GET("/", controllers.ListCategory)
 		category.PATCH("/:id/edit", controllers.EditCategory)
@@ -71,7 +67,6 @@ func AdminRoutes(r *gin.Engine) {
 	}
 	OrderList := r.Group("/admin/orderlist")
 	OrderList.Use(middleware.AuthMiddleware(RoleAdmin))
-	OrderList.Use(middleware.NoCacheMiddleware())
 	{
 		OrderList.GET("/", controllers.ShowOrderManagent)
 		OrderList.GET("/details/:id", controllers.ShowOrderDetailManagement)
@@ -81,7 +76,6 @@ func AdminRoutes(r *gin.Engine) {
 
 	coupon := r.Group("/admin/coupon")
 	coupon.Use(middleware.AuthMiddleware(RoleAdmin))
-	coupon.Use(middleware.NoCacheMiddleware())
 	{
 		coupon.GET("/", controllers.ShowCoupon)
 		coupon.POST("/add", controllers.AddCoupon)
@@ -92,7 +86,6 @@ func AdminRoutes(r *gin.Engine) {
 
 	sales := r.Group("/sales")
 	sales.Use(middleware.AuthMiddleware(RoleAdmin))
-	sales.Use(middleware.NoCacheMiddleware())
 	{
 		sales.GET("/", controllers.GetSalesDashboard)
 		sales.GET("/filter", controllers.GetSalesData)
@@ -102,7 +95,6 @@ func AdminRoutes(r *gin.Engine) {
 
 	wallet := r.Group("/admin/wallet")
 	wallet.Use(middleware.AuthMiddleware(RoleAdmin))
-	wallet.Use(middleware.NoCacheMiddleware())
 	{
 		wallet.GET("/management", controllers.ShowWalletManagement)
 		wallet.GET("/management/details/:id", controllers.ShowTransactionDetails)
@@ -110,7 +102,6 @@ func AdminRoutes(r *gin.Engine) {
 
 	adminDashboard := r.Group("/admin/dashboard")
 	adminDashboard.Use(middleware.AuthMiddleware(RoleAdmin))
-	adminDashboard.Use(middleware.NoCacheMiddleware())
 	{
 		adminDashboard.GET("/", controllers.DashboardHandler)
 		adminDashboard.GET("/stats", controllers.StatsHandler)

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - LAPTIX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
+</head>
+
+<body class="bg-gray-50">
+    <div class="bg-black py-4 sticky top-0 z-50 ">
+        <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+            <div class="flex justify-between items-center py-2">
+                <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
+
+                <!-- Desktop Navigation -->
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                </nav>
+
+                <!-- Icons Section -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
+                            </svg></button></a>
+                    <a href="/cart">
+                        <button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
+                                <path fill="#000"
+                                    d="M241.55 64.74A12 12 0 0 0 232 60H60.23l-8.67-31.21A12 12 0 0 0 40 20H20a12 12 0 0 0 0 24h10.88l34.3 123.49a28.09 28.09 0 0 0 27 20.51H191a28.09 28.09 0 0 0 27-20.51l25.63-92.28a12 12 0 0 0-2.08-10.47m-46.75 96.33A4 4 0 0 1 191 164H92.16a4 4 0 0 1-3.85-2.93L66.9 84h149.31ZM108 220a20 20 0 1 1-20-20a20 20 0 0 1 20 20m104 0a20 20 0 1 1-20-20a20 20 0 0 1 20 20" />
+                            </svg>
+                        </button>
+                    </a>
+                    <a href="/wishlist">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
+                    <a href="/profile"><button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="#000"
+                                    d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
+                            </svg>
+                        </button>
+
+                    </a>
+
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden" onclick="toggleMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
+                <nav class="flex flex-col space-y-4 text-md font-medium">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                    <a href="/cart" class="hover:text-gray-600">Cart</a>
+                    <a href="#" class="hover:text-gray-600">Whishlist</a>
+                    <a href="/profile" class="hover:text-gray-600">Profile</a>
+
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <!-- 404 Content Section -->
+    <div class="container mx-auto px-4 py-14">
+        <div class="flex flex-col items-center justify-center min-h-[60vh]">
+            <!-- 404 Illustration -->
+            <div class="mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-64 h-64">
+                    <!-- Laptop Base -->
+                    <rect x="80" y="320" width="352" height="30" rx="5" fill="#333" />
+                    <!-- Laptop Screen -->
+                    <rect x="100" y="120" width="312" height="200" rx="5" fill="#555" />
+                    <rect x="110" y="130" width="292" height="180" rx="2" fill="#000" />
+                    <!-- 404 Text on Screen -->
+                    <text x="156" y="220" font-family="Arial" font-size="60" font-weight="bold" fill="#fff">404</text>
+                    <text x="160" y="250" font-family="Arial" font-size="20" fill="#fff">Page Not Found</text>
+                    <!-- Keyboard -->
+                    <rect x="120" y="350" width="272" height="20" rx="2" fill="#222" />
+                    <rect x="130" y="355" width="252" height="10" rx="1" fill="#111" />
+                </svg>
+            </div>
+            
+            <!-- 404 Message -->
+            <h1 class="text-5xl font-bold text-black mb-4">Oops! Page Not Found</h1>
+            <p class="text-xl text-gray-600 mb-8 text-center max-w-lg">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="/" class="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
+                    Go to Homepage
+                </a>
+                <a href="/products" class="px-8 py-3 bg-white border border-black text-black rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                    Browse Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-black text-white py-12 mt-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">LAPTIX</h2>
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
+                        our exclusive collections and latest laptops.</p>
+                    <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-x"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Home</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Shop</a></li>
+                        <li><a href="#" class="hover:text-gray-400">About</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Help</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Payment Options</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Returns</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Privacy Policies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Dell Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mac Book</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
+                <p>&copy; 2025 LAPTIX, Inc</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Mobile Menu -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+
+</html>

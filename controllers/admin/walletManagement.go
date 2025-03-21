@@ -5,11 +5,14 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func ShowWalletManagement(c *gin.Context) {
+	logger.Log.Info("Requested wallet management page")
 
 	type walletResponce struct {
 		ID            uint
@@ -23,8 +26,8 @@ func ShowWalletManagement(c *gin.Context) {
 	}
 
 	var walletTransactions []models.WalletTransaction
-
 	if err := config.DB.Order("created_at DESC").Preload("UserAuth").Find(&walletTransactions).Error; err != nil {
+		logger.Log.Error("Failed to fetch wallet transactions", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch wallet Transactions", "Something Went Wrong", "")
 		return
 	}
@@ -43,6 +46,9 @@ func ShowWalletManagement(c *gin.Context) {
 		}
 		transaction = append(transaction, responce)
 	}
+
+	logger.Log.Info("Wallet transactions fetched successfully",
+		zap.Int("transactionCount", len(walletTransactions)))
 	c.HTML(http.StatusOK, "walletManagement.html", gin.H{
 		"status": "success",
 		"Data":   transaction,
@@ -51,6 +57,8 @@ func ShowWalletManagement(c *gin.Context) {
 }
 
 func ShowTransactionDetails(c *gin.Context) {
+	logger.Log.Info("Requested transaction details")
+
 	txnID := c.Param("id")
 
 	type TXNDetails struct {
@@ -66,6 +74,9 @@ func ShowTransactionDetails(c *gin.Context) {
 
 	var transactionDetail models.WalletTransaction
 	if err := config.DB.First(&transactionDetail, txnID).Error; err != nil {
+		logger.Log.Error("Failed to fetch transaction details",
+			zap.String("transactionID", txnID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch details", "Something Went Wrong", "")
 		return
 	}
@@ -73,6 +84,9 @@ func ShowTransactionDetails(c *gin.Context) {
 	isOrderAvailable := true
 	var order models.Order
 	if err := config.DB.First(&order, "order_uid = ?", transactionDetail.OrderId).Error; err != nil {
+		logger.Log.Debug("Order not found by UID",
+			zap.String("orderUID", transactionDetail.OrderId),
+			zap.Error(err))
 		isOrderAvailable = false
 	}
 
@@ -85,16 +99,23 @@ func ShowTransactionDetails(c *gin.Context) {
 	if transactionDetail.Type != "Deposit" {
 		if isOrderAvailable {
 			if err := config.DB.Find(&orderItem, "order_id = ?", order.ID).Error; err != nil {
+				logger.Log.Error("Failed to fetch order items by order ID",
+					zap.Uint("orderID", order.ID),
+					zap.Error(err))
 				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch details", "Something Went Wrong", "")
 				return
 			}
 		} else {
 			if err := config.DB.First(&orderItem, "order_uid = ?", transactionDetail.OrderId).Error; err != nil {
+				logger.Log.Error("Failed to fetch order items by order UID",
+					zap.String("orderUID", transactionDetail.OrderId),
+					zap.Error(err))
 				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch details", "Something Went Wrong", "")
 				return
 			}
 		}
 	}
+
 	var itmDetails []orderItemsDetails
 	if transactionDetail.Type != "Deposit" {
 		for _, itm := range orderItem {
@@ -120,10 +141,16 @@ func ShowTransactionDetails(c *gin.Context) {
 	if err := config.DB.
 		Preload("UserProfile").
 		First(&userDetails, transactionDetail.UserID).Error; err != nil {
+		logger.Log.Error("Failed to fetch user details",
+			zap.Uint("userID", transactionDetail.UserID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch details", "Something Went Wrong", "")
 		return
 	}
 
+	logger.Log.Info("Transaction details fetched successfully",
+		zap.String("transactionID", txnID),
+		zap.Int("orderItemCount", len(itmDetails)))
 	c.HTML(http.StatusOK, "walletDetail.html", gin.H{
 		"status":     "success",
 		"TxnDetails": txnDetails,

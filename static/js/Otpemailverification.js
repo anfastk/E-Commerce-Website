@@ -30,7 +30,7 @@ async function handleSubmit(event) {
       showSuccessToast(data.message||'OTP verified successfully!');
       // Delay redirect to show success message
       setTimeout(() => {
-        window.location.href = '/user/login';
+        window.location.href = '/auth/login';
       }, 1500);
     } else {
       // Handle different error cases
@@ -78,7 +78,7 @@ function updateTimer() {
 
 async function resendOTP() {
   try {
-    const response = await fetch('/user/signup/otp/resend', {
+    const response = await fetch('/auth/signup/otp/resend', {
       method: 'POST',
       headers: {
         'Accept': 'application/json'

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Server Error - LAPTIX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
+</head>
+
+<body class="bg-gray-50">
+    <div class="bg-black py-4 sticky top-0 z-50 ">
+        <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+            <div class="flex justify-between items-center py-2">
+                <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
+
+                <!-- Desktop Navigation -->
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                </nav>
+
+                <!-- Icons Section -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
+                            </svg></button></a>
+                    <a href="/cart">
+                        <button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
+                                <path fill="#000"
+                                    d="M241.55 64.74A12 12 0 0 0 232 60H60.23l-8.67-31.21A12 12 0 0 0 40 20H20a12 12 0 0 0 0 24h10.88l34.3 123.49a28.09 28.09 0 0 0 27 20.51H191a28.09 28.09 0 0 0 27-20.51l25.63-92.28a12 12 0 0 0-2.08-10.47m-46.75 96.33A4 4 0 0 1 191 164H92.16a4 4 0 0 1-3.85-2.93L66.9 84h149.31ZM108 220a20 20 0 1 1-20-20a20 20 0 0 1 20 20m104 0a20 20 0 1 1-20-20a20 20 0 0 1 20 20" />
+                            </svg>
+                        </button>
+                    </a>
+                    <a href="/wishlist">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                        </svg>
+                    </a>
+                    <a href="/profile"><button class="hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="#000"
+                                    d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
+                            </svg>
+                        </button>
+
+                    </a>
+
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden" onclick="toggleMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
+                <nav class="flex flex-col space-y-4 text-md font-medium">
+                    <a href="/" class="hover:text-gray-600">Home</a>
+                    <a href="/products" class="hover:text-gray-600">Shop</a>
+                    <a href="#" class="hover:text-gray-600">Contact</a>
+                    <a href="/cart" class="hover:text-gray-600">Cart</a>
+                    <a href="#" class="hover:text-gray-600">Whishlist</a>
+                    <a href="/profile" class="hover:text-gray-600">Profile</a>
+
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <!-- 500 Content Section -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col items-center justify-center min-h-[60vh]">
+            <!-- 500 Illustration -->
+            <div class=" relative">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-64 h-64">
+                    <!-- Laptop Base -->
+                    <rect x="80" y="320" width="352" height="30" rx="5" fill="#333" />
+                    <!-- Laptop Screen -->
+                    <rect x="100" y="120" width="312" height="200" rx="5" fill="#555" />
+                    <rect x="110" y="130" width="292" height="180" rx="2" fill="#000" />
+                    <!-- Error Code Text on Screen -->
+                    <text x="156" y="220" font-family="Arial" font-size="60" font-weight="bold" fill="#ff3333">500</text>
+                    <text x="120" y="250" font-family="Arial" font-size="16" fill="#ff3333">Internal Server Error</text>
+                    <!-- Warning Symbol -->
+                    <circle cx="256" cy="160" r="25" fill="#ff3333" />
+                    <rect x="254" y="145" width="4" height="18" fill="white" />
+                    <rect x="254" y="168" width="4" height="4" fill="white" />
+                    <!-- Circuit Board Lines -->
+                    <path d="M110 280 L400 280" stroke="#333" stroke-width="1" />
+                    <path d="M130 260 L380 260" stroke="#333" stroke-width="1" />
+                    <path d="M150 240 L360 240" stroke="#333" stroke-width="1" />
+                    <!-- Server Rack -->
+                    <rect x="210" y="290" width="90" height="60" rx="2" fill="#444" />
+                    <rect x="220" y="300" width="70" height="6" rx="1" fill="#222" />
+                    <rect x="220" y="310" width="70" height="6" rx="1" fill="#222" />
+                    <rect x="220" y="320" width="70" height="6" rx="1" fill="#222" />
+                    <rect x="220" y="330" width="70" height="6" rx="1" fill="#ff3333" />
+                    <rect x="220" y="340" width="70" height="6" rx="1" fill="#222" />
+                    <!-- Smoke -->
+                    <path d="M250 290 Q240 270 255 260 Q270 250 260 240 Q250 230 265 220" stroke="#888" stroke-width="3" fill="none" />
+                    <path d="M270 290 Q280 270 265 260 Q250 250 260 240 Q270 230 255 220" stroke="#888" stroke-width="3" fill="none" />
+                </svg>
+            </div>
+            
+            <!-- 500 Message -->
+            <h1 class="text-5xl font-bold text-black mb-4">Server Error</h1>
+            <p class="text-xl text-gray-600 mb-6 text-center max-w-lg">Our systems are experiencing some technical difficulties. Our team has been notified and is working on the issue.</p>
+            <p class="text-md text-gray-500 mb-8 text-center max-w-md">Error Code: 500 Internal Server Error</p>
+            
+            <!-- Timer for Auto-Refresh -->
+            <div class="mb-8 text-center">
+                <p class="text-gray-600">This page will automatically refresh in <span id="countdown" class="font-bold">30</span> seconds</p>
+                <div class="w-64 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-black rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="window.location.reload()" class="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                        <path d="M16 21h5v-5"></path>
+                    </svg>
+                    Refresh Page
+                </button>
+                <a href="/" class="px-8 py-3 bg-white border border-black text-black rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 10-5 5 5 5"></path>
+                        <path d="M4 15h11a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4h-7"></path>
+                    </svg>
+                    Return Home
+                </a>
+            </div>
+            
+            <!-- Contact Support Section -->
+            <div class="mt-16 bg-gray-100 p-6 rounded-lg max-w-lg w-full">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Need Help?
+                </h2>
+                <p class="text-gray-600 mb-4">If this problem persists, please contact our support team:</p>
+                <div class="flex items-center mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                    </svg>
+                    <a href="mailto:support@laptix.com" class="text-black hover:underline">support@laptix.com</a>
+                </div>
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    <span class="text-black">+1 (800) 123-4567</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-black text-white py-12 mt-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">LAPTIX</h2>
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
+                        our exclusive collections and latest laptops.</p>
+                    <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-x"></i>
+                        </a>
+                        <a href="#" class="hover:text-gray-400">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Home</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Shop</a></li>
+                        <li><a href="#" class="hover:text-gray-400">About</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Help</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-gray-400">Payment Options</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Returns</a></li>
+                        <li><a href="#" class="hover:text-gray-400">Privacy Policies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Dell Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mac Book</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span>
+                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
+                <p>&copy; 2025 LAPTIX, Inc</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // Auto-refresh countdown
+        let timeLeft = 30;
+        const countdownElement = document.getElementById('countdown');
+        const progressBar = document.getElementById('progress-bar');
+        
+        function updateCountdown() {
+            timeLeft -= 1;
+            countdownElement.textContent = timeLeft;
+            
+            // Update progress bar width
+            const percentLeft = (timeLeft / 30) * 100;
+            progressBar.style.width = percentLeft + '%';
+            
+            if (timeLeft <= 0) {
+                window.location.reload();
+            } else {
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+        
+        // Start the countdown
+        setTimeout(updateCountdown, 1000);
+    </script>
+</body>
+
+</html>

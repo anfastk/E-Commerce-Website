@@ -786,7 +786,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                     showErrorToast('Login First');
-                    location.href = '/user/login';
+                    location.href = '/auth/login';
                 });
         }
 
@@ -829,7 +829,7 @@
                     } catch (error) {
                         console.error('Error:', error);
                         showErrorToast('Login First');
-                        location.href = '/user/login';
+                        location.href = '/auth/login';
                     }
                 });
             });

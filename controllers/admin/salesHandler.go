@@ -9,10 +9,12 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/now"
 	"github.com/jung-kurt/gofpdf"
 	"github.com/xuri/excelize/v2"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -64,6 +66,8 @@ type Filter struct {
 }
 
 func GetSalesDashboard(c *gin.Context) {
+	logger.Log.Info("Requested sales dashboard")
+
 	period := c.DefaultQuery("period", "monthly")
 	pageStr := c.DefaultQuery("page", "1")
 	status := c.DefaultQuery("status", "Delivered")
@@ -77,10 +81,14 @@ func GetSalesDashboard(c *gin.Context) {
 		parsedFromDate, err := time.Parse("2006-01-02", fromDateStr)
 		if err == nil {
 			fromDate = &parsedFromDate
+		} else {
+			logger.Log.Warn("Failed to parse fromDate", zap.String("fromDate", fromDateStr), zap.Error(err))
 		}
 		parsedToDate, err := time.Parse("2006-01-02", toDateStr)
 		if err == nil {
 			toDate = &parsedToDate
+		} else {
+			logger.Log.Warn("Failed to parse toDate", zap.String("toDate", toDateStr), zap.Error(err))
 		}
 	}
 
@@ -95,14 +103,20 @@ func GetSalesDashboard(c *gin.Context) {
 
 	data, err := GetSalesDashboardData(filter)
 	if err != nil {
+		logger.Log.Error("Failed to get sales dashboard data", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
+	logger.Log.Info("Sales dashboard data retrieved successfully",
+		zap.String("period", period),
+		zap.Int("page", page))
 	c.HTML(http.StatusOK, "sales.html", data)
 }
 
 func GetSalesData(c *gin.Context) {
+	logger.Log.Info("Requested sales data")
+
 	period := c.DefaultQuery("period", "monthly")
 	pageStr := c.DefaultQuery("page", "1")
 	status := c.DefaultQuery("status", "Delivered")
@@ -112,11 +126,15 @@ func GetSalesData(c *gin.Context) {
 	if fromDateStr := c.Query("fromDate"); fromDateStr != "" {
 		if parsed, err := time.Parse("2006-01-02", fromDateStr); err == nil {
 			fromDate = &parsed
+		} else {
+			logger.Log.Warn("Failed to parse fromDate", zap.String("fromDate", fromDateStr), zap.Error(err))
 		}
 	}
 	if toDateStr := c.Query("toDate"); toDateStr != "" {
 		if parsed, err := time.Parse("2006-01-02", toDateStr); err == nil {
 			toDate = &parsed
+		} else {
+			logger.Log.Warn("Failed to parse toDate", zap.String("toDate", toDateStr), zap.Error(err))
 		}
 	}
 
@@ -131,13 +149,20 @@ func GetSalesData(c *gin.Context) {
 
 	data, err := GetSalesDashboardData(filter)
 	if err != nil {
+		logger.Log.Error("Failed to get sales data", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	logger.Log.Info("Sales data retrieved successfully",
+		zap.String("period", period),
+		zap.Int("page", page))
 	c.JSON(http.StatusOK, data)
 }
 
 func GetRecentOrdersUnfiltered(c *gin.Context) {
+	logger.Log.Info("Requested recent orders unfiltered")
+
 	pageStr := c.DefaultQuery("page", "1")
 	page, _ := strconv.Atoi(pageStr)
 	pageSize := 5
@@ -149,7 +174,11 @@ func GetRecentOrdersUnfiltered(c *gin.Context) {
 	countQuery := db.Model(&models.OrderItem{}).
 		Joins("JOIN orders ON order_items.order_id = orders.id").
 		Joins("JOIN user_auths ON orders.user_id = user_auths.id")
-	countQuery.Count(&totalCount)
+	if err := countQuery.Count(&totalCount).Error; err != nil {
+		logger.Log.Error("Failed to count recent orders", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	dataQuery := db.Model(&models.OrderItem{}).
 		Select(`
@@ -163,11 +192,15 @@ func GetRecentOrdersUnfiltered(c *gin.Context) {
 		Joins("JOIN user_auths ON orders.user_id = user_auths.id")
 
 	offset := (page - 1) * pageSize
-	dataQuery.Group("orders.order_uid, user_auths.full_name, orders.order_date, order_items.order_status, orders.coupon_discount_amount").
+	if err := dataQuery.Group("orders.order_uid, user_auths.full_name, orders.order_date, order_items.order_status, orders.coupon_discount_amount").
 		Order("orders.order_date DESC").
 		Limit(pageSize).
 		Offset(offset).
-		Scan(&orders)
+		Scan(&orders).Error; err != nil {
+		logger.Log.Error("Failed to fetch recent orders", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	for i := range orders {
 		orders[i].OrderID = fmt.Sprintf("ORD-%s", orders[i].OrderNumber[0:8])
@@ -182,10 +215,15 @@ func GetRecentOrdersUnfiltered(c *gin.Context) {
 		"itemsPerPage":    pageSize,
 	}
 
+	logger.Log.Info("Recent orders retrieved successfully",
+		zap.Int("orderCount", len(orders)),
+		zap.Int("page", page))
 	c.JSON(http.StatusOK, response)
 }
 
 func DownloadSalesReport(c *gin.Context) {
+	logger.Log.Info("Requested sales report download")
+
 	format := c.DefaultQuery("format", "excel")
 	period := c.DefaultQuery("period", "monthly")
 	status := c.DefaultQuery("status", "Delivered")
@@ -198,10 +236,14 @@ func DownloadSalesReport(c *gin.Context) {
 		parsedFromDate, err := time.Parse("2006-01-02", fromDateStr)
 		if err == nil {
 			fromDate = &parsedFromDate
+		} else {
+			logger.Log.Warn("Failed to parse fromDate", zap.String("fromDate", fromDateStr), zap.Error(err))
 		}
 		parsedToDate, err := time.Parse("2006-01-02", toDateStr)
 		if err == nil {
 			toDate = &parsedToDate
+		} else {
+			logger.Log.Warn("Failed to parse toDate", zap.String("toDate", toDateStr), zap.Error(err))
 		}
 	}
 
@@ -216,6 +258,7 @@ func DownloadSalesReport(c *gin.Context) {
 
 	fileBytes, fileName, err := GenerateSalesReport(filter, format)
 	if err != nil {
+		logger.Log.Error("Failed to generate sales report", zap.String("format", format), zap.Error(err))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -229,9 +272,14 @@ func DownloadSalesReport(c *gin.Context) {
 
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
 	c.Data(http.StatusOK, contentType, fileBytes)
+	logger.Log.Info("Sales report downloaded successfully",
+		zap.String("format", format),
+		zap.String("filename", fileName))
 }
 
 func GetSalesDashboardData(filter Filter) (SalesDashboardDTO, error) {
+	logger.Log.Info("Fetching sales dashboard data", zap.String("period", filter.Period))
+
 	db := config.DB
 	startDate, endDate := calculateDateRange(filter)
 
@@ -273,6 +321,7 @@ func GetSalesDashboardData(filter Filter) (SalesDashboardDTO, error) {
 	}
 
 	if err := query.Scan(&totalStats).Error; err != nil {
+		logger.Log.Error("Failed to fetch total stats", zap.Error(err))
 		return result, err
 	}
 
@@ -292,6 +341,9 @@ func GetSalesDashboardData(filter Filter) (SalesDashboardDTO, error) {
 	result.TotalOrderCount = totalOrders
 	result.TotalPages = (totalOrders + filter.PageSize - 1) / filter.PageSize
 
+	logger.Log.Info("Sales dashboard data fetched successfully",
+		zap.Int("orderCount", result.OrderCount),
+		zap.Float64("totalRevenue", result.TotalRevenue))
 	return result, nil
 }
 
@@ -332,10 +384,15 @@ func calculateDateRange(filter Filter) (*time.Time, *time.Time) {
 		startDate = time.Date(startDate.Year(), startDate.Month(), 1, 0, 0, 0, 0, startDate.Location())
 		endDate = now
 	}
+	logger.Log.Debug("Calculated date range",
+		zap.String("startDate", startDate.Format(time.RFC3339)),
+		zap.String("endDate", endDate.Format(time.RFC3339)))
 	return &startDate, &endDate
 }
 
 func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.Time) []SalesOverviewDTO {
+	logger.Log.Info("Fetching sales overview data", zap.String("period", filter.Period))
+
 	var results []SalesOverviewDTO
 	var groupBy, orderBy string
 	var labelFunc func(time.Time) string
@@ -427,7 +484,10 @@ func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.T
 		Revenue     float64
 		Orders      int
 	}
-	query.Group(groupBy).Order(orderBy + " ASC").Scan(&tempResults)
+	if err := query.Group(groupBy).Order(orderBy + " ASC").Scan(&tempResults).Error; err != nil {
+		logger.Log.Error("Failed to fetch sales overview data", zap.Error(err))
+		return nil
+	}
 
 	if filter.Period == "daily" {
 		results = make([]SalesOverviewDTO, 8)
@@ -523,10 +583,13 @@ func getSalesOverviewData(db *gorm.DB, filter Filter, startDate, endDate *time.T
 		}
 	}
 
+	logger.Log.Info("Sales overview data fetched successfully", zap.Int("count", len(results)))
 	return results
 }
 
 func getCategorySalesData(db *gorm.DB, startDate, endDate *time.Time, status string) []CategorySalesDTO {
+	logger.Log.Info("Fetching category sales data")
+
 	var results []CategorySalesDTO
 
 	query := db.Model(&models.OrderItem{}).
@@ -542,15 +605,21 @@ func getCategorySalesData(db *gorm.DB, startDate, endDate *time.Time, status str
 		query = query.Where("orders.order_date BETWEEN ? AND ?", startDate, endDate)
 	}
 
-	query.Group("product_category").
+	if err := query.Group("product_category").
 		Order("amount DESC").
 		Limit(5).
-		Scan(&results)
+		Scan(&results).Error; err != nil {
+		logger.Log.Error("Failed to fetch category sales data", zap.Error(err))
+		return nil
+	}
 
+	logger.Log.Info("Category sales data fetched successfully", zap.Int("count", len(results)))
 	return results
 }
 
 func getRecentOrders(db *gorm.DB, filter Filter, startDate, endDate *time.Time) ([]RecentOrderDTO, int) {
+	logger.Log.Info("Fetching recent orders")
+
 	var orders []RecentOrderDTO
 	var totalCount int64
 
@@ -562,7 +631,10 @@ func getRecentOrders(db *gorm.DB, filter Filter, startDate, endDate *time.Time) 
 	if startDate != nil && endDate != nil {
 		countQuery = countQuery.Where("orders.order_date BETWEEN ? AND ?", startDate, endDate)
 	}
-	countQuery.Count(&totalCount)
+	if err := countQuery.Count(&totalCount).Error; err != nil {
+		logger.Log.Error("Failed to count recent orders", zap.Error(err))
+		return nil, 0
+	}
 
 	dataQuery := db.Model(&models.OrderItem{}).
 		Select(`
@@ -581,22 +653,31 @@ func getRecentOrders(db *gorm.DB, filter Filter, startDate, endDate *time.Time) 
 	}
 
 	offset := (filter.Page - 1) * filter.PageSize
-	dataQuery.Group("orders.order_uid, user_auths.full_name, orders.order_date, order_items.order_status, orders.coupon_discount_amount").
+	if err := dataQuery.Group("orders.order_uid, user_auths.full_name, orders.order_date, order_items.order_status, orders.coupon_discount_amount").
 		Order("orders.order_date DESC").
 		Limit(filter.PageSize).
 		Offset(offset).
-		Scan(&orders)
+		Scan(&orders).Error; err != nil {
+		logger.Log.Error("Failed to fetch recent orders", zap.Error(err))
+		return nil, 0
+	}
 
 	for i := range orders {
 		orders[i].OrderID = fmt.Sprintf("ORD-%s", orders[i].OrderNumber[0:8])
 	}
 
+	logger.Log.Info("Recent orders fetched successfully",
+		zap.Int("count", len(orders)),
+		zap.Int("totalCount", int(totalCount)))
 	return orders, int(totalCount)
 }
 
 func GenerateSalesReport(filter Filter, format string) ([]byte, string, error) {
+	logger.Log.Info("Generating sales report", zap.String("format", format))
+
 	data, err := GetSalesDashboardData(filter)
 	if err != nil {
+		logger.Log.Error("Failed to get data for sales report", zap.Error(err))
 		return nil, "", err
 	}
 
@@ -604,9 +685,21 @@ func GenerateSalesReport(filter Filter, format string) ([]byte, string, error) {
 	fileName := fmt.Sprintf("sales_report_%s_%s", filter.Period, now.Format("2006-01-02"))
 
 	if format == "excel" {
-		return generateExcelReport(data, fileName+".xlsx")
+		fileBytes, fname, err := generateExcelReport(data, fileName+".xlsx")
+		if err != nil {
+			logger.Log.Error("Failed to generate Excel report", zap.Error(err))
+			return nil, "", err
+		}
+		logger.Log.Info("Excel sales report generated successfully", zap.String("filename", fname))
+		return fileBytes, fname, nil
 	} else {
-		return generatePDFReport(data, fileName+".pdf")
+		fileBytes, fname, err := generatePDFReport(data, fileName+".pdf")
+		if err != nil {
+			logger.Log.Error("Failed to generate PDF report", zap.Error(err))
+			return nil, "", err
+		}
+		logger.Log.Info("PDF sales report generated successfully", zap.String("filename", fname))
+		return fileBytes, fname, nil
 	}
 }
 

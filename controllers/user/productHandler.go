@@ -8,12 +8,16 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/middleware"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.uber.org/zap"
 )
 
 func UserHome(c *gin.Context) {
+	logger.Log.Info("Loading user home page")
+
 	tokenString, err := c.Cookie("jwtTokensUser")
 	isLoggedIn := false
 	var userID uint
@@ -30,22 +34,43 @@ func UserHome(c *gin.Context) {
 
 			var user models.UserAuth
 			if err := config.DB.First(&user, userID).Error; err != nil || user.IsBlocked || user.IsDeleted {
+				logger.Log.Warn("User invalid or blocked",
+					zap.Uint("userID", userID),
+					zap.Error(err))
 				c.SetCookie("jwtTokensUser", "", -1, "/", "", false, true)
 				isLoggedIn = false
 			}
+		} else {
+			logger.Log.Warn("Invalid JWT token", zap.Error(err))
 		}
 	}
 
-	keyboard, _ := helper.RelatedProducts(2)
-	laptop, _ := helper.RelatedProducts(3)
-	mouse, _ := helper.RelatedProducts(4)
+	keyboard, err := helper.RelatedProducts(2)
+	if err != nil {
+		logger.Log.Error("Failed to fetch keyboard products", zap.Error(err))
+	}
+	laptop, err := helper.RelatedProducts(3)
+	if err != nil {
+		logger.Log.Error("Failed to fetch laptop products", zap.Error(err))
+	}
+	mouse, err := helper.RelatedProducts(4)
+	if err != nil {
+		logger.Log.Error("Failed to fetch mouse products", zap.Error(err))
+	}
 
 	if isLoggedIn {
 		keyboard = helper.CheckCartAndWishlist(keyboard, userID)
 		laptop = helper.CheckCartAndWishlist(laptop, userID)
 		mouse = helper.CheckCartAndWishlist(mouse, userID)
+		logger.Log.Debug("Checked cart and wishlist for user",
+			zap.Uint("userID", userID))
 	}
 
+	logger.Log.Info("User home page loaded",
+		zap.Bool("isLoggedIn", isLoggedIn),
+		zap.Int("keyboardCount", len(keyboard)),
+		zap.Int("laptopCount", len(laptop)),
+		zap.Int("mouseCount", len(mouse)))
 	c.HTML(http.StatusOK, "userHome.html", gin.H{
 		"Keyboard":   keyboard,
 		"Laptop":     laptop,
@@ -67,23 +92,31 @@ type ProductVariantResponse struct {
 }
 
 func ShowProducts(c *gin.Context) {
-	
+	logger.Log.Info("Showing products")
+
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var cartItems []models.CartItem
 	var wishlistItems []models.WishlistItem
 
-	config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?)", userID).Find(&cartItems)
+	if err := config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?)", userID).Find(&cartItems).Error; err != nil {
+		logger.Log.Warn("Failed to fetch cart items",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+	}
 
-	config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?)", userID).Find(&wishlistItems)
+	if err := config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?)", userID).Find(&wishlistItems).Error; err != nil {
+		logger.Log.Warn("Failed to fetch wishlist items",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+	}
 
 	cartMap := make(map[uint]bool)
 	wishlistMap := make(map[uint]bool)
-
 	for _, item := range cartItems {
 		cartMap[item.ProductVariantID] = true
 	}
-
 	for _, item := range wishlistItems {
 		wishlistMap[item.ProductVariantID] = true
 	}
@@ -92,16 +125,17 @@ func ShowProducts(c *gin.Context) {
 	var Category []string
 
 	if err := config.DB.Model(&models.ProductDetail{}).Distinct("brand_name").Where("is_deleted =?", false).Pluck("brand_name", &Brand).Error; err != nil {
+		logger.Log.Error("Failed to fetch brand names", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch brand name", "Something Went Wrong", "")
 		return
 	}
 	if err := config.DB.Model(&models.Categories{}).Where("is_deleted =?", false).Pluck("name", &Category).Error; err != nil {
+		logger.Log.Error("Failed to fetch category names", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch category name", "Something Went Wrong", "")
 		return
 	}
 
 	var variants []models.ProductVariantDetails
-
 	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
 		Preload("Category").
 		Preload("Product").
@@ -109,6 +143,7 @@ func ShowProducts(c *gin.Context) {
 		Find(&variants)
 
 	if result.Error != nil {
+		logger.Log.Error("Failed to fetch product variants", zap.Error(result.Error))
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch product variants",
 		})
@@ -119,10 +154,13 @@ func ShowProducts(c *gin.Context) {
 	for _, variant := range variants {
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ProductID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
 		if disErr != nil {
+			logger.Log.Error("Discount calculation failed",
+				zap.Uint("productID", variant.ProductID),
+				zap.Error(disErr))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
 			return
 		}
-		responses := ProductVariantResponse{
+		resp := ProductVariantResponse{
 			ID:              variant.ID,
 			ProductName:     variant.ProductName,
 			RegularPrice:    variant.RegularPrice,
@@ -132,14 +170,17 @@ func ShowProducts(c *gin.Context) {
 			IsInStock:       variant.StockQuantity > 0,
 		}
 		if cartMap[variant.ID] {
-			responses.IsInCart = true
+			resp.IsInCart = true
 		}
 		if wishlistMap[variant.ID] {
-			responses.IsInWishlist = true
+			resp.IsInWishlist = true
 		}
-		response = append(response, responses)
+		response = append(response, resp)
 	}
 
+	logger.Log.Info("Products page loaded",
+		zap.Uint("userID", userID),
+		zap.Int("productCount", len(response)))
 	c.HTML(http.StatusFound, "productpage.html", gin.H{
 		"status":   true,
 		"message":  "Product variants fetched successfully",
@@ -150,23 +191,31 @@ func ShowProducts(c *gin.Context) {
 }
 
 func FilterProducts(c *gin.Context) {
-	
+	logger.Log.Info("Filtering products")
+
 	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
 
 	var cartItems []models.CartItem
 	var wishlistItems []models.WishlistItem
 
-	config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?)", userID).Find(&cartItems)
+	if err := config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?)", userID).Find(&cartItems).Error; err != nil {
+		logger.Log.Warn("Failed to fetch cart items",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+	}
 
-	config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?)", userID).Find(&wishlistItems)
+	if err := config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?)", userID).Find(&wishlistItems).Error; err != nil {
+		logger.Log.Warn("Failed to fetch wishlist items",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+	}
 
 	cartMap := make(map[uint]bool)
 	wishlistMap := make(map[uint]bool)
-
 	for _, item := range cartItems {
 		cartMap[item.ProductVariantID] = true
 	}
-
 	for _, item := range wishlistItems {
 		wishlistMap[item.ProductVariantID] = true
 	}
@@ -247,6 +296,7 @@ func FilterProducts(c *gin.Context) {
 
 	var variants []models.ProductVariantDetails
 	if err := query.Find(&variants).Error; err != nil {
+		logger.Log.Error("Failed to fetch filtered products", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch products", err.Error(), "")
 		return
 	}
@@ -255,10 +305,13 @@ func FilterProducts(c *gin.Context) {
 	for _, variant := range variants {
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ProductID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
 		if disErr != nil {
+			logger.Log.Error("Discount calculation failed",
+				zap.Uint("productID", variant.ProductID),
+				zap.Error(disErr))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
 			return
 		}
-		responses := ProductVariantResponse{
+		resp := ProductVariantResponse{
 			ID:              variant.ID,
 			ProductName:     variant.ProductName,
 			RegularPrice:    variant.RegularPrice,
@@ -268,13 +321,20 @@ func FilterProducts(c *gin.Context) {
 			IsInStock:       variant.StockQuantity > 0,
 		}
 		if cartMap[variant.ID] {
-			responses.IsInCart = true
+			resp.IsInCart = true
 		}
 		if wishlistMap[variant.ID] {
-			responses.IsInWishlist = true
+			resp.IsInWishlist = true
 		}
-		response = append(response, responses)
+		response = append(response, resp)
 	}
+
+	logger.Log.Info("Products filtered successfully",
+		zap.Uint("userID", userID),
+		zap.Int("productCount", len(response)),
+		zap.String("search", search),
+		zap.Strings("categories", categories),
+		zap.Strings("brands", brands))
 	c.JSON(http.StatusOK, gin.H{
 		"status":  true,
 		"message": "Products filtered successfully",
@@ -314,13 +374,15 @@ type SpecificationResponse struct {
 }
 
 func ShowProductDetail(c *gin.Context) {
+	logger.Log.Info("Showing product detail")
 
 	userID := helper.FetchUserID(c)
-
 	productID := c.Param("id")
+	logger.Log.Debug("Fetched user ID and product ID",
+		zap.Uint("userID", userID),
+		zap.String("productID", productID))
 
 	var variant models.ProductVariantDetails
-
 	result := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
 		Preload("Category", "is_deleted = ?", false).
 		Preload("Specification", "is_deleted = ?", false).
@@ -329,6 +391,9 @@ func ShowProductDetail(c *gin.Context) {
 		First(&variant)
 
 	if result.Error != nil {
+		logger.Log.Error("Product variant not found",
+			zap.String("productID", productID),
+			zap.Error(result.Error))
 		c.HTML(http.StatusNotFound, "404.html", nil)
 		return
 	}
@@ -341,7 +406,6 @@ func ShowProductDetail(c *gin.Context) {
 	if err := config.DB.Where("cart_id = (SELECT id FROM carts WHERE user_id = ?) AND product_variant_id = ?", userID, variant.ID).First(&cartItems).Error; err != nil {
 		IsInCart = false
 	}
-
 	if err := config.DB.Where("wishlist_id = (SELECT id FROM wishlists WHERE user_id = ?) AND product_variant_id = ?", userID, variant.ID).First(&wishlistItems).Error; err != nil {
 		IsInWishlist = false
 	}
@@ -369,9 +433,13 @@ func ShowProductDetail(c *gin.Context) {
 
 	discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(variant.ProductID, variant.CategoryID, variant.RegularPrice, variant.SalePrice)
 	if disErr != nil {
+		logger.Log.Error("Discount calculation failed",
+			zap.Uint("productID", variant.ProductID),
+			zap.Error(disErr))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
 		return
 	}
+
 	product := ProductDetailResponse{
 		ID:              variant.ID,
 		ProductName:     variant.ProductName,
@@ -407,6 +475,9 @@ func ShowProductDetail(c *gin.Context) {
 
 	var otherVariant []models.ProductVariantDetails
 	if err := config.DB.Preload("VariantsImages").Where("id !=? AND product_id = ?", variant.ID, variant.ProductID).Find(&otherVariant).Error; err != nil {
+		logger.Log.Error("Failed to fetch other variants",
+			zap.Uint("productID", variant.ProductID),
+			zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Variants Not Found", "Something Went Wrong", "")
 		return
 	}
@@ -415,6 +486,9 @@ func ShowProductDetail(c *gin.Context) {
 	for _, row := range otherVariant {
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(row.ProductID, row.CategoryID, row.RegularPrice, row.SalePrice)
 		if disErr != nil {
+			logger.Log.Error("Discount calculation failed for other variant",
+				zap.Uint("productID", row.ProductID),
+				zap.Error(disErr))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
 			return
 		}
@@ -433,10 +507,14 @@ func ShowProductDetail(c *gin.Context) {
 	}
 
 	var relatedProducts []models.ProductVariantDetails
-	config.DB.Preload("VariantsImages", "is_deleted = ?", false).
+	if err := config.DB.Preload("VariantsImages", "is_deleted = ?", false).
 		Where("category_id = ? AND id != ? AND is_deleted = ?", variant.CategoryID, variant.ID, false).
 		Limit(20).
-		Find(&relatedProducts)
+		Find(&relatedProducts).Error; err != nil {
+		logger.Log.Warn("Failed to fetch related products",
+			zap.Uint("categoryID", variant.CategoryID),
+			zap.Error(err))
+	}
 
 	type RelatedProductsResponce struct {
 		ID              uint     `json:"id"`
@@ -455,6 +533,9 @@ func ShowProductDetail(c *gin.Context) {
 		}
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(product.ProductID, product.CategoryID, product.RegularPrice, product.SalePrice)
 		if disErr != nil {
+			logger.Log.Error("Discount calculation failed for related product",
+				zap.Uint("productID", product.ProductID),
+				zap.Error(disErr))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Discount Calculation Failed", "Something Went Wrong", "")
 			return
 		}
@@ -468,6 +549,10 @@ func ShowProductDetail(c *gin.Context) {
 		})
 	}
 
+	logger.Log.Info("Product detail page loaded",
+		zap.Uint("userID", userID),
+		zap.Uint("productID", variant.ID),
+		zap.Int("relatedProductsCount", len(relatedProductsResponce)))
 	c.HTML(http.StatusFound, "productDetails.html", gin.H{
 		"product":             product,
 		"relatedProducts":     relatedProductsResponce,

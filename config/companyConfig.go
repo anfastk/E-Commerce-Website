@@ -2,9 +2,11 @@ package config
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"go.uber.org/zap"
 )
 
 var CompanyConfig = struct {
@@ -26,23 +28,24 @@ var CompanyConfig = struct {
 func DownloadLogo() {
 	resp, err := http.Get(CompanyConfig.LogoURL)
 	if err != nil {
-		log.Printf("Error downloading logo: %v", err)
+		logger.Log.Error("Error downloading logo", zap.Error(err))
 		return
 	}
 	defer resp.Body.Close()
 
 	file, err := os.Create(CompanyConfig.LogoFilePath)
 	if err != nil {
-		log.Printf("Error creating logo file: %v", err)
+		logger.Log.Error("Error creating logo file", zap.Error(err))
 		return
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		log.Printf("Error saving logo: %v", err)
+		logger.Log.Error("Error saving log", zap.Error(err))
 		return
 	}
-
-	log.Println("Logo downloaded successfully")
+	IsConfigErr = true
+	ConfigErr = nil
+	logger.Log.Info("Logo downloaded successfully")
 }

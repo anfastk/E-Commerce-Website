@@ -7,7 +7,10 @@ import (
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
+	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func DashboardHandler(c *gin.Context) {
@@ -39,7 +42,9 @@ func StatsHandler(c *gin.Context) {
 		startTime, err1 = time.Parse("2006-01-02", startDate)
 		endTime, err2 = time.Parse("2006-01-02", endDate)
 		if err1 != nil || err2 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+			logger.Log.Error("Invalid date format", zap.Error(err1))
+			logger.Log.Error("Invalid date format", zap.Error(err2))
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid date format", "Invalid date format", "")
 			return
 		}
 		endTime = endTime.Add(24*time.Hour - time.Second)
@@ -54,7 +59,8 @@ func StatsHandler(c *gin.Context) {
 	var categories []models.Categories
 
 	if err := config.DB.Where("order_date BETWEEN ? AND ?", startTime, endTime).Find(&orders).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
+		logger.Log.Error("Failed to fetch orders", zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch orders", "Something Went Wrong", "")
 		return
 	}
 	totalAmount := 0.0
@@ -108,7 +114,8 @@ func StatsHandler(c *gin.Context) {
 func OrdersHandler(c *gin.Context) {
 	var orderItems []models.OrderItem
 	if err := config.DB.Preload("UserAuth").Order("created_at desc").Limit(10).Find(&orderItems).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
+		logger.Log.Error("Failed to fetch orders", zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch orders", "Something Went Wrong", "")
 		return
 	}
 
@@ -151,7 +158,9 @@ func ChartsHandler(c *gin.Context) {
 		startTime, err1 = time.Parse("2006-01-02", startDate)
 		endTime, err2 = time.Parse("2006-01-02", endDate)
 		if err1 != nil || err2 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+			logger.Log.Error("Invalid date format", zap.Error(err1))
+			logger.Log.Error("Invalid date format", zap.Error(err2))
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid date format", "Invalid date format", "")
 			return
 		}
 		endTime = endTime.Add(24*time.Hour - time.Second)
@@ -244,6 +253,7 @@ func ChartsHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"brands": brandsData})
 
 	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid section"})
+		logger.Log.Error("Invalid section")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid section", "Invalid section", "")
 	}
 }
