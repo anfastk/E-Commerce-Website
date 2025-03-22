@@ -353,10 +353,10 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition">
                             <div class="flex items-center flex-1">
-                                <img src="{{ (index .OrderItem.ProductVariantDetails.VariantsImages 0).ProductVariantsImages  }}"
+                                <img src="{{ .OrderItem.ProductImage}}"
                                     alt="Product" class="w-20 h-20 object-contain rounded" />
                                 <div class="ml-4">
-                                    <h3 class="font-medium">{{.OrderItem.ProductVariantDetails.ProductName}}</h3>
+                                    <h3 class="font-medium">{{.OrderItem.ProductName}}</h3>
                                     <p class="text-gray-600">Quantity: {{.OrderItem.Quantity}}</p>
                                     <div class="flex space-x-2 mt-2">
                                         {{if .IsDelivered}}
@@ -385,10 +385,10 @@
                 <div class="mb-6 bg-grey-50  p-4 rounded-lg border border-grey-100 slide-down">
                     <div class="flex items-start ">
                         <div class="flex-shrink-0 mr-3">
-                            <img src="{{ (index .OrderItem.ProductVariantDetails.VariantsImages 0).ProductVariantsImages  }}" alt="Product image" class="h-16 w-16 object-contain rounded">
+                            <img src="{{.OrderItem.ProductImage}}" alt="Product image" class="h-16 w-16 object-contain rounded">
                         </div>
                         <div>
-                            <h4 class="font-medium text-gray-800">{{.OrderItem.ProductVariantDetails.ProductName}}</h4>
+                            <h4 class="font-medium text-gray-800">{{.OrderItem.ProductName}}</h4>
                             <p class="text-sm text-gray-500">Order ID {{.OrderItem.OrderUID}} <span><br></span> • Delivered on <span class="format-date"
                                 data-date="{{.DeliveryDate}}" data-format="datetime"></p>
                         </div>
@@ -539,6 +539,7 @@
                     <h2 class="text-xl font-semibold mb-4">Other Items In This Order</h2>
                     <div class="space-y-4"> <!-- Apply space-y-4 here -->
                         {{range .AllProduct}}
+                        <a href="/profile/order/details/track/{{.ID}}">
                         <div
                             class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition bg-white">
                             <div class="flex items-center flex-1">
@@ -551,6 +552,7 @@
                             </div>
                             <p class="font-medium">&#8377; {{printf "%.2f" .ProductRegularPrice}}</p>
                         </div>
+                    </a>
                         {{end}}
                     </div>
                 </div>

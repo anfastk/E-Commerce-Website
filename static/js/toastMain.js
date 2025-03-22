@@ -5,7 +5,7 @@ function showErrorToast(message) {
 
     setTimeout(() => {
         toast.classList.add("hidden");
-    }, 1000);
+    }, 3000);
 }
 
 function showToast(message, type) {
@@ -44,8 +44,8 @@ function showToast(message, type) {
         // Remove from DOM after hide animation
         setTimeout(() => {
             toast.remove();
-        }, 100);
-    }, 1000);
+        }, 300);
+    }, 3000);
 }
 
 function showErrorToast(message) {

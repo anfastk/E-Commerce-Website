@@ -248,7 +248,7 @@
                                             Edit
                                         </button>
                                     </a>
-                                    <form id="deleteAddressForm" action="/profile/delete/address/{{.ID}}" method="post">
+                                    <form id="deleteAddressForm" action="/profile/delete/address/{{.ID}}">
                                         <button type="submit"
                                             class="px-4 py-1 bg-red-50 text-red-400 rounded flex items-center gap-1">
                                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
@@ -365,7 +365,7 @@
 
             let form = event.target;
             fetch(form.action, {
-                method: form.method,
+                method: 'DELETE',
                 body: new FormData(form),
             })
                 .then(response => {

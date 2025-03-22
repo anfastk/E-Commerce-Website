@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -26,9 +28,7 @@ func TrackingPage(c *gin.Context) {
 	logger.Log.Debug("Fetched user ID and order ID", zap.Uint("userID", userID), zap.String("orderID", orderID))
 
 	var orderItem models.OrderItem
-	if err := config.DB.Preload("ProductVariantDetails").
-		Preload("ProductVariantDetails.VariantsImages").
-		Preload("ProductVariantDetails.Product").
+	if err := config.DB.
 		First(&orderItem, "id = ? AND user_id = ?", orderID, userID).Error; err != nil {
 		logger.Log.Error("Failed to fetch order item",
 			zap.String("orderID", orderID),
@@ -88,18 +88,13 @@ func TrackingPage(c *gin.Context) {
 
 	var (
 		allSubTotal             float64
-		allSalePrice            float64
 		allProductDiscount      float64
 		allProductTotalDiscount float64
 		shipCharge              float64
 	)
-	for _, allItems := range allOrderItems {
-		allSubTotal += allItems.ProductRegularPrice
-		allSalePrice += allItems.ProductSalePrice
-	}
-	allSubTotal += orderItem.ProductRegularPrice
-	allSalePrice += orderItem.ProductSalePrice
-	allProductDiscount = (allSubTotal - allSalePrice)
+
+	allSubTotal += order.SubTotal
+	allProductDiscount = order.TotalProductDiscount
 	if order.ShippingCharge == 0.0 {
 		shipCharge = 100
 	}
@@ -192,6 +187,10 @@ func TrackingPage(c *gin.Context) {
 
 func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, totalProductDiscount float64, totalDiscount float64, tax float64, shippingCharge float64, totalAmount float64, currentTime time.Time, CouponCode string, CouponDiscountAmount float64, CouponDiscription string) uint {
 	logger.Log.Info("Creating new order", zap.Uint("userID", userID))
+	IsCouponApplied := false
+	if CouponDiscountAmount > 0 {
+		IsCouponApplied = true
+	}
 
 	orderUID := helper.GenerateOrderID()
 	order := models.Order{
@@ -205,6 +204,7 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 		TotalAmount:          totalAmount,
 		OrderDate:            currentTime,
 		CouponCode:           CouponCode,
+		IsCouponApplied:      IsCouponApplied,
 		CouponDiscountAmount: CouponDiscountAmount,
 		CouponDiscription:    CouponDiscription,
 	}
@@ -253,7 +253,7 @@ func CreateOrderItems(c *gin.Context, tx *gorm.DB, reservedProducts []models.Res
 		if salePrice > 1000 {
 			shippingCharge = 0
 		}
-		total := salePrice + tax + shippingCharge - couponDiscount
+		total := salePrice + tax + shippingCharge
 
 		var firstImage string
 		var firstVariantImage models.ProductVariantsImage
@@ -487,7 +487,6 @@ func FetchAddressByIDAndUserID(c *gin.Context, userID uint, addressID string) *m
 		logger.Log.Error("Invalid address ID",
 			zap.String("addressID", addressID),
 			zap.Error(adErr))
-		fmt.Println("Invalid Address:", adErr)
 		return nil
 	}
 
@@ -524,7 +523,17 @@ func FetchReservedProducts(c *gin.Context, userID uint) []models.ReservedStock {
 	return reservedProducts
 }
 
-func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStock, cartItems []models.CartItem) (map[uint]int, float64, float64, float64, float64, float64, float64) {
+type ReservedProductCheckResult struct {
+	ReservedMap     map[uint]int
+	RegularPrice    float64
+	ProductDiscount float64
+	TotalDiscount   float64
+	ShippingCharge  float64
+	Tax             float64
+	Total           float64
+}
+
+func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStock, cartItems []services.CartItemDetailWithDiscount) (*ReservedProductCheckResult, error) {
 	logger.Log.Info("Checking reserved products")
 
 	shippingCharge := 100.0
@@ -542,32 +551,32 @@ func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStoc
 		discountAmount, _, _ := helper.DiscountCalculation(r.ProductVariantID, r.ProductVariant.CategoryID, r.ProductVariant.RegularPrice, r.ProductVariant.SalePrice)
 		reservedMap[r.ProductVariantID] = r.Quantity
 		regularPrice += r.ProductVariant.RegularPrice * float64(r.Quantity)
-		salePrice += (r.ProductVariant.SalePrice * float64(r.Quantity)) - discountAmount
+		salePrice += (r.ProductVariant.SalePrice - discountAmount) * float64(r.Quantity)
 	}
 
 	for _, item := range cartItems {
-		reservedQty, exists := reservedMap[item.ProductID]
+		reservedQty, exists := reservedMap[item.CartItem.ProductID]
 		if exists {
-			if item.Quantity != reservedQty {
+			if item.CartItem.Quantity != reservedQty {
 				logger.Log.Error("Mismatch between cart and reserved quantity",
-					zap.Uint("productID", item.ProductID),
-					zap.Int("cartQty", int(item.Quantity)),
+					zap.Uint("productID", item.CartItem.ProductID),
+					zap.Int("cartQty", int(item.CartItem.Quantity)),
 					zap.Int("reservedQty", reservedQty))
-				helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 1", "Something Went Wrong", "/cart")
-				return nil, 0, 0, 0, 0, 0, 0
+				helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product ", "Something Went Wrong", "/cart")
+				return nil, errors.New("cart-reserved quantity mismatch")
 			}
 		} else {
 			logger.Log.Error("Product in cart not found in reserved",
-				zap.Uint("productID", item.ProductID))
+				zap.Uint("productID", item.CartItem.ProductID))
 			helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 2", "Something Went Wrong", "/cart")
-			return nil, 0, 0, 0, 0, 0, 0
+			return nil, errors.New("cart product not in reserved")
 		}
 	}
 
 	for pID := range reservedMap {
 		found := false
 		for _, items := range cartItems {
-			if items.ProductID == pID {
+			if items.CartItem.ProductID == pID {
 				found = true
 				break
 			}
@@ -576,7 +585,7 @@ func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStoc
 			logger.Log.Error("Product in reserved not found in cart",
 				zap.Uint("productID", pID))
 			helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 3", "Something Went Wrong", "/cart")
-			return nil, 0, 0, 0, 0, 0, 0
+			return nil, errors.New("reserved product not in cart")
 		}
 	}
 
@@ -594,7 +603,16 @@ func ReservedProductCheck(c *gin.Context, reservedProducts []models.ReservedStoc
 	logger.Log.Info("Reserved products checked successfully",
 		zap.Float64("total", total),
 		zap.Int("productCount", len(reservedMap)))
-	return reservedMap, regularPrice, productDiscount, totalDiscount, float64(shippingCharge), tax, total
+
+	return &ReservedProductCheckResult{
+		ReservedMap:     reservedMap,
+		RegularPrice:    regularPrice,
+		ProductDiscount: productDiscount,
+		TotalDiscount:   totalDiscount,
+		ShippingCharge:  shippingCharge,
+		Tax:             tax,
+		Total:           total,
+	}, nil
 }
 
 func DeleteReservedItems(c *gin.Context, tx *gorm.DB, productVariantID uint, userID uint) {
@@ -686,9 +704,10 @@ func CancelSpecificOrder(c *gin.Context) {
 	}
 
 	var refundAmount float64
-	total := order.SubTotal
-	productTotal := orderItems.SubTotal
+	total := order.SubTotal - order.TotalProductDiscount
+	productTotal := orderItems.ProductSalePrice
 	IscouponRemoved := false
+	IsMinusAmount := false
 
 	if order.IsCouponApplied {
 		var couponDetails models.Coupon
@@ -700,16 +719,10 @@ func CancelSpecificOrder(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 			return
 		}
-
 		if (total - productTotal) < couponDetails.MinOrderValue {
 			refundAmount = orderItems.Total - order.CouponDiscountAmount
-			if refundAmount < 0 {
-				logger.Log.Warn("Cannot cancel due to negative refund",
-					zap.Uint("orderItemID", orderItems.ID),
-					zap.Float64("refundAmount", refundAmount))
-				tx.Rollback()
-				helper.RespondWithError(c, http.StatusBadRequest, "Sorry, you cannot cancel this order individually.", "Something Went Wrong", "")
-				return
+			if refundAmount <= 0 {
+				IsMinusAmount = true
 			}
 			couponDetails.UsersUsedCount -= 1
 			if err := tx.Unscoped().Save(&couponDetails).Error; err != nil {
@@ -766,40 +779,116 @@ func CancelSpecificOrder(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 			return
 		}
-		lastBalance := wallet.Balance
-		wallet.Balance += refundAmount
-		if err := tx.Save(&wallet).Error; err != nil {
-			logger.Log.Error("Failed to update wallet",
-				zap.Uint("userID", userID),
-				zap.Error(err))
-			tx.Rollback()
-			helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
-			return
-		}
 
-		receiptID := "rcpt_" + uuid.New().String()
-		rand.Seed(time.Now().UnixNano())
-		transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+		if IsMinusAmount {
+			lastBalance := wallet.Balance
+			wallet.Balance += -order.CouponDiscountAmount
+			if err := tx.Save(&wallet).Error; err != nil {
+				logger.Log.Error("Failed to update wallet",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+				return
+			}
 
-		walletTransaction := models.WalletTransaction{
-			UserID:        userID,
-			WalletID:      wallet.ID,
-			Amount:        refundAmount,
-			Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
-			Type:          "Refund",
-			Receipt:       receiptID,
-			OrderId:       orderItems.OrderUID,
-			LastBalance:   lastBalance,
-			TransactionID: strings.ToUpper(transactionID),
-			PaymentMethod: payment.PaymentMethod,
-		}
-		if err := tx.Create(&walletTransaction).Error; err != nil {
-			logger.Log.Error("Failed to create wallet transaction",
-				zap.Uint("userID", userID),
-				zap.Error(err))
-			tx.Rollback()
-			helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
-			return
+			receiptID := "rcpt_" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano())
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+			walletTransaction := models.WalletTransaction{
+				UserID:        userID,
+				WalletID:      wallet.ID,
+				Amount:        order.CouponDiscountAmount,
+				Description:   fmt.Sprintf("Coupon discount adjustment due to partial order cancellation. ₹%.2f deducted from wallet as per refund policy. ORD ID %s", order.CouponDiscountAmount, orderItems.OrderUID),
+				Type:          "Deduct",
+				Receipt:       receiptID,
+				OrderId:       orderItems.OrderUID,
+				LastBalance:   lastBalance,
+				TransactionID: strings.ToUpper(transactionID),
+				PaymentMethod: payment.PaymentMethod,
+			}
+			if err := tx.Create(&walletTransaction).Error; err != nil {
+				logger.Log.Error("Failed to create wallet transaction",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+				return
+			}
+
+			lastBalance = wallet.Balance
+			wallet.Balance += orderItems.ProductSalePrice + orderItems.Tax
+			if err := tx.Save(&wallet).Error; err != nil {
+				logger.Log.Error("Failed to update wallet",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+				return
+			}
+
+			receiptID = "rcpt_" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano())
+			transactionID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+			walletTransaction = models.WalletTransaction{
+				UserID:        userID,
+				WalletID:      wallet.ID,
+				Amount:        orderItems.Total,
+				Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
+				Type:          "Refund",
+				Receipt:       receiptID,
+				OrderId:       orderItems.OrderUID,
+				LastBalance:   lastBalance,
+				TransactionID: strings.ToUpper(transactionID),
+				PaymentMethod: payment.PaymentMethod,
+			}
+			if err := tx.Create(&walletTransaction).Error; err != nil {
+				logger.Log.Error("Failed to create wallet transaction",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+				return
+			}
+
+		} else {
+			lastBalance := wallet.Balance
+			wallet.Balance += refundAmount
+			if err := tx.Save(&wallet).Error; err != nil {
+				logger.Log.Error("Failed to update wallet",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+				return
+			}
+
+			receiptID := "rcpt_" + uuid.New().String()
+			rand.Seed(time.Now().UnixNano())
+			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+			walletTransaction := models.WalletTransaction{
+				UserID:        userID,
+				WalletID:      wallet.ID,
+				Amount:        refundAmount,
+				Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
+				Type:          "Refund",
+				Receipt:       receiptID,
+				OrderId:       orderItems.OrderUID,
+				LastBalance:   lastBalance,
+				TransactionID: strings.ToUpper(transactionID),
+				PaymentMethod: payment.PaymentMethod,
+			}
+			if err := tx.Create(&walletTransaction).Error; err != nil {
+				logger.Log.Error("Failed to create wallet transaction",
+					zap.Uint("userID", userID),
+					zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+				return
+			}
 		}
 
 		if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", userID, orderItems.ID).
@@ -832,7 +921,6 @@ func CancelSpecificOrder(c *gin.Context) {
 		if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
 			Updates(map[string]interface{}{
 				"coupon_code":            gorm.Expr("NULL"),
-				"coupon_id":              gorm.Expr("NULL"),
 				"shipping_charge":        shipCharge,
 				"coupon_discount_amount": gorm.Expr("NULL"),
 				"is_coupon_applied":      false,
@@ -875,7 +963,11 @@ func CancelSpecificOrder(c *gin.Context) {
 		return
 	}
 
-	tx.Commit()
+	if err := tx.Commit().Error; err != nil {
+		logger.Log.Error("Failed to commit transaction", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction Failed", "Order cancellation failed", "")
+		return
+	}
 	logger.Log.Info("Specific order cancelled successfully",
 		zap.Uint("userID", userID),
 		zap.Uint("orderItemID", orderItems.ID),

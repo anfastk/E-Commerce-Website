@@ -37,11 +37,19 @@ func ShowCheckoutPage(c *gin.Context) {
 
 	for _, item := range cartItems {
 		if item.ProductDetails.StockQuantity < item.CartItem.Quantity || item.ProductDetails.StockQuantity == 0 || item.CartItem.Quantity == 0 {
-			logger.Log.Warn("Stock unavailable for item",
+			logger.Log.Warn("Product Out Of Stock",
 				zap.Uint("productVariantID", item.ProductDetails.ID),
 				zap.Int("stockQuantity", int(item.ProductDetails.StockQuantity)),
 				zap.Int("cartQuantity", int(item.CartItem.Quantity)))
-			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/cart")
+			helper.RespondWithError(c, http.StatusConflict, "Out of stock", "Some items in your cart are out of stock or have lower availability than your selected quantity. Please update your cart.", "/cart")
+			return
+		}
+		if item.ProductDetails.IsDeleted {
+			logger.Log.Warn("Product Unavailable",
+				zap.Uint("productVariantID", item.ProductDetails.ID),
+				zap.Int("stockQuantity", int(item.ProductDetails.StockQuantity)),
+				zap.Int("cartQuantity", int(item.CartItem.Quantity)))
+			helper.RespondWithError(c, http.StatusConflict, "Product unavailable", "Some items in your cart are unavailable. Please update your cart.", "/cart")
 			return
 		}
 	}
@@ -53,13 +61,6 @@ func ShowCheckoutPage(c *gin.Context) {
 
 	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
 	total := salePrice + tax
-
-	var address []models.UserAddress
-	if err := config.DB.Order("updated_at DESC").Find(&address, "user_id = ?", userID).Error; err != nil {
-		logger.Log.Error("Failed to fetch user addresses", zap.Uint("userID", userID), zap.Error(err))
-		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
-		return
-	}
 
 	isAllCategorySame := true
 	for _, items := range cartItems {
@@ -113,6 +114,106 @@ func ShowCheckoutPage(c *gin.Context) {
 		allResponceCoupons = append(allResponceCoupons, coupon)
 	}
 
+	tx := config.DB.Begin()
+	var expiredReservations []models.ReservedStock
+	if err := tx.Where("is_confirmed = ? AND reserve_till >= ?", false, time.Now()).
+		Find(&expiredReservations).Error; err != nil {
+		logger.Log.Error("Failed to find expired reservations", zap.Error(err))
+		tx.Rollback()
+		return
+	}
+
+	for _, reservation := range expiredReservations {
+		var coupon models.ReservedCoupon
+		if err := tx.First(&coupon, reservation.ReservedCouponID).Error; err != nil {
+			logger.Log.Warn("Failed to fetch reserved coupon",
+				zap.Uint("reservedCouponID", reservation.ReservedCouponID),
+				zap.Error(err))
+		}
+		if err := tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID).Error; err != nil {
+			logger.Log.Error("Failed to update coupon users count",
+				zap.Uint("couponID", coupon.CouponID),
+				zap.Error(err))
+		}
+		if err := tx.Unscoped().Delete(&coupon).Error; err != nil {
+			logger.Log.Warn("Failed to delete reserved coupon",
+				zap.Uint("reservedCouponID", reservation.ReservedCouponID),
+				zap.Error(err))
+		}
+		if err := tx.Exec(
+			"UPDATE product_variant_details SET stock_quantity = stock_quantity + ? WHERE id = ?",
+			reservation.Quantity, reservation.ProductVariantID,
+		).Error; err != nil {
+			logger.Log.Error("Failed to release stock",
+				zap.Uint("productVariantID", reservation.ProductVariantID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed releasing stock", "Something Went Wrong", "")
+			tx.Rollback()
+			return
+		}
+		if err := tx.Unscoped().Delete(&reservation).Error; err != nil {
+			logger.Log.Error("Failed to delete released stock",
+				zap.Uint("reservationID", reservation.ID),
+				zap.Error(err))
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete released stock", "Something Went Wrong", "")
+			tx.Rollback()
+			return
+		}
+		logger.Log.Info("Expired reservation cleaned up",
+			zap.Uint("reservationID", reservation.ID))
+	}
+
+	for _, item := range cartItems {
+		if item.ProductDetails.StockQuantity < item.CartItem.Quantity {
+			logger.Log.Warn("Stock unavailable",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Int("stockQty", int(item.CartItem.ProductVariant.StockQuantity)),
+				zap.Int("requestedQty", int(item.CartItem.Quantity)))
+			helper.RespondWithError(c, http.StatusConflict, "Stock unavailable", "One or more items in your cart are out of stock. Please update your cart.", "/checkout")
+			return
+		}
+		var product models.ProductVariantDetails
+		if err := tx.First(&product, item.CartItem.ProductID).Error; err != nil {
+			logger.Log.Error("Product not found",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Product not found", "Something Went Wrong", "/checkout")
+			return
+		}
+		product.StockQuantity -= item.CartItem.Quantity
+		if err := tx.Save(&product).Error; err != nil {
+			logger.Log.Error("Failed to reserve stock",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusConflict, "Failed to Reserve stock", "Something Went Wrong", "/checkout")
+			return
+		}
+		reserveStock := models.ReservedStock{
+			UserID:           userID,
+			ProductVariantID: item.CartItem.ProductID,
+			Quantity:         item.CartItem.Quantity,
+			ReservedAt:       time.Now(),
+			ReserveTill:      time.Now().Add(15 * time.Minute),
+			IsConfirmed:      false,
+		}
+
+		if err := tx.Create(&reserveStock).Error; err != nil {
+			logger.Log.Error("Failed to store reserved stock",
+				zap.Uint("productID", item.CartItem.ProductID),
+				zap.Error(err))
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to store reserved stock", "Something Went Wrong", "/checkout")
+			return
+		}
+		logger.Log.Info("Stock reserved",
+			zap.Uint("productID", item.CartItem.ProductID),
+			zap.Int("quantity", int(item.CartItem.Quantity)))
+	}
+
+	tx.Commit()
+
 	CreateWallet(c, userID)
 	logger.Log.Info("Checkout page loaded successfully",
 		zap.Uint("userID", userID),
@@ -122,7 +223,6 @@ func ShowCheckoutPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "checkOut.html", gin.H{
 		"status":          "OK",
 		"message":         "Checkout fetch success",
-		"Address":         address,
 		"CartItem":        cartItems,
 		"SubTotal":        regularPrice,
 		"Shipping":        shippingCharge,
@@ -132,6 +232,26 @@ func ShowCheckoutPage(c *gin.Context) {
 		"Total":           total,
 		"Coupons":         allResponceCoupons,
 		"code":            http.StatusOK,
+	})
+}
+
+func ShippingAddress(c *gin.Context) {
+	logger.Log.Info("Requested to address")
+
+	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
+
+	var address []models.UserAddress
+	if err := config.DB.Order("updated_at DESC").Find(&address, "user_id = ?", userID).Error; err != nil {
+		logger.Log.Error("Failed to fetch user addresses", zap.Uint("userID", userID), zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "Address not found", "Address not found", "")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":    "Success",
+		"Addresses": address,
+		"code":      http.StatusOK,
 	})
 }
 

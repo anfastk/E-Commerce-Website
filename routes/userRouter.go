@@ -47,7 +47,7 @@ func UserRouter(r *gin.Engine) {
 		userProfile.GET("/edit/address/:id", controllers.ShowEditAddress)
 		userProfile.PATCH("/edit/address", controllers.EditAddress)
 		userProfile.POST("/address/:id/default", controllers.SetAsDefaultAddress)
-		userProfile.POST("/delete/address/:id", controllers.DeleteAddress)
+		userProfile.DELETE("/delete/address/:id", controllers.DeleteAddress)
 		userProfile.GET("/settings", controllers.Settings)
 		userProfile.GET("/change/password", controllers.ShowChangePassword)
 		userProfile.POST("/change/password", controllers.ChangePassword)
@@ -81,7 +81,8 @@ func UserRouter(r *gin.Engine) {
 	checkout := r.Group("/checkout")
 	checkout.Use(middleware.AuthMiddleware(RoleUser))
 	{
-		checkout.GET("/", controllers.ShowCheckoutPage)
+		checkout.POST("/", controllers.ShowCheckoutPage)
+		checkout.POST("/addresses", controllers.ShippingAddress)
 		checkout.POST("/payment", controllers.PaymentPage)
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
 		checkout.POST("/check/coupon", controllers.CheckCoupon)

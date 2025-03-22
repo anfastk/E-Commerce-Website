@@ -37,7 +37,7 @@ func ReleaseExpiredReservations(db *gorm.DB) {
 				zap.Uint("reservedCouponID", reservation.ReservedCouponID),
 				zap.Error(err))
 		} else {
-			if err := tx.Exec("UPDATE coupons SET users_used_count = users_used_count + ? WHERE id = ?", 1, coupon.CouponID).Error; err != nil {
+			if err := tx.Exec("UPDATE coupons SET users_used_count = users_used_count - ? WHERE id = ?", 1, coupon.CouponID).Error; err != nil {
 				logger.Log.Error("Failed to update coupon users_used_count",
 					zap.Uint("couponID", coupon.CouponID),
 					zap.Error(err))

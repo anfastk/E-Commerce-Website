@@ -248,7 +248,7 @@
                                                 class="px-3 py-1 rounded-full text-sm {{if eq .OrderStatus `Pending`}} bg-orange-100 text-orange-800 border border-orange-300
                                                 {{else if or (eq .OrderStatus `Cancelled`) (eq .OrderStatus `Returned`) (eq .OrderStatus `Failed`)}} bg-red-100 text-red-800 border border-red-300
                                                 {{else if or (eq .OrderStatus `Shipped`) (eq .OrderStatus `Out For Delivery`) (eq .OrderStatus `Confirmed`)}} bg-blue-100 text-blue-800 border border-blue-300
-                                                {{else if eq .OrderStatus `Delivered` }} bg-green-100 text-green-800 border border-orange-300
+                                                {{else if eq .OrderStatus `Delivered` }} bg-green-100 text-green-800 border border-green-300
                                                 {{end}}">{{.OrderStatus}}</span>
                                             <a class="text-blue-600 hover:text-blue-800"
                                                 href="/profile/order/details/track/{{.ID}} ">View Details</a>

@@ -964,11 +964,9 @@
                     if (isInWishlist) {
                         icon.classList.remove('text-red-500', 'fill-current');
                         icon.classList.add('text-gray-400');
-                        showSuccessToast("Removed from wishlist!");
                     } else {
                         icon.classList.remove('text-gray-400');
                         icon.classList.add('text-red-500', 'fill-current');
-                        showSuccessToast("Added to wishlist!");
                     }
                 } else {
                     throw new Error("Failed to update wishlist");

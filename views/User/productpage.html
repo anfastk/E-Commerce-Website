@@ -815,13 +815,11 @@
                                 this.classList.remove('active');
                                 svg.classList.remove('active');
                                 svg.setAttribute('fill', 'none');
-                                showSuccessToast('Removed from wishlist!');
                             } else {
                                 this.setAttribute('data-in-wishlist', 'true');
                                 this.classList.add('active');
                                 svg.classList.add('active');
                                 svg.setAttribute('fill', 'currentColor');
-                                showSuccessToast('Added to wishlist!');
                             }
                         } else {
                             throw new Error('Failed to update wishlist');

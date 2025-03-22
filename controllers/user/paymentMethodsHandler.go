@@ -14,6 +14,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"github.com/anfastk/E-Commerce-Website/services"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -148,15 +149,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 		return
 	}
 
-	cart := FetchCartByUserID(c, userDetails.ID)
-	if cart == nil {
-		return // Error already logged in FetchCartByUserID
-	}
-
-	cartItems := FetchCartItemByCartID(c, cart.ID)
-	if cartItems == nil {
-		return // Error already logged in FetchCartItemByCartID
-	}
+	_, cartItems, err := services.FetchCartItems(userID)
 
 	if len(cartItems) == 0 {
 		logger.Log.Warn("Cart is empty", zap.Uint("userID", userID))
@@ -166,20 +159,24 @@ func VerifyRazorpayPayment(c *gin.Context) {
 
 	reservedProducts := FetchReservedProducts(c, userID)
 	if reservedProducts == nil {
-		return // Error already logged in FetchReservedProducts
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch reserved stock", "Something Went Wrong", "/cart")
+		return
 	}
 
 	if len(reservedProducts) != len(cartItems) {
 		logger.Log.Error("Mismatch between cart items and reserved products",
 			zap.Int("cartItemCount", len(cartItems)),
 			zap.Int("reservedProductCount", len(reservedProducts)))
-		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product 11", "Something Went Wrong", "/cart")
+		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch cart items and reserved product", "Something Went Wrong", "/cart")
 		return
 	}
 
-	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
-	if reservedMap == nil {
-		return // Error already logged in ReservedProductCheck
+	result, err := ReservedProductCheck(c, reservedProducts, cartItems)
+	if err != nil {
+		logger.Log.Error(err.Error(),
+			zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, err.Error(), "Something Went Wrong", "/cart")
+		return
 	}
 
 	tx := config.DB.Begin()
@@ -199,16 +196,18 @@ func VerifyRazorpayPayment(c *gin.Context) {
 		return
 	}
 
-	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+	orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	if orderID == 0 {
-		return // Error already logged in CreateOrder
+		helper.RespondWithError(c, http.StatusNotFound, "Order not found", "Something Went Wrong", "/cart")
+		return
 	}
 
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
+	CreateOrderItems(c, tx, reservedProducts, float64(result.ShippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 	orderItems := FetchOrderItems(c, tx, orderID)
 	if orderItems == nil {
-		return // Error already logged in FetchOrderItems
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch order items", "Something Went Wrong", "/cart")
+		return
 	}
 
 	var OrderItemIDs []int
@@ -260,7 +259,7 @@ func VerifyRazorpayPayment(c *gin.Context) {
 		DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
 	}
 
-	ClearCart(c, tx, reservedMap)
+	ClearCart(c, tx, result.ReservedMap)
 	if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
 		logger.Log.Warn("Failed to delete reserved coupon",
 			zap.String("couponID", paymentRequest.CouponId),
@@ -305,15 +304,7 @@ func PaymentFailureHandler(c *gin.Context) {
 		return
 	}
 
-	cart := FetchCartByUserID(c, userDetails.ID)
-	if cart == nil {
-		return // Error already logged in FetchCartByUserID
-	}
-
-	cartItems := FetchCartItemByCartID(c, cart.ID)
-	if cartItems == nil {
-		return // Error already logged in FetchCartItemByCartID
-	}
+	_, cartItems, err := services.FetchCartItems(userID)
 
 	if len(cartItems) == 0 {
 		logger.Log.Warn("Cart is empty", zap.Uint("userID", userID))
@@ -323,7 +314,8 @@ func PaymentFailureHandler(c *gin.Context) {
 
 	reservedProducts := FetchReservedProducts(c, userID)
 	if reservedProducts == nil {
-		return // Error already logged in FetchReservedProducts
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch reserved stock", "Something Went Wrong", "/cart")
+		return
 	}
 
 	if len(reservedProducts) != len(cartItems) {
@@ -334,9 +326,12 @@ func PaymentFailureHandler(c *gin.Context) {
 		return
 	}
 
-	reservedMap, subtotal, totalProductDiscount, totalDiscount, shippingCharge, tax, total := ReservedProductCheck(c, reservedProducts, cartItems)
-	if reservedMap == nil {
-		return // Error already logged in ReservedProductCheck
+	result, err := ReservedProductCheck(c, reservedProducts, cartItems)
+	if err != nil {
+		logger.Log.Error(err.Error(),
+			zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, err.Error(), "Something Went Wrong", "/cart")
+		return
 	}
 
 	tx := config.DB.Begin()
@@ -356,16 +351,18 @@ func PaymentFailureHandler(c *gin.Context) {
 		return
 	}
 
-	orderID := CreateOrder(c, tx, userDetails.ID, subtotal, totalProductDiscount, totalDiscount+couponDiscountAmount, tax, float64(shippingCharge), total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+	orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
 	if orderID == 0 {
-		return // Error already logged in CreateOrder
+		helper.RespondWithError(c, http.StatusNotFound, "Order not found", "Something Went Wrong", "/cart")
+		return
 	}
 
 	SaveOrderAddress(c, tx, orderID, userDetails.ID, paymentRequest.AddressID)
-	CreateOrderItems(c, tx, reservedProducts, float64(shippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
+	CreateOrderItems(c, tx, reservedProducts, float64(result.ShippingCharge), orderID, userDetails.ID, currentTime, couponDiscountAmount)
 	orderItems := FetchOrderItems(c, tx, orderID)
 	if orderItems == nil {
-		return // Error already logged in FetchOrderItems
+		helper.RespondWithError(c, http.StatusNotFound, "Failed to fetch order items", "Something Went Wrong", "/cart")
+		return
 	}
 
 	var OrderItemIDs []int
@@ -379,7 +376,7 @@ func PaymentFailureHandler(c *gin.Context) {
 			UserID:        userID,
 			OrderItemID:   orderItem.ID,
 			PaymentStatus: "Failed",
-			PaymentAmount: total,
+			PaymentAmount: result.Total,
 			PaymentMethod: "Razorpay",
 			OrderId:       RazorPayOrderID,
 			TransactionID: verifyRequest.PaymentID,
@@ -417,7 +414,7 @@ func PaymentFailureHandler(c *gin.Context) {
 		DeleteReservedItems(c, tx, orderItem.ProductVariantID, userID)
 	}
 
-	ClearCart(c, tx, reservedMap)
+	ClearCart(c, tx, result.ReservedMap)
 	if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
 		logger.Log.Warn("Failed to delete reserved coupon",
 			zap.String("couponID", paymentRequest.CouponId),

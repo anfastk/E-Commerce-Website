@@ -20,7 +20,7 @@ import (
 
 func ShowOrderManagent(c *gin.Context) {
 	logger.Log.Info("Requested to show order management")
-	
+
 	type OrderListResponce struct {
 		ID            uint    `json:"id"`
 		ProductImage  string  `json:"productimage"`
@@ -33,7 +33,7 @@ func ShowOrderManagent(c *gin.Context) {
 		Status        string  `json:"status"`
 		Amount        float64 `json:"amount"`
 	}
-	
+
 	var orderDetails []models.OrderItem
 	if err := config.DB.Order("created_at DESC").Find(&orderDetails).Error; err != nil {
 		logger.Log.Error("Failed to fetch orders", zap.Error(err))
@@ -49,21 +49,21 @@ func ShowOrderManagent(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders payment detail", "Something Went Wrong", "")
 			return
 		}
-		
+
 		var orderDetails models.Order
 		if err := config.DB.First(&orderDetails, "id = ?", item.OrderID).Error; err != nil {
 			logger.Log.Error("Failed to fetch order details", zap.Uint("orderID", item.OrderID), zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders detail", "Something Went Wrong", "")
 			return
 		}
-		
+
 		var userDetails models.UserAuth
 		if err := config.DB.First(&userDetails, "id = ?", orderDetails.UserID).Error; err != nil {
 			logger.Log.Error("Failed to fetch user details", zap.Uint("userID", orderDetails.UserID), zap.Error(err))
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch userdetail", "Something Went Wrong", "")
 			return
 		}
-		
+
 		orderListResponces := OrderListResponce{
 			ID:            item.ID,
 			ProductImage:  item.ProductImage,
@@ -78,7 +78,7 @@ func ShowOrderManagent(c *gin.Context) {
 		}
 		orderListResponce = append(orderListResponce, orderListResponces)
 	}
-	
+
 	logger.Log.Info("Order management data fetched successfully", zap.Int("orderCount", len(orderListResponce)))
 	c.HTML(http.StatusOK, "orderList.html", gin.H{
 		"status":  "success",
@@ -106,48 +106,48 @@ func ordinalSuffix(day int) string {
 func ShowOrderDetailManagement(c *gin.Context) {
 	orderItemID := c.Param("id")
 	logger.Log.Info("Requested to show order detail management", zap.String("orderItemID", orderItemID))
-	
+
 	var orderItemDetails models.OrderItem
 	if err := config.DB.First(&orderItemDetails, "id = ?", orderItemID).Error; err != nil {
 		logger.Log.Error("Failed to fetch order item details", zap.String("orderItemID", orderItemID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders items details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var UserDetails models.UserAuth
 	if err := config.DB.Unscoped().First(&UserDetails, "id = ?", orderItemDetails.UserID).Error; err != nil {
 		logger.Log.Error("Failed to fetch user details", zap.Uint("userID", orderItemDetails.UserID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch user details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var orderDetails models.Order
 	if err := config.DB.First(&orderDetails, "id = ? AND user_id = ?", orderItemDetails.OrderID, UserDetails.ID).Error; err != nil {
 		logger.Log.Error("Failed to fetch order details", zap.Uint("orderID", orderItemDetails.OrderID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var shippingAddress models.ShippingAddress
 	if err := config.DB.First(&shippingAddress, "order_id = ? AND user_id = ?", orderDetails.ID, orderDetails.UserID).Error; err != nil {
 		logger.Log.Error("Failed to fetch shipping address", zap.Uint("orderID", orderDetails.ID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var paymentDetails models.PaymentDetail
 	if err := config.DB.First(&paymentDetails, "user_id = ? AND order_item_id = ?", UserDetails.ID, orderItemDetails.ID).Error; err != nil {
 		logger.Log.Error("Failed to fetch payment details", zap.Uint("orderItemID", orderItemDetails.ID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch payment details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	productDiscount := (orderItemDetails.ProductRegularPrice - orderItemDetails.ProductSalePrice) * float64(orderItemDetails.Quantity)
 	totalDiscount := productDiscount + orderDetails.CouponDiscountAmount
 	if orderDetails.ShippingCharge == 0 {
 		totalDiscount += 100
 	}
-	
+
 	IsReurnRequested := false
 	var returnRequest models.ReturnRequest
 	if err := config.DB.First(&returnRequest, "user_id = ? AND order_item_id = ? AND product_variant_id = ?", UserDetails.ID, orderItemDetails.ID, orderItemDetails.ProductVariantID).Error; err == nil {
@@ -174,7 +174,7 @@ func ShowOrderDetailManagement(c *gin.Context) {
 
 func ChangeOrderStatus(c *gin.Context) {
 	logger.Log.Info("Requested to change order status")
-	
+
 	type orderManageData struct {
 		OrderId       string `json:"orderId"`
 		NewStatus     string `json:"status"`
@@ -189,14 +189,14 @@ func ChangeOrderStatus(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Invalid Data", "")
 		return
 	}
-	
+
 	orderItemID, err := strconv.Atoi(updateOrderStatus.OrderId)
 	if err != nil {
 		logger.Log.Error("Invalid order ID", zap.String("orderId", updateOrderStatus.OrderId), zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Order Id", "Invalid Order Id", "")
 		return
 	}
-	
+
 	tx := config.DB.Begin()
 	var orderItemDetails models.OrderItem
 	if err := tx.First(&orderItemDetails, "id = ?", orderItemID).Error; err != nil {
@@ -205,7 +205,7 @@ func ChangeOrderStatus(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders items details", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var paymentDetails models.PaymentDetail
 	if err := tx.First(&paymentDetails, "order_item_id = ?", orderItemDetails.ID).Error; err != nil {
 		logger.Log.Error("Failed to fetch payment details", zap.Uint("orderItemID", orderItemDetails.ID), zap.Error(err))
@@ -315,9 +315,9 @@ func ChangeOrderStatus(c *gin.Context) {
 			}
 		}
 	}
-	
+
 	tx.Commit()
-	logger.Log.Info("Order status updated successfully", 
+	logger.Log.Info("Order status updated successfully",
 		zap.Int("orderItemID", orderItemID),
 		zap.String("newStatus", updateOrderStatus.NewStatus),
 		zap.String("previousStatus", updateOrderStatus.CurrentStatus))
@@ -330,7 +330,7 @@ func ChangeOrderStatus(c *gin.Context) {
 
 func ApproveReturn(c *gin.Context) {
 	logger.Log.Info("Requested to approve return")
-	
+
 	var input struct {
 		ReturnRequestID string `json:"requestUID"`
 		OrderID         string `json:"orderId"`
@@ -343,7 +343,7 @@ func ApproveReturn(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Something Went Wrong", "")
 		return
 	}
-	
+
 	tx := config.DB.Begin()
 	ordid, err := strconv.ParseUint(input.OrderID, 10, 32)
 	if err != nil {
@@ -360,7 +360,7 @@ func ApproveReturn(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Return request not found", "Something Went Wrong", "")
 		return
 	}
-	
+
 	if returnRequest.Status != "Pending" {
 		logger.Log.Warn("Return request already processed", zap.String("requestUID", input.ReturnRequestID), zap.String("status", returnRequest.Status))
 		tx.Rollback()
@@ -386,30 +386,31 @@ func ApproveReturn(c *gin.Context) {
 		}
 
 		var refundAmount float64
-		total := order.SubTotal
-		productTotal := orderItems.SubTotal
+		total := order.SubTotal - order.TotalProductDiscount
+		productTotal := orderItems.ProductSalePrice
 		IscouponRemoved := false
+		IsMinusAmount := false
 
 		if order.IsCouponApplied {
 			var couponDetails models.Coupon
 			if err := tx.Unscoped().First(&couponDetails, "coupon_code = ?", order.CouponCode).Error; err != nil {
-				logger.Log.Error("Coupon not found", zap.String("couponCode", order.CouponCode), zap.Error(err))
+				logger.Log.Error("Coupon not found",
+					zap.String("couponCode", order.CouponCode),
+					zap.Error(err))
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 				return
 			}
-
 			if (total - productTotal) < couponDetails.MinOrderValue {
 				refundAmount = orderItems.Total - order.CouponDiscountAmount
-				if refundAmount < 0 {
-					logger.Log.Error("Invalid refund amount", zap.Float64("refundAmount", refundAmount))
-					tx.Rollback()
-					helper.RespondWithError(c, http.StatusBadRequest, "Sorry, you cannot cancel this order individually.", "Something Went Wrong", "")
-					return
+				if refundAmount <= 0 {
+					IsMinusAmount = true
 				}
 				couponDetails.UsersUsedCount -= 1
 				if err := tx.Unscoped().Save(&couponDetails).Error; err != nil {
-					logger.Log.Error("Failed to update coupon", zap.String("couponCode", order.CouponCode), zap.Error(err))
+					logger.Log.Error("Failed to update coupon",
+						zap.String("couponCode", order.CouponCode),
+						zap.Error(err))
 					tx.Rollback()
 					helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Coupon", "Something Went Wrong", "")
 					return
@@ -442,7 +443,7 @@ func ApproveReturn(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "Payment Details Not Found", "Something Went Wrong", "")
 			return
 		}
-		
+
 		if payment.PaymentStatus == "Completed" {
 			var wallet models.Wallet
 			if err := tx.First(&wallet, "user_id = ?", returnRequest.UserID).Error; err != nil {
@@ -451,36 +452,115 @@ func ApproveReturn(c *gin.Context) {
 				helper.RespondWithError(c, http.StatusNotFound, "User Wallet Not Found", "Something Went Wrong", "")
 				return
 			}
-			lastBalance := wallet.Balance
-			wallet.Balance += refundAmount
-			if err := tx.Save(&wallet).Error; err != nil {
-				logger.Log.Error("Failed to update wallet", zap.Uint("userID", returnRequest.UserID), zap.Error(err))
-				tx.Rollback()
-				helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
-				return
-			}
-			
-			receiptID := "rcpt_" + uuid.New().String()
-			rand.Seed(time.Now().UnixNano())
-			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			if IsMinusAmount {
+				lastBalance := wallet.Balance
+				wallet.Balance += -order.CouponDiscountAmount
+				if err := tx.Save(&wallet).Error; err != nil {
+					logger.Log.Error("Failed to update wallet",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+					return
+				}
 
-			walletTransaction := models.WalletTransaction{
-				UserID:        returnRequest.UserID,
-				WalletID:      wallet.ID,
-				Amount:        refundAmount,
-				Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
-				Type:          "Refund",
-				Receipt:       receiptID,
-				OrderId:       order.OrderUID,
-				LastBalance:   lastBalance,
-				TransactionID: strings.ToUpper(transactionID),
-				PaymentMethod: payment.PaymentMethod,
-			}
-			if err := tx.Create(&walletTransaction).Error; err != nil {
-				logger.Log.Error("Failed to create wallet transaction", zap.Uint("userID", returnRequest.UserID), zap.Error(err))
-				tx.Rollback()
-				helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
-				return
+				receiptID := "rcpt_" + uuid.New().String()
+				rand.Seed(time.Now().UnixNano())
+				transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+				walletTransaction := models.WalletTransaction{
+					UserID:        returnRequest.UserID,
+					WalletID:      wallet.ID,
+					Amount:        order.CouponDiscountAmount,
+					Description:   fmt.Sprintf("Coupon discount adjustment due to partial order cancellation. ₹%.2f deducted from wallet as per refund policy. ORD ID %s", order.CouponDiscountAmount, orderItems.OrderUID),
+					Type:          "Deduct",
+					Receipt:       receiptID,
+					OrderId:       orderItems.OrderUID,
+					LastBalance:   lastBalance,
+					TransactionID: strings.ToUpper(transactionID),
+					PaymentMethod: payment.PaymentMethod,
+				}
+				if err := tx.Create(&walletTransaction).Error; err != nil {
+					logger.Log.Error("Failed to create wallet transaction",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+					return
+				}
+
+				lastBalance = wallet.Balance
+				wallet.Balance += orderItems.ProductSalePrice + orderItems.Tax
+				if err := tx.Save(&wallet).Error; err != nil {
+					logger.Log.Error("Failed to update wallet",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+					return
+				}
+
+				receiptID = "rcpt_" + uuid.New().String()
+				rand.Seed(time.Now().UnixNano())
+				transactionID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+				walletTransaction = models.WalletTransaction{
+					UserID:        returnRequest.UserID,
+					WalletID:      wallet.ID,
+					Amount:        orderItems.Total,
+					Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
+					Type:          "Refund",
+					Receipt:       receiptID,
+					OrderId:       orderItems.OrderUID,
+					LastBalance:   lastBalance,
+					TransactionID: strings.ToUpper(transactionID),
+					PaymentMethod: payment.PaymentMethod,
+				}
+				if err := tx.Create(&walletTransaction).Error; err != nil {
+					logger.Log.Error("Failed to create wallet transaction",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+					return
+				}
+
+			} else {
+				lastBalance := wallet.Balance
+				wallet.Balance += refundAmount
+				if err := tx.Save(&wallet).Error; err != nil {
+					logger.Log.Error("Failed to update wallet",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Wallet", "Something Went Wrong", "")
+					return
+				}
+
+				receiptID := "rcpt_" + uuid.New().String()
+				rand.Seed(time.Now().UnixNano())
+				transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+
+				walletTransaction := models.WalletTransaction{
+					UserID:        returnRequest.UserID,
+					WalletID:      wallet.ID,
+					Amount:        refundAmount,
+					Description:   fmt.Sprintf("Order Refund ORD ID " + orderItems.OrderUID),
+					Type:          "Refund",
+					Receipt:       receiptID,
+					OrderId:       orderItems.OrderUID,
+					LastBalance:   lastBalance,
+					TransactionID: strings.ToUpper(transactionID),
+					PaymentMethod: payment.PaymentMethod,
+				}
+				if err := tx.Create(&walletTransaction).Error; err != nil {
+					logger.Log.Error("Failed to create wallet transaction",
+						zap.Uint("userID", returnRequest.UserID),
+						zap.Error(err))
+					tx.Rollback()
+					helper.RespondWithError(c, http.StatusNotFound, "Failed to Create Transaction History", "Something Went Wrong", "")
+					return
+				}
 			}
 			if err := tx.Model(&payment).Where("user_id = ? AND order_item_id = ?", returnRequest.UserID, orderItems.ID).
 				Update("payment_status", "Refunded").Error; err != nil {
@@ -548,8 +628,12 @@ func ApproveReturn(c *gin.Context) {
 		return
 	}
 
-	tx.Commit()
-	logger.Log.Info("Return request processed successfully", 
+	if err := tx.Commit().Error; err != nil {
+		logger.Log.Error("Failed to commit transaction", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Transaction Failed", "Order cancellation failed", "")
+		return
+	}
+	logger.Log.Info("Return request processed successfully",
 		zap.String("requestUID", input.ReturnRequestID),
 		zap.String("status", input.Status))
 	c.JSON(http.StatusOK, gin.H{

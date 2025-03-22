@@ -603,7 +603,78 @@
             updateCartTotalAndCount();
         });
 
+        // Function to handle the checkout process
+        function handleCheckout() {
+            // Disable button and show loading state
+            const checkoutButton = document.querySelector('a[href="/checkout"]');
+            const originalButtonContent = checkoutButton.innerHTML;
+            checkoutButton.innerHTML = 'Processing...';
+            checkoutButton.classList.add('opacity-70', 'cursor-not-allowed');
 
+            // Make POST request to the checkout endpoint
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if your application uses it
+                    // 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                // Add any required body data if needed
+                // body: JSON.stringify({ /* data if needed */ }),
+                credentials: 'same-origin' // Include cookies for authentication
+            })
+                .then(response => {
+                    // Restore button state
+                    checkoutButton.innerHTML = originalButtonContent;
+                    checkoutButton.classList.remove('opacity-70', 'cursor-not-allowed');
+
+                    if (!response.ok) {
+                        // Handle HTTP errors (4xx, 5xx)
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Error processing checkout');
+                        });
+                    }
+
+                    // For successful responses, check content type
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        // If JSON response, parse it
+                        return response.json().then(data => {
+                            window.location.href = data.redirect || '/checkout';
+                            return null;
+                        });
+                    } else {
+                        // If HTML response, replace the current page content
+                        return response.text().then(html => {
+                            // Replace the entire HTML body with the response
+                            document.open();
+                            document.write(html);
+                            document.close();
+                            return null;
+                        });
+                    }
+                })
+                .catch(error => {
+                    // Restore button state if not already done
+                    checkoutButton.innerHTML = originalButtonContent;
+                    checkoutButton.classList.remove('opacity-70', 'cursor-not-allowed');
+
+                    // Show error toast
+                    showErrorToast(error.message || 'Failed to process checkout. Please try again.');
+                    console.error('Checkout error:', error);
+                });
+        }
+
+        // Add click event listener to the checkout button
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkoutButton = document.querySelector('a[href="/checkout"]');
+            if (checkoutButton) {
+                checkoutButton.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default link behavior
+                    handleCheckout();
+                });
+            }
+        });
     </script>
     <script src="/static/js/toastMain.js"></script>
 

@@ -52,18 +52,11 @@
             position: relative;
         }
 
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .modal-content {
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        /* Custom scrollbar */
         .modal-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -85,19 +78,16 @@
 </head>
 
 <body class="bg-gray-50">
+    <!-- Header remains unchanged -->
     <div class="bg-black py-4 sticky top-0 z-30 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="#" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
@@ -113,7 +103,6 @@
                             </svg>
                         </button>
                     </a>
-                    </button>
                     <a href="/wishlist">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                             <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
@@ -126,12 +115,8 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -139,8 +124,6 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
@@ -149,13 +132,13 @@
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
                     <a href="#" class="hover:text-gray-600">Whishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
     </div>
+
+    <!-- Main content -->
     <div class="container mx-auto px-4 py-8">
-        <!-- Breadcrumb -->
         <div class="flex items-center gap-2 text-sm mb-8">
             <a href="#" class="text-gray-600">Home</a>
             <span class="text-gray-400">></span>
@@ -165,55 +148,16 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-            <!-- Left Column - Shipping Address -->
             <div class="md:col-span-2">
                 <h1 class="text-2xl font-bold mb-4">Shipping Address</h1>
-                {{if ge (len .Address) 2}}
-                <p class="text-sm text-gray-600 mb-8">
+                <p class="text-sm text-gray-600 mb-8" id="address-subtitle">
                     Select a existing delivery address or add a new one
                 </p>
-                {{end}}
-                <!-- Address Cards -->
-                <div class="space-y-4 mb-8">
-                    {{range .Address}}
-                    <div class="address-card border rounded-lg p-4" onclick="handleCardClick(this, event)">
-                        <div class="flex items-start gap-4">
-                            <input type="radio" name="address_card" class="mt-1 cursor-pointer" value="{{.ID}}" {{if
-                                .IsDefault}}checked{{end}} onclick="event.stopPropagation()">
-                            <div class="flex-grow">
-                                <h3 class="font-medium">{{.FirstName}} {{.LastName}}</h3>
-                                <p class="text-sm text-gray-600">{{.Address}} <br> {{.City}} , {{.State}} {{.PinCode}}
-                                    <br> {{.Country}}
-                                </p>
-                                <p class="text-sm text-gray-600">LandMark : {{.Landmark}}</p>
-                            </div>
-                        </div>
-                        <div class="action-buttons flex gap-4 mt-4 ml-8" onclick="event.stopPropagation()">
-                            <!-- Edit Button -->
-                            <button
-                                onclick="openEditModal('{{.ID}}', '{{.FirstName}}', '{{.LastName}}', '{{.Landmark}}', '{{.Address}}', '{{.Country}}', '{{.State}}', '{{.City}}', '{{.PinCode}}', '{{.Mobile}}')"
-                                class="text-gray-600 flex items-center gap-1 hover:text-gray-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                                Edit
-                            </button>
-                            <form action="/profile/delete/address/{{.ID}}" method="post">
-                                <button class="text-red-400 flex items-center gap-1 hover:text-red-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Delete
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {{end}}
+                <div class="space-y-4 mb-8" id="address-container">
+                    <!-- Addresses will be loaded dynamically -->
                 </div>
 
-                <!-- Single Modal -->
+                <!-- Modals -->
                 <div id="editAddressModal" class="modal z-40">
                     <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
                         <button onclick="closeModal('editAddressModal')"
@@ -223,12 +167,9 @@
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-
                         <h2 class="text-xl font-bold mb-6">EDIT SHIPPING ADDRESS</h2>
-
-                        <div id="editAddressForm" class="space-y-4" onsubmit="handleEditAddress(event)">
-                            <!-- Form fields for Edit Address - Same structure but with pre-filled values -->
-                            <input type="hidden" id="id" name="id">
+                        <form id="editAddressForm" class="space-y-4">
+                            <input type="hidden" name="id">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">First Name</label>
@@ -241,29 +182,24 @@
                                         required>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">LandMark</label>
                                 <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2" required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Address</label>
                                 <input type="text" name="address" class="w-full border rounded-lg px-3 py-2" required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Country</label>
                                 <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
                                     required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Region/State</label>
                                 <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
                                     required>
                             </div>
-
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">City</label>
@@ -276,25 +212,20 @@
                                         required>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Phone Number</label>
                                 <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
                                     required>
                             </div>
-
                             <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">UPDATE
                                 ADDRESS</button>
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
 
                 <button onclick="openModal('addAddressModal')" class="w-full border-2 border-black py-3 rounded-lg">
                     ADD NEW ADDRESS
                 </button>
-
-                <!-- Address Modal -->
                 <div id="addAddressModal" class="modal z-50">
                     <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
                         <button onclick="closeModal('addAddressModal')"
@@ -304,11 +235,8 @@
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-
                         <h2 class="text-xl font-bold mb-6">ADD NEW ADDRESS</h2>
-
-                        <form id="addAddressForm" class="space-y-4" onsubmit="handleAddAddress(event)">
-                            <!-- Form fields for Add Address -->
+                        <form id="addAddressForm" class="space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">First Name</label>
@@ -321,29 +249,24 @@
                                         required>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">LandMark</label>
                                 <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2" required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Address</label>
                                 <input type="text" name="address" class="w-full border rounded-lg px-3 py-2" required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Country</label>
                                 <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
                                     required>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Region/State</label>
                                 <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
                                     required>
                             </div>
-
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm mb-1">City</label>
@@ -356,13 +279,11 @@
                                         required>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-sm mb-1">Phone Number</label>
                                 <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
                                     required>
                             </div>
-
                             <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">SAVE
                                 ADDRESS</button>
                         </form>
@@ -370,36 +291,27 @@
                 </div>
             </div>
 
-            <!-- Right Column - Order Summary -->
+            <!-- Order summary remains unchanged -->
             <div class="md:col-span-1">
                 <div class="bg-white shadow-lg p-6 rounded-lg">
                     <h2 class="text-lg font-bold mb-6">Order Summary</h2>
-
-                    <!-- Product Items -->
                     <div class="space-y-4 mb-6">
-                        <!-- Product 1 -->
                         {{range .CartItem}}
                         <div class="flex gap-4">
-                            <img src="{{.ProductImage}}"
-                                alt="Camera" class="w-16 h-16 object-contain rounded">
+                            <img src="{{.ProductImage}}" alt="Camera" class="w-16 h-16 object-contain rounded">
                             <div>
                                 <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="text-sm">{{.CartItem.Quantity}} ×</span>
-                                    <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice}}</span>
-                                    <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf
-                                        "%.2f"
+                                    <span class="font-medium">₹ {{printf "%.2f" .DiscountPrice}}</span>
+                                    <span class="font-semibold text-xs text-gray-400 line-through">₹ {{printf "%.2f"
                                         .ProductDetails.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
                         {{end}}
                     </div>
-
-                    <!-- Summary Details -->
                     <div class="space-y-3 text-sm">
-
-                        <!-- Coupon Input -->
                         <div class="flex flex-col gap-2 mb-4">
                             <div class="flex gap-2">
                                 <input type="text" id="coupon-input" placeholder="Coupon Code"
@@ -407,11 +319,8 @@
                                 <button id="apply-coupon-btn"
                                     class="bg-black text-white px-4 py-2 rounded">APPLY</button>
                             </div>
-                            <!-- Coupon validation message -->
                             <div id="coupon-validation-message" class="text-sm hidden"></div>
                         </div>
-
-                        <!-- Applied Coupon -->
                         <div id="applied-coupon" class="hidden bg-gray-100 p-3 rounded-md mb-3">
                             <div class="flex justify-between items-center">
                                 <div>
@@ -421,8 +330,6 @@
                                 <button id="remove-coupon-btn" class="text-red-600 text-sm">Remove</button>
                             </div>
                         </div>
-
-                        <!-- Show Available Coupons Button -->
                         <button id="show-coupons-btn" class="text-blue-600 text-sm flex items-center">
                             <span>Show available coupons</span>
                             <svg id="coupon-arrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform"
@@ -431,8 +338,6 @@
                                     d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-
-                        <!-- Available Coupons List -->
                         <div id="coupon-list" class="coupon-list mt-2 border border-gray-200 rounded-md">
                             {{range .Coupons}}
                             <div class="p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item"
@@ -447,38 +352,35 @@
                         </div>
                         <div class="flex justify-between">
                             <span>Sub-total</span>
-                            <span id="order-subtotal">&#8377; {{printf "%.2f" .SubTotal}}</span>
+                            <span id="order-subtotal">₹ {{printf "%.2f" .SubTotal}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Product Discount</span>
-                            <span id="product-discount">&#8377; {{printf "%.2f" .ProductDiscount}}</span>
+                            <span id="product-discount">₹ {{printf "%.2f" .ProductDiscount}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Tax (18%)</span>
-                            <span id="tax-amount">&#8377; {{printf "%.2f" .Tax}}</span>
+                            <span id="tax-amount">₹ {{printf "%.2f" .Tax}}</span>
                         </div>
-
                         <div class="flex justify-between text-gray-600">
                             <span>Coupon Discount</span>
-                            <span class="text-blue-600"><span id="coupon-discount">-&#8377; 0.00</span></span>
+                            <span class="text-blue-600"><span id="coupon-discount">-₹ 0.00</span></span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
                             <span id="shipping-cost">{{if .Shipping}} {{.Shipping}} {{else}} <span
-                                    class="text-green-600">
-                                    Free <span class="line-through text-xs">&#8377;100</span>
-                                </span> {{end}}</span>
+                                    class="text-green-600">Free <span class="line-through text-xs">₹100</span></span>
+                                {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
-                            <span id="total-discount">&#8377; {{printf "%.2f" .TotalDiscount}}</span>
+                            <span id="total-discount">₹ {{printf "%.2f" .TotalDiscount}}</span>
                         </div>
                         <div class="flex justify-between font-bold pt-4 border-t">
                             <span>Total</span>
-                            <span id="final-total">&#8377; {{printf "%.2f" .Total}}</span>
+                            <span id="final-total">₹ {{printf "%.2f" .Total}}</span>
                         </div>
                     </div>
-
                     <button id="proceedToPaymentBtn"
                         class="w-full bg-black text-white py-3 rounded-lg mt-6 flex items-center justify-center gap-2">
                         PLACE ORDER
@@ -492,8 +394,7 @@
         </div>
     </div>
 
-
-    <!-- Footer Section -->
+    <!-- Footer remains unchanged -->
     <footer class="bg-black text-white py-12 mt-20">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -503,18 +404,10 @@
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-x"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-youtube"></i>
-                        </a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-x"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div>
@@ -554,10 +447,12 @@
                 </div>
             </div>
             <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
-                <p>&copy; 2025 LAPTIX, Inc</p>
+                <p>© 2025 LAPTIX, Inc</p>
             </div>
         </div>
     </footer>
+
+    <!-- Toast remains unchanged -->
     <div class="toast-container z-40 fixed top-24 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
@@ -570,190 +465,25 @@
             <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
         </div>
     </div>
+
     <script>
-        function handleCardClick(card, event) {
-            // Don't handle click if it's coming from buttons
-            if (event.target.closest('.action-buttons')) {
-                return;
-            }
 
-            // Find the radio button within this card
-            const radio = card.querySelector('input[type="radio"]');
-
-            // Unselect all other cards
-            document.querySelectorAll('.address-card').forEach(c => {
-                c.classList.remove('selected');
-            });
-
-            // Select this card
-            card.classList.add('selected');
-
-            // Check the radio button
-            radio.checked = true;
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close modal when clicking outside
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function (e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
-            });
-        });
-
-        async function handleAddAddress(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch('/profile/add/address', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    closeModal('addAddressModal');
-                    window.location.reload()
-                } else {
-                    throw new Error('Failed to add address');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Handle error
-            }
-        }
-
-        function openEditModal(id, firstName, lastName, landmark, address, country, state, city, pinCode, mobile) {
-            document.getElementById('id').value = id;
-            document.querySelector('input[name="firstName"]').value = firstName;
-            document.querySelector('input[name="lastName"]').value = lastName;
-            document.querySelector('input[name="landmark"]').value = landmark;
-            document.querySelector('input[name="address"]').value = address;
-            document.querySelector('input[name="country"]').value = country;
-            document.querySelector('input[name="state"]').value = state;
-            document.querySelector('input[name="city"]').value = city;
-            document.querySelector('input[name="zipCode"]').value = pinCode;
-            document.querySelector('input[name="phoneNumber"]').value = mobile;
-            openModal('editAddressModal');
-        }
-
-        async function handleEditAddress(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            try {
-                const response = await fetch('/profile/edit/address', {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                if (response.ok) {
-                    closeModal('editAddressModal');
-                    window.location.reload()
-                } else {
-                    throw new Error('Failed to update address');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Handle error
-            }
-        }
-
-        // Add to your existing script
-        document.getElementById('proceedToPaymentBtn').addEventListener('click', async function (e) {
-            e.preventDefault();
-
-            // Get selected address ID
-            const selectedAddress = document.querySelector('input[name="address_card"]:checked');
-            if (!selectedAddress) {
-                showErrorToast('Please select a shipping address');
-                return;
-            }
-
-            const addressId = selectedAddress.value;
-
-            // Prepare data object with address ID
-            const paymentData = {
-                addressId: addressId
-            };
-
-            // Add coupon information if a coupon is applied
-            if (appliedCoupon) {
-                paymentData.couponCode = appliedCoupon.code;
-                paymentData.couponId = appliedCoupon.couponId; // This will come from validation response
-                paymentData.couponDiscountAmount = couponDiscountAmount;
-            }
-
-            try {
-                const response = await fetch('/checkout/payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(paymentData),
-                });
-
-                if (response.ok) {
-                    const result = await response.text();
-                    document.open();
-                    document.write(result);
-                    document.close();
-                } else {
-                    const result = await response.json();
-                    throw new Error(result.message || 'Payment proceeding failed');
-                }
-            } catch (error) {
-                console.error(error);
-                showErrorToast(error.message || 'Error proceeding to payment');
-            }
-        });
-
-
-
-        // Define raw values from the template
         const rawSubTotal = "{{.SubTotal}}";
         const rawProductDiscount = "{{.ProductDiscount}}";
         const rawTax = "{{.Tax}}";
         const rawTotalDiscount = "{{.TotalDiscount}}";
         const rawTotal = "{{.Total}}";
 
-        // Get original values with proper parsing for Indian format (accounting for commas)
-        // Example: "1,418,694.06" -> 1418694.06
         function parseIndianNumber(value) {
-            // Remove ₹ symbol and all non-numeric characters except dots
             const numStr = value.replace(/₹|,|\s/g, '');
             return parseFloat(numStr);
         }
 
-        // Original values properly parsed
         const originalValues = {
             subTotal: parseIndianNumber(rawSubTotal),
             productDiscount: parseIndianNumber(rawProductDiscount),
             tax: parseIndianNumber(rawTax),
-            shipping: 0, // Assuming free shipping by default
+            shipping: 0,
             totalDiscount: parseIndianNumber(rawTotalDiscount),
             total: parseIndianNumber(rawTotal)
         };
@@ -762,7 +492,6 @@
         let appliedCoupon = null;
         let couponDiscountAmount = 0;
 
-        // Elements
         const couponInput = document.getElementById('coupon-input');
         const applyCouponBtn = document.getElementById('apply-coupon-btn');
         const showCouponsBtn = document.getElementById('show-coupons-btn');
@@ -777,25 +506,17 @@
         const finalTotal = document.getElementById('final-total');
         const couponValidationMessage = document.getElementById('coupon-validation-message');
 
-        // Toggle coupon list
         showCouponsBtn.addEventListener('click', () => {
             couponList.classList.toggle('show');
             couponArrow.classList.toggle('rotate-180');
         });
 
-        // Track the previously applied coupon code
         let previouslyAppliedCode = '';
 
-        // Add input event listener to the coupon input field
         couponInput.addEventListener('input', () => {
             const currentCode = couponInput.value.trim().toUpperCase();
-
-            // If there's an applied coupon and the current input is different from the applied code
             if (appliedCoupon && currentCode !== previouslyAppliedCode) {
-                // Remove the applied coupon automatically
                 removeCoupon();
-
-                // Reset the Apply button to normal state
                 applyCouponBtn.textContent = "APPLY";
                 applyCouponBtn.disabled = false;
                 applyCouponBtn.classList.remove('bg-green-600');
@@ -803,86 +524,51 @@
             }
         });
 
-        // Select a coupon from the list
         document.querySelectorAll('.coupon-item').forEach(item => {
             item.addEventListener('click', () => {
                 const code = item.getAttribute('data-code');
-
-                // Fill the input box with the selected coupon code
                 couponInput.value = code;
-
-                // Validate with backend just like manual input
                 validateCouponWithBackend(code);
-
-                // Close the coupon list
                 couponList.classList.remove('show');
                 couponArrow.classList.remove('rotate-180');
             });
         });
 
-        // Apply coupon button
         applyCouponBtn.addEventListener('click', () => {
             const code = couponInput.value.trim().toUpperCase();
             if (!code) return;
-
-            // Validate the coupon with backend
             validateCouponWithBackend(code);
         });
 
-        // Remove coupon
         removeCouponBtn.addEventListener('click', () => {
             removeCoupon();
         });
 
-        // Function to validate coupon with backend
-        // Function to validate coupon with backend
         async function validateCouponWithBackend(code) {
-            // Show loading state
             applyCouponBtn.textContent = "VALIDATING...";
             applyCouponBtn.disabled = true;
 
             try {
-                // Create the data to send to backend with correctly parsed values
                 const data = {
                     couponCode: code,
                     subTotal: originalValues.subTotal,
                     productDiscount: originalValues.productDiscount
                 };
 
-
-                // Call your backend API
                 const response = await fetch('/checkout/check/coupon', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
                 });
 
-
-                // Parse the response JSON
                 const result = await response.json();
 
-                // Check if the response indicates success (status is 'ok' or code is 200)
                 if (response.ok && (result.status === 'ok' || result.code === 200)) {
-                    // Coupon is valid, apply it
                     showValidationMessage(result.message || "Coupon applied successfully!", 'success');
-
-                    // Store the currently applied code for future comparison
                     previouslyAppliedCode = code;
-
-                    // Use the discount amount sent from the backend and also store couponId
-                    applyCoupon(
-                        code,
-                        result.discountAmount, // Using the exact amount from backend
-                        result.description || "Discount applied",
-                        result.CouponID // Store the coupon ID from the validation response
-                    );
-
-                    // Hide the "show available coupons" button when a coupon is applied
+                    applyCoupon(code, result.discountAmount, result.description || "Discount applied", result.CouponID);
                     showCouponsBtn.classList.add('hidden');
                 } else {
-                    // Coupon is invalid
                     showValidationMessage(result.message || "Invalid coupon code", 'error');
                     resetCouponState();
                 }
@@ -893,19 +579,12 @@
             }
         }
 
-        // Show validation message
         function showValidationMessage(message, type) {
             couponValidationMessage.textContent = message;
             couponValidationMessage.classList.remove('hidden', 'text-green-600', 'text-red-600');
-
-            if (type === 'success') {
-                couponValidationMessage.classList.add('text-green-600');
-            } else {
-                couponValidationMessage.classList.add('text-red-600');
-            }
+            couponValidationMessage.classList.add(type === 'success' ? 'text-green-600' : 'text-red-600');
         }
 
-        // Reset coupon input state after failed validation
         function resetCouponState() {
             applyCouponBtn.textContent = "APPLY";
             applyCouponBtn.disabled = false;
@@ -914,82 +593,52 @@
             couponInput.classList.remove('border-green-500');
         }
 
-        // Apply coupon function - now using exact discount amount from backend
-        // Apply coupon function - now including coupon ID from backend
         function applyCoupon(code, discountAmount, desc, couponId) {
-            // Reset to original values first
-            if (appliedCoupon) {
-                removeCoupon();
-            }
-
-            // Set the new applied coupon with coupon ID
+            if (appliedCoupon) removeCoupon();
             appliedCoupon = { code, discountAmount, desc, couponId };
-
-            // Show the applied coupon section
             appliedCouponDiv.classList.remove('hidden');
             appliedCouponCode.textContent = code;
             appliedCouponDesc.textContent = desc;
-
-            // Change Apply button to show "Applied"
             applyCouponBtn.textContent = "APPLIED";
             applyCouponBtn.disabled = false;
             applyCouponBtn.classList.remove('bg-black');
             applyCouponBtn.classList.add('bg-green-600');
-
-            // Make the input appear as applied
             couponInput.classList.add('border-green-500');
-
-            // Use the discount amount directly from the backend
             couponDiscountAmount = discountAmount;
-
-            // Update UI with coupon discount
             couponDiscount.textContent = `-₹ ${couponDiscountAmount.toFixed(2)}`;
-
-            // Update total discount (product discount + coupon discount)
             const newTotalDiscount = originalValues.totalDiscount + couponDiscountAmount;
             totalDiscount.textContent = `₹ ${newTotalDiscount.toFixed(2)}`;
-
-            // Calculate new total (original total - coupon discount)
             const newTotal = originalValues.total - couponDiscountAmount;
             finalTotal.textContent = `₹ ${newTotal.toFixed(2)}`;
         }
 
-        // Remove coupon function
         function removeCoupon() {
             appliedCoupon = null;
-            previouslyAppliedCode = ''; // Reset the previously applied code
+            previouslyAppliedCode = '';
             appliedCouponDiv.classList.add('hidden');
-
-            // Don't clear the input box when called from the input event listener
-            // Only clear it when explicitly removing a coupon via the remove button
             if (event && event.type === 'click' && event.currentTarget === removeCouponBtn) {
                 couponInput.value = '';
             }
-
-            // Hide validation message
             couponValidationMessage.classList.add('hidden');
-
-            // Reset Apply button
             applyCouponBtn.textContent = "APPLY";
             applyCouponBtn.disabled = false;
             applyCouponBtn.classList.remove('bg-green-600');
             applyCouponBtn.classList.add('bg-black');
-
-            // Reset input styling
             couponInput.classList.remove('border-green-500');
-
-            // Reset values
             couponDiscountAmount = 0;
-
-            // Update UI
             couponDiscount.textContent = `-₹ 0.00`;
             totalDiscount.textContent = `₹ ${originalValues.totalDiscount.toFixed(2)}`;
             finalTotal.textContent = `₹ ${originalValues.total.toFixed(2)}`;
-
-            // Show the "show available coupons" button again when coupon is removed
             showCouponsBtn.classList.remove('hidden');
         }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+        
     </script>
+        <script src="/static/js/checkout.js"></script>
+
     <script src="/static/js/toastMain.js"></script>
 </body>
 

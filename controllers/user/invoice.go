@@ -230,7 +230,7 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 	var totalTax float64
 
 	for _, item := range orderItems {
-		product := products[item.ProductVariantID]
+		product := item.ProductName
 		regularPrice := item.ProductRegularPrice
 		discountPrice := item.ProductSalePrice
 		discount := regularPrice - discountPrice
@@ -243,7 +243,7 @@ func GenerateInvoice(order models.Order, user models.UserAuth, orderItems []mode
 		totalDiscount += order.TotalProductDiscount
 		totalTax += taxAmount
 
-		pdf.CellFormat(75, 8, product.ProductName, "1", 0, "L", false, 0, "")
+		pdf.CellFormat(75, 8, product, "1", 0, "L", false, 0, "")
 		pdf.CellFormat(20, 8, strconv.Itoa(item.Quantity), "1", 0, "C", false, 0, "")
 		pdf.CellFormat(25, 8, fmt.Sprintf("%.2f", regularPrice), "1", 0, "R", false, 0, "")
 		pdf.CellFormat(25, 8, fmt.Sprintf("%.2f", discount*quantity), "1", 0, "R", false, 0, "")
