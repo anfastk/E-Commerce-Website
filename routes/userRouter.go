@@ -64,6 +64,7 @@ func UserRouter(r *gin.Engine) {
 		userProfile.POST("/referral/add", controllers.AddReferral)
 		userProfile.POST("/wallet/add/amount", controllers.AddMoneyTOWalltet)
 		userProfile.POST("/wallet/add/amount/verify", controllers.VerifyAddTOWalletRazorpayPayment)
+		userProfile.POST("/wallet/send/gift/card", controllers.SendGiftCard)
 		userProfile.GET("/order/details/track/invoices/:id", controllers.DownloadInvoice)
 	}
 
@@ -87,6 +88,7 @@ func UserRouter(r *gin.Engine) {
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
 		checkout.POST("/check/coupon", controllers.CheckCoupon)
 		checkout.GET("/check/wallet/balance", controllers.FetchWalletBalance)
+		checkout.POST("/redeem/gift/code",controllers.RedeemGiftCard)
 	}
 
 	wishlist := r.Group("/wishlist")

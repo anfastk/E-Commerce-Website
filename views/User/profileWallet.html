@@ -496,7 +496,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span
-                                                    class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                                                    class="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
                                                     {{.Type}}
                                                 </span>
                                             </td>
@@ -528,7 +528,7 @@
                                         </tr>
                                         {{end}}
 
-                                        {{if eq .Type "Gift Received"}}
+                                        {{if eq .Type "Gift Redeemed"}}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {{.Date}}
@@ -705,49 +705,49 @@
             maximumFractionDigits: 2
         }).format(amount);
         amountElement.innerHTML = `₹${formattedAmount}`;
-
+    
         // Toggle forms visibility
         document.getElementById('addMoneyBtn').addEventListener('click', function () {
             document.getElementById('addMoneyForm').classList.remove('hidden');
             document.getElementById('giftCardForm').classList.add('hidden');
         });
-
+    
         document.getElementById('sendGiftBtn').addEventListener('click', function () {
             document.getElementById('giftCardForm').classList.remove('hidden');
             document.getElementById('addMoneyForm').classList.add('hidden');
         });
-
+    
         document.getElementById('cancelAddMoney').addEventListener('click', function () {
             document.getElementById('addMoneyForm').classList.add('hidden');
         });
-
+    
         document.getElementById('cancelGiftCard').addEventListener('click', function () {
             document.getElementById('giftCardForm').classList.add('hidden');
         });
-
-        // Wallet form logic
+    
+        // Wallet and Gift Card form logic
         document.addEventListener('DOMContentLoaded', function () {
-            // Get elements
+            // Wallet Form Logic
             const amountButtons = document.querySelectorAll('.amount-btn');
             const otherAmountBtn = document.getElementById('otherAmountBtn');
             const customAmountSection = document.getElementById('customAmountSection');
-            const amountInput = document.getElementById('customAmountInput'); // Updated ID
+            const amountInput = document.getElementById('customAmountInput');
             const selectedAmountField = document.getElementById('selectedAmount');
             const submitButton = document.getElementById('submitButton');
             const cancelButton = document.getElementById('cancelAddMoney');
             const statusMessage = document.getElementById('statusMessage');
-
-            // Helper functions
+    
+            // Wallet Helper functions
             function enableSubmitButton() {
                 submitButton.disabled = false;
                 submitButton.classList.remove('opacity-50');
             }
-
+    
             function disableSubmitButton() {
                 submitButton.disabled = true;
                 submitButton.classList.add('opacity-50');
             }
-
+    
             function resetForm() {
                 amountInput.value = '';
                 document.getElementById('payment-method').selectedIndex = 0;
@@ -759,11 +759,9 @@
                 submitButton.textContent = 'Add Money';
                 statusMessage.classList.add('hidden');
             }
-
-            // Initialize button as disabled
+    
             disableSubmitButton();
-
-            // Handle predefined amount buttons
+    
             amountButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
@@ -775,8 +773,7 @@
                     statusMessage.classList.add('hidden');
                 });
             });
-
-            // Handle "Other" button
+    
             otherAmountBtn.addEventListener('click', function () {
                 amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
                 this.classList.add('bg-blue-500', 'text-white');
@@ -787,8 +784,7 @@
                 disableSubmitButton();
                 statusMessage.classList.add('hidden');
             });
-
-            // Validate custom amount
+    
             function validateCustomAmount() {
                 const value = amountInput.value.trim();
                 const amount = parseFloat(value);
@@ -800,40 +796,31 @@
                     disableSubmitButton();
                 }
             }
-
-            // Attach event listeners to amountInput
+    
             if (amountInput) {
-                amountInput.addEventListener('input', function () {
-                    validateCustomAmount();
-                });
-
-                amountInput.addEventListener('change', function () {
-                    validateCustomAmount();
-                });
-            } else {
-                console.error("customAmountInput element not found!");
+                amountInput.addEventListener('input', validateCustomAmount);
+                amountInput.addEventListener('change', validateCustomAmount);
             }
-
-            // Handle submit button click
+    
             submitButton.addEventListener('click', function () {
                 if (!customAmountSection.classList.contains('hidden')) {
                     validateCustomAmount();
                 }
-
+    
                 const amount = selectedAmountField.value;
                 if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) < 1) {
                     showErrorToast('Please select or enter a valid amount');
                     return;
                 }
-
+    
                 disableSubmitButton();
                 submitButton.textContent = 'Processing...';
-
+    
                 const data = {
                     amount: parseFloat(amount),
                     paymentMethod: document.getElementById('payment-method').value
                 };
-
+    
                 fetch('/profile/wallet/add/amount', {
                     method: 'POST',
                     headers: {
@@ -863,14 +850,100 @@
                         submitButton.textContent = 'Add Money';
                     });
             });
-
-            // Handle cancel button
-            cancelButton.addEventListener('click', function () {
-                document.getElementById('addMoneyForm').classList.add('hidden');
-                resetForm();
+    
+            cancelButton.addEventListener('click', resetForm);
+    
+            // Gift Card Form Logic
+            const giftCardForm = document.getElementById('giftCardForm');
+            const sendGiftButton = giftCardForm.querySelector('button[type="submit"]');
+            const recipientName = document.getElementById('recipient-name');
+            const recipientEmail = document.getElementById('recipient-email');
+            const giftAmount = document.getElementById('gift-amount');
+            const giftMessage = document.getElementById('gift-message');
+    
+            function enableGiftButton() {
+                sendGiftButton.disabled = false;
+                sendGiftButton.classList.remove('opacity-50');
+            }
+    
+            function disableGiftButton() {
+                sendGiftButton.disabled = true;
+                sendGiftButton.classList.add('opacity-50');
+            }
+    
+            function resetGiftForm() {
+                recipientName.value = '';
+                recipientEmail.value = '';
+                giftAmount.value = '';
+                giftMessage.value = '';
+                enableGiftButton();
+                sendGiftButton.textContent = 'Send Gift Card';
+            }
+    
+            enableGiftButton();
+    
+            giftCardForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent default form submission
+    
+                // Client-side validation
+                if (!recipientName.value.trim()) {
+                    showErrorToast('Please enter recipient name');
+                    return;
+                }
+                if (!recipientEmail.value.trim() || !/^\S+@\S+\.\S+$/.test(recipientEmail.value)) {
+                    showErrorToast('Please enter a valid email');
+                    return;
+                }
+                const amount = parseFloat(giftAmount.value);
+                if (!amount || amount < 5) {
+                    showErrorToast('Please enter an amount of at least ₹5');
+                    return;
+                }
+    
+                disableGiftButton();
+                sendGiftButton.textContent = 'Sending...';
+    
+                // Prepare data object for POST request
+                const giftData = {
+                    recipient_name: recipientName.value.trim(),
+                    recipient_email: recipientEmail.value.trim(),
+                    amount: amount,
+                    message: giftMessage.value.trim()
+                };
+    
+                // Send POST request with JSON body (no query parameters)
+                fetch('/profile/wallet/send/gift/card', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(giftData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showSuccessToast('Gift card sent successfully!');
+                        resetGiftForm();
+                        setTimeout(() => {
+                            document.getElementById('giftCardForm').classList.add('hidden');
+                            window.location.reload();
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Gift card sending failed:', error);
+                        showErrorToast('Failed to send gift card. Please try again.');
+                        enableGiftButton();
+                        sendGiftButton.textContent = 'Send Gift Card';
+                    });
             });
         });
-
+    
         // Razorpay integration
         function initializeRazorpay(data) {
             const options = {
@@ -908,18 +981,21 @@
                     enabled: false
                 }
             };
-
+    
             const rzp = new Razorpay(options);
             rzp.on('payment.failed', function (response) {
                 showErrorToast("Payment Failed");
             });
             rzp.open();
         }
-
+    
         function verifyPayment(paymentData) {
             fetch('/profile/wallet/add/amount/verify', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
                 body: JSON.stringify(paymentData),
             })
                 .then(response => {
@@ -941,7 +1017,7 @@
                     enableSubmitButton();
                 });
         }
-
+    
         // Toast functions
         function showSuccessToast(message) {
             const toast = document.getElementById('toast');
@@ -957,7 +1033,7 @@
                 successIcon.classList.add('hidden');
             }, 3000);
         }
-
+    
         function showErrorToast(message) {
             const toast = document.getElementById('toast');
             const toastMessage = document.querySelector('.toast-message');

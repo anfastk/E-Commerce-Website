@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.disabled = true;
 
         // Send AJAX request to apply gift card
-        fetch('/auth/wallet/apply-gift-card', {
+        fetch('/checkout/redeem/gift/code', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

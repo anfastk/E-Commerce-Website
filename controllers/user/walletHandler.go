@@ -4,11 +4,16 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
+	"github.com/anfastk/E-Commerce-Website/utils"
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -306,5 +311,246 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "success",
 		"message": "Payment verified successfully",
+	})
+}
+
+func GenerateGiftCardCode() string {
+	b := make([]byte, 8)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+
+	hexStr := strings.ToUpper(hex.EncodeToString(b))
+	return fmt.Sprintf("LPTX-%s-%s-%s-%s", hexStr[0:4], hexStr[4:8], hexStr[8:12], hexStr[12:16])
+}
+
+func SendGiftCard(c *gin.Context) {
+	logger.Log.Info("Sending Gift Card")
+	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
+
+	var Details struct {
+		RecipientName  string `json:"recipient_name"`
+		RecipientEmail string `json:"recipient_email"`
+		Amount         int    `json:"amount"`
+		Message        string `json:"message"`
+	}
+
+	if err := c.ShouldBindJSON(&Details); err != nil {
+		logger.Log.Error("Failed to bind details data", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request", "Invalid request format", "")
+		return
+	}
+
+	fmt.Println(Details)
+	tx := config.DB.Begin()
+
+	var userDetails models.UserAuth
+	if err := tx.First(&userDetails, userID).Error; err != nil {
+		logger.Log.Error("User not found",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "/profile/order/details")
+		return
+	}
+
+	var walletDetails models.Wallet
+	if err := tx.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+		tx.Rollback()
+		logger.Log.Error("Wallet Not Found", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Wallet Not Found", "Something Went Wrong", "")
+		return
+	}
+
+	if walletDetails.Balance < float64(Details.Amount) {
+		tx.Rollback()
+		logger.Log.Error("Wallet Balance Is Lessthan Entered Amount")
+		helper.RespondWithError(c, http.StatusBadRequest, "Wallet Balance Is Lessthan Entered Amount", "Wallet Balance Is Lessthan Entered Amount", "")
+		return
+	}
+
+	GiftCode := GenerateGiftCardCode()
+	transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	cleanedGiftCode := strings.ReplaceAll(GiftCode, " ", "")
+	cleanedGiftCode = strings.ReplaceAll(cleanedGiftCode, "-", "")
+
+	data := models.WalletGiftCard{
+		GiftCardCode:   cleanedGiftCode,
+		GiftCardValue:  float64(Details.Amount),
+		ExpDate:        time.Now().AddDate(1, 0, 0),
+		UserID:         userID,
+		RecipientName:  strings.ToUpper(Details.RecipientName),
+		RecipientEmail: Details.RecipientEmail,
+		Message:        Details.Message,
+		Status:         "Active",
+		PaymentMethod:  "Wallet",
+		TransactionID:  transactionID,
+	}
+
+	if err := tx.Create(&data).Error; err != nil {
+		tx.Rollback()
+		logger.Log.Error("Failed to create gift card", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create gift card", "Something WEnt Wrong", "")
+		return
+	}
+	formattedExpDate := data.ExpDate.Format("January 02, 2006")
+	giftCardValueStr := fmt.Sprintf("%.2f", data.GiftCardValue)
+	if err := utils.SendGiftCardToEmail(data.RecipientName, userDetails.ProfilePic, data.Message, data.RecipientEmail, giftCardValueStr, GiftCode, formattedExpDate); err != nil {
+		logger.Log.Error("Failed to send gift card to email",
+			zap.String("email", data.RecipientEmail),
+			zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to send Gift Card", "Failed To Gift Card , Please Try Again ", "")
+		return
+	}
+
+	lastBalance := walletDetails.Balance
+	walletDetails.Balance -= data.GiftCardValue
+	if err := tx.Save(&walletDetails).Error; err != nil {
+		logger.Log.Error("Failed to update wallet balance",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update wallet details", "Failed to update order", "")
+		return
+	}
+
+	walletReceiptID := "rcpt-" + uuid.New().String()
+	rand.Seed(time.Now().UnixNano())
+	walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	orderUID := helper.GenerateOrderID()
+
+	walletHistory := models.WalletTransaction{
+		UserID:        userID,
+		WalletID:      walletDetails.ID,
+		Amount:        data.GiftCardValue,
+		LastBalance:   lastBalance,
+		Description:   "Send A Gift Card To (" + data.RecipientName + "). Email ID :" + data.RecipientEmail,
+		Type:          "Gift Send",
+		Receipt:       walletReceiptID,
+		OrderId:       orderUID,
+		TransactionID: walletTransactionID,
+		PaymentMethod: "Wallet",
+	}
+	if err := tx.Create(&walletHistory).Error; err != nil {
+		logger.Log.Error("Failed to create wallet transaction",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Creation Failed", "Something Went Wrong", "/cart")
+		return
+	}
+
+	tx.Commit()
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Gift Card Send Successfully",
+		"Code":    http.StatusOK,
+	})
+}
+
+func RedeemGiftCard(c *gin.Context) {
+	logger.Log.Info("Redeeming Gift Card")
+	userID := helper.FetchUserID(c)
+	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
+
+	var userInput struct {
+		GiftCode string `json:"code"`
+	}
+
+	if err := c.ShouldBindJSON(&userInput); err != nil {
+		logger.Log.Error("Failed to bind details data", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request", "Invalid request format", "")
+		return
+	}
+
+	cleanedGiftCode := strings.ReplaceAll(userInput.GiftCode, " ", "")
+	cleanedGiftCode = strings.ReplaceAll(cleanedGiftCode, "-", "")
+
+	tx := config.DB.Begin()
+	var giftCardDetails models.WalletGiftCard
+	if err := tx.First(&giftCardDetails, "gift_card_code = ?", cleanedGiftCode).Error; err != nil {
+		helper.RespondWithError(c, http.StatusNotFound, "Invalid Code Entered", "Invalid Code Entered", "")
+		return
+	}
+
+	if giftCardDetails.GiftCardCode != cleanedGiftCode {
+		helper.RespondWithError(c, http.StatusNotFound, "Invalid Code Entered", "Invalid Code Entered", "")
+		return
+	} else if giftCardDetails.UserID == userID {
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Usage", "You cannot use your own gift code.", "")
+		return
+	} else if giftCardDetails.Status == "Redeemed" || giftCardDetails.RedeemedUserID != nil {
+		helper.RespondWithError(c, http.StatusBadRequest, "Code Already redeemed", "Code Already redeemed", "")
+		return
+	} else if giftCardDetails.ExpDate.Before(time.Now()) {
+		giftCardDetails.Status = "Expired"
+		if err := config.DB.Save(&giftCardDetails).Error; err != nil {
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update code", "Something Went Wrong", "")
+			return
+		}
+		helper.RespondWithError(c, http.StatusBadRequest, "Code Expired", "Code Expired", "")
+		return
+	}
+
+	var walletDetails models.Wallet
+	if err := tx.First(&walletDetails, "user_id = ?", userID).Error; err != nil {
+		tx.Rollback()
+		logger.Log.Error("Wallet Not Found", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Wallet Not Found", "Something Went Wrong", "")
+		return
+	}
+
+	lastBalance := walletDetails.Balance
+	walletDetails.Balance += giftCardDetails.GiftCardValue
+	if err := tx.Save(&walletDetails).Error; err != nil {
+		logger.Log.Error("Failed to update wallet balance",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update wallet details", "Failed to update order", "")
+		return
+	}
+
+	walletReceiptID := "rcpt-" + uuid.New().String()
+	rand.Seed(time.Now().UnixNano())
+	walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	orderUID := helper.GenerateOrderID()
+
+	walletHistory := models.WalletTransaction{
+		UserID:        userID,
+		WalletID:      walletDetails.ID,
+		Amount:        giftCardDetails.GiftCardValue,
+		LastBalance:   lastBalance,
+		Description:   "Redeemed A Gift Card ",
+		Type:          "Gift Redeemed",
+		Receipt:       walletReceiptID,
+		OrderId:       orderUID,
+		TransactionID: walletTransactionID,
+		PaymentMethod: "Gift Card",
+	}
+	if err := tx.Create(&walletHistory).Error; err != nil {
+		logger.Log.Error("Failed to create wallet transaction",
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Creation Failed", "Something Went Wrong", "/cart")
+		return
+	}
+
+	giftCardDetails.Status = "Redeemed"
+	giftCardDetails.RedeemedUserID = &userID
+	if err := config.DB.Save(&giftCardDetails).Error; err != nil {
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update code", "Something Went Wrong", "")
+		return
+	}
+	tx.Commit()
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "Success",
+		"message": "Gift Card Redeemed Successfully",
+		"Code":    http.StatusOK,
 	})
 }
