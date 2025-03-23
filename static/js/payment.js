@@ -388,17 +388,21 @@ document.getElementById('proceedToPay').addEventListener('click', function () {
             if (!response.ok) {
                 return response.json().then(err => { throw new Error(err.message || "Payment failed."); });
             }
-            return response.json(); // Expecting JSON response
+            // Check the payment method to handle response appropriately
+            if (selectedPaymentMethod === 'Razorpay') {
+                return response.json(); // Razorpay still expects JSON
+            } else {
+                return response.text(); // COD and Wallet expect HTML
+            }
         })
         .then(data => {
             if (selectedPaymentMethod === 'Razorpay') {
-                initializeRazorpay(data);
-            }
-            else if (selectedPaymentMethod === 'COD') {
-                window.location.href = '/order/success';
-            }
-            else if (selectedPaymentMethod === 'Wallet') {
-                window.location.href = '/order/success';
+                initializeRazorpay(data); // Handle Razorpay as before
+            } else if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'Wallet') {
+                // Instead of redirecting, render the HTML response
+                document.open();
+                document.write(data); // Write the HTML response to the current window
+                document.close();
             }
         })
         .catch(error => {
@@ -497,11 +501,13 @@ function verifyPayment(paymentData) {
             if (!response.ok) {
                 return response.json().then(err => { throw new Error(err.message || "Payment verification failed."); });
             }
-            return response.json();
+            return response.text(); // Expecting HTML response instead of JSON
         })
         .then(data => {
-            // Redirect to success page
-            window.location.href = '/order/success';
+            // Render the HTML response instead of redirecting
+            document.open();
+            document.write(data); // Write the HTML response to the current window
+            document.close();
         })
         .catch(error => {
             console.error('Error:', error);

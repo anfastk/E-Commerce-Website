@@ -298,15 +298,27 @@ func ProceedToPayment(c *gin.Context) {
 				zap.String("couponID", paymentRequest.CouponId),
 				zap.Error(err))
 		}
+		var orderDetails models.Order
+		if err := tx.First(&orderDetails, orderID).Error; err != nil {
+			logger.Log.Error("Order not found",
+				zap.Uint("orderID", orderID),
+				zap.Error(err))
+			tx.Rollback()
+			helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
+			return
+		}
 		tx.Commit()
 		logger.Log.Info("COD payment processed successfully",
 			zap.Uint("userID", userID),
 			zap.Uint("orderID", orderID))
-		c.JSON(http.StatusOK, gin.H{
-			"status":   "OK",
-			"message":  "Payment processed",
-			"redirect": "/order/success",
-			"code":     http.StatusOK,
+		c.HTML(http.StatusOK, "orderSuccess.html", gin.H{
+			"status":        "Success",
+			"message":       "Order Success",
+			"OrderID":       orderDetails.OrderUID,
+			"PaymentMethod": "Cash On Delivery",
+			"OrderDate":     orderDetails.CreatedAt.Format("January 2, 2006"),
+			"ExpextedDate":  orderDetails.CreatedAt.AddDate(0, 0, 7).Format("January 2, 2006"),
+			"code":          http.StatusOK,
 		})
 
 	case "Razorpay":
@@ -431,7 +443,7 @@ func ProceedToPayment(c *gin.Context) {
 		}
 
 		lastBalance := walletDetails.Balance
-		walletDetails.Balance -= (result.Total-couponDiscountAmount)
+		walletDetails.Balance -= (result.Total - couponDiscountAmount)
 		if err := tx.Save(&walletDetails).Error; err != nil {
 			logger.Log.Error("Failed to update wallet balance",
 				zap.Uint("userID", userID),
@@ -448,7 +460,7 @@ func ProceedToPayment(c *gin.Context) {
 		walletHistory := models.WalletTransaction{
 			UserID:        userID,
 			WalletID:      walletDetails.ID,
-			Amount:        result.Total-couponDiscountAmount,
+			Amount:        result.Total - couponDiscountAmount,
 			LastBalance:   lastBalance,
 			Description:   "Product Purchase ORD ID" + orderDetails.OrderUID,
 			Type:          "Debited",
@@ -477,13 +489,15 @@ func ProceedToPayment(c *gin.Context) {
 			zap.Uint("userID", userID),
 			zap.Uint("orderID", orderID),
 			zap.Float64("amount", result.Total))
-		c.JSON(http.StatusOK, gin.H{
-			"status":   "OK",
-			"message":  "Payment processed",
-			"redirect": "/order/success",
-			"code":     http.StatusOK,
+		c.HTML(http.StatusOK, "orderSuccess.html", gin.H{
+			"status":        "Success",
+			"message":       "Order Success",
+			"OrderID":       orderDetails.OrderUID,
+			"PaymentMethod": "Wallet",
+			"OrderDate":     orderDetails.CreatedAt.Format("January 2, 2006"),
+			"ExpextedDate":  orderDetails.CreatedAt.AddDate(0, 0, 7).Format("January 2, 2006"),
+			"code":          http.StatusOK,
 		})
-
 	default:
 		logger.Log.Warn("Invalid payment method",
 			zap.String("method", paymentRequest.PaymentMethod))

@@ -399,32 +399,6 @@ func ClearCart(c *gin.Context, tx *gorm.DB, ordered map[uint]int) {
 	}
 }
 
-func ShowSuccessPage(c *gin.Context) {
-	logger.Log.Info("Showing order success page")
-
-	userID := helper.FetchUserID(c)
-	logger.Log.Debug("Fetched user ID", zap.Uint("userID", userID))
-
-	today := time.Now().Format("2006-01-02")
-	var order models.Order
-	if err := config.DB.First(&order, "user_id = ? AND DATE(created_at) = ?", userID, today).Error; err != nil {
-		logger.Log.Warn("No recent order found",
-			zap.Uint("userID", userID),
-			zap.String("today", today),
-			zap.Error(err))
-		c.HTML(http.StatusForbidden, "error.html", gin.H{"message": "No recent order found"})
-		return
-	}
-
-	logger.Log.Info("Order success page loaded",
-		zap.Uint("userID", userID),
-		zap.Uint("orderID", order.ID))
-	c.HTML(http.StatusOK, "orderSuccess.html", gin.H{
-		"status":  "OK",
-		"message": "Payment processed",
-	})
-}
-
 func FetchOrderItems(c *gin.Context, tx *gorm.DB, orderID uint) []models.OrderItem {
 	logger.Log.Info("Fetching order items", zap.Uint("orderID", orderID))
 

@@ -265,15 +265,29 @@ func VerifyRazorpayPayment(c *gin.Context) {
 			zap.String("couponID", paymentRequest.CouponId),
 			zap.Error(err))
 	}
+	var orderDetails models.Order
+	if err := tx.First(&orderDetails, orderID).Error; err != nil {
+		logger.Log.Error("Order not found",
+			zap.Uint("orderID", orderID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusInternalServerError, "Order not found", "Something Went Wrong", "")
+		return
+	}
 	tx.Commit()
 
 	logger.Log.Info("Razorpay payment verified successfully",
 		zap.Uint("userID", userID),
 		zap.Uint("orderID", orderID),
 		zap.String("paymentID", verifyRequest.PaymentID))
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "success",
-		"message": "Payment verified successfully",
+	c.HTML(http.StatusOK, "orderSuccess.html", gin.H{
+		"status":        "Success",
+		"message":       "Order Success",
+		"OrderID":       orderDetails.OrderUID,
+		"PaymentMethod": "Razorpay",
+		"OrderDate":     orderDetails.CreatedAt.Format("January 2, 2006"),
+		"ExpextedDate":  orderDetails.CreatedAt.AddDate(0, 0, 7).Format("January 2, 2006"),
+		"code":          http.StatusOK,
 	})
 }
 

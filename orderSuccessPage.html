@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes checkmark {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+        
+        @keyframes circle {
+            0% { stroke-dashoffset: 380; }
+            100% { stroke-dashoffset: 0; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .circle {
+            stroke-dasharray: 380;
+            stroke-dashoffset: 380;
+            animation: circle 1s ease-in-out forwards;
+        }
+        
+        .checkmark {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: checkmark 1s ease-in-out forwards 0.5s;
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+        
+        .slide-up {
+            opacity: 0;
+            animation: slideUp 0.8s ease-in-out forwards;
+        }
+        
+        .delay-1 {
+            animation-delay: 0.6s;
+        }
+        
+        .delay-2 {
+            animation-delay: 0.9s;
+        }
+        
+        .delay-3 {
+            animation-delay: 1.2s;
+        }
+        
+        .delay-4 {
+            animation-delay: 1.5s;
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <!-- Header placeholder (black and white as mentioned) -->
+    <header class="bg-black p-4 shadow-lg text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Your Brand</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="hover:text-purple-400 transition">Home</a></li>
+                    <li><a href="#" class="hover:text-purple-400 transition">Shop</a></li>
+                    <li><a href="#" class="hover:text-purple-400 transition">Account</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-grow flex items-center justify-center p-6 bg-gradient-to-b from-gray-900 to-gray-800">
+        <div class="container mx-auto max-w-2xl">
+            <div class="bg-gray-800 rounded-xl shadow-2xl p-8 relative overflow-hidden">
+                <!-- Animated success mark -->
+                <div class="flex justify-center mb-6 fade-in">
+                    <div class="w-24 h-24 relative">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="circle" cx="50" cy="50" r="45" fill="none" stroke="#6d28d9" stroke-width="6"></circle>
+                            <path class="checkmark" fill="none" stroke="#ffffff" stroke-width="6" d="M30,50 L45,65 L70,35"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Main heading -->
+                <h1 class="text-3xl md:text-4xl font-bold text-center mb-4 slide-up delay-1 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Order Complete!</h1>
+                
+                <!-- Thank you message -->
+                <p class="text-lg text-center text-gray-300 mb-8 slide-up delay-2">Thank you for your purchase. Your order has been received successfully!</p>
+                
+                <!-- Order details -->
+                <div class="bg-gray-700 rounded-lg p-6 mb-8 slide-up delay-3">
+                    <h2 class="text-xl font-semibold mb-4 text-purple-300">Order Details</h2>
+                    <div class="grid grid-cols-2 gap-4 text-gray-300">
+                        <div>
+                            <p class="text-sm text-gray-400">Order Number</p>
+                            <p class="font-medium">#ORD-2458964</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Date</p>
+                            <p class="font-medium">March 23, 2025</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Payment Method</p>
+                            <p class="font-medium">Credit Card</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Shipping Method</p>
+                            <p class="font-medium">Express Delivery</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Next steps -->
+                <div class="text-center mb-8 slide-up delay-4">
+                    <p class="text-gray-300 mb-2">Your order confirmation has been sent to your email address.</p>
+                    <p class="text-purple-300">Expected delivery: <span class="font-semibold">March 26-28, 2025</span></p>
+                </div>
+                
+                <!-- Action buttons -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4 slide-up delay-4">
+                    <a href="#" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 text-center bounce">
+                        Track Order
+                    </a>
+                    <a href="#" class="bg-transparent border border-purple-500 text-purple-400 hover:bg-purple-900 hover:bg-opacity-30 font-medium py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 text-center">
+                        Continue Shopping
+                    </a>
+                </div>
+                
+                <!-- Decorative elements -->
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-600 opacity-10 rounded-full"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-600 opacity-10 rounded-full"></div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer (black as mentioned) -->
+    <footer class="bg-black text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Your Brand</h3>
+                    <p class="text-gray-400">Premium products for our valued customers.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-purple-400 transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-purple-400 transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-purple-400 transition">FAQs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Customer Support</h3>
+                    <p class="text-gray-400">support@yourbrand.com</p>
+                    <p class="text-gray-400">+1 (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-800 text-center text-gray-500">
+                <p>&copy; 2025 Your Brand. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#9333ea', '#ec4899', '#4f46e5', '#06b6d4', '#14b8a6'];
+            const confettiContainer = document.body;
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = -20 + 'px';
+                confettiContainer.appendChild(confetti);
+                
+                // Animate each confetti piece
+                gsap.to(confetti, {
+                    y: '100vh',
+                    x: (Math.random() - 0.5) * 400,
+                    rotation: Math.random() * 360,
+                    duration: 1.5 + Math.random() * 3,
+                    ease: 'power1.out',
+                    opacity: 1,
+                    onComplete: () => {
+                        confetti.remove();
+                    },
+                    delay: Math.random()
+                });
+            }
+        }
+        
+        // Run animation when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(createConfetti, 500);
+        });
+    </script>
+</body>
+</html>

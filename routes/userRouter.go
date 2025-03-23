@@ -32,8 +32,8 @@ func UserRouter(r *gin.Engine) {
 	r.GET("/products/details/:id", controllers.ShowProductDetail)
 	r.GET("/products/filter", controllers.FilterProducts)
 	r.POST("/checkout/payment/verify", middleware.AuthMiddleware(RoleUser), controllers.VerifyRazorpayPayment)
-	r.GET("/order/success", middleware.AuthMiddleware(RoleUser), controllers.ShowSuccessPage)
 	r.POST("/order/failed", middleware.AuthMiddleware(RoleUser), controllers.PaymentFailureHandler)
+	r.GET("/contactUs", controllers.ShowContactUs)
 
 	userProfile := r.Group("/profile")
 	userProfile.Use(middleware.AuthMiddleware(RoleUser))
@@ -88,7 +88,7 @@ func UserRouter(r *gin.Engine) {
 		checkout.POST("/payment/proceed", controllers.ProceedToPayment)
 		checkout.POST("/check/coupon", controllers.CheckCoupon)
 		checkout.GET("/check/wallet/balance", controllers.FetchWalletBalance)
-		checkout.POST("/redeem/gift/code",controllers.RedeemGiftCard)
+		checkout.POST("/redeem/gift/code", controllers.RedeemGiftCard)
 	}
 
 	wishlist := r.Group("/wishlist")

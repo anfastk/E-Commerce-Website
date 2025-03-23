@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAPTIX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("5mn8HfdjAXX956IqN");
+        })();
+    </script>
+</head>
+
+<body class="bg-white">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <div class="bg-black py-4 sticky top-0 z-50 ">
+            <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+                <div class="flex justify-between items-center py-2">
+                    <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
+    
+                    <!-- Desktop Navigation -->
+                    <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                        <a href="/" class="hover:text-gray-600">Home</a>
+                        <a href="/products" class="hover:text-gray-600">Shop</a>
+                        <a href="/contactUs" class="hover:text-gray-600">Contact</a>
+                    </nav>
+    
+                    <!-- Icons Section -->
+                    <div class="hidden lg:flex items-center space-x-8">
+                        <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" viewBox="0 0 24 24">
+                                    <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2.5"
+                                        d="m21 21l-4.343-4.343m0 0A8 8 0 1 0 5.343 5.343a8 8 0 0 0 11.314 11.314" />
+                                </svg></button></a>
+                        <a href="/cart">
+                            <button class="hover:text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256">
+                                    <path fill="#000"
+                                        d="M241.55 64.74A12 12 0 0 0 232 60H60.23l-8.67-31.21A12 12 0 0 0 40 20H20a12 12 0 0 0 0 24h10.88l34.3 123.49a28.09 28.09 0 0 0 27 20.51H191a28.09 28.09 0 0 0 27-20.51l25.63-92.28a12 12 0 0 0-2.08-10.47m-46.75 96.33A4 4 0 0 1 191 164H92.16a4 4 0 0 1-3.85-2.93L66.9 84h149.31ZM108 220a20 20 0 1 1-20-20a20 20 0 0 1 20 20m104 0a20 20 0 1 1-20-20a20 20 0 0 1 20 20" />
+                                </svg>
+                            </button>
+                        </a>
+                        <a href="/wishlist">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
+                            </svg>
+                        </a>
+                        <a href="/profile"><button class="hover:text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path fill="#000"
+                                        d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
+                                </svg>
+                            </button>
+    
+                        </a>
+    
+                    </div>
+    
+                    <!-- Mobile Menu Button -->
+                    <button class="lg:hidden" onclick="toggleMobileMenu()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+    
+                <!-- Mobile Navigation -->
+                <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
+                    <nav class="flex flex-col space-y-4 text-md font-medium">
+                        <a href="/" class="hover:text-gray-600">Home</a>
+                        <a href="/products" class="hover:text-gray-600">Shop</a>
+                        <a href="/contactUs" class="hover:text-gray-600">Contact</a>
+                        <a href="/cart" class="hover:text-gray-600">Cart</a>
+                        <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
+                        <a href="/profile" class="hover:text-gray-600">Profile</a>
+    
+                    </nav>
+                </div>
+            </header>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="bg-gray-50 py-16">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-black mb-4">Get In Touch</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto">We're here to help and answer any questions you might have.
+                    We look forward to hearing from you.</p>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Contact Information -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-black mb-6">Contact Information</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="bg-black text-white p-3 rounded-full">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg">Our Location</h3>
+                                    <p class="text-gray-600">123 Commerce Street, Business City, 12345</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="bg-black text-white p-3 rounded-full">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg">Phone Number</h3>
+                                    <p class="text-gray-600">(123) 456-7890</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="bg-black text-white p-3 rounded-full">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg">Email Address</h3>
+                                    <p class="text-gray-600">laptixinfo@gmial.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="bg-black text-white p-3 rounded-full">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg">Working Hours</h3>
+                                    <p class="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
+                                    <p class="text-gray-600">Saturday: 10:00 AM - 4:00 PM</p>
+                                    <p class="text-gray-600">Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-black mb-6">Connect With Us</h2>
+                        <div class="flex space-x-4">
+                            <a href="#" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="bg-black text-white p-3 rounded-full hover:bg-gray-800 transition">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form with EmailJS -->
+                <div class="bg-gray-50 p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-black mb-6">Send Us a Message</h2>
+
+                    <form id="contactForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                                <input type="text" id="name" name="name" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Your
+                                    Email</label>
+                                <input type="email" id="email" name="email" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <input type="text" id="subject" name="subject" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Your
+                                Message</label>
+                            <textarea id="message" name="message" rows="5" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"></textarea>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" id="privacy" name="privacy" required
+                                class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
+                            <label for="privacy" class="ml-2 block text-sm text-gray-700">
+                                I agree to the <a href="/privacy-policy" class="text-black underline">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div>
+                            <button type="submit"
+                                class="w-full bg-black text-white py-3 px-6 rounded-md hover:bg-gray-800 transition transform hover:scale-105 duration-200 flex items-center justify-center">
+                                <span>Send Message</span>
+                                <i class="fas fa-paper-plane ml-2"></i>
+                            </button>
+                        </div>
+
+                        <div id="formStatus" class="text-center hidden">
+                            <p id="statusMessage" class="text-green-600">Thank you! Your message has been sent
+                                successfully.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Map Section -->
+        <section class="py-12 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-2xl font-bold text-black mb-8 text-center">Find Us On The Map</h2>
+                <div class="h-96 bg-gray-200 rounded-lg overflow-hidden">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3914.4727375658204!2d75.88980567406003!3d11.152591589020009!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba6502f41ef4e8b%3A0xf4c653a7548cccd!2sKinfra%20Techno%20Industrial%20Park!5e0!3m2!1sen!2sin!4v1742717206155!5m2!1sen!2sin"
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-12">
+            <div class="container mx-auto px-6">
+                <h2 class="text-2xl font-bold text-black mb-8 text-center">Frequently Asked Questions</h2>
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="border border-gray-200 rounded-lg">
+                        <button class="flex justify-between items-center w-full px-6 py-4 text-left"
+                            onclick="toggleFAQ(this)">
+                            <span class="font-medium">What are your shipping rates?</span>
+                            <i class="fas fa-chevron-down text-black transition-transform"></i>
+                        </button>
+                        <div class="px-6 pb-4 hidden">
+                            <p class="text-gray-600">We offer free shipping on all orders over &#8377;1000. For orders under
+                                &#8377;100.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg">
+                        <button class="flex justify-between items-center w-full px-6 py-4 text-left"
+                            onclick="toggleFAQ(this)">
+                            <span class="font-medium">What is your return policy?</span>
+                            <i class="fas fa-chevron-down text-black transition-transform"></i>
+                        </button>
+                        <div class="px-6 pb-4 hidden">
+                            <p class="text-gray-600">We offer a 7-day return policy. If you're not satisfied with your
+                                purchase, you can return it within 7 days for a full refund. Items must be in their
+                                original condition with tags attached.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg">
+                        <button class="flex justify-between items-center w-full px-6 py-4 text-left"
+                            onclick="toggleFAQ(this)">
+                            <span class="font-medium">How can I track my order?</span>
+                            <i class="fas fa-chevron-down text-black transition-transform"></i>
+                        </button>
+                        <div class="px-6 pb-4 hidden">
+                            <p class="text-gray-600">Once your order ships, you will receive a confirmation email with a
+                                tracking number. You can use this tracking number on our website or the carrier's
+                                website to track your package.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg">
+                        <button class="flex justify-between items-center w-full px-6 py-4 text-left"
+                            onclick="toggleFAQ(this)">
+                            <span class="font-medium">Do you ship internationally?</span>
+                            <i class="fas fa-chevron-down text-black transition-transform"></i>
+                        </button>
+                        <div class="px-6 pb-4 hidden">
+                            <p class="text-gray-600">Yes, we ship to most countries worldwide. International shipping
+                                rates and delivery times vary depending on the destination. Please note that
+                                international orders may be subject to customs duties and taxes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-black text-white py-12">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 logo-font">LAPTIX</h2>
+                        <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
+                            with
+                            our exclusive collections and latest laptops.</p>
+                        <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
+                        <div class="flex space-x-4">
+                            <a href="#" class="hover:text-gray-400">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="hover:text-gray-400">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="hover:text-gray-400">
+                                <i class="fab fa-x"></i>
+                            </a>
+                            <a href="#" class="hover:text-gray-400">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Links</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="/" class="hover:text-gray-400">Home</a></li>
+                            <li><a href="/product" class="hover:text-gray-400">Shop</a></li>
+                            <li><a href="#" class="hover:text-gray-400">About</a></li>
+                            <li><a href="/contactUs" class="hover:text-gray-400">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Help</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" class="hover:text-gray-400">Payment Options</a></li>
+                            <li><a href="#" class="hover:text-gray-400">Returns</a></li>
+                            <li><a href="#" class="hover:text-gray-400">Privacy Policies</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                            <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                            <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                            <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                            <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                            <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                            <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                            <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                            <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                            <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                            <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                            <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
+                    <p>© 2025 LAPTIX, Inc</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuButton').addEventListener('click', function () {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // FAQ toggle
+        function toggleFAQ(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // Form submission handling with EmailJS
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const formStatus = document.getElementById('formStatus');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Prepare email parameters
+            const templateParams = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+
+            // Send email using EmailJS
+            emailjs.send('service_pdk9fsj', 'template_dhcy60z', templateParams)
+                .then(function (response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    statusMessage.textContent = 'Thank you! Your message has been sent successfully.';
+                    statusMessage.classList.remove('text-red-600');
+                    statusMessage.classList.add('text-green-600');
+                    formStatus.classList.remove('hidden');
+                    document.getElementById('contactForm').reset(); // Reset form
+                }, function (error) {
+                    console.log('FAILED...', error);
+                    statusMessage.textContent = 'Sorry, there was an error sending your message. Please try again later.';
+                    statusMessage.classList.remove('text-green-600');
+                    statusMessage.classList.add('text-red-600');
+                    formStatus.classList.remove('hidden');
+                });
+        });
+    </script>
+</body>
+
+</html>

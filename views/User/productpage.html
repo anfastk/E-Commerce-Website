@@ -137,15 +137,19 @@
 <body class="bg-gray-100">
 
     <!-- Header Section -->
-    <div class="bg-black py-4 sticky top-0 z-50">
+    <div class="bg-black py-4 sticky top-0 z-50 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium">
+
+                <!-- Desktop Navigation -->
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
-                    <a href="#" class="hover:text-gray-600">Contact</a>
+                    <a href="/contactUs" class="hover:text-gray-600">Contact</a>
                 </nav>
+
+                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
@@ -167,8 +171,7 @@
                                 stroke-width="2" d="M12 7.694C10 3 3 3.5 3 9.5s9 11 9 11s9-5 9-11s-7-6.5-9-1.806" />
                         </svg>
                     </a>
-                    <a href="/profile">
-                        <button class="hover:text-gray-600">
+                    <a href="/profile"><button class="hover:text-gray-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="#000"
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
@@ -176,6 +179,8 @@
                         </button>
                     </a>
                 </div>
+
+                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -183,11 +188,16 @@
                     </svg>
                 </button>
             </div>
+
+            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
-                    <a href="#" class="hover:text-gray-600">Contact</a>
+                    <a href="/contactUs" class="hover:text-gray-600">Contact</a>
+                    <a href="/cart" class="hover:text-gray-600">Cart</a>
+                    <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
+                    <a href="/profile" class="hover:text-gray-600">Profile</a>
                 </nav>
             </div>
         </header>
@@ -279,8 +289,8 @@
 
         <!-- Sort/Filter Bar for Small Screens -->
         <div class="block lg:hidden">
-            <div class="flex justify-between items-center bg-white rounded-lg shadow-md p-4 sticky">
-                <button onclick="toggleFilterPopup()" class="flex items-center space-x-2">
+            <div class="flex justify-between items-center bg-white rounded-lg shadow-md p-4 sticky top-20 z-10">
+                <button onclick="toggleSortPopup()" class="flex items-center space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M3 12h18m-7 8h7" />
@@ -297,10 +307,36 @@
             </div>
         </div>
 
-        <!-- Filter Popup -->
-        <div id="filter-popup"
-            class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6">
+        <!-- Sort Popup for Small Screens -->
+        <div id="sort-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6 max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Sort By</h2>
+                    <button onclick="toggleSortPopup()" class="text-gray-600 hover:text-black">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <ul class="space-y-2">
+                    <li><input type="radio" name="sort" value="relevance" id="sm-relevance" onchange="checkFilters()" />
+                        <label for="sm-relevance">Relevance</label></li>
+                    <li><input type="radio" name="sort" value="price-low" id="sm-price-low" onchange="checkFilters()" />
+                        <label for="sm-price-low">Price – Low to High</label></li>
+                    <li><input type="radio" name="sort" value="price-high" id="sm-price-high" onchange="checkFilters()" />
+                        <label for="sm-price-high">Price – High to Low</label></li>
+                    <li><input type="radio" name="sort" value="newest" id="sm-newest" onchange="checkFilters()" /> <label
+                            for="sm-newest">Newest First</label></li>
+                </ul>
+                <button onclick="toggleSortPopup()" class="mt-6 w-full bg-black text-white py-2 rounded-lg">Apply
+                    Sort</button>
+            </div>
+        </div>
+
+        <!-- Filter Popup for Small Screens -->
+        <div id="filter-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6 max-h-[80vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold">Filter Options</h2>
                     <button onclick="toggleFilterPopup()" class="text-gray-600 hover:text-black">
@@ -310,26 +346,50 @@
                         </svg>
                     </button>
                 </div>
-                <h2 class="text-lg font-semibold mb-4">Sort by</h2>
-                <ul class="space-y-2">
-                    <li><input type="checkbox" /> Relevance</li>
-                    <li><input type="checkbox" /> Popularity</li>
-                    <li><input type="checkbox" /> Price – Low to High</li>
-                    <li><input type="checkbox" /> Price – High to Low</li>
-                    <li><input type="checkbox" /> Newest First</li>
-                </ul>
                 <h2 class="text-lg font-semibold mt-6 mb-4">Categories</h2>
                 <ul class="space-y-2">
-                    <li><input type="checkbox" /> Lorem Ipsum (3)</li>
-                    <li><input type="checkbox" /> Lorem Ipsum (3)</li>
-                    <li><input type="checkbox" /> Lorem Ipsum (3)</li>
+                    {{range .Category}}
+                    <li><input type="checkbox" id="sm-cat-{{.}}" onchange="checkFilters()" /> <label
+                            for="sm-cat-{{.}}">{{.}}</label></li>
+                    {{end}}
                 </ul>
                 <h2 class="text-lg font-semibold mt-6 mb-4">Price Range</h2>
                 <ul class="space-y-2">
-                    <li><input type="checkbox" /> $20.00 - $50.00</li>
-                    <li><input type="checkbox" /> $50.00 - $100.00</li>
+                    <li><input type="checkbox" id="sm-price-1" onchange="checkFilters()" /> <label for="sm-price-1">₹1000
+                            - ₹50000+</label></li>
+                    <li><input type="checkbox" id="sm-price-2" onchange="checkFilters()" /> <label
+                            for="sm-price-2">₹50000 - ₹100000+</label></li>
+                    <li><input type="checkbox" id="sm-price-3" onchange="checkFilters()" /> <label
+                            for="sm-price-3">₹100000 - ₹500000+</label></li>
                 </ul>
-                <button onclick="toggleFilterPopup()" class="mt-4 w-full bg-black text-white py-2 rounded-lg">Apply
+                <h2 class="text-lg font-semibold mt-6 mb-4">Discount</h2>
+                <ul class="space-y-2">
+                    <li><input type="checkbox" id="sm-disc-10" onchange="checkFilters()" /> <label for="sm-disc-10">10%
+                            Off or more</label></li>
+                    <li><input type="checkbox" id="sm-disc-25" onchange="checkFilters()" /> <label for="sm-disc-25">25%
+                            Off or more</label></li>
+                    <li><input type="checkbox" id="sm-disc-35" onchange="checkFilters()" /> <label for="sm-disc-35">35%
+                            Off or more</label></li>
+                    <li><input type="checkbox" id="sm-disc-50" onchange="checkFilters()" /> <label for="sm-disc-50">50%
+                            Off or more</label></li>
+                    <li><input type="checkbox" id="sm-disc-60" onchange="checkFilters()" /> <label for="sm-disc-60">60%
+                            Off or more</label></li>
+                    <li><input type="checkbox" id="sm-disc-75" onchange="checkFilters()" /> <label for="sm-disc-75">75%
+                            Off or more</label></li>
+                </ul>
+                <h2 class="text-lg font-semibold mt-6 mb-4">Availability</h2>
+                <ul class="space-y-2">
+                    <li><input type="checkbox" id="sm-stock" onchange="checkFilters()" /> <label for="sm-stock">Include
+                            Out of Stock</label></li>
+                </ul>
+                <h2 class="text-lg font-semibold mt-6 mb-4">Brand Name</h2>
+                <ul class="space-y-2">
+                    {{range .Brand}}
+                    <li><input type="checkbox" id="sm-brand-{{.}}" onchange="checkFilters()" /> <label
+                            for="sm-brand-{{.}}">{{.}}</label></li>
+                    {{end}}
+                </ul>
+                <button onclick="toggleFilterPopup()" class="mt-6 w-full bg-black text-white py-2 rounded-lg">Apply
                     Filters</button>
             </div>
         </div>
@@ -347,7 +407,9 @@
                             <div
                                 class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 to-transparent">
                             </div>
-                            <div class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border"></div>
+                            <div
+                                class="absolute inset-0 border-2 border-white/30 opacity-0 animate-pulse-border">
+                            </div>
                         </div>
                         <button
                             class="wishlist-btn absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md transform transition-all duration-300 hover:scale-110 {{if .IsInWishlist}}active{{end}}"
@@ -459,7 +521,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <h2 class="text-2xl font-bold mb-4 logo-font">LAPTIX</h2>
-                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
+                        with
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
@@ -480,10 +543,10 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Links</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-gray-400">Home</a></li>
-                        <li><a href="#" class="hover:text-gray-400">Shop</a></li>
+                        <li><a href="/" class="hover:text-gray-400">Home</a></li>
+                        <li><a href="/product" class="hover:text-gray-400">Shop</a></li>
                         <li><a href="#" class="hover:text-gray-400">About</a></li>
-                        <li><a href="#" class="hover:text-gray-400">Contact</a></li>
+                        <li><a href="/contactUs" class="hover:text-gray-400">Contact</a></li>
                     </ul>
                 </div>
                 <div>
@@ -497,19 +560,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Dell Laptop</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mac Book</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span>
-                        <span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -586,19 +660,77 @@
             return params.toString();
         }
 
+        function toggleSortPopup() {
+            const sortPopup = document.getElementById('sort-popup');
+            sortPopup.classList.toggle('hidden');
+            syncSortOptions();
+        }
+
+        function toggleFilterPopup() {
+            const filterPopup = document.getElementById('filter-popup');
+            filterPopup.classList.toggle('hidden');
+            syncFilterOptions();
+        }
+
+        function syncSortOptions() {
+            const desktopSort = document.querySelector('input[name="sort"]:checked');
+            const mobileSortInputs = document.querySelectorAll('#sort-popup input[name="sort"]');
+            mobileSortInputs.forEach(input => {
+                input.checked = desktopSort && input.value === desktopSort.value;
+            });
+        }
+
+        function syncFilterOptions() {
+            // Sync Categories
+            document.querySelectorAll('input[id^="cat-"]:checked').forEach(desktopInput => {
+                const id = desktopInput.id.replace('cat-', 'sm-cat-');
+                const mobileInput = document.getElementById(id);
+                if (mobileInput) mobileInput.checked = true;
+            });
+
+            // Sync Price Ranges
+            document.querySelectorAll('input[id^="price-"]:checked').forEach(desktopInput => {
+                const id = desktopInput.id.replace('price-', 'sm-price-');
+                const mobileInput = document.getElementById(id);
+                if (mobileInput) mobileInput.checked = true;
+            });
+
+            // Sync Discounts
+            document.querySelectorAll('input[id^="disc-"]:checked').forEach(desktopInput => {
+                const id = desktopInput.id.replace('disc-', 'sm-disc-');
+                const mobileInput = document.getElementById(id);
+                if (mobileInput) mobileInput.checked = true;
+            });
+
+            // Sync Availability
+            const desktopStock = document.getElementById('stock');
+            const mobileStock = document.getElementById('sm-stock');
+            if (mobileStock) mobileStock.checked = desktopStock.checked;
+
+            // Sync Brands
+            document.querySelectorAll('input[id^="brand-"]:checked').forEach(desktopInput => {
+                const id = desktopInput.id.replace('brand-', 'sm-brand-');
+                const mobileInput = document.getElementById(id);
+                if (mobileInput) mobileInput.checked = true;
+            });
+        }
+
         function checkFilters() {
             const clearFilterBtn = document.getElementById('clearFilterBtn');
             const selectedSort = document.querySelector('input[name="sort"]:checked');
             currentFilters.sort = selectedSort ? selectedSort.value : '';
-            currentFilters.categories = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
-                .map(cb => cb.id.replace('cat-', ''));
-            currentFilters.priceRanges = Array.from(document.querySelectorAll('input[id^="price-"]:checked'))
-                .map(cb => cb.id.replace('price-', ''));
-            currentFilters.discounts = Array.from(document.querySelectorAll('input[id^="disc-"]:checked'))
-                .map(cb => parseInt(cb.id.replace('disc-', '')));
-            currentFilters.brands = Array.from(document.querySelectorAll('input[id^="brand-"]:checked'))
-                .map(cb => cb.id.replace('brand-', ''));
-            currentFilters.includeOutOfStock = document.getElementById('stock').checked;
+
+            // Check both desktop and mobile filters
+            currentFilters.categories = Array.from(document.querySelectorAll('input[id^="cat-"]:checked, input[id^="sm-cat-"]:checked'))
+                .map(cb => cb.id.replace(/^(cat-|sm-cat-)/, ''));
+            currentFilters.priceRanges = Array.from(document.querySelectorAll('input[id^="price-"]:checked, input[id^="sm-price-"]:checked'))
+                .map(cb => cb.id.replace(/^(price-|sm-price-)/, ''));
+            currentFilters.discounts = Array.from(document.querySelectorAll('input[id^="disc-"]:checked, input[id^="sm-disc-"]:checked'))
+                .map(cb => parseInt(cb.id.replace(/^(disc-|sm-disc-)/, '')));
+            currentFilters.brands = Array.from(document.querySelectorAll('input[id^="brand-"]:checked, input[id^="sm-brand-"]:checked'))
+                .map(cb => cb.id.replace(/^(brand-|sm-brand-)/, ''));
+            currentFilters.includeOutOfStock = document.getElementById('stock').checked || document.getElementById('sm-stock').checked;
+
             const anyFilterSelected = Object.values(currentFilters).some(val =>
                 Array.isArray(val) ? val.length > 0 : Boolean(val)
             );
@@ -748,7 +880,7 @@
 
         function attachCartListeners() {
             document.querySelectorAll('.cart-btn').forEach(button => {
-                button.removeEventListener('click', handleCartClick); // Remove existing listeners to prevent duplicates
+                button.removeEventListener('click', handleCartClick);
                 button.addEventListener('click', handleCartClick);
             });
         }
@@ -756,7 +888,7 @@
         function handleCartClick(e) {
             const button = e.currentTarget;
             if (button.getAttribute('data-in-cart') === 'true') {
-                return; // Let the link to /cart work normally
+                return;
             }
             e.preventDefault();
             const productId = button.getAttribute('data-id');
@@ -794,7 +926,7 @@
             document.querySelectorAll('.wishlist-btn').forEach(button => {
                 button.addEventListener('click', async function (e) {
                     e.preventDefault();
-                    e.stopPropagation(); // Prevent card click
+                    e.stopPropagation();
 
                     const productId = this.getAttribute('data-id');
                     const isInWishlist = this.getAttribute('data-in-wishlist') === 'true';
@@ -880,6 +1012,8 @@
             }
             attachCartListeners();
             attachWishlistListeners();
+            syncSortOptions();
+            syncFilterOptions();
         });
 
         window.onpopstate = function () {
@@ -889,11 +1023,6 @@
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
-        }
-
-        function toggleFilterPopup() {
-            const filterPopup = document.getElementById('filter-popup');
-            filterPopup.classList.toggle('hidden');
         }
     </script>
     <script src="/static/js/toastMain.js"></script>
