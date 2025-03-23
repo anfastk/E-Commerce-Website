@@ -284,7 +284,7 @@ const giftCardTemplate = `<!DOCTYPE html>
             <div class="gift-card-message">
                 Thank you for being an amazing friend. Here's a gift card to show my appreciation!
             </div>
-            <div class="amount">%AMOUNT%</div>
+            <div class="amount">&#8377;%AMOUNT%</div>
             
             <div class="gift-card-code-container">
                 <div class="gift-card-code">%GIFT_CODE%</div>

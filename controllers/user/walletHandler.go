@@ -366,8 +366,14 @@ func SendGiftCard(c *gin.Context) {
 
 	if walletDetails.Balance < float64(Details.Amount) {
 		tx.Rollback()
-		logger.Log.Error("Wallet Balance Is Lessthan Entered Amount")
-		helper.RespondWithError(c, http.StatusBadRequest, "Wallet Balance Is Lessthan Entered Amount", "Wallet Balance Is Lessthan Entered Amount", "")
+		logger.Log.Error("Insufficient wallet balance!")
+		helper.RespondWithError(c, http.StatusBadRequest, "Insufficient wallet balance!", "Insufficient wallet balance! Please add funds to your wallet to proceed with the gift card transaction.", "")
+		return
+	}
+
+	if Details.Amount > 50000 {
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusBadRequest, "can only send a maximum of ₹50,000.", "Transaction limit exceeded! You can only send up to ₹50,000 at a time.", "")
 		return
 	}
 
@@ -397,7 +403,7 @@ func SendGiftCard(c *gin.Context) {
 	}
 	formattedExpDate := data.ExpDate.Format("January 02, 2006")
 	giftCardValueStr := fmt.Sprintf("%.2f", data.GiftCardValue)
-	if err := utils.SendGiftCardToEmail(data.RecipientName, userDetails.ProfilePic, data.Message, data.RecipientEmail, giftCardValueStr, GiftCode, formattedExpDate); err != nil {
+	if err := utils.SendGiftCardToEmail(userDetails.FullName, userDetails.ProfilePic, data.Message, data.RecipientEmail, giftCardValueStr, GiftCode, formattedExpDate); err != nil {
 		logger.Log.Error("Failed to send gift card to email",
 			zap.String("email", data.RecipientEmail),
 			zap.Error(err))
@@ -547,10 +553,11 @@ func RedeemGiftCard(c *gin.Context) {
 		return
 	}
 	tx.Commit()
+	message := fmt.Sprintf("₹%.2f has been successfully added to your gift card balance!", giftCardDetails.GiftCardValue)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "Success",
-		"message": "Gift Card Redeemed Successfully",
+		"message": message,
 		"Code":    http.StatusOK,
 	})
 }

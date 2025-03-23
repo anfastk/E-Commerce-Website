@@ -151,11 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Apply gift card functionality
+    // Apply gift card functionality
     applyButton.addEventListener('click', function () {
         const giftCardCode = giftCardInput.value.trim();
+        const responseDiv = document.getElementById('gift-card-response');
+
+        // Clear previous message
+        responseDiv.classList.remove('text-green-600', 'text-red-600');
+        responseDiv.classList.add('hidden');
+        responseDiv.textContent = '';
 
         if (!giftCardCode) {
-            showErrorToast('Please enter a gift card code');
+            responseDiv.textContent = 'Please enter a gift card code';
+            responseDiv.classList.add('text-red-600', 'block');
+            responseDiv.classList.remove('hidden');
             return;
         }
 
@@ -181,7 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 // Show success message
-                showSuccessToast(data.message || 'Gift card applied successfully');
+                responseDiv.textContent = data.message || 'Gift card applied successfully';
+                responseDiv.classList.add('text-green-600', 'block');
+                responseDiv.classList.remove('hidden');
 
                 // Clear input field
                 giftCardInput.value = '';
@@ -190,7 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetchWalletBalance();
             })
             .catch(error => {
-                showErrorToast(error.message || 'Failed to apply gift card');
+                responseDiv.textContent = error.message || 'Failed to apply gift card';
+                responseDiv.classList.add('text-red-600', 'block');
+                responseDiv.classList.remove('hidden');
             })
             .finally(() => {
                 // Reset button state

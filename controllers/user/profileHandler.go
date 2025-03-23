@@ -73,7 +73,7 @@ func ProfileUpdate(c *gin.Context) {
 	tx := config.DB.Begin()
 
 	if err := tx.Model(&authDetails).Where("id = ? ", userID).Updates(map[string]interface{}{
-		"full_name": userUpdate.FullName,
+		"full_name": strings.ToUpper(userUpdate.FullName),
 		"email":     userUpdate.Email,
 	}).Error; err != nil {
 		logger.Log.Error("Failed to update user auth details",

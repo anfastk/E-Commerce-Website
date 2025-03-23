@@ -120,7 +120,7 @@ func VerifyOtp(c *gin.Context) {
 		referralCode := helper.GenerateReferralCode()
 
 		userAuth = models.UserAuth{
-			FullName:     fullName,
+			FullName:     strings.ToUpper(fullName),
 			Email:        otpInput.Email,
 			Password:     hashedPassword,
 			ProfilePic:   os.Getenv("DEFAULT_PROFILE_PIC"),

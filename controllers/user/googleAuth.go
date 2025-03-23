@@ -105,7 +105,7 @@ func HandleGoogleCallback(c *gin.Context) {
 
 		referralCode := helper.GenerateReferralCode()
 		user = models.UserAuth{
-			FullName:     googleUser.Name,
+			FullName:     strings.ToUpper(googleUser.Name),
 			Email:        googleUser.Email,
 			Password:     "",
 			GoogleID:     googleUser.Email,

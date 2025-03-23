@@ -1,236 +1,250 @@
  /* Animation styles */
  .payment-option {
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
+     transition: all 0.3s ease;
+     border: 2px solid transparent;
+     position: relative;
+     overflow: hidden;
+ }
 
-.payment-option:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+ .payment-option:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+ }
 
-.payment-option.selected {
-    background-color: #EEF2FF;
-    border-color: #4F46E5;
-}
+ .payment-option.selected {
+     background-color: #EEF2FF;
+     border-color: #4F46E5;
+ }
 
-.payment-option.selected::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 4px;
-    background-color: #4F46E5;
-}
+ .payment-option.selected::before {
+     content: '';
+     position: absolute;
+     left: 0;
+     top: 0;
+     height: 100%;
+     width: 4px;
+     background-color: #4F46E5;
+ }
 
-.payment-option.selected .payment-title {
-    color: #4338CA;
-    font-weight: 600;
-}
+ .payment-option.selected .payment-title {
+     color: #4338CA;
+     font-weight: 600;
+ }
 
-.wallet-input {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out;
-    opacity: 0;
-    transform: translateY(-10px);
-}
+ .wallet-input {
+     max-height: 0;
+     overflow: hidden;
+     transition: max-height 0.3s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out;
+     opacity: 0;
+     transform: translateY(-10px);
+ }
 
-.wallet-input.active {
-    max-height: 200px;
-    opacity: 1;
-    transform: translateY(0);
-    transition: max-height 0.5s ease-in, opacity 0.3s ease-in, transform 0.3s ease-in;
-}
+ .wallet-input.active {
+     max-height: 200px;
+     opacity: 1;
+     transform: translateY(0);
+     transition: max-height 0.5s ease-in, opacity 0.3s ease-in, transform 0.3s ease-in;
+ }
 
-/* Custom radio styles */
-.custom-radio {
-    position: relative;
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #d1d5db;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
+ /* Custom radio styles */
+ .custom-radio {
+     position: relative;
+     display: inline-block;
+     width: 20px;
+     height: 20px;
+     border-radius: 50%;
+     border: 2px solid #d1d5db;
+     transition: all 0.2s ease;
+     flex-shrink: 0;
+ }
 
-.custom-radio.selected {
-    border-color: #4F46E5;
-    border-width: 6px;
-}
+ .custom-radio.selected {
+     border-color: #4F46E5;
+     border-width: 6px;
+ }
 
-/* Pulse animation for selection */
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
-    }
+ /* Pulse animation for selection */
+ @keyframes pulse {
+     0% {
+         box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+     }
 
-    70% {
-        box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
-    }
+     70% {
+         box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+     }
 
-    100% {
-        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
-    }
-}
+     100% {
+         box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+     }
+ }
 
-.payment-option.just-selected .custom-radio {
-    animation: pulse 0.8s 1;
-}
+ .payment-option.just-selected .custom-radio {
+     animation: pulse 0.8s 1;
+ }
 
-/* Button styles */
-.apply-btn {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
+ /* Button styles */
+ .apply-btn {
+     transition: all 0.3s ease;
+     position: relative;
+     overflow: hidden;
+ }
 
-.apply-btn:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-}
+ .apply-btn:after {
+     content: '';
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     width: 5px;
+     height: 5px;
+     background: rgba(255, 255, 255, 0.5);
+     opacity: 0;
+     border-radius: 100%;
+     transform: scale(1, 1) translate(-50%);
+     transform-origin: 50% 50%;
+ }
 
-.apply-btn:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
-}
+ .apply-btn:focus:not(:active)::after {
+     animation: ripple 1s ease-out;
+ }
 
-/* Disabled payment option styling */
-.payment-option.disabled {
-    position: relative;
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    opacity: 0.75;
-    cursor: not-allowed !important;
-    overflow: hidden;
-}
+ /* Disabled payment option styling */
+ .payment-option.disabled {
+     position: relative;
+     background-color: #f9fafb;
+     border: 1px solid #e5e7eb;
+     opacity: 0.75;
+     cursor: not-allowed !important;
+     overflow: hidden;
+ }
 
-/* Diagonal striped overlay */
-.payment-option.disabled::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: repeating-linear-gradient(-45deg,
-            transparent,
-            transparent 10px,
-            rgba(243, 244, 246, 0.8) 10px,
-            rgba(243, 244, 246, 0.8) 20px);
-    pointer-events: none;
-}
+ /* Diagonal striped overlay */
+ .payment-option.disabled::after {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-image: repeating-linear-gradient(-45deg,
+             transparent,
+             transparent 10px,
+             rgba(243, 244, 246, 0.8) 10px,
+             rgba(243, 244, 246, 0.8) 20px);
+     pointer-events: none;
+ }
 
-/* Red diagonal "Unavailable" banner */
-.payment-option.disabled::before {
-    content: 'Unavailable';
-    position: absolute;
-    background-color: rgba(239, 68, 68, 0.8);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.5;
-    width: 120px;
-    top: 15px;
-    right: -30px;
-    transform: rotate(45deg);
-    z-index: 2;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+ /* Red diagonal "Unavailable" banner */
+ .payment-option.disabled::before {
+     content: 'Unavailable';
+     position: absolute;
+     background-color: rgba(239, 68, 68, 0.8);
+     color: white;
+     font-size: 0.7rem;
+     font-weight: 600;
+     text-align: center;
+     line-height: 1.5;
+     width: 120px;
+     top: 15px;
+     right: -30px;
+     transform: rotate(45deg);
+     z-index: 2;
+     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+ }
 
-/* Icon greying within disabled option */
-.payment-option.disabled .payment-title {
-    color: #9ca3af;
-}
+ /* Icon greying within disabled option */
+ .payment-option.disabled .payment-title {
+     color: #9ca3af;
+ }
 
-.payment-option.disabled i,
-.payment-option.disabled svg {
-    opacity: 0.5;
-}
+ .payment-option.disabled i,
+ .payment-option.disabled svg {
+     opacity: 0.5;
+ }
 
-/* Custom tooltip on hover */
-.payment-option.disabled {
-    transition: all 0.3s ease;
-}
+ /* Custom tooltip on hover */
+ .payment-option.disabled {
+     transition: all 0.3s ease;
+ }
 
-.payment-option.disabled:hover .disabled-tooltip {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-}
+ .payment-option.disabled:hover .disabled-tooltip {
+     opacity: 1;
+     transform: translateY(0);
+     visibility: visible;
+ }
 
-.disabled-tooltip {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background-color: #1f2937;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 10;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+ .disabled-tooltip {
+     position: absolute;
+     bottom: calc(100% + 8px);
+     left: 50%;
+     transform: translateX(-50%) translateY(10px);
+     background-color: #1f2937;
+     color: white;
+     padding: 8px 12px;
+     border-radius: 6px;
+     font-size: 0.75rem;
+     white-space: nowrap;
+     opacity: 0;
+     visibility: hidden;
+     transition: all 0.3s ease;
+     z-index: 10;
+     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+ }
 
-.disabled-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -6px;
-    border-width: 6px;
-    border-style: solid;
-    border-color: #1f2937 transparent transparent transparent;
-}
+ .disabled-tooltip::after {
+     content: '';
+     position: absolute;
+     top: 100%;
+     left: 50%;
+     margin-left: -6px;
+     border-width: 6px;
+     border-style: solid;
+     border-color: #1f2937 transparent transparent transparent;
+ }
 
-/* Accessibility focus indicator */
-.payment-option.disabled:focus-visible {
-    outline: 2px solid #d1d5db;
-    outline-offset: 2px;
-}
+ /* Accessibility focus indicator */
+ .payment-option.disabled:focus-visible {
+     outline: 2px solid #d1d5db;
+     outline-offset: 2px;
+ }
 
-/* Shake animation when clicking on disabled option */
-@keyframes shake {
+ /* Shake animation when clicking on disabled option */
+ @keyframes shake {
 
-    0%,
-    100% {
-        transform: translateX(0);
-    }
+     0%,
+     100% {
+         transform: translateX(0);
+     }
 
-    10%,
-    30%,
-    50%,
-    70%,
-    90% {
-        transform: translateX(-4px);
-    }
+     10%,
+     30%,
+     50%,
+     70%,
+     90% {
+         transform: translateX(-4px);
+     }
 
-    20%,
-    40%,
-    60%,
-    80% {
-        transform: translateX(4px);
-    }
-}
+     20%,
+     40%,
+     60%,
+     80% {
+         transform: translateX(4px);
+     }
+ }
 
-.payment-option.disabled.shake {
-    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
-}
+ .payment-option.disabled.shake {
+     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+ }
+
+ #gift-card-response {
+     padding: 4px 8px;
+     border-radius: 4px;
+     transition: opacity 0.3s ease;
+ }
+
+ #gift-card-response.text-green-600 {
+     background-color: #f0fdf4;
+ }
+
+ #gift-card-response.text-red-600 {
+     background-color: #fef2f2;
+ }

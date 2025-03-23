@@ -109,6 +109,7 @@
                     <input type="hidden" id="isCodAvailable" value="{{.IsCodAvailable}}">
 
                     <!-- Wallet Balance -->
+                    <!-- Wallet Balance -->
                     <div class="mb-6">
                         <div class="payment-option flex items-start gap-3 mb-4 p-4 rounded-lg cursor-pointer"
                             id="walletPayment" data-value="Wallet">
@@ -134,6 +135,8 @@
                                     <button
                                         class="px-4 py-2 rounded-md text-sm bg-indigo-600 text-white hover:bg-indigo-700 transition apply-btn">Apply</button>
                                 </div>
+                                <!-- Response Message -->
+                                <div id="gift-card-response" class="text-sm mt-2 hidden"></div>
                             </div>
                         </div>
                     </div>
@@ -186,8 +189,7 @@
                     </div>
                     {{range .CartItem}}
                     <div class="flex items-center gap-4 p-4  rounded-lg border border-gray-200 mt-1">
-                        <img src="{{.ProductImage}}"
-                            alt="Laptop Stand" class="w-20 h-20 object-contain">
+                        <img src="{{.ProductImage}}" alt="Laptop Stand" class="w-20 h-20 object-contain">
                         <div class="flex flex-col">
                             <p class="text-sm font-medium">{{ .ProductDetails.ProductSummary }}</p>
                             <div class="flex items-center gap-2 mt-1">
@@ -210,8 +212,7 @@
                 <div class="space-y-4 mb-6">
                     {{range .CartItem}}
                     <div class="flex gap-4">
-                        <img src="{{.ProductImage}}"
-                            alt="Camera" class="w-16 h-16 object-contain">
+                        <img src="{{.ProductImage}}" alt="Camera" class="w-16 h-16 object-contain">
                         <div>
                             <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
                             <div class="flex items-center gap-2 mt-1">
