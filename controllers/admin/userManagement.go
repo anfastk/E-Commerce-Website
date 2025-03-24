@@ -14,10 +14,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserAuth struct {
+	ID        string `gorm:"primaryKey"`
+	FullName  string
+	Email     string
+	Status    string
+	IsBlocked bool
+	IsDeleted bool
+}
+
 func ListUsers(c *gin.Context) {
 	logger.Log.Info("Requested to list users")
 
-	var users []models.UserAuth
+	var users []UserAuth
 	if err := config.DB.Unscoped().Order("id ASC").Find(&users).Error; err != nil {
 		logger.Log.Error("Failed to fetch users", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Could not fetch users", "Could not fetch users", "")
@@ -26,6 +35,32 @@ func ListUsers(c *gin.Context) {
 
 	logger.Log.Info("Users fetched successfully", zap.Int("userCount", len(users)))
 	c.HTML(http.StatusOK, "user_management.html", gin.H{
+		"users": users,
+	})
+}
+
+func SearchUsers(c *gin.Context) {
+	query := c.Query("q")
+	logger.Log.Info("Search users requested", zap.String("query", query))
+
+	var users []UserAuth
+	queryDB := config.DB.Unscoped().Order("id ASC")
+
+	if query != "" {
+		searchTerm := "%" + query + "%"
+		queryDB = queryDB.Where("full_name LIKE ? OR email LIKE ?", searchTerm, searchTerm)
+	}
+
+	if err := queryDB.Find(&users).Error; err != nil {
+		logger.Log.Error("Failed to search users", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not search users",
+		})
+		return
+	}
+
+	logger.Log.Info("Users search completed", zap.Int("userCount", len(users)))
+	c.JSON(http.StatusOK, gin.H{
 		"users": users,
 	})
 }

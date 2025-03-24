@@ -768,7 +768,7 @@ func CancelSpecificOrder(c *gin.Context) {
 
 			receiptID := "rcpt_" + uuid.New().String()
 			rand.Seed(time.Now().UnixNano())
-			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			walletTransaction := models.WalletTransaction{
 				UserID:        userID,
@@ -804,7 +804,7 @@ func CancelSpecificOrder(c *gin.Context) {
 
 			receiptID = "rcpt_" + uuid.New().String()
 			rand.Seed(time.Now().UnixNano())
-			transactionID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			transactionID = fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			walletTransaction = models.WalletTransaction{
 				UserID:        userID,
@@ -841,7 +841,7 @@ func CancelSpecificOrder(c *gin.Context) {
 
 			receiptID := "rcpt_" + uuid.New().String()
 			rand.Seed(time.Now().UnixNano())
-			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 			walletTransaction := models.WalletTransaction{
 				UserID:        userID,
@@ -1087,7 +1087,7 @@ func CancelAllOrderItems(c *gin.Context) {
 
 		receiptID := "rcpt_" + uuid.New().String()
 		rand.Seed(time.Now().UnixNano())
-		transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+		transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 		walletTransaction := models.WalletTransaction{
 			UserID:        userID,

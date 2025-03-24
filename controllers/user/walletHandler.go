@@ -287,7 +287,7 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 		Type:          "Deposit",
 		Receipt:       receiptID,
 		OrderId:       verifyRequest.OrderID,
-		TransactionID: verifyRequest.PaymentID,
+		TransactionID: fmt.Sprintf("TXN" + verifyRequest.PaymentID),
 		LastBalance:   lastBalance,
 		PaymentMethod: "RazorPay",
 	}
@@ -378,7 +378,7 @@ func SendGiftCard(c *gin.Context) {
 	}
 
 	GiftCode := GenerateGiftCardCode()
-	transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 	cleanedGiftCode := strings.ReplaceAll(GiftCode, " ", "")
 	cleanedGiftCode = strings.ReplaceAll(cleanedGiftCode, "-", "")
 
@@ -424,7 +424,7 @@ func SendGiftCard(c *gin.Context) {
 
 	walletReceiptID := "rcpt-" + uuid.New().String()
 	rand.Seed(time.Now().UnixNano())
-	walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	walletTransactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 	orderUID := helper.GenerateOrderID()
 
 	walletHistory := models.WalletTransaction{
@@ -522,7 +522,7 @@ func RedeemGiftCard(c *gin.Context) {
 
 	walletReceiptID := "rcpt-" + uuid.New().String()
 	rand.Seed(time.Now().UnixNano())
-	walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+	walletTransactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 	orderUID := helper.GenerateOrderID()
 
 	walletHistory := models.WalletTransaction{

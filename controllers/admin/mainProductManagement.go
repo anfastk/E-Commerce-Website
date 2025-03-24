@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,82 +16,102 @@ import (
 )
 
 type ProductVariantResponse struct {
-	ID             uint     `json:"id"`
-	ProductName    string   `json:"productname"`
-	CategoryName   string   `json:"category_name"`
-	RegularPrice   float64  `json:"regular_price"`
-	SalePrice      float64  `json:"sale_price"`
-	ProductSummary string   `json:"product_summary"`
-	IsDeleted      bool     `json:"isdeleted"`
-	Images         []string `json:"images"`
+    ID             uint     `json:"ID"`
+    ProductName    string   `json:"ProductName"`
+    CategoryName   string   `json:"CategoryName"`
+    RegularPrice   float64  `json:"RegularPrice"`
+    SalePrice      float64  `json:"SalePrice"`
+    ProductSummary string   `json:"ProductSummary"`
+    Images         []string `json:"Images"`
+    Status         bool     `json:"Status"`
 }
 
 func ShowProductsAdmin(c *gin.Context) {
-	logger.Log.Info("Requested to show products for admin")
-	
-	var variants []models.ProductVariantDetails
-	result := config.DB.Unscoped().
-		Preload("VariantsImages").
-		Preload("Category").
-		Preload("Product").
-		Find(&variants)
+    logger.Log.Info("Requested to show products for admin")
+    
+    searchQuery := c.Query("search")
+    categoryID := c.Query("category")
+    
+    var variants []models.ProductVariantDetails
+    query := config.DB.Unscoped().
+        Preload("VariantsImages").
+        Preload("Category").
+        Preload("Product")
+        
+    if searchQuery != "" {
+        query = query.Where("product_name ILIKE ?", "%"+searchQuery+"%")
+    }
+    if categoryID != "" {
+        query = query.Where("category_id = ?", categoryID)
+    }
+    
+    result := query.Find(&variants)
+    if result.Error != nil {
+        logger.Log.Error("Failed to fetch product variants", zap.Error(result.Error))
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")
+        return
+    }
 
-	if result.Error != nil {
-		logger.Log.Error("Failed to fetch product variants", zap.Error(result.Error))
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")
-		return
-	}
+    var response []ProductVariantResponse
+    for _, variant := range variants {
+        var images []string
+        for _, img := range variant.VariantsImages {
+            images = append(images, img.ProductVariantsImages)
+        }
 
-	var response []ProductVariantResponse
-	for _, variant := range variants {
-		var images []string
-		for _, img := range variant.VariantsImages {
-			images = append(images, img.ProductVariantsImages)
-		}
+        categoryName := "Uncategorized"
+        if variant.Category.ID != 0 {
+            categoryName = variant.Category.Name
+        }
 
-		categoryName := "Uncategorized"
-		if variant.Category.ID != 0 {
-			categoryName = variant.Category.Name
-		}
+        productName := variant.ProductName
+        if productName == "" && variant.Product.ID != 0 {
+            productName = variant.ProductName
+        }
 
-		productName := variant.ProductName
-		if productName == "" && variant.Product.ID != 0 {
-			productName = variant.ProductName
-		}
+        response = append(response, ProductVariantResponse{
+            ID:             variant.ID,
+            ProductName:    productName,
+            CategoryName:   categoryName,
+            RegularPrice:   variant.RegularPrice,
+            SalePrice:      variant.SalePrice,
+            ProductSummary: variant.ProductSummary,
+            Images:         images,
+            Status:         variant.IsDeleted,
+        })
+    }
 
-		response = append(response, ProductVariantResponse{
-			ID:             variant.ID,
-			ProductName:    productName,
-			CategoryName:   categoryName,
-			RegularPrice:   variant.RegularPrice,
-			SalePrice:      variant.SalePrice,
-			ProductSummary: variant.ProductSummary,
-			Images:         images,
-			IsDeleted:      variant.IsDeleted,
-		})
-	}
+    if c.Request.Header.Get("X-Requested-With") != "XMLHttpRequest" {
+        c.HTML(http.StatusOK, "productPageAdmin.html", gin.H{
+            "status":  true,
+            "message": "Product variants fetched successfully",
+        })
+        return
+    }
 
-	var formattedResponceDetails []map[string]interface{}
-	for _, variant := range response {
-		formattedVariant := map[string]interface{}{
-			"ID":             variant.ID,
-			"ProductName":    variant.ProductName,
-			"CategoryName":   variant.CategoryName,
-			"RegularPrice":   variant.RegularPrice,
-			"SalePrice":      fmt.Sprintf("%.2f", variant.SalePrice),
-			"ProductSummary": variant.ProductSummary,
-			"Images":         variant.Images,
-			"Status":         variant.IsDeleted,
-		}
-		formattedResponceDetails = append(formattedResponceDetails, formattedVariant)
-	}
+    c.JSON(http.StatusOK, gin.H{
+        "status":  true,
+        "message": "Product variants fetched successfully",
+        "data":    response,
+    })
+}
 
-	logger.Log.Info("Products fetched successfully", zap.Int("count", len(response)))
-	c.HTML(http.StatusFound, "productPageAdmin.html", gin.H{
-		"status":  true,
-		"message": "Product variants fetched successfully",
-		"data":    formattedResponceDetails,
-	})
+func GetCategories(c *gin.Context) {
+    var categories []models.Categories
+    if err := config.DB.Find(&categories).Error; err != nil {
+        logger.Log.Error("Failed to fetch categories", zap.Error(err))
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "status":  false,
+            "message": "Failed to fetch categories",
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "status":  true,
+        "message": "Categories fetched successfully",
+        "data":    categories,
+    })
 }
 
 func ShowAddMainProduct(c *gin.Context) {

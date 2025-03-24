@@ -18,10 +18,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func ShowOrderManagent(c *gin.Context) {
+func ShowOrderManagement(c *gin.Context) {
 	logger.Log.Info("Requested to show order management")
 
-	type OrderListResponce struct {
+	type OrderListResponse struct {
 		ID            uint    `json:"id"`
 		ProductImage  string  `json:"productimage"`
 		ProductName   string  `json:"productname"`
@@ -41,7 +41,7 @@ func ShowOrderManagent(c *gin.Context) {
 		return
 	}
 
-	var orderListResponce []OrderListResponce
+	var orderListResponse []OrderListResponse
 	for _, item := range orderDetails {
 		var paymentDetails models.PaymentDetail
 		if err := config.DB.First(&paymentDetails, "order_item_id = ?", item.ID).Error; err != nil {
@@ -64,7 +64,7 @@ func ShowOrderManagent(c *gin.Context) {
 			return
 		}
 
-		orderListResponces := OrderListResponce{
+		orderListResponses := OrderListResponse{
 			ID:            item.ID,
 			ProductImage:  item.ProductImage,
 			ProductName:   item.ProductName,
@@ -76,14 +76,93 @@ func ShowOrderManagent(c *gin.Context) {
 			Status:        item.OrderStatus,
 			Amount:        item.Total,
 		}
-		orderListResponce = append(orderListResponce, orderListResponces)
+		orderListResponse = append(orderListResponse, orderListResponses)
 	}
 
-	logger.Log.Info("Order management data fetched successfully", zap.Int("orderCount", len(orderListResponce)))
+	logger.Log.Info("Order management data fetched successfully", zap.Int("orderCount", len(orderListResponse)))
 	c.HTML(http.StatusOK, "orderList.html", gin.H{
 		"status":  "success",
 		"message": "Order details fetched successfully",
-		"data":    orderListResponce,
+		"data":    orderListResponse,
+	})
+}
+
+func SearchOrders(c *gin.Context) {
+	searchQuery := c.Query("search")
+	logger.Log.Info("Search request received", zap.String("query", searchQuery))
+
+	type OrderListResponse struct {
+		ID            uint    `json:"id"`
+		ProductImage  string  `json:"productimage"`
+		ProductName   string  `json:"productname"`
+		OrderID       string  `json:"orderid"`
+		OrderDate     string  `json:"orderdate"`
+		PaymentMethod string  `json:"paymentmethod"`
+		ProfilePic    string  `json:"profilepic"`
+		UserName      string  `json:"username"`
+		Status        string  `json:"status"`
+		Amount        float64 `json:"amount"`
+	}
+
+	var orderDetails []models.OrderItem
+	query := config.DB.Order("created_at DESC")
+
+	if searchQuery != "" {
+		query = query.Joins("JOIN orders ON orders.id = order_items.order_id").
+			Joins("JOIN user_auths ON user_auths.id = orders.user_id").
+			Where("order_items.product_name ILIKE ? OR order_items.order_uid ILIKE ? OR user_auths.full_name ILIKE ?",
+				"%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
+	}
+
+	if err := query.Find(&orderDetails).Error; err != nil {
+		logger.Log.Error("Failed to fetch orders", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders", "Something Went Wrong", "")
+		return
+	}
+
+	var orderListResponse []OrderListResponse
+	for _, item := range orderDetails {
+		var paymentDetails models.PaymentDetail
+		if err := config.DB.First(&paymentDetails, "order_item_id = ?", item.ID).Error; err != nil {
+			logger.Log.Error("Failed to fetch payment details", zap.Uint("orderItemID", item.ID), zap.Error(err))
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to fetch payment details"})
+			return
+		}
+
+		var orderDetails models.Order
+		if err := config.DB.First(&orderDetails, "id = ?", item.OrderID).Error; err != nil {
+			logger.Log.Error("Failed to fetch order details", zap.Uint("orderID", item.OrderID), zap.Error(err))
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to fetch order details"})
+			return
+		}
+
+		var userDetails models.UserAuth
+		if err := config.DB.First(&userDetails, "id = ?", orderDetails.UserID).Error; err != nil {
+			logger.Log.Error("Failed to fetch user details", zap.Uint("userID", orderDetails.UserID), zap.Error(err))
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Failed to fetch user details"})
+			return
+		}
+
+		orderListResponses := OrderListResponse{
+			ID:            item.ID,
+			ProductImage:  item.ProductImage,
+			ProductName:   item.ProductName,
+			OrderID:       item.OrderUID,
+			OrderDate:     fmt.Sprintf("%s %d%s, %d", item.CreatedAt.Format("Jan"), item.CreatedAt.Day(), ordinalSuffix(item.CreatedAt.Day()), item.CreatedAt.Year()),
+			PaymentMethod: paymentDetails.PaymentMethod,
+			ProfilePic:    userDetails.ProfilePic,
+			UserName:      userDetails.FullName,
+			Status:        item.OrderStatus,
+			Amount:        item.Total,
+		}
+		orderListResponse = append(orderListResponse, orderListResponses)
+	}
+
+	logger.Log.Info("Search completed successfully", zap.Int("resultCount", len(orderListResponse)))
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Search results fetched successfully",
+		"data":    orderListResponse,
 	})
 }
 

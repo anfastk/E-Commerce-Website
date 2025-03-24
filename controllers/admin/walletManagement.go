@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
@@ -12,48 +13,104 @@ import (
 )
 
 func ShowWalletManagement(c *gin.Context) {
-	logger.Log.Info("Requested wallet management page")
+    logger.Log.Info("Requested wallet management page")
+    c.HTML(http.StatusOK, "walletManagement.html", gin.H{
+        "status": "success",
+        "code":   http.StatusOK,
+    })
+}
 
-	type walletResponce struct {
-		ID            uint
-		TransactionID string
-		Date          string
-		ProfilePic    string
-		Name          string
-		Email         string
-		Types         string
-		Amount        float64
-	}
+func SearchWalletTransactions(c *gin.Context) {
+    type walletResponse struct {
+        ID            uint    `json:"ID"`
+        TransactionID string  `json:"TransactionID"`
+        Date          string  `json:"Date"`
+        ProfilePic    string  `json:"ProfilePic"`
+        Name          string  `json:"Name"`
+        Email         string  `json:"Email"`
+        Types         string  `json:"Types"`
+        Amount        float64 `json:"Amount"`
+    }
 
-	var walletTransactions []models.WalletTransaction
-	if err := config.DB.Order("created_at DESC").Preload("UserAuth").Find(&walletTransactions).Error; err != nil {
-		logger.Log.Error("Failed to fetch wallet transactions", zap.Error(err))
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch wallet Transactions", "Something Went Wrong", "")
-		return
-	}
+    // Get query parameters
+    search := c.Query("search")
+    transactionType := c.Query("type")
+    page := c.DefaultQuery("page", "1")
 
-	var transaction []walletResponce
-	for _, row := range walletTransactions {
-		responce := walletResponce{
-			ID:            row.ID,
-			TransactionID: row.TransactionID[0:12],
-			Date:          row.CreatedAt.Format("Jan 02, 2006"),
-			ProfilePic:    row.UserAuth.ProfilePic,
-			Name:          row.UserAuth.FullName,
-			Email:         row.UserAuth.Email,
-			Types:         row.Type,
-			Amount:        row.Amount,
-		}
-		transaction = append(transaction, responce)
-	}
+    perPage := 10
+    offset := (StringToInt(page) - 1) * perPage
 
-	logger.Log.Info("Wallet transactions fetched successfully",
-		zap.Int("transactionCount", len(walletTransactions)))
-	c.HTML(http.StatusOK, "walletManagement.html", gin.H{
-		"status": "success",
-		"Data":   transaction,
-		"code":   http.StatusOK,
-	})
+    var walletTransactions []models.WalletTransaction
+    query := config.DB.Order("created_at DESC").Preload("UserAuth")
+
+    // Apply search filter with JOIN
+    if search != "" {
+        query = query.Joins("JOIN user_auths ON user_auths.id = wallet_transactions.user_id").
+            Where("wallet_transactions.transaction_id LIKE ? OR user_auths.full_name LIKE ?",
+                "%"+search+"%", "%"+search+"%")
+    }
+
+    // Apply type filter
+    if transactionType != "" {
+        query = query.Where("wallet_transactions.type = ?", transactionType)
+    }
+
+    // Get total count for pagination
+    var total int64
+    countQuery := config.DB.Model(&models.WalletTransaction{})
+    if search != "" {
+        countQuery = countQuery.Joins("JOIN user_auths ON user_auths.id = wallet_transactions.user_id").
+            Where("wallet_transactions.transaction_id LIKE ? OR user_auths.full_name LIKE ?",
+                "%"+search+"%", "%"+search+"%")
+    }
+    if transactionType != "" {
+        countQuery = countQuery.Where("wallet_transactions.type = ?", transactionType)
+    }
+    if err := countQuery.Count(&total).Error; err != nil {
+        logger.Log.Error("Failed to count wallet transactions", zap.Error(err))
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to count wallet transactions", "Something Went Wrong", "")
+        return
+    }
+
+    // Get paginated results
+    if err := query.Limit(perPage).Offset(offset).Find(&walletTransactions).Error; err != nil {
+        logger.Log.Error("Failed to fetch wallet transactions", zap.Error(err))
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch wallet transactions", "Something Went Wrong", "")
+        return
+    }
+
+    var transactions []walletResponse
+    for _, row := range walletTransactions {
+        response := walletResponse{
+            ID:            row.ID,
+            TransactionID: row.TransactionID[0:12],
+            Date:          row.CreatedAt.Format("Jan 02, 2006"),
+            ProfilePic:    row.UserAuth.ProfilePic,
+            Name:          row.UserAuth.FullName,
+            Email:         row.UserAuth.Email,
+            Types:         row.Type,
+            Amount:        row.Amount,
+        }
+        transactions = append(transactions, response)
+    }
+
+    logger.Log.Info("Wallet transactions fetched successfully",
+        zap.Int("transactionCount", len(walletTransactions)))
+
+    c.JSON(http.StatusOK, gin.H{
+        "transactions": transactions,
+        "total":        total,
+        "page":         StringToInt(page),
+        "perPage":      perPage,
+    })
+}
+
+func StringToInt(s string) int {
+    i, err := strconv.Atoi(s)
+    if err != nil {
+        return 1
+    }
+    return i
 }
 
 func ShowTransactionDetails(c *gin.Context) {

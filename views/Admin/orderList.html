@@ -9,10 +9,11 @@
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/nav&sideBar.js" defer></script>
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
-    <div class="toast-container z-40 fixed top-0 right-4">
+    <div class="toast-container z-40 fixed top-16 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
                 <div class="toast-icon mr-2">
@@ -29,14 +30,12 @@
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
         <div class="py-6 px-4 flex items-center justify-start space-x-4">
-            <!-- Hamburger Menu for Small Screens inside Sidebar -->
             <button class="lg:hidden text-white" onclick="toggleSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <!-- Logo -->
             <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
         </div>
         <nav class="flex-1 ">
@@ -50,7 +49,6 @@
                     <a href="/admin/dashboard" class="text-base font-medium hover:text-blue-500">Dashboard</a>
                 </li>
                 <li class="py-3 px-4  flex items-center space-x-2">
-                    <!-- All Products Button with Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"
                         fill="currentColour">
                         <rect width="384" height="256" x="64" y="176" fill="none" stroke="currentColor"
@@ -123,20 +121,15 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navigation -->
         <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-10 ">
-            <!-- Hamburger Menu for Small Screens (Main Header) -->
             <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <!-- Logo -->
             <h1 class="text-2xl font-bold tracking-wide logo-font block lg:hidden">LAPTIX</h1>
-
             <div class="flex-grow lg:flex-grow-0"></div>
-            <!-- Right-aligned buttons -->
             <div class="flex items-center space-x-4 ml-auto">
-                <!-- Search Button -->
                 <button id="search-button" onclick="toggleSearchBar()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <g fill="none" fill-rule="evenodd">
@@ -147,22 +140,16 @@
                         </g>
                     </svg>
                 </button>
-
-                <!-- Search Bar Container -->
                 <div id="search-bar-container"
                     class="hidden flex items-center border-2 border-blue-500 rounded-xl px-4 py-2 space-x-4">
-                    <!-- Search Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd"
                             d="M12.9 14.32a8 8 0 111.414-1.415l4.387 4.387a1 1 0 01-1.414 1.415l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
                             clip-rule="evenodd" />
                     </svg>
-
-                    <!-- Input Field -->
-                    <input id="search-input" type="text" placeholder="Search..."
-                        class="outline-none bg-transparent text-lg" />
-                    <!-- Clear Button -->
+                    <input id="search-input" type="text" placeholder="Search by username, product, or order ID..."
+                        class="outline-none bg-transparent text-lg w-64" />
                     <button onclick="clearSearch()" class="text-blue-500">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -171,32 +158,26 @@
                         </svg>
                     </button>
                 </div>
+            </div>
         </header>
 
         <div class="container mx-auto px-4 py-6 max-w-6xl">
-            <!-- Header -->
             <div class="mb-6">
                 <h1 class="text-xl font-bold text-gray-800">Orders List</h1>
                 <div class="text-sm text-gray-600">
-                    <a href="/admin/orderlist" class="hover:underline">Home</a> &gt; <span>Order List</span>
+                    <a href="/admin/orderlist" class="hover:underline">Home</a> > <span>Order List</span>
                 </div>
             </div>
-
-            <!-- Orders Card -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg font-semibold text-gray-800">Recent Purchases</h2>
-
                 </div>
-
-                <!-- Table -->
                 <div class="overflow-x-auto cursor-pointer">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
                                 </th>
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -229,7 +210,6 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Order Row 1 -->
                             {{range .data}}
                             <tr class="hover:bg-gray-100">
                                 <td class="px-1 py-1 whitespace-nowrap">
@@ -241,24 +221,16 @@
                                     </a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
-                                    <a href="/admin/orderlist/details/{{.ID}}">
-                                        {{.ProductName}}
-                                    </a>
+                                    <a href="/admin/orderlist/details/{{.ID}}">{{.ProductName}}</a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
-                                    <a href="/admin/orderlist/details/{{.ID}}">
-                                        {{.OrderID}}
-                                    </a>
+                                    <a href="/admin/orderlist/details/{{.ID}}">{{.OrderID}}</a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
-                                    <a href="/admin/orderlist/details/{{.ID}}">
-                                        {{.OrderDate}}
-                                    </a>
+                                    <a href="/admin/orderlist/details/{{.ID}}">{{.OrderDate}}</a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
-                                    <a href="/admin/orderlist/details/{{.ID}}">
-                                        {{.PaymentMethod}}
-                                    </a>
+                                    <a href="/admin/orderlist/details/{{.ID}}">{{.PaymentMethod}}</a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap">
                                     <a href="/admin/orderlist/details/{{.ID}}">
@@ -280,13 +252,10 @@
                                     </a>
                                 </td>
                                 <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
-                                    <a href="/admin/orderlist/details/{{.ID}}">
-                                        &#8377;{{.Amount}}
-                                    </a>
+                                    <a href="/admin/orderlist/details/{{.ID}}">₹{{.Amount}}</a>
                                 </td>
                             </tr>
                             {{end}}
-                            <!-- Additional rows would continue here -->
                         </tbody>
                     </table>
                 </div>
@@ -294,15 +263,12 @@
         </div>
     </div>
     <script>
+        // Status badge styling
         document.addEventListener("DOMContentLoaded", function () {
-            // Select all elements with class "status-badge"
             const statusElements = document.querySelectorAll(".status-badge");
-
             statusElements.forEach(function (statusElement) {
                 const status = statusElement.dataset.status;
                 const dotElement = statusElement.querySelector(".dot");
-
-                // Apply classes based on status
                 if (status === "Pending" || status === "Shipped" || status === "Confirmed") {
                     statusElement.classList.add("bg-orange-100", "text-orange-800");
                     dotElement.classList.add("bg-orange-500");
@@ -313,6 +279,113 @@
                     statusElement.classList.add("bg-green-100", "text-green-800");
                     dotElement.classList.add("bg-green-500");
                 }
+            });
+        });
+        // AJAX search function
+        function performSearch(query) {
+            $.ajax({
+                url: '/admin/orderlist/search',
+                method: 'GET',
+                data: { search: query },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        updateTable(response.data);
+                    } else {
+                        console.error('Search failed:', response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+
+        // Update table with search results
+        function updateTable(data) {
+            const tbody = $('tbody');
+            tbody.empty();
+            data.forEach(item => {
+                const row = `
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-1 py-1 whitespace-nowrap">
+                            <a href="/admin/orderlist/details/${item.id}">
+                                <div class="flex items-center">
+                                    <img src="${item.productimage}" alt="${item.productname}" class="h-20 w-20 flex items-center justify-center font-medium mr-2 object-contain">
+                                </div>
+                            </a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                            <a href="/admin/orderlist/details/${item.id}">${item.productname}</a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                            <a href="/admin/orderlist/details/${item.id}">${item.orderid}</a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                            <a href="/admin/orderlist/details/${item.id}">${item.orderdate}</a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                            <a href="/admin/orderlist/details/${item.id}">${item.paymentmethod}</a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap">
+                            <a href="/admin/orderlist/details/${item.id}">
+                                <div class="flex items-center">
+                                    <img src="${item.profilepic}" alt="${item.username}" class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-medium mr-2 object-contain">
+                                    <span class="text-sm text-gray-700">${item.username}</span>
+                                </div>
+                            </a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap">
+                            <a href="/admin/orderlist/details/${item.id}">
+                                <span class="status-badge px-3 py-1 inline-flex items-center text-xs font-medium rounded-full" data-status="${item.status}">
+                                    <span class="dot h-2 w-2 mr-1 rounded-full"></span>
+                                    ${item.status}
+                                </span>
+                            </a>
+                        </td>
+                        <td class="px-1 py-1 whitespace-nowrap text-sm text-gray-700">
+                            <a href="/admin/orderlist/details/${item.id}">₹${item.amount}</a>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+
+            // Re-apply status badge styling
+            const statusElements = document.querySelectorAll(".status-badge");
+            statusElements.forEach(function (statusElement) {
+                const status = statusElement.dataset.status;
+                const dotElement = statusElement.querySelector(".dot");
+                if (status === "Pending" || status === "Shipped" || status === "Confirmed") {
+                    statusElement.classList.add("bg-orange-100", "text-orange-800");
+                    dotElement.classList.add("bg-orange-500");
+                } else if (status === "Cancelled" || status === "Returned" || status === "Order Not Placed" || status === "Failed") {
+                    statusElement.classList.add("bg-red-100", "text-red-800");
+                    dotElement.classList.add("bg-red-500");
+                } else if (status === "Delivered") {
+                    statusElement.classList.add("bg-green-100", "text-green-800");
+                    dotElement.classList.add("bg-green-500");
+                }
+            });
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Search input listener
+        $(document).ready(function () {
+            const debouncedSearch = debounce(performSearch, 300);
+            $('#search-input').on('input', function () {
+                debouncedSearch(this.value);
             });
         });
     </script>

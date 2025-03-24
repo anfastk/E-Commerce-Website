@@ -49,6 +49,7 @@ func AdminRoutes(r *gin.Engine) {
 	adminUser.Use(middleware.AuthMiddleware(RoleAdmin))
 	{
 		adminUser.GET("/", controllers.ListUsers)
+		adminUser.GET("/search", controllers.SearchUsers)
 		adminUser.POST("/:id/block", controllers.BlockUser)
 		adminUser.POST("/:id/delete", controllers.DeleteUser)
 	}
@@ -68,7 +69,8 @@ func AdminRoutes(r *gin.Engine) {
 	OrderList := r.Group("/admin/orderlist")
 	OrderList.Use(middleware.AuthMiddleware(RoleAdmin))
 	{
-		OrderList.GET("/", controllers.ShowOrderManagent)
+		OrderList.GET("/", controllers.ShowOrderManagement)
+		OrderList.GET("/search", controllers.SearchOrders)
 		OrderList.GET("/details/:id", controllers.ShowOrderDetailManagement)
 		OrderList.PATCH("/details/status/update", controllers.ChangeOrderStatus)
 		OrderList.POST("/details/return/request", controllers.ApproveReturn)
@@ -96,6 +98,7 @@ func AdminRoutes(r *gin.Engine) {
 	wallet := r.Group("/admin/wallet")
 	wallet.Use(middleware.AuthMiddleware(RoleAdmin))
 	{
+		wallet.GET("/management/search", controllers.SearchWalletTransactions)
 		wallet.GET("/management", controllers.ShowWalletManagement)
 		wallet.GET("/management/details/:id", controllers.ShowTransactionDetails)
 	}

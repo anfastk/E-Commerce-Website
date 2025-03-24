@@ -303,7 +303,7 @@ func CheckForReferrer(c *gin.Context) {
 
 			receiptID := "rcpt_" + uuid.New().String()
 			rand.Seed(time.Now().UnixNano())
-			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 			createReferrerWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      referrerWallet.ID,
@@ -422,7 +422,7 @@ func CheckForJoinee(c *gin.Context) {
 
 			receiptID := "rcpt_" + uuid.New().String()
 			rand.Seed(time.Now().UnixNano())
-			transactionID := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+			transactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 			createJoineeWalletHistory := models.WalletTransaction{
 				UserID:        userID,
 				WalletID:      joineeWallet.ID,

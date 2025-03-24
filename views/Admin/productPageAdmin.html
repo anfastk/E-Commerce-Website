@@ -1,50 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laptix Adimin Product Page</title>
+    <title>Laptix Admin Product Page</title>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
     <script src="/static/js/productpage.js" defer></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col lg:flex-row">
     <!-- Sidebar -->
-    <aside id="sidebar"
-        class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
+    <aside id="sidebar" class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50">
         <div class="py-6 px-4 flex items-center justify-start space-x-4">
-            <!-- Hamburger Menu for Small Screens inside Sidebar -->
             <button class="lg:hidden text-white" onclick="toggleSidebar()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <!-- Logo -->
             <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
         </div>
-        <nav class="flex-1 ">
+        <nav class="flex-1">
             <ul>
+                <!-- [Previous sidebar menu items remain unchanged] -->
                 <li class="py-3 px-4 flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                        fill="currentColor">
-                        <path
-                            d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6zm2-10h4V5H5zm10 8h4v-6h-4zm0-12h4V5h-4zM5 19h4v-2H5zm4-2"/>
                     </svg>
                     <a href="/admin/dashboard" class="text-base font-medium hover:text-blue-500">Dashboard</a>
                 </li>
                 <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
-                    <!-- All Products Button with Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
-                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
-                            stroke-width="32" rx="28.87" ry="28.87" />
-                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
-                            stroke-width="32" d="M144 80h224m-256 48h288" />
+                        <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round" stroke-width="32" rx="28.87" ry="28.87"/>
+                        <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M144 80h224m-256 48h288"/>
                     </svg>
-                    <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
+                    <a href="/admin/products" class="text-base font-medium text-black">All Products</a>
                 </li>
                 <li class="py-3 px-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
@@ -108,158 +100,207 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
-        <!-- Top Navigation -->
         <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-50">
-            <!-- Hamburger Menu for Small Screens (Main Header) -->
             <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <!-- Logo -->
             <h1 class="text-2xl font-bold tracking-wide logo-font block lg:hidden">LAPTIX</h1>
-
             <div class="flex-grow lg:flex-grow-0"></div>
-            <!-- Right-aligned buttons -->
             <div class="flex items-center space-x-4 ml-auto">
-                <!-- Search Button -->
                 <button id="search-button" onclick="toggleSearchBar()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <g fill="none" fill-rule="evenodd">
-                            <path
-                                d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                            <path fill="currentColor"
-                                d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0" />
+                            <path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/>
+                            <path fill="currentColor" d="M10.5 2a8.5 8.5 0 1 0 5.262 15.176l3.652 3.652a1 1 0 0 0 1.414-1.414l-3.652-3.652A8.5 8.5 0 0 0 10.5 2M4 10.5a6.5 6.5 0 1 1 13 0a6.5 6.5 0 0 1-13 0"/>
                         </g>
                     </svg>
                 </button>
-
-                <!-- Search Bar Container -->
-                <div id="search-bar-container"
-                    class="hidden flex items-center border-2 border-blue-500 rounded-xl px-4 py-2 space-x-4">
-                    <!-- Search Icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M12.9 14.32a8 8 0 111.414-1.415l4.387 4.387a1 1 0 01-1.414 1.415l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
-                            clip-rule="evenodd" />
+                <div id="search-bar-container" class="hidden flex items-center border-2 border-blue-500 rounded-xl px-4 py-2 space-x-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.415l4.387 4.387a1 1 0 01-1.414 1.415l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
                     </svg>
-
-                    <!-- Input Field -->
-                    <input id="search-input" type="text" placeholder="Search..."
-                        class="outline-none bg-transparent text-lg" />
-                    <!-- Clear Button -->
+                    <input id="search-input" type="text" placeholder="Search..." class="outline-none bg-transparent text-lg" />
                     <button onclick="clearSearch()" class="text-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
+            </div>
         </header>
 
-        <!-- Breadcrumbs -->
         <div class="mt-2 text-gray-500 mx-5 text-xs"><a href="">All Products</a></div>
 
-        <!-- Content -->
         <main class="mx-5 flex-1">
-
-            <div class="bg-gray-100  py-4">
+            <div class="bg-gray-100 py-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold">All Products</h2>
-                    <a href=" /admin/products/main/add">
+                    <a href="/admin/products/main/add">
                         <button class="bg-black text-white px-4 py-2 rounded">ADD NEW PRODUCT</button>
                     </a>
                 </div>
                 <div class="mt-4 flex items-center">
-                    <select id="categories" class="px-4 py-2 rounded focus:outline-none bg-gray-100 ">
-                        <option value="all">All Categories</option>
-                        <option value="category1">Category 1</option>
-                        <option value="category2">Category 2</option>
-                        <option value="category3">Category 3</option>
+                    <select id="categories" class="px-4 py-2 rounded focus:outline-none bg-gray-100">
+                        <option value="">All Categories</option>
+                        <!-- Categories will be populated dynamically -->
                     </select>
                 </div>
             </div>
 
             <div class="mt-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Product Card -->
-                    {{range .data}}
-                    <div class="w-auto h-auto bg-white rounded-lg shadow-md overflow-hidden relative">
-                        <!-- Three-dot Menu Button -->
-                        <div class="absolute top-4 right-4 flex items-center">
-                            <button class="menuButton p-2 rounded-full hover:bg-gray-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                    <path fill="currentColor"
-                                        d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3" />
-                                </svg>
-                            </button>
-                            <div
-                                class="menuOptions absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg hidden sticky top-0">
-                                <ul class="text-sm text-gray-700">
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 1</li>
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 2</li>
-                                    <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 3</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
-                            <div class="p-4 flex items-start">
-                                <div class="h-24 w-24">
-                                    <!-- Product Image -->
-                                    {{if len .Images}}
-                                    <img src="{{index .Images 0}}" alt="Adidas Ultra Boost"
-                                        class="w-full h-full object-contain rounded-lg">
-                                    {{else}}
-                                    <img src="https://via.placeholder.com/150  " alt="Default Image"
-                                        class="w-24 h-24 object-cover rounded-lg">
-                                    {{end}}
-                                </div>
-
-
-                                <!-- Product Title and Price -->
-                                <div class="ml-4 flex-1">
-                                    <h2 class="text-lg font-semibold text-gray-800">{{.ProductName}}</h2>
-                                    <p class="text-sm text-gray-500">{{.CategoryName}}</p>
-                                    <p class="text-xl font-bold text-gray-900 mt-1">₹
-                                        {{.SalePrice}}</p>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="/admin/products/variant/detail?variant_id={{.ID}}">
-                            <!-- Summary -->
-                            <div class="px-4 mt-4">
-                                <h3 class="text-sm font-semibold text-gray-800">Summary</h3>
-                                <p class="text-sm text-gray-600">{{.ProductSummary}}</p>
-                            </div>
-
-                            <!-- Sales and Remaining Products -->
-                            <div class="px-4 my-5">
-                                <div
-                                    class="flex justify-between items-center text-sm font-semibold text-gray-800 border-t pt-2">
-                                </div>
-                                <div class="flex justify-between items-center text-sm font-semibold text-gray-800 mt-2">
-                                    {{if .Status}}
-                                    <p class="text-xl font-bold mt-1">Status: <span class="text-red-600 ">Deleted</span>
-                                        </span></p>
-                                    {{else}}
-                                    <p class="text-xl font-bold mt-1">Status: <span
-                                            class="text-green-600 ">Active</span>
-                                        </span></p>
-                                    {{end}}
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    {{end}}
-
-                    <!-- Additional Product Cards Can Be Added Here -->
+                <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Products will be loaded dynamically -->
                 </div>
             </div>
         </main>
     </div>
-</body>
+    <script>
+        $(document).ready(function() {
+    loadCategories();
+    loadProducts();
 
+    $('#search-input').on('input', debounce(function() {
+        loadProducts();
+    }, 300));
+
+    $('#categories').on('change', function() {
+        loadProducts();
+    });
+
+    window.toggleSearchBar = function() {
+        $('#search-bar-container').toggleClass('hidden');
+        if (!$('#search-bar-container').hasClass('hidden')) {
+            $('#search-input').focus();
+        }
+    };
+
+    window.clearSearch = function() {
+        $('#search-input').val('');
+        loadProducts();
+    };
+
+    $(document).on('click', '.menuButton', function(e) {
+        e.stopPropagation();
+        $(this).next('.menuOptions').toggleClass('hidden');
+    });
+
+    $(document).on('click', function() {
+        $('.menuOptions').addClass('hidden');
+    });
+});
+
+function loadCategories() {
+    $.ajax({
+        url: '/admin/products/categories',
+        method: 'GET',
+        success: function(response) {
+            if (response.status) {
+                const $select = $('#categories');
+                response.data.forEach(category => {
+                    $select.append(`<option value="${category.ID}">${category.Name}</option>`);
+                });
+            }
+        },
+        error: function(xhr) {
+            console.error('Failed to load categories:', xhr);
+        }
+    });
+}
+
+function loadProducts() {
+    const searchQuery = $('#search-input').val();
+    const categoryId = $('#categories').val();
+
+    $.ajax({
+        url: '/admin/products',
+        method: 'GET',
+        data: {
+            search: searchQuery,
+            category: categoryId
+        },
+        success: function(response) {
+            if (response.status) {
+                renderProducts(response.data);
+            }
+        },
+        error: function(xhr) {
+            console.error('Failed to load products:', xhr);
+        }
+    });
+}
+
+function renderProducts(products) {
+    const $container = $('#products-container');
+    $container.empty();
+
+    products.forEach(product => {
+        const imageSrc = product.Images && product.Images.length > 0 
+            ? product.Images[0] 
+            : 'https://via.placeholder.com/150';
+        
+        const status = product.Status 
+            ? '<span class="text-red-600">Deleted</span>' 
+            : '<span class="text-green-600">Active</span>';
+
+        const card = `
+            <div class="w-auto h-auto bg-white rounded-lg shadow-md overflow-hidden relative">
+                <div class="absolute top-4 right-4 flex items-center">
+                    <button class="menuButton p-2 rounded-full hover:bg-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path fill="currentColor" d="M3 9.5a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/>
+                        </svg>
+                    </button>
+                    <div class="menuOptions absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg hidden sticky top-0">
+                        <ul class="text-sm text-gray-700">
+                            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 1</li>
+                            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 2</li>
+                            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Option 3</li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="/admin/products/variant/detail?variant_id=${product.ID}">
+                    <div class="p-4 flex items-start">
+                        <div class="h-24 w-24">
+                            <img src="${imageSrc}" alt="${product.ProductName}" class="w-full h-full object-contain rounded-lg">
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h2 class="text-lg font-semibold text-gray-800">${product.ProductName}</h2>
+                            <p class="text-sm text-gray-500">${product.CategoryName}</p>
+                            <p class="text-xl font-bold text-gray-900 mt-1">₹${product.SalePrice}</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="/admin/products/variant/detail?variant_id=${product.ID}">
+                    <div class="px-4 mt-4">
+                        <h3 class="text-sm font-semibold text-gray-800">Summary</h3>
+                        <p class="text-sm text-gray-600">${product.ProductSummary}</p>
+                    </div>
+                    <div class="px-4 my-5">
+                        <div class="flex justify-between items-center text-sm font-semibold text-gray-800 border-t pt-2"></div>
+                        <div class="flex justify-between items-center text-sm font-semibold text-gray-800 mt-2">
+                            <p class="text-xl font-bold mt-1">Status: ${status}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        `;
+        $container.append(card);
+    });
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+    </script>
+</body>
 </html>

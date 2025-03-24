@@ -455,7 +455,7 @@ func ProceedToPayment(c *gin.Context) {
 
 		walletReceiptID := "rcpt-" + uuid.New().String()
 		rand.Seed(time.Now().UnixNano())
-		walletTransactionID := fmt.Sprintf("-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
+		walletTransactionID := fmt.Sprintf("TXN-%d-%d", time.Now().UnixNano(), rand.Intn(10000))
 
 		walletHistory := models.WalletTransaction{
 			UserID:        userID,
