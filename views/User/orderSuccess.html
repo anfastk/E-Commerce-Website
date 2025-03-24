@@ -395,6 +395,11 @@
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(createConfetti, 500);
         });
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
     </script>
 </body>
 

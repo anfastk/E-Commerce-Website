@@ -163,7 +163,8 @@
 
     <script>
         function toggleMobileMenu() {
-            $('#mobile-menu').toggleClass('hidden');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
         }
 
         function loadOrders() {

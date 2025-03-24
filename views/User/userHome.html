@@ -990,6 +990,10 @@
                 setTimeout(() => location.href = "/auth/login", 1500);
             }
         }
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
     </script>
     <script src="/static/js/toastMain.js"></script>
 </body>
