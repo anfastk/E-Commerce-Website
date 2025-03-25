@@ -69,7 +69,7 @@ func AddCategory(c *gin.Context) {
 	logger.Log.Info("Requested TO Add Category")
 
 	var categoryInput struct {
-		Name        string ` form:"name" json:"name"`
+		Name        string `form:"name" json:"name"`
 		Description string `form:"description" json:"description"`
 	}
 	if err := c.ShouldBind(&categoryInput); err != nil {
@@ -83,12 +83,11 @@ func AddCategory(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
 		return
 	}
-	fmt.Println(categoryInput)
 
-	 category:=models.Categories{
-		Name: categoryInput.Name,
+	category := models.Categories{
+		Name:        categoryInput.Name,
 		Description: categoryInput.Description,
-	 }
+	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
 		logger.Log.Error("Failed To Create Category", zap.Error(err))
