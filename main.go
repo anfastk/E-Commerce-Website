@@ -22,7 +22,7 @@ func init() {
 	r.Use(middleware.ErrorHandlerMiddleware())
 	r.Use(middleware.NoCacheMiddleware())
 	config.SyncDatabase()
-	config.InitializeGoogleOAuth()
+	config.InitializeGoogleOAuth() 
 }
 
 func main() {
