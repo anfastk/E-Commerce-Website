@@ -68,7 +68,7 @@ func AddCategory(c *gin.Context) {
 	logger.Log.Info("Requested TO Add Category")
 
 	var categoryInput struct {
-		Name        string `json:"Name"`
+		Name        string `json:"name"`
 		Description string `json:"description"`
 	}
 	if err := c.ShouldBindJSON(&categoryInput); err != nil {
