@@ -69,8 +69,8 @@ func AddCategory(c *gin.Context) {
 	logger.Log.Info("Requested TO Add Category")
 
 	var categoryInput struct {
-		Name        string ` form:"name"`
-		Description string `form:"description"`
+		Name        string ` form:"name" json:"name"`
+		Description string `form:"description" json:"description"`
 	}
 	if err := c.ShouldBind(&categoryInput); err != nil {
 		logger.Log.Error("Invaild Data Entered", zap.Error(err))
