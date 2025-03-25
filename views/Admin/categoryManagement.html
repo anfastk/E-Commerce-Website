@@ -76,7 +76,8 @@
             <path
               d="M21 6h-2V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2ZM5 4h12v2H5V4Zm16 16H5V8h16v12Zm-4-7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
           </svg>
-          <a href="/admin/wallet/management" class="text-base font-medium hover:text-blue-500 pl-2">Wallet Management</a>
+          <a href="/admin/wallet/management" class="text-base font-medium hover:text-blue-500 pl-2">Wallet
+            Management</a>
         </li>
         <li class="py-3 px-4 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" class="mr-2">
@@ -354,23 +355,23 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Sidebar toggle
-      window.toggleSidebar = function() {
+      window.toggleSidebar = function () {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('hidden');
       };
 
       // Search bar functionality
-      window.toggleSearchBar = function() {
+      window.toggleSearchBar = function () {
         const searchBar = document.getElementById('search-bar-container');
         searchBar.classList.toggle('hidden');
       };
 
-      window.clearSearch = function() {
+      window.clearSearch = function () {
         document.getElementById('search-input').value = '';
       };
 
       // Modal toggle
-      window.toggleModal = function() {
+      window.toggleModal = function () {
         const modal = document.getElementById('categoryModal');
         if (modal) modal.classList.toggle('hidden');
       };
@@ -401,7 +402,10 @@
           try {
             const response = await fetch('/admin/category/add', {
               method: 'POST',
-              body: formData
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
             });
             const data = await response.json();
 
@@ -426,7 +430,7 @@
       }
 
       // Delete functionality
-      window.handleDelete = async function(categoryId, currentStatus) {
+      window.handleDelete = async function (categoryId, currentStatus) {
         try {
           const response = await fetch(`/admin/category/${categoryId}/delete`, {
             method: 'POST',

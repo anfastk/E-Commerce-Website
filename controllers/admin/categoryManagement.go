@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -63,45 +65,51 @@ func ListCategory(c *gin.Context) {
 }
 
 func AddCategory(c *gin.Context) {
-	c.Request.ParseForm()
+    logger.Log.Info("Requested TO Add Category")
 
-	logger.Log.Info("Requested TO Add Category")
+    // ✅ Read raw request body
+    body, _ := ioutil.ReadAll(c.Request.Body)
+    logger.Log.Info("Raw Request Body", zap.String("body", string(body)))
 
-	var categoryInput struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-	}
-	if err := c.ShouldBindJSON(&categoryInput); err != nil {
-		logger.Log.Error("Invaild Data Entered", zap.Error(err))
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data Entered", "Invalid data Entered", "")
-		return
-	}
+    var categoryInput struct {
+        Name        string `json:"name"`
+        Description string `json:"description"`
+    }
 
-	if categoryInput.Name == "" {
-		logger.Log.Error("Category Name Is Required")
-		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
-		return
-	}
+    if err := json.Unmarshal(body, &categoryInput); err != nil {
+        logger.Log.Error("JSON Unmarshal Error", zap.Error(err))
+        helper.RespondWithError(c, http.StatusBadRequest, "Invalid JSON", "Invalid JSON format", "")
+        return
+    }
 
-	category := models.Categories{
-		Name:        categoryInput.Name,
-		Description: categoryInput.Description,
-	}
+    logger.Log.Info("Parsed Data", zap.String("name", categoryInput.Name), zap.String("description", categoryInput.Description))
 
-	if err := config.DB.Create(&category).Error; err != nil {
-		logger.Log.Error("Failed To Create Category", zap.Error(err))
-		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category", "Something Went Wrong", "")
-		return
-	}
+    if categoryInput.Name == "" {
+        logger.Log.Error("Category Name Is Required")
+        helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
+        return
+    }
 
-	logger.Log.Info("Categoty Created Successfully")
+    category := models.Categories{
+        Name:        categoryInput.Name,
+        Description: categoryInput.Description,
+    }
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "OK",
-		"message": "Category created successfully",
-		"code":    200,
-	})
+    if err := config.DB.Create(&category).Error; err != nil {
+        logger.Log.Error("Failed To Create Category", zap.Error(err))
+        helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create category", "Something Went Wrong", "")
+        return
+    }
+
+    logger.Log.Info("Category Created Successfully")
+
+    c.JSON(http.StatusOK, gin.H{
+        "status":  "OK",
+        "message": "Category created successfully",
+        "code":    200,
+    })
 }
+
 
 func EditCategory(c *gin.Context) {
 	logger.Log.Info("Requested To Edit Category")
