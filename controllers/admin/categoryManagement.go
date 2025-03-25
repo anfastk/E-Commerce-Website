@@ -73,6 +73,7 @@ func AddCategory(c *gin.Context) {
 	}
 	if err := c.ShouldBind(&categoryInput); err != nil {
 		logger.Log.Error("Invaild Data Entered", zap.Error(err))
+		c.Request.ParseMultipartForm(10 << 20)
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data Entered", "Invalid data Entered", "")
 		return
 	}
