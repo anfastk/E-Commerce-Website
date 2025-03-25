@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -67,18 +68,27 @@ func AddCategory(c *gin.Context) {
 
 	logger.Log.Info("Requested TO Add Category")
 
-	var category models.Categories
-	if err := c.ShouldBind(&category); err != nil {
+	var categoryInput struct {
+		Name        string ` form:"name"`
+		Description string `form:"description"`
+	}
+	if err := c.ShouldBind(&categoryInput); err != nil {
 		logger.Log.Error("Invaild Data Entered", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data Entered", "Invalid data Entered", "")
 		return
 	}
 
-	if category.Name == "" {
+	if categoryInput.Name == "" {
 		logger.Log.Error("Category Name Is Required")
 		helper.RespondWithError(c, http.StatusBadRequest, "Category name is required", "Category name is required", "")
 		return
 	}
+	fmt.Println(categoryInput)
+
+	 category:=models.Categories{
+		Name: categoryInput.Name,
+		Description: categoryInput.Description,
+	 }
 
 	if err := config.DB.Create(&category).Error; err != nil {
 		logger.Log.Error("Failed To Create Category", zap.Error(err))
