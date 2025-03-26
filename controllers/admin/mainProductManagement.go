@@ -45,7 +45,7 @@ func ShowProductsAdmin(c *gin.Context) {
         query = query.Where("category_id = ?", categoryID)
     }
     
-    result := query.Find(&variants)
+    result := query.Order("created_at DESC").Find(&variants)
     if result.Error != nil {
         logger.Log.Error("Failed to fetch product variants", zap.Error(result.Error))
         helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product variants", "Failed to fetch product variants", "")

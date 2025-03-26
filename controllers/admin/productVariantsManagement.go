@@ -34,9 +34,10 @@ func ShowProductVariant(c *gin.Context) {
 	})
 }
 
+
 func AddProductVariants(c *gin.Context) {
 	logger.Log.Info("Requested to add product variants")
-	
+
 	productIDStr := c.PostForm("product_id")
 	productID, err := strconv.Atoi(productIDStr)
 	if err != nil {
@@ -76,12 +77,19 @@ func AddProductVariants(c *gin.Context) {
 	tx := config.DB.Begin()
 	cld := config.InitCloudinary()
 
+	form, err := c.MultipartForm()
+	if err != nil {
+		logger.Log.Error("Failed to parse multipart form", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Failed to parse form", "Form Error", "")
+		return
+	}
+
 	for i := 0; i < formLength; i++ {
 		regularPrice, err := strconv.ParseFloat(regularPrices[i], 64)
 		salePrice, err2 := strconv.ParseFloat(salePrices[i], 64)
 		stockQuantity, err3 := strconv.Atoi(stockQuantities[i])
 		if err != nil || err2 != nil || err3 != nil {
-			logger.Log.Error("Invalid price or quantity values", 
+			logger.Log.Error("Invalid price or quantity values",
 				zap.String("regularPrice", regularPrices[i]),
 				zap.String("salePrice", salePrices[i]),
 				zap.String("stockQuantity", stockQuantities[i]),
@@ -113,33 +121,40 @@ func AddProductVariants(c *gin.Context) {
 			return
 		}
 
-		form, _ := c.MultipartForm()
-		if form != nil {
-			files := form.File[fmt.Sprintf("product_images[%d][]", i)]
-			if files != nil {
-				for j, fileHeader := range files {
-					file, _ := fileHeader.Open()
-					defer file.Close()
+		files := form.File[fmt.Sprintf("product_images[%d][]", i)]
+		logger.Log.Info("Processing variant", zap.Int("index", i), zap.Int("fileCount", len(files)))
 
-					url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProductVariants", "")
-					if err != nil {
-						logger.Log.Error("Failed to upload product image", zap.Int("variantIndex", i), zap.Int("imageIndex", j), zap.Error(err))
-						tx.Rollback()
-						helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Upload Error", "")
-						return
-					}
+		if len(files) == 0 {
+			logger.Log.Warn("No images uploaded for variant", zap.Int("index", i))
+		}
 
-					variantImage := models.ProductVariantsImage{
-						ProductVariantsImages: url,
-						ProductVariantID:      productVariant.ID,
-					}
-					if err := tx.Create(&variantImage).Error; err != nil {
-						logger.Log.Error("Failed to save product image", zap.Uint("variantID", productVariant.ID), zap.Error(err))
-						tx.Rollback()
-						helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product image", "Database Error", "")
-						return
-					}
-				}
+		for j, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				logger.Log.Error("Failed to open file", zap.Int("variantIndex", i), zap.Int("fileIndex", j), zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to process image", "File Error", "")
+				return
+			}
+			defer file.Close()
+
+			url, err := utils.UploadImageToCloudinary(file, fileHeader, cld, "ProductVariants", "")
+			if err != nil {
+				logger.Log.Error("Failed to upload product image", zap.Int("variantIndex", i), zap.Int("imageIndex", j), zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to upload product image", "Upload Error", "")
+				return
+			}
+
+			variantImage := models.ProductVariantsImage{
+				ProductVariantsImages: url,
+				ProductVariantID:      productVariant.ID,
+			}
+			if err := tx.Create(&variantImage).Error; err != nil {
+				logger.Log.Error("Failed to save product image", zap.Uint("variantID", productVariant.ID), zap.Error(err))
+				tx.Rollback()
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to save product image", "Database Error", "")
+				return
 			}
 		}
 	}
