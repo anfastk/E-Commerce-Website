@@ -1,8 +1,8 @@
 # ***E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)***
 
- 📌 Project Overview
+## 📌 Project Overview
 
-### This is a full-fledged e-commerce website built using the Gin framework in Golang, following the MVC architecture. The project includes both admin and user sides, handling product management, stock management, user authentication, order processing, and payment integration with Razorpay.
+This is a full-fledged e-commerce website built using the Gin framework in Golang, following the MVC architecture. The project includes both admin and user sides, handling product management, stock management, user authentication, order processing, and payment integration with Razorpay.
 
 ## 🚀 Features
 
