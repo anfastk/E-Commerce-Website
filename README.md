@@ -20,7 +20,7 @@ This is a full-fledged e-commerce website built using the Gin framework in Golan
 
 - Order tracking system
 
-- Responsive UI using HTML, CSS, and Bootstrap
+- Responsive UI using HTML, and Tailwind Css
 
 - Logging using Zap
 
@@ -32,7 +32,7 @@ This is a full-fledged e-commerce website built using the Gin framework in Golan
 
 - Database: PostgreSQL with GORM ORM
 
-- Frontend: HTML, CSS, Bootstrap
+- Frontend: HTML, Tailwind Css
 
 - Logging: Zap Logger
 
