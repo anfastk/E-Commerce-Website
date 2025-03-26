@@ -67,7 +67,7 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 		return VariantsDetails{}, errors.New("descriptions not found")
 	}
 
-	if err := tx.Where("product_Variant_id = ? AND is_deleted = ?", variantID, false).Find(&images).Error; err != nil {
+	if err := tx.Order("created_at DESC").Where("product_Variant_id = ? AND is_deleted = ?", variantID, false).Find(&images).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("images not found")
 	}
