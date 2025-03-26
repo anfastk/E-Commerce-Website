@@ -20,12 +20,12 @@ function confirmUpload() {
     const productId = document.getElementById('product-id').value;
 
     if (!previewImg) {
-        window.toast.error('Please upload an image first');
+        showErrorToast('Please upload an image first');
         return;
     }
 
     // Show loading toast
-    window.toast.success('Uploading image...');
+    showSuccessToast('Uploading image...');
 
     // Convert image to file
     fetch(previewImg.src)
@@ -42,18 +42,18 @@ function confirmUpload() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.filename) {
-                        window.toast.success('Image uploaded successfully');
+                        showSuccessToast('Image uploaded successfully');
                         closeUploadPopup();
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
                     } else {
-                        window.toast.error('Upload failed');
+                        showErrorToast('Upload failed');
                     }
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
-                    window.toast.error('Failed to upload image');
+                    showErrorToast('Failed to upload image');
                 });
         });
 }
@@ -89,13 +89,13 @@ function handleFileUpload(files) {
     previewContainer.innerHTML = ''; // Clear previous previews
 
     if (files.length > 1) {
-        window.toast.error('Please upload only one image');
+        showErrorToast('Please upload only one image');
         return;
     }
 
     const file = files[0];
     if (!file.type.startsWith('image/')) {
-        window.toast.error('Please upload only image files');
+        showErrorToast('Please upload only image files');
         return;
     }
 
@@ -113,11 +113,11 @@ function handleFileUpload(files) {
                 </div>
             `;
         previewContainer.appendChild(preview);
-        window.toast.success('Image loaded successfully');
+        showSuccessToast('Image loaded successfully');
     };
 
     reader.onerror = function () {
-        window.toast.error('Failed to load image');
+        showErrorToast('Failed to load image');
     };
 
     reader.readAsDataURL(file);
@@ -152,7 +152,7 @@ function startCrop(imgElement, fileName) {
         transparent: true
     });
 
-    window.toast.success('Crop mode enabled');
+    showSuccessToast('Crop mode enabled');
 }
 
 function cancelCrop() {
@@ -162,7 +162,7 @@ function cancelCrop() {
         cropper.destroy();
         cropper = null;
     }
-    window.toast.error('Crop cancelled');
+    showErrorToast('Crop cancelled');
 }
 
 function saveCrop() {
@@ -184,7 +184,7 @@ function saveCrop() {
         imgPreview.src = URL.createObjectURL(croppedFile);
 
         cancelCrop();
-        window.toast.success('Image cropped successfully');
+        showSuccessToast('Image cropped successfully');
     }, 'image/png', 1.0);
 }
 
@@ -236,7 +236,7 @@ descriptionForm.addEventListener("submit", async (e) => {
         });
 
         if (response.ok) {
-            window.toast.success("Description added successfully!");
+            showSuccessToast("Description added successfully!");
             setTimeout(() => {
                 window.location.reload();
             }, 500); modal.classList.add("hidden"); // Close modal on success
@@ -252,11 +252,11 @@ descriptionForm.addEventListener("submit", async (e) => {
                 </div>
             `;
         } else {
-            window.toast.error("Failed to add description. Please try again.");
+            showErrorToast("Failed to add description. Please try again.");
         }
     } catch (error) {
         console.error("Error submitting form:", error);
-        window.toast.error("An error occurred. Please try again.");
+        showErrorToast("An error occurred. Please try again.");
     }
 });
 
@@ -272,13 +272,13 @@ addPairButton.onclick = () => {
         <textarea name="description[]" placeholder="Enter description" class="p-2 border border-gray-300 rounded w-2/3" required></textarea>
     `;
     keyValuePairs.appendChild(newPair);
-    window.toast.success("New description field added");
+    showSuccessToast("New description field added");
 };
 
 // Optional: Add error handling for required fields
 descriptionForm.querySelectorAll('input, textarea').forEach(field => {
     field.addEventListener('invalid', () => {
-        window.toast.error("Please fill in all required fields");
+        showErrorToast("Please fill in all required fields");
     });
 });
 
@@ -301,7 +301,7 @@ function deleteDescription(descriptionId, productId) {
             return response.json();
         })
         .then(() => {
-            window.toast.success('Description deleted successfully');
+            showSuccessToast('Description deleted successfully');
             // Remove the description item from the DOM
             const descriptionItem = document.querySelector(`.Descriptions-item[data-desc-id="${descId}"]`);
             if (descriptionItem) {
@@ -314,7 +314,7 @@ function deleteDescription(descriptionId, productId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            window.toast.error('Failed to delete description');
+            showErrorToast('Failed to delete description');
         });
 }
 

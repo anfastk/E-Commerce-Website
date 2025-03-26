@@ -840,7 +840,7 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
-                    <h2 class="text-2xl font-bold mb-4 logo-font">LAPTIX</h2>
+                    <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
                     <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
@@ -992,7 +992,10 @@
                         }
                     } catch (error) {
                         console.error("Error:", error);
-                        showErrorToast("Something went wrong. Please try again.");
+                        showErrorToast("Login First");
+                        setTimeout(() => {
+                            window.location.href = "/auth/login";
+                        }, 1500);
 
                         // Reset button state
                         const button = this.querySelector('button');
@@ -1062,7 +1065,11 @@
                         })
                         .catch(error => {
                             // Show error message
-                            showErrorToast('Login First');
+                            showErrorToast("Login First");
+                            setTimeout(() => {
+                                window.location.href = "/auth/login";
+                            }, 1500);
+
                             console.error('Error:', error);
                             // Reset button to original state
                             button.textContent = originalButtonText;
