@@ -19,7 +19,7 @@ import (
 
 func ShowProductVariant(c *gin.Context) {
 	logger.Log.Info("Requested to show product variant page")
-	
+
 	productID := c.Param("id")
 	var images models.ProductImage
 	if err := config.DB.Where("product_id = ? AND is_deleted = ?", productID, false).Find(&images).Error; err != nil {
@@ -27,13 +27,12 @@ func ShowProductVariant(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Image not found", "Image not found", "")
 		return
 	}
-	
+
 	logger.Log.Info("Product variant page loaded successfully", zap.String("productID", productID))
 	c.HTML(http.StatusSeeOther, "addProductVariants.html", gin.H{
 		"Images": images,
 	})
 }
-
 
 func AddProductVariants(c *gin.Context) {
 	logger.Log.Info("Requested to add product variants")
@@ -172,7 +171,7 @@ func AddProductVariants(c *gin.Context) {
 
 func ShowSingleProductVariantDetail(c *gin.Context) {
 	logger.Log.Info("Requested to show single product variant detail")
-	
+
 	variantIDStr := c.Query("variant_id")
 	variantID, idErr := strconv.Atoi(variantIDStr)
 	if idErr != nil {
@@ -180,14 +179,14 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product ID", "Invalid Input", "")
 		return
 	}
-	
+
 	variantDetails, err := services.ShowSingleProductVariantDetail(uint(variantID))
 	if err != nil {
 		logger.Log.Error("Failed to fetch variant details", zap.Int("variantID", variantID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch product details", "Database Error", "")
 		return
 	}
-	
+
 	logger.Log.Info("Single product variant detail fetched successfully", zap.Int("variantID", variantID))
 	c.HTML(http.StatusSeeOther, "productVariantDetails.html", gin.H{
 		"Variant":       variantDetails,
@@ -198,7 +197,7 @@ func ShowSingleProductVariantDetail(c *gin.Context) {
 
 func AddProductSpecification(c *gin.Context) {
 	logger.Log.Info("Requested to add product specification")
-	
+
 	variantIDStr := c.PostForm("variant_id")
 	variantID, err := strconv.Atoi(variantIDStr)
 	if err != nil {
@@ -206,7 +205,7 @@ func AddProductSpecification(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid product variant ID", "Invalid Input", "")
 		return
 	}
-	
+
 	headings := c.PostFormArray("key[]")
 	specification := c.PostFormArray("value[]")
 	if len(headings) != len(specification) {
@@ -214,7 +213,7 @@ func AddProductSpecification(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Mismatch in headings and specification", "Validation Error", "")
 		return
 	}
-	
+
 	for i := 0; i < len(headings); i++ {
 		spec := models.ProductSpecification{
 			ProductVariantID:   uint(variantID),
@@ -227,7 +226,7 @@ func AddProductSpecification(c *gin.Context) {
 			return
 		}
 	}
-	
+
 	logger.Log.Info("Product specification added successfully", zap.Int("variantID", variantID), zap.Int("count", len(headings)))
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "OK",
@@ -238,7 +237,7 @@ func AddProductSpecification(c *gin.Context) {
 
 func DeleteProductVariant(c *gin.Context) {
 	logger.Log.Info("Requested to delete product variant")
-	
+
 	variantID := c.Param("id")
 	var variant models.ProductVariantDetails
 
@@ -247,7 +246,7 @@ func DeleteProductVariant(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Product not found", "Not Found", "")
 		return
 	}
-	
+
 	var mainProduct models.ProductDetail
 	if err := config.DB.Unscoped().First(&mainProduct, "ID = ?", variant.ProductID).Error; err != nil {
 		logger.Log.Error("Main product not found", zap.Uint("productID", variant.ProductID), zap.Error(err))
@@ -260,7 +259,7 @@ func DeleteProductVariant(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Cannot recover because the main product is deleted.", "Operation Failed", "")
 		return
 	}
-	
+
 	newDeleteStatus := !variant.IsDeleted
 	if newDeleteStatus {
 		variant.IsDeleted = true
@@ -275,8 +274,8 @@ func DeleteProductVariant(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete or recover product", "Database Error", "")
 		return
 	}
-	
-	logger.Log.Info("Product variant delete status updated", 
+
+	logger.Log.Info("Product variant delete status updated",
 		zap.String("variantID", variantID),
 		zap.Bool("isDeleted", newDeleteStatus))
 	c.JSON(http.StatusOK, gin.H{
@@ -288,7 +287,7 @@ func DeleteProductVariant(c *gin.Context) {
 
 func DeleteVariantImage(c *gin.Context) {
 	logger.Log.Info("Requested to delete variant image")
-	
+
 	imageID := c.Param("id")
 	var variantImage models.ProductVariantsImage
 
@@ -325,7 +324,7 @@ func DeleteVariantImage(c *gin.Context) {
 
 func ShowEditProductVariant(c *gin.Context) {
 	logger.Log.Info("Requested to show edit product variant")
-	
+
 	variantID := c.Param("id")
 	var productVariant models.ProductVariantDetails
 	if err := config.DB.First(&productVariant, "id = ?", variantID).Error; err != nil {
@@ -363,7 +362,7 @@ type updateProductVariants struct {
 
 func EditProductVariant(c *gin.Context) {
 	logger.Log.Info("Requested to edit product variant")
-	
+
 	variantID := c.Param("id")
 	var existingVariant models.ProductVariantDetails
 	if err := config.DB.First(&existingVariant, variantID).Error; err != nil {
@@ -406,7 +405,7 @@ func EditProductVariant(c *gin.Context) {
 
 func DeleteSpecification(c *gin.Context) {
 	logger.Log.Info("Requested to delete specification")
-	
+
 	specificationID := c.Param("id")
 	var specification models.ProductSpecification
 	if err := config.DB.First(&specification, specificationID).Error; err != nil {
@@ -431,7 +430,7 @@ func DeleteSpecification(c *gin.Context) {
 
 func UpdateProductSpecification(c *gin.Context) {
 	logger.Log.Info("Requested to update product specification")
-	
+
 	type UpdateSpecification struct {
 		SpecificationIDs []string `json:"specification_id"`
 		SpecificationKey []string `json:"specification_key"`
@@ -455,7 +454,7 @@ func UpdateProductSpecification(c *gin.Context) {
 
 	if len(updateData.SpecificationIDs) != len(updateData.SpecificationKey) ||
 		len(updateData.SpecificationKey) != len(updateData.Specification) {
-		logger.Log.Error("Mismatch in specification arrays", 
+		logger.Log.Error("Mismatch in specification arrays",
 			zap.Int("ids", len(updateData.SpecificationIDs)),
 			zap.Int("keys", len(updateData.SpecificationKey)),
 			zap.Int("values", len(updateData.Specification)))
@@ -470,7 +469,7 @@ func UpdateProductSpecification(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusBadRequest, "Invalid specification ID", "Update Specification Failed", "")
 			return
 		}
-		
+
 		result := config.DB.Model(&models.ProductSpecification{}).
 			Where("id = ? AND Product_variant_id = ?", descID, productID).
 			Updates(map[string]interface{}{
@@ -501,7 +500,7 @@ func UpdateProductSpecification(c *gin.Context) {
 
 func ReplaceVariantProductImage(c *gin.Context) {
 	logger.Log.Info("Requested to replace variant product image")
-	
+
 	imageIDStr := c.PostForm("image_id")
 	imageID, err := strconv.Atoi(imageIDStr)
 	if err != nil {

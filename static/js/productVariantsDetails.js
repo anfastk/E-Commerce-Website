@@ -1,3 +1,4 @@
+// Modal Functionality for Specifications
 const openPopup = document.getElementById("openPopup");
 const popupModal = document.getElementById("popupModal");
 const closePopup = document.getElementById("closePopup");
@@ -11,7 +12,6 @@ closePopup.addEventListener("click", () => {
     popupModal.classList.add("hidden");
 });
 
-// Add More Specification Functionality
 const addSpecBtn = document.getElementById("addSpecBtn");
 const specificationsList = document.getElementById("specificationsList");
 
@@ -19,23 +19,21 @@ addSpecBtn.addEventListener("click", () => {
     const newSpec = document.createElement("div");
     newSpec.classList.add("specification-item", "flex", "flex-row", "gap-4", "mt-4");
     newSpec.innerHTML = `
-                <div class="flex-1">
-                    <label for="key" class="block text-gray-700 font-medium">Specification Key</label>
-                    <input type="text" name="key[]" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g., Material" required>
-                </div>
-                <div class="flex-1">
-                    <label for="value" class="block text-gray-700 font-medium">Specification Value</label>
-                    <input type="text" name="value[]" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g., Cotton" required>
-                </div>
-            `;
+        <div class="flex-1">
+            <label for="key" class="block text-gray-700 font-medium">Specification Key</label>
+            <input type="text" name="key[]" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g., Material" required>
+        </div>
+        <div class="flex-1">
+            <label for="value" class="block text-gray-700 font-medium">Specification Value</label>
+            <input type="text" name="value[]" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g., Cotton" required>
+        </div>
+    `;
     specificationsList.appendChild(newSpec);
 });
 
-// Form submission handler with toast messages
 specificationsForm.addEventListener("submit", function (event) {
     event.preventDefault();
     const formData = new FormData(this);
-
     fetch(this.action, {
         method: 'POST',
         body: formData
@@ -59,49 +57,56 @@ specificationsForm.addEventListener("submit", function (event) {
 });
 
 // Update/Delete Specification Modal
-const openUpdatePopup = document.getElementById("openUpdatePopup");
-const updatePopupModal = document.getElementById("updatePopupModal");
-const closeUpdatePopup = document.getElementById("closeUpdatePopup");
-const updateSpecificationsForm = document.getElementById("updateSpecificationsForm");
+document.addEventListener('DOMContentLoaded', () => {
+    const openPopupBtn = document.getElementById('openUpdatePopup');
+    const closePopupBtn = document.getElementById('closeUpdatePopup');
+    const popupModal = document.getElementById('updatePopupModal');
+    const updateSpecificationsForm = document.getElementById('updateSpecificationsForm');
 
-openUpdatePopup.addEventListener("click", () => {
-    updatePopupModal.classList.remove("hidden");
-});
+    openPopupBtn.addEventListener('click', () => {
+        popupModal.classList.remove('hidden');
+    });
 
-closeUpdatePopup.addEventListener("click", () => {
-    updatePopupModal.classList.add("hidden");
-});
+    closePopupBtn.addEventListener('click', () => {
+        popupModal.classList.add('hidden');
+    });
 
-updateSpecificationsForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const formData = new FormData(updateSpecificationsForm);
-    const data = {
-        specification_id: formData.getAll('specification_id[]'),
-        specification_key: formData.getAll('specification_key[]'),
-        specification: formData.getAll('specification[]')
-    };
-
-    try {
-        const response = await fetch(updateSpecificationsForm.action, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        const responseData = await response.json();
-
-        if (response.ok) {
-            showSuccessToast('Specifications updated successfully!');
-            setTimeout(() => {
-                updatePopupModal.classList.add("hidden");
-                window.location.reload();
-            }, 1500);
-        } else {
-            showErrorToast(responseData.error || 'Failed to update specifications');
+    popupModal.addEventListener('click', (event) => {
+        if (event.target === popupModal) {
+            popupModal.classList.add('hidden');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showErrorToast('An error occurred while updating specifications');
-    }
+    });
+
+    updateSpecificationsForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(updateSpecificationsForm);
+        const data = {
+            specification_id: formData.getAll('specification_id[]'),
+            specification_key: formData.getAll('specification_key[]'),
+            specification: formData.getAll('specification[]')
+        };
+
+        try {
+            const response = await fetch(updateSpecificationsForm.action, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const responseData = await response.json();
+            if (response.ok) {
+                showSuccessToast('Specifications updated successfully!');
+                setTimeout(() => {
+                    popupModal.classList.add('hidden');
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showErrorToast(responseData.error || 'Failed to update specifications');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showErrorToast('An error occurred while updating specifications');
+        }
+    });
 });
 
 function deleteSpecification(specificationId, productId) {
@@ -129,7 +134,7 @@ function deleteSpecification(specificationId, productId) {
         });
 }
 
-// Image Change Functionality
+// Image Handling
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.options-btn').forEach((btn) => {
         btn.addEventListener('click', function () {
@@ -145,23 +150,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (event) {
         const optionsButtons = document.querySelectorAll('.options-btn');
-        const optionsMenus = document.querySelectorAll('.options');
         let clickedOnOptionsButton = false;
         optionsButtons.forEach(btn => {
-            if (btn.contains(event.target)) clickedOnOptionsButton = true;
+            if (btn.contains(event.target)) {
+                clickedOnOptionsButton = true;
+            }
         });
         if (!clickedOnOptionsButton) {
-            optionsMenus.forEach(menu => menu.classList.add('hidden'));
+            document.querySelectorAll('.options').forEach(menu => {
+                menu.classList.add('hidden');
+            });
         }
     });
 
     document.querySelectorAll('#openUploadPopup').forEach(button => {
         button.addEventListener('click', function () {
-            const imageContainer = this.closest('.image-container');
-            const imageId = imageContainer.getAttribute('data-image-id');
-            if (imageId) {
-                document.getElementById('product-id').value = imageId;
-            }
+            const imageId = this.getAttribute('data-image-id');
+            document.getElementById('current-image-id').value = imageId;
             document.getElementById('imageUploadPopup').classList.remove('hidden');
         });
     });
@@ -172,17 +177,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const CROP_WIDTH = 400;
     const CROP_HEIGHT = 400;
 
-    window.closeUploadPopup = function () {
+    function closeUploadPopup() {
         document.getElementById('imageUploadPopup').classList.add('hidden');
         document.getElementById('banner-preview').innerHTML = '';
-    };
+        document.getElementById('current-image-id').value = '';
+    }
 
-    window.confirmUpload = function () {
+    function confirmUpload() {
         const previewImg = document.getElementById('banner-preview').querySelector('img');
-        const imageId = document.getElementById('product-id').value;
+        const imageId = document.getElementById('current-image-id').value;
 
         if (!previewImg) {
             showErrorToast('Please upload an image first');
+            return;
+        }
+
+        if (!imageId) {
+            showErrorToast('No image selected for replacement');
             return;
         }
 
@@ -200,10 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === "Success") {
-                            showSuccessToast('Image uploaded successfully');
-                            setTimeout(() => window.location.reload(), 1500);
+                            showSuccessToast('Image replaced successfully');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
                         } else {
-                            showErrorToast('Upload failed: ' + (data.message || 'Please try again'));
+                            showErrorToast(data.message || 'Upload failed. Please try again.');
                         }
                     })
                     .catch(error => {
@@ -211,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         showErrorToast('Upload failed. Please check your connection and try again.');
                     });
             });
-    };
+    }
 
     function handleFileUpload(files) {
         const previewContainer = document.getElementById('banner-preview');
@@ -233,14 +246,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const preview = document.createElement('div');
             preview.className = 'relative border rounded p-2';
             preview.innerHTML = `
-                        <img src="${e.target.result}" alt="" class="w-full h-40 object-contain">
-                        <div class="absolute top-2 right-2 flex gap-2">
-                            <button type="button" class="bg-blue-500 text-white p-1 rounded" 
-                                onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
-                                Crop
-                            </button>
-                        </div>
-                    `;
+                <img src="${e.target.result}" alt="" class="w-full h-40 object-contain">
+                <div class="absolute top-2 right-2 flex gap-2">
+                    <button type="button" class="bg-blue-500 text-white p-1 rounded" 
+                        onclick="startCrop(this.parentElement.parentElement.querySelector('img'), '${file.name}')">
+                        Crop
+                    </button>
+                </div>
+            `;
             previewContainer.appendChild(preview);
             showSuccessToast('Image loaded successfully.');
         };
@@ -250,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.readAsDataURL(file);
     }
 
-    window.startCrop = function (imgElement, fileName) {
+    function startCrop(imgElement, fileName) {
         const modal = document.getElementById('cropModal');
         const cropImage = document.getElementById('cropImage');
 
@@ -260,57 +273,46 @@ document.addEventListener('DOMContentLoaded', function () {
         cropImage.src = imgElement.src;
         modal.classList.remove('hidden');
 
-        if (cropper) cropper.destroy();
+        if (cropper) {
+            cropper.destroy();
+        }
 
-        try {
-            cropper = new Cropper(cropImage, {
-                aspectRatio: CROP_WIDTH / CROP_HEIGHT,
-                viewMode: 1,
-                dragMode: 'move',
-                cropBoxResizable: true,
-                cropBoxMovable: true,
-                minContainerWidth: 400,
-                minContainerHeight: 400,
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high',
-                background: false,
-                modal: false,
-                transparent: true
-            });
-        } catch (error) {
-            showErrorToast('Error initializing crop tool. Please try again.');
+        cropper = new Cropper(cropImage, {
+            aspectRatio: CROP_WIDTH / CROP_HEIGHT,
+            viewMode: 1,
+            dragMode: 'move',
+            cropBoxResizable: true,
+            cropBoxMovable: true,
+            minContainerWidth: 400,
+            minContainerHeight: 400,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+            background: false,
+            modal: false,
+            transparent: true
+        });
+    }
+
+    function saveCrop() {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: CROP_WIDTH,
+            height: CROP_HEIGHT,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+
+        canvas.toBlob((blob) => {
+            const croppedFile = new File([blob], currentFile, { type: 'image/png' });
+            const previewContainer = document.getElementById('banner-preview');
+            const imgPreview = previewContainer.querySelector('img');
+            imgPreview.src = URL.createObjectURL(croppedFile);
+
             cancelCrop();
-        }
-    };
-
-    window.saveCrop = function () {
-        if (!cropper) {
-            showErrorToast('Crop tool not initialized. Please try again.');
-            return;
-        }
-
-        try {
-            const canvas = cropper.getCroppedCanvas({
-                width: CROP_WIDTH,
-                height: CROP_HEIGHT,
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high'
-            });
-
-            canvas.toBlob((blob) => {
-                const croppedFile = new File([blob], currentFile, { type: 'image/png' });
-                const previewContainer = document.getElementById('banner-preview');
-                const imgPreview = previewContainer.querySelector('img');
-                imgPreview.src = URL.createObjectURL(croppedFile);
-
-                cancelCrop();
-                showSuccessToast('Image cropped successfully');
-            }, 'image/png', 1.0);
-        } catch (error) {
-            showErrorToast('Error cropping image. Please try again.');
-            cancelCrop();
-        }
-    };
+            showSuccessToast('Image cropped successfully');
+        }, 'image/png', 1.0);
+    }
 
     function enableDragAndDrop() {
         const dropArea = document.getElementById('banner-drop-area');
@@ -336,14 +338,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    window.cancelCrop = function () {
+    function cancelCrop() {
         const modal = document.getElementById('cropModal');
         modal.classList.add('hidden');
         if (cropper) {
             cropper.destroy();
             cropper = null;
         }
-    };
+    }
+
+    window.closeUploadPopup = closeUploadPopup;
+    window.confirmUpload = confirmUpload;
+    window.startCrop = startCrop;
+    window.cancelCrop = cancelCrop;
+    window.saveCrop = saveCrop;
 
     enableDragAndDrop();
 });
@@ -364,7 +372,9 @@ function handleSubmit(event) {
             } else {
                 showSuccessToast('Product deleted successfully!');
             }
-            setTimeout(() => window.location.reload(), 500);
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         })
         .catch(error => {
             console.error('Error:', error);

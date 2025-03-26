@@ -30,16 +30,18 @@
         </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (unchanged) -->
     <aside id="sidebar"
         class="lg:block hidden w-full lg:w-64 bg-black text-white flex flex-col sticky top-0 lg:h-screen z-50 ">
         <div class="py-6 px-4 flex items-center justify-start space-x-4">
+            <!-- Hamburger Menu for Small Screens inside Sidebar -->
             <button class="lg:hidden text-white" onclick="toggleSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
+            <!-- Logo -->
             <h1 class="text-4xl font-bold tracking-wide logo-font">LAPTIX</h1>
         </div>
         <nav class="flex-1">
@@ -53,13 +55,14 @@
                     <a href="/admin/dashboard" class="text-base font-medium hover:text-blue-500">Dashboard</a>
                 </li>
                 <li class="py-3 px-4 bg-blue-600 flex items-center space-x-2">
+                    <!-- All Products Button with Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="black">
                         <rect width="384" height="256" x="64" y="176" fill="none" stroke="black" stroke-linejoin="round"
                             stroke-width="32" rx="28.87" ry="28.87" />
                         <path fill="black" stroke="black" stroke-linecap="round" stroke-miterlimit="10"
                             stroke-width="32" d="M144 80h224m-256 48h288" />
                     </svg>
-                    <a href="/admin/products" class="text-base font-medium text-black">All Products</a>
+                    <a href="/admin/products" class="text-base font-medium  text-black">All Products</a>
                 </li>
                 <li class="py-3 px-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2">
@@ -123,6 +126,7 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
+        <!-- Top Navigation (unchanged) -->
         <header class="bg-white shadow py-4 px-6 flex items-center sticky top-0 z-40">
             <button id="hamburger-menu" class="lg:hidden text-black mr-4" onclick="toggleSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -137,10 +141,12 @@
             </div>
         </header>
 
+        <!-- Breadcrumbs (unchanged) -->
         <div class="mt-2 text-gray-500 mx-5 text-xs">
             <span><a href="/admin/products"> All Products</a></span> > <a href="">Product Variants Details</a>
         </div>
 
+        <!-- Content -->
         <main class="mx-5 flex-1 font-roboto-medium">
             <div>
                 <div class="flex flex-wrap gap-4 mt-5 justify-between">
@@ -192,7 +198,7 @@
 
                 <div class="grid lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-2 gap-4 w-full lg:w-1/2">
                     {{range .Variant.Images}}
-                    <div data-image-id="{{.ID}}" class="image-container">
+                    <div>
                         <div class="group relative">
                             <button
                                 class="options-btn text-2xl text-gray-500 hover:text-gray-700 absolute top-0 right-0">
@@ -202,7 +208,7 @@
                                 class="options hidden absolute top-8 right-0 mt-2 bg-gray-100 shadow-md rounded-md w-32 text-gray-700">
                                 <ul>
                                     <li>
-                                        <button id="openUploadPopup"
+                                        <button id="openUploadPopup" data-image-id="{{.ID}}"
                                             class="pl-4 pr-16 py-2 hover:bg-gray-200 cursor-pointer">CHANGE</button>
                                     </li>
                                 </ul>
@@ -210,6 +216,7 @@
                         </div>
                         <img class="rounded shadow w-full h-auto object-cover" src="{{.ProductVariantsImages}}"
                             alt="Product Image">
+                        <input type="hidden" class="image-id" value="{{.ID}}">
                     </div>
                     <!-- Image Upload Popup -->
                     <div id="imageUploadPopup"
@@ -218,7 +225,7 @@
                             <h2 class="text-xl font-bold mb-4">Upload Product Image</h2>
                             <div id="banner-drop-area"
                                 class="border-dashed border-2 border-gray-300 rounded px-4 py-6 text-center bg-white mb-4 hover:border-blue-500 transition">
-                                <input type="hidden" id="product-id" value="{{.ID}}">
+                                <input type="hidden" id="current-image-id" name="image_id" value="">
                                 <input id="banner-input" type="file" accept="image/*" class="hidden"
                                     name="product_image" />
                                 <p class="text-gray-500">
@@ -262,7 +269,7 @@
                 </div>
             </div>
 
-            <!-- Product Details -->
+            <!-- Product Details (unchanged) -->
             <div class="bg-white p-4 sm:p-6 mt-8 rounded shadow">
                 <div style="font-family: rubik;" class="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                     <div class="space-y-6">
@@ -273,7 +280,7 @@
                         {{end}}
                         <p class="text-semibold"><span class="font-semibold">Product Name:</span> {{
                             .Variant.ProductName}}</p>
-                        <p class="text-semibold"><span class="font-semibold">Product Summary:</span><br> {{
+                        <p class="text-semibold"><span class="font-semibold">Product Summary:</span><br>{{
                             .Variant.ProductSummary}}</p>
                         <p class="text-semibold"><span class="font-semibold">Category:</span><br> {{
                             .Variant.CategoryName}}</p>
@@ -327,6 +334,7 @@
                         <p>No offers available for this product.</p>
                         {{ end }}
                     </div>
+                    <!-- Specification Popup (unchanged) -->
                     <button id="openPopup"
                         class="bg-blue-600 text-white py-2 px-6 rounded font-bold hover:bg-blue-700 transition">
                         Add Specifications
@@ -372,6 +380,7 @@
                             </form>
                         </div>
                     </div>
+                    <!-- Update/Delete Specification Popup (unchanged) -->
                     <button id="openUpdatePopup"
                         class="bg-red-600 text-white py-2 px-6 rounded font-bold hover:bg-red-700 transition">
                         Update/Delete Specification
@@ -428,9 +437,11 @@
             </div>
         </main>
     </div>
-    <script src="/static/js/productVariantsDetails.js"></script>
+
     <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
+    <script src="/static/js/productVariantsDetails.js" defer></script>
+
 </body>
 
 </html>
