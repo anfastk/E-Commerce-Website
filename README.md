@@ -1,41 +1,41 @@
-# E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)
+# ***E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)***
 
-📌 Project Overview
+ 📌 Project Overview
 
-This is a full-fledged e-commerce website built using the Gin framework in Golang, following the MVC architecture. The project includes both admin and user sides, handling product management, stock management, user authentication, order processing, and payment integration with Razorpay.
+### This is a full-fledged e-commerce website built using the Gin framework in Golang, following the MVC architecture. The project includes both admin and user sides, handling product management, stock management, user authentication, order processing, and payment integration with Razorpay.
 
-🚀 Features
+## 🚀 Features
 
-User authentication (signup, login, logout, password reset)
+- User authentication (signup, login, logout, password reset)
 
-Admin dashboard for product and order management
+- Admin dashboard for product and order management
 
-Product catalog with categories and filters
+- Product catalog with categories and filters
 
-Shopping cart and checkout system
+- Shopping cart and checkout system
 
-Secure payments via Razorpay
+- Secure payments via Razorpay
 
-Stock management to prevent overselling
+- Stock management to prevent overselling
 
-Order tracking system
+- Order tracking system
 
-Responsive UI using HTML, CSS, and Bootstrap
+- Responsive UI using HTML, CSS, and Bootstrap
 
-Logging using Zap
+- Logging using Zap
 
-Hosted on AWS with Nginx, secured with HTTPS/TLS
+- Hosted on AWS with Nginx, secured with HTTPS/TLS
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-Backend: Golang (Gin framework)
+- Backend: Golang (Gin framework)
 
-Database: PostgreSQL with GORM ORM
+- Database: PostgreSQL with GORM ORM
 
-Frontend: HTML, CSS, Bootstrap
+- Frontend: HTML, CSS, Bootstrap
 
-Logging: Zap Logger
+- Logging: Zap Logger
 
-Payment Gateway: Razorpay
+- Payment Gateway: Razorpay
 
-Deployment: AWS (EC2, S3, RDS, Nginx, TLS/SSL)
+- Deployment: AWS (EC2, S3, RDS, Nginx, TLS/SSL)
