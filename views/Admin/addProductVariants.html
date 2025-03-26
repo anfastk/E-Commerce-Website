@@ -390,7 +390,7 @@
                         hideLoader();
                         if (data.code === 200) {
                             showSuccessToast(data.message || 'Variant added successfully!');
-                            setTimeout(() => window.location.href = data.redirect || '/admin/products', 1000);
+                            setTimeout(() => window.location.href = '/admin/products', 1000);
                         } else {
                             showErrorToast(data.message || 'Error adding variant');
                         }
