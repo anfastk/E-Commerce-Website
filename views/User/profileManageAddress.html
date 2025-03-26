@@ -371,6 +371,7 @@
                 .then(response => {
                     if (response.ok) {
                         showSuccessToast("Address deleted successfully!");
+                        location.reload();
                     } else {
                         showErrorToast("Failed to delete address.");
                     }

@@ -708,6 +708,8 @@ func CancelSpecificOrder(c *gin.Context) {
 				return
 			}
 			IscouponRemoved = true
+		}else{
+			refundAmount = orderItems.Total
 		}
 	} else {
 		refundAmount = orderItems.Total

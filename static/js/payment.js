@@ -50,16 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const total = parseFloat(document.getElementById('total').value) || 0;
     const isCodAvailable = document.getElementById('isCodAvailable').value === 'true';
 
-    // Ensure wallet input is visible initially if needed
-    if (walletInput) {
-        // Make sure wallet input is properly initialized
-        walletInput.style.display = 'block';
-    }
+    // Initial wallet input state
+    walletInput.style.display = 'block';
+    walletInput.style.transition = 'all 0.3s ease';
 
     // Fetch wallet balance initially
     fetchWalletBalance();
 
-    // Function to fetch wallet balance via AJAX
     function fetchWalletBalance() {
         fetch('/checkout/check/wallet/balance', {
             method: 'GET',
@@ -67,96 +64,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Content-Type': 'application/json'
             }
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch wallet balance');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 updateWalletDisplay(data.balance);
             })
             .catch(error => {
                 console.error('Error fetching wallet balance:', error);
-                updateWalletDisplay(0); // Default to 0 if there's an error
+                updateWalletDisplay(0);
             });
     }
 
-    // Function to update wallet display based on balance
     function updateWalletDisplay(balance) {
-
-        // Update the wallet balance text
         walletBalanceDisplay.textContent = `Wallet Balance ₹ ${balance.toFixed(2)}${balance < total ? ' Unavailable' : ''}`;
 
-        // Check if wallet balance is sufficient
-        if (balance < total) {
-            // Disable wallet payment option - add 'disabled' class to match COD style
+        const isInsufficient = balance < total;
+
+        if (isInsufficient) {
             walletPaymentOption.classList.add('disabled');
             walletPaymentOption.style.cursor = 'not-allowed';
-
-            // Update message to show insufficient balance
             walletMessageDisplay.innerHTML = `
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z"></path>
-        </svg>
-        Insufficient balance.
-    `;
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z"></path>
+                </svg>
+                Insufficient balance.
+            `;
 
-            // Show gift card input when balance is less than total
-            if (walletInput) {
-                walletInput.classList.add('active');
-
-                // Force show the input by setting inline styles
-                walletInput.style.maxHeight = '200px';
-                walletInput.style.opacity = '1';
-                walletInput.style.transform = 'translateY(0)';
-
-            }
-
-            // If this was selected, choose another payment method
-            if (selectedPaymentMethod === 'Wallet') {
-                // Find the first available payment method
-                const availableMethod = document.querySelector('.payment-option:not(.disabled)');
-                if (availableMethod) {
-                    availableMethod.click();
-                }
-            }
+            // Show wallet input when balance is insufficient
+            walletInput.style.maxHeight = '200px';
+            walletInput.style.opacity = '1';
+            walletInput.style.transform = 'translateY(0)';
         } else {
-            // Enable wallet payment option
             walletPaymentOption.classList.remove('disabled');
             walletPaymentOption.style.cursor = 'pointer';
+            walletMessageDisplay.innerHTML = `Available`;
 
-            // Update message to show wallet is available
-            walletMessageDisplay.innerHTML = `
-        Available 
-    `;
+            // Hide wallet input when balance is sufficient
+            walletInput.style.maxHeight = '0';
+            walletInput.style.opacity = '0';
+            walletInput.style.transform = 'translateY(-10px)';
+        }
 
-            // Hide gift card input if balance is sufficient
-            if (walletInput) {
-                walletInput.classList.remove('active');
-
-                // Reset inline styles
-                walletInput.style.maxHeight = '';
-                walletInput.style.opacity = '';
-                walletInput.style.transform = '';
-            }
+        // Update selected payment method if necessary
+        if (selectedPaymentMethod === 'Wallet' && isInsufficient) {
+            const availableMethod = document.querySelector('.payment-option:not(.disabled)');
+            if (availableMethod) availableMethod.click();
         }
     }
 
     // Check COD availability
     if (!isCodAvailable) {
-        // Disable COD payment option
         codPaymentOption.classList.add('disabled');
         codPaymentOption.style.cursor = 'not-allowed';
     }
 
-    // Apply gift card functionality
-    // Apply gift card functionality
+    // Apply gift card functionality (unchanged)
     applyButton.addEventListener('click', function () {
         const giftCardCode = giftCardInput.value.trim();
         const responseDiv = document.getElementById('gift-card-response');
 
-        // Clear previous message
         responseDiv.classList.remove('text-green-600', 'text-red-600');
         responseDiv.classList.add('hidden');
         responseDiv.textContent = '';
@@ -168,19 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Show loading state
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         this.disabled = true;
 
-        // Send AJAX request to apply gift card
         fetch('/checkout/redeem/gift/code', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                code: giftCardCode
-            })
+            body: JSON.stringify({ code: giftCardCode })
         })
             .then(response => {
                 if (!response.ok) {
@@ -189,15 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
-                // Show success message
                 responseDiv.textContent = data.message || 'Gift card applied successfully';
                 responseDiv.classList.add('text-green-600', 'block');
                 responseDiv.classList.remove('hidden');
-
-                // Clear input field
                 giftCardInput.value = '';
-
-                // Fetch updated wallet balance
                 fetchWalletBalance();
             })
             .catch(error => {
@@ -206,79 +162,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 responseDiv.classList.remove('hidden');
             })
             .finally(() => {
-                // Reset button state
                 this.innerHTML = 'Apply';
                 this.disabled = false;
             });
     });
 
-    // Set up event listeners for each payment option
+    // Payment option selection
     paymentOptions.forEach(option => {
         option.addEventListener('click', function () {
-            // Check if this option is disabled
-            if (this.classList.contains('disabled')) {
-                return;
-            }
+            if (this.classList.contains('disabled')) return;
 
-            // Remove selected class from all options
             paymentOptions.forEach(opt => {
-                opt.classList.remove('selected');
-                opt.classList.remove('just-selected');
+                opt.classList.remove('selected', 'just-selected');
                 opt.querySelector('.custom-radio').classList.remove('selected');
             });
 
-            // Add selected class to clicked option
-            this.classList.add('selected');
-            this.classList.add('just-selected');
+            this.classList.add('selected', 'just-selected');
             this.querySelector('.custom-radio').classList.add('selected');
-
-            // Store the selected payment method
             selectedPaymentMethod = this.getAttribute('data-value');
 
-            // Toggle wallet input visibility
+            const walletBalance = parseFloat(walletBalanceDisplay.textContent.match(/₹\s+([\d.]+)/)[1]) || 0;
+
+            // Handle wallet input visibility
             if (this.id === 'walletPayment') {
-                const walletBalance = parseFloat(walletBalanceDisplay.textContent.match(/₹\s+([\d.]+)/)[1]);
-
                 if (walletBalance < total) {
-                    walletInput.classList.add('active');
-
-                    // Force show the input
                     walletInput.style.maxHeight = '200px';
                     walletInput.style.opacity = '1';
                     walletInput.style.transform = 'translateY(0)';
-
                 } else {
-                    walletInput.classList.remove('active');
-
-                    // Reset inline styles
-                    walletInput.style.maxHeight = '';
-                    walletInput.style.opacity = '';
-                    walletInput.style.transform = '';
+                    walletInput.style.maxHeight = '0';
+                    walletInput.style.opacity = '0';
+                    walletInput.style.transform = 'translateY(-10px)';
                 }
             } else {
-                walletInput.classList.remove('active');
-
-                // Reset inline styles
-                walletInput.style.maxHeight = '';
-                walletInput.style.opacity = '';
-                walletInput.style.transform = '';
+                // Show wallet input for other payment methods only if balance < total
+                if (walletBalance < total) {
+                    walletInput.style.maxHeight = '200px';
+                    walletInput.style.opacity = '1';
+                    walletInput.style.transform = 'translateY(0)';
+                } else {
+                    walletInput.style.maxHeight = '0';
+                    walletInput.style.opacity = '0';
+                    walletInput.style.transform = 'translateY(-10px)';
+                }
             }
 
-            // Remove the pulse animation class after animation completes
-            setTimeout(() => {
-                this.classList.remove('just-selected');
-            }, 800);
+            setTimeout(() => this.classList.remove('just-selected'), 800);
         });
     });
 
-    // Add hover effects
+    // Add hover effects (unchanged)
     paymentOptions.forEach(option => {
         option.addEventListener('mouseenter', function () {
             if (!this.classList.contains('selected') && !this.classList.contains('disabled')) {
                 this.style.backgroundColor = '#f9fafb';
             }
         });
-
         option.addEventListener('mouseleave', function () {
             if (!this.classList.contains('selected')) {
                 this.style.backgroundColor = '';
@@ -286,68 +225,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Helper functions for showing toasts
-    function showErrorToast(message) {
-        console.error('Error:', message);
-        // Add your toast implementation here
-    }
-
-    function showSuccessToast(message) {
-        console.log('Success:', message);
-        // Add your toast implementation here
-    }
-
-    // Set default selection (first available payment method)
+    // Set default selection
     const availableMethod = document.querySelector('.payment-option:not(.disabled)');
-    if (availableMethod) {
-        availableMethod.click();
-    }
+    if (availableMethod) availableMethod.click();
 
-    // Add tooltips to disabled payment options
+    // Add tooltips to disabled options (unchanged)
     const disabledOptions = document.querySelectorAll('.payment-option.disabled');
-
-    // Add tooltip elements to each disabled option
     disabledOptions.forEach(option => {
-        // Extract the reason for disability
-        let reasonText = "This payment option is unavailable";
+        let reasonText = option.id === 'walletPayment' ?
+            "Insufficient wallet balance" :
+            "Cash on Delivery is not available for this order";
 
-        // Get specific messages
-        if (option.id === 'walletPayment') {
-            reasonText = "Insufficient wallet balance";
-        } else if (option.id === 'codPayment') {
-            reasonText = "Cash on Delivery is not available for this order";
-        }
-
-        // Create tooltip
         const tooltip = document.createElement('div');
         tooltip.className = 'disabled-tooltip';
         tooltip.textContent = reasonText;
         option.appendChild(tooltip);
 
-        // Add shake effect when clicked
         option.addEventListener('click', function () {
             if (this.classList.contains('disabled')) {
                 this.classList.add('shake');
-                setTimeout(() => {
-                    this.classList.remove('shake');
-                }, 500);
+                setTimeout(() => this.classList.remove('shake'), 500);
             }
         });
     });
-
-    // Force check the wallet balance and update UI after a small delay
-    setTimeout(() => {
-        const walletBalance = parseFloat(walletBalanceDisplay.textContent.match(/₹\s+([\d.]+)/)[1]) || 0;
-
-        if (walletBalance < total) {
-            walletInput.classList.add('active');
-
-            // Force show the input
-            walletInput.style.maxHeight = '200px';
-            walletInput.style.opacity = '1';
-            walletInput.style.transform = 'translateY(0)';
-        }
-    }, 100);
 });
 
 // Process payment function
