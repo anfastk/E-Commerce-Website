@@ -307,10 +307,10 @@
                                         </div>
                                     </div>
                                     {{end}}
-                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f"
-                                        .product.RegularPrice}}
+                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f" .product.SalePrice}}
                                     </p>
-                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f" .product.SalePrice}}
+                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f"
+                                        .product.RegularPrice}}
                                     </p>
                                     {{if .product.OfferPercentage}}
                                     <span
@@ -392,9 +392,9 @@
                                         </div>
                                     </div>
                                     {{end}}
-                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f" .RegularPrice}}
+                                    <p class="font-bold text-base text-blue-800">₹{{printf "%.2f" .SalePrice}}
                                     </p>
-                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f" .SalePrice}}</p>
+                                    <p class="text-xs text-gray-500 line-through">₹{{printf "%.2f" .RegularPrice}}</p>
                                     {{if .OfferPercentage}}
                                     <span
                                         class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-1">{{.OfferPercentage}}%
