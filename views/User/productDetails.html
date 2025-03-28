@@ -350,15 +350,16 @@
                             </div>
                             {{end}}
                         </a>
-                        {{range .otherVariantDetails}}
-                        <a href="/products/details/{{.ID}}" class=" hover:border-2 hover:border-blue-500">
+                        {{range .OtherVariantDetails}}
+                        <a href="/products/details/{{.ID}}">
                             {{if gt .Stock 0}}
-                            <div class="relative border-2 border-gray-200 rounded-lg p-2 w-40 opacity-80">
+                            <div
+                                class="relative border-2 border-gray-200 rounded-lg p-2 w-40 opacity-80 h-full hover:border-2 hover:border-blue-500">
                                 <div class="bg-white p-3 rounded flex flex-col items-center">
                                     <div class="bg-white mb-2 w-full flex justify-center">
-                                        <img src="{{.Images }}" alt="Purple Headphones" class="mb-1" />
+                                        <img src="{{.Image }}" alt="Purple Headphones" class="mb-1" />
                                     </div>
-                                    <p class="font-bold text-sm text-purple-800">{{.Color}}</p>
+                                    <p class="font-bold text-sm text-purple-800">{{.Colour}}</p>
                                     <p class="text-xs bg-gray-100 rounded-full px-2 py-1 my-1 font-medium">{{.Rom}} +
                                         {{.Ram}}</p>
                                     <p class="text-red-500 text-xs font-medium mt-1">Currently unavailable</p>

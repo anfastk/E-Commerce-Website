@@ -100,14 +100,14 @@
                         data-cart-item="{{.CartItem.ID}}">
                         {{if .ProductImage}}
                         <img src="{{.ProductImage}}" alt="{{.ProductDetail.ProductName}}"
-                            class="w-24 h-24 object-contain">
+                            class="w-24 h-24 object-contain self-center md:self-start">
                         {{end}}
                         <div class="flex-grow">
-                            <a href="/products/details/{{.ProductDetail.ID}}">
+                            <a href="/products/details/{{.ProductDetail.ID}}" class="block">
                                 <h3 class="font-bold mb-2">{{ .ProductDetail.Category.Name }}</h3>
                                 <p class="text-sm text-gray-600 mb-4">{{ .ProductDetail.ProductSummary }}</p>
                             </a>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-center justify-between flex-wrap gap-4">
                                 <a href="/products/details/{{.ProductDetail.ID}}">
                                     <div class="flex items-center gap-4">
                                         <p class="line-through text-gray-400">&#8377;{{
@@ -153,7 +153,7 @@
                         </div>
                         <div class="flex justify-between mb-4">
                             <span>DISCOUNT</span>
-                            <span class="discount-amount">₹{{.DiscountAmount}}</span>
+                            <span class="discount-amount text-green-500">₹{{.DiscountAmount}}</span>
                         </div>
                         <div class="flex justify-between mb-8">
                             <span class="font-bold">TOTAL</span>
@@ -371,18 +371,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -471,7 +483,7 @@
                         const totalElement = document.querySelector('.total-amount');
                         if (subtotalElement && totalElement) {
                             subtotalElement.textContent = `₹${data.SubTotal.toFixed(2)}`;
-                            discountElement.textContent = `₹${data.DiscountAmount.toFixed(2)}`;
+                            discountElement.textContent = `-₹${data.DiscountAmount.toFixed(2)}`;
                             totalElement.textContent = `₹${data.Total.toFixed(2)}`;
                         }
 
