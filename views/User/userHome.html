@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/userhome.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
-    <script src="/static/js/userhome.js" defer></script>
     <script src="/static/js/productpage.js" defer></script>
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <style>
@@ -84,15 +83,78 @@
         .animate-heartbeat {
             animation: heartbeat 1.5s infinite;
         }
+
+        @media (max-width: 640px) {
+            .black-cart-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .wishlist-btn {
+                padding: 0.25rem;
+            }
+
+            .wishlist-icon {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-font {
+                font-size: 1.5rem;
+            }
+
+            .carousel-image {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .category-image {
+                height: 200px;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+            .category-image {
+                height: 250px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .category-image {
+                height: 300px;
+            }
+        }
+
+        /* Additional custom styles */
+        @media (max-width: 640px) {
+            .carousel-image {
+                max-height: 200px !important;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .carousel-image {
+                max-height: 300px !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .carousel-image {
+                max-height: 400px !important;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
     <!-- Header Section -->
-    <div class="bg-black py-4 sticky top-0 z-50 ">
-        <header class="bg-white rounded-lg shadow-md mx-4 px-6">
+    <div class="bg-black py-2 sm:py-4 sticky top-0 z-50">
+        <header class="bg-white rounded-lg shadow-md mx-2 sm:mx-4 px-3 sm:px-6">
             <div class="flex justify-between items-center py-2">
-                <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
+                <a href="#" class="text-2xl sm:text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
 
                 <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
@@ -102,7 +164,7 @@
                 </nav>
 
                 <!-- Icons Section -->
-                <div class="hidden lg:flex items-center space-x-8">
+                <div class="hidden lg:flex items-center space-x-4 xl:space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"
@@ -135,7 +197,7 @@
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <button class="lg:hidden" onclick="toggleMobileMenu()">
+                <button class="lg:hidden p-2" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
@@ -144,41 +206,62 @@
             </div>
 
             <!-- Mobile Navigation -->
-            <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
-                <nav class="flex flex-col space-y-4 text-md font-medium">
-                    <a href="/" class="hover:text-gray-600">Home</a>
-                    <a href="/products" class="hover:text-gray-600">Shop</a>
-                    <a href="/contactUs" class="hover:text-gray-600">Contact</a>
-                    <a href="/cart" class="hover:text-gray-600">Cart</a>
-                    <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
-                    <a href="/profile" class="hover:text-gray-600">Profile</a>
-
+            <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-2 px-4 py-3">
+                <nav class="flex flex-col space-y-3 text-sm font-medium">
+                    <a href="/" class="hover:text-gray-600 py-2">Home</a>
+                    <a href="/products" class="hover:text-gray-600 py-2">Shop</a>
+                    <a href="/contactUs" class="hover:text-gray-600 py-2">Contact</a>
+                    <a href="/cart" class="hover:text-gray-600 py-2">Cart</a>
+                    <a href="/wishlist" class="hover:text-gray-600 py-2">Wishlist</a>
+                    <a href="/profile" class="hover:text-gray-600 py-2">Profile</a>
                 </nav>
             </div>
         </header>
     </div>
 
     <!-- Carousel -->
-    <div class="relative w-full h-64 overflow-hidden flex items-center justify-center mt-8">
+    <div
+        class="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden flex items-center justify-center max-sm:mt-8">
         <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out">
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_1_wcxv0j.gif"
-                    alt="Slide 1" class="max-w-full max-h-full object-contain" /></div>
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_7_vey07l.gif"
-                    alt="Slide 2" class="max-w-full max-h-full object-contain" /></div>
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984268/Banner_6_lbhpwd.gif"
-                    alt="Slide 3" class="max-w-full max-h-full object-contain" /></div>
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984266/Banner_4_wgw1in.jpg"
-                    alt="Slide 4" class="max-w-full max-h-full object-contain" /></div>
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984265/Banner_3_daxofx.png"
-                    alt="Slide 5" class="max-w-full max-h-full object-contain" /></div>
-            <div class="min-w-full h-64 flex-shrink-0 flex items-center justify-center"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984263/Banner_2_whgpma.jpg"
-                    alt="Slide 6" class="max-w-full max-h-full object-contain" /></div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_1_wcxv0j.gif"
+                    alt="Slide 1" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984269/Banner_7_vey07l.gif"
+                    alt="Slide 2" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984268/Banner_6_lbhpwd.gif"
+                    alt="Slide 3" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984266/Banner_4_wgw1in.jpg"
+                    alt="Slide 4" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984265/Banner_3_daxofx.png"
+                    alt="Slide 5" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+            <div class="min-w-full h-full flex-shrink-0 flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984263/Banner_2_whgpma.jpg"
+                    alt="Slide 6" class="carousel-image max-w-full max-h-full object-contain" />
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <button id="prev-btn"
+            class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/50 p-2 rounded-full z-10">
+            &#10094;
+        </button>
+        <button id="next-btn"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/50 p-2 rounded-full z-10">
+            &#10095;
+        </button>
+
+        <!-- Dots Navigation -->
+        <div id="carousel-dots" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <!-- Dots will be dynamically added by JavaScript -->
         </div>
     </div>
 
@@ -196,15 +279,16 @@
     </div>
 
     <!-- Laptops Section -->
-    <div class="container mx-auto px-4 py-6 mt-10">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">LAPTOPS</h1>
-            <a href="/products?categories=LAPTOP" class="bg-black text-white px-4 py-2 rounded-full">Show More</a>
+    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-6 mt-6 sm:mt-10">
+        <div class="flex justify-between items-center mb-4 sm:mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold">LAPTOPS</h1>
+            <a href="/products?categories=LAPTOP"
+                class="bg-black text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm sm:text-base">Show More</a>
         </div>
-        <div class="flex gap-6 overflow-x-auto scrollbar-hide pb-4 pl-4">
+        <div class="flex gap-3 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 pl-2 sm:pl-4">
             {{range .Laptop}}
             <div
-                class="bg-white rounded-lg shadow-lg w-64 flex-shrink-0 p-2 border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+                class="bg-white rounded-lg shadow-lg w-56 sm:w-64 flex-shrink-0 p-2 border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
                 <!-- Product Link - Modified to not scale the entire container -->
                 <a href="/products/details/{{.ID}}" class="block">
                     <div class="absolute -left-6 top-6 z-20 transform rotate-[-45deg] overflow-hidden">
@@ -268,7 +352,7 @@
                     {{if .IsInCart}}
                     <a href="/cart" class="w-full">
                         <button
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -291,7 +375,7 @@
                     {{else}}
                     <form class="cart-form w-full" data-product-id="{{.ID}}">
                         <button type="button" onclick="addToCart(event, '{{.ID}}', this)"
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -317,13 +401,13 @@
     </div>
 
     <!-- Features Section -->
-    <div class="bg-white py-6 shadow-md mt-10">
+    <div class="bg-white py-4 sm:py-6 shadow-md mt-6 sm:mt-10">
         <div
-            class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-800 space-y-6 md:space-y-0">
-            <div class="flex items-center space-x-4">
+            class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-800 space-y-4 sm:space-y-6 md:space-y-0 px-4">
+            <div class="flex items-center space-x-3 sm:space-x-4">
                 <div>
-                    <p class="font-semibold">FASTED DELIVERY</p>
-                    <p class="text-sm">Delivery in 24/H</p>
+                    <p class="font-semibold text-sm sm:text-base">FASTED DELIVERY</p>
+                    <p class="text-xs sm:text-sm">Delivery in 24/H</p>
                 </div>
             </div>
             <div class="hidden md:block border-l border-gray-300 h-10"></div>
@@ -351,23 +435,19 @@
     </div>
 
     <!-- Featured Products -->
-    <div class="container mx-auto px-4 py-6 mt-10">
+    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-6 mt-6 sm:mt-10">
         <a href="/products/details/1">
-            <div class="bg-white rounded-lg shadow p-6 flex flex-col lg:flex-row items-center pb-20">
-                <div class="lg:w-1/2 w-full pr-0 lg:pr-8 mb-6 lg:mb-0">
-                    <h1 class="text-3xl lg:text-4xl font-bold mb-4">MSI Titan 18 HX</h1>
-                    <p class="text-gray-700 mb-6 leading-relaxed">MSI Titan 18 HX, Intel 14th Gen. i9-14900HX, 45.72CM
-                        UHD+ MiniLED 120Hz Gaming Laptop (64GB/2TB NVMe SSD/Windows 11 Home/NVIDIA GeForce RTX 4080,
-                        Core Black/3.6Kg), A14VHG-207IN</p>
-                    <form class="cart-form" data-product-id="1">
-                        <!-- <button type="button" onclick="addToCart(event, '1', this)"
-                            class="bg-black text-white text-base font-medium py-3 px-8 rounded-full shadow-lg focus:outline-none hover:bg-gray-800">Add
-                            To Cart</button> -->
-                    </form>
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col lg:flex-row items-center pb-12 sm:pb-20">
+                <div class="lg:w-1/2 w-full pr-0 lg:pr-8 mb-4 sm:mb-6 lg:mb-0">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">MSI Titan 18 HX</h1>
+                    <p class="text-gray-700 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">MSI Titan 18 HX, Intel
+                        14th Gen. i9-14900HX, 45.72CM UHD+ MiniLED 120Hz Gaming Laptop (64GB/2TB NVMe SSD/Windows 11
+                        Home/NVIDIA GeForce RTX 4080, Core Black/3.6Kg), A14VHG-207IN</p>
                 </div>
-                <div class="lg:w-1/2 w-md flex justify-center"><img
-                        src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/Msi_Titan_Banner_pxneew.jpg"
-                        alt="MSI Titan 18 HX" class="rounded-lg shadow-md object-cover max-w-full"></div>
+                <div class="lg:w-1/2 w-full flex justify-center">
+                    <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/Msi_Titan_Banner_pxneew.jpg"
+                        alt="MSI Titan 18 HX" class="rounded-lg shadow-md object-cover max-w-full h-auto">
+                </div>
             </div>
         </a>
         <a href="/products/details/2">
@@ -480,7 +560,7 @@
                     {{if .IsInCart}}
                     <a href="/cart" class="w-full">
                         <button
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -503,7 +583,7 @@
                     {{else}}
                     <form class="cart-form w-full" data-product-id="{{.ID}}">
                         <button type="button" onclick="addToCart(event, '{{.ID}}', this)"
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -529,7 +609,7 @@
     </div>
 
     <!-- Zebronics Banner -->
-    <a href="/products/details/4">
+    <!-- <a href="/products/details/4">
         <div class="max-w-7xl mx-auto mt-14">
             <div class="relative h-[350px] rounded-[30px] overflow-hidden">
                 <div class="absolute inset-0"><img
@@ -548,7 +628,100 @@
                 </div>
             </div>
         </div>
-    </a>
+    </a> -->
+
+
+
+    <!-- Categories Section -->
+    <div class="flex flex-col items-center justify-center mt-16">
+        <h1 class="text-2xl font-bold tracking-wider text-gray-800 mb-6">CATEGORIES</h1>
+        <div class="max-w-6xl w-full p-6 overflow-x-auto scrollbar-hide">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 justify-center items-center">
+                <!-- Laptop Category -->
+                <a href="/products?categories=LAPTOP" class="group">
+                    <div class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-lg 
+                                transform transition-all duration-300 
+                                hover:scale-105 hover:shadow-2xl">
+                        <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/Categort_Laptop_knl3dr.png"
+                            alt="Laptop"
+                            class="absolute inset-0 w-full h-full object-cover brightness-90 group-hover:brightness-75 transition-all duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent
+                                    opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                                    flex items-end p-4 md:p-6">
+                            <span class="text-white text-xl md:text-2xl font-bold tracking-wide
+                                         transform translate-y-4 group-hover:translate-y-0 
+                                         transition-transform duration-300">
+                                Laptops
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Keyboard and Headset Categories -->
+                <div class="space-y-6 md:space-y-8">
+                    <!-- Keyboard -->
+                    <a href="/products?categories=KEYBOARD" class="group block">
+                        <div class="relative aspect-video overflow-hidden rounded-2xl shadow-md
+                                    transform transition-all duration-300 
+                                    hover:scale-105 hover:shadow-xl">
+                            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Keyboard_b9rikj.png"
+                                alt="Keyboard"
+                                class="absolute inset-0 w-full h-full object-cover brightness-90 group-hover:brightness-75 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent
+                                        opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                                        flex items-end p-3 md:p-4">
+                                <span class="text-white text-lg md:text-xl font-bold tracking-wide
+                                             transform translate-y-4 group-hover:translate-y-0 
+                                             transition-transform duration-300">
+                                    Keyboards
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Headset -->
+                    <a href="/products?categories=HEADSET" class="group block">
+                        <div class="relative aspect-video overflow-hidden rounded-2xl shadow-md
+                                    transform transition-all duration-300 
+                                    hover:scale-105 hover:shadow-xl">
+                            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Headset_wrvkcp.png"
+                                alt="Headset"
+                                class="absolute inset-0 w-full h-full object-cover brightness-90 group-hover:brightness-75 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent
+                                        opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                                        flex items-end p-3 md:p-4">
+                                <span class="text-white text-lg md:text-xl font-bold tracking-wide
+                                             transform translate-y-4 group-hover:translate-y-0 
+                                             transition-transform duration-300">
+                                    Headsets
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mouse Category -->
+                <a href="/products?categories=MOUSE" class="group">
+                    <div class="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-lg 
+                                transform transition-all duration-300 
+                                hover:scale-105 hover:shadow-2xl">
+                        <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984250/Category_Mouse_sdticp.png"
+                            alt="Mouse"
+                            class="absolute inset-0 w-full h-full object-cover brightness-90 group-hover:brightness-75 transition-all duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent
+                                    opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+                                    flex items-end p-4 md:p-6">
+                            <span class="text-white text-xl md:text-2xl font-bold tracking-wide
+                                         transform translate-y-4 group-hover:translate-y-0 
+                                         transition-transform duration-300">
+                                Mice
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Keyboards Section -->
     <div class="container mx-auto px-4 py-6 border rounded-lg mt-10">
@@ -627,7 +800,7 @@
                     {{if .IsInCart}}
                     <a href="/cart" class="w-full">
                         <button
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -650,7 +823,7 @@
                     {{else}}
                     <form class="cart-form w-full" data-product-id="{{.ID}}">
                         <button type="button" onclick="addToCart(event, '{{.ID}}', this)"
-                            class="w-full py-2.5 px-12 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
+                            class="w-full py-2.5 px-12 sm:px-8 max-sm:px-8 rounded-lg shadow-md focus:outline-none transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:brightness-110 flex items-center justify-center group overflow-hidden relative black-cart-button">
                             <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-black to-gray-700"></span>
                             <span class="absolute inset-0 w-full h-1/2 bg-white/10 rounded-t-lg"></span>
                             <span class="absolute inset-0 w-full h-full overflow-hidden">
@@ -675,44 +848,14 @@
         </div>
     </div>
 
-    <!-- Categories Section -->
-    <div class="flex flex-col items-center justify-center mt-16">
-        <h1 class="text-lg font-bold tracking-wider text-gray-800 mb-6">CATEGORIES</h1>
-        <div class="max-w-6xl w-full p-6 overflow-x-auto scrollbar-hide">
-            <div class="flex gap-6 justify-center">
-                <a href="/products?categories=LAPTOP">
-                    <div class="flex-shrink-0 bg-gray-400 rounded-lg overflow-hidden w-72 h-96"><img
-                            src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/Categort_Laptop_knl3dr.png"
-                            alt="Laptop" class="w-full h-full object-cover" /></div>
-                </a>
-                <div class="flex-shrink-0 flex flex-col gap-6 w-72">
-                    <a href="/products?categories=KEYBOARD">
-                        <div class="bg-gray-400 rounded-lg overflow-hidden h-44"><img
-                                src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Keyboard_b9rikj.png"
-                                alt="Keyboard" class="w-full h-full object-cover" /></div>
-                    </a>
-                    <a href="/products?categories=HEADSET">
-                        <div class="bg-gray-400 rounded-lg overflow-hidden h-44"><img
-                                src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984267/Category_Headset_wrvkcp.png"
-                                alt="Headset" class="w-full h-full object-cover" /></div>
-                    </a>
-                </div>
-                <a href="/products?categories=MOUSE">
-                    <div class="flex-shrink-0 bg-gray-400 rounded-lg overflow-hidden w-72 h-96"><img
-                            src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984250/Category_Mouse_sdticp.png"
-                            alt="Mouse" class="w-full h-full object-cover" /></div>
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- Popular Series -->
-    <div class="flex justify-center mt-16">
-        <div class="w-full max-w-full p-4">
-            <div class="w-full h-28 rounded overflow-hidden"><img
-                    src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/PopularSeries_p5rha9.png"
-                    alt="Popular Series Header" class="w-full h-full object-cover"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
+    <div class="flex justify-center mt-8 sm:mt-16">
+        <div class="w-full max-w-full p-2 sm:p-4">
+            <div class="w-full h-20 sm:h-28 rounded overflow-hidden">
+                <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984264/PopularSeries_p5rha9.png"
+                    alt="Popular Series Header" class="w-full h-full object-cover">
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 mt-4 sm:mt-6">
                 <a href="/products/details/5">
                     <div class="h-auto rounded overflow-hidden relative"><img
                             src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984261/PopularSeries_MI_08_av45ts.png"
@@ -803,58 +946,63 @@
 
     <!-- Shop By Brand -->
     <div class="w-full max-w-8xl p-4 my-20">
-        <div class="h-20 mb-6"><img
-                src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984254/Shop_By_Brand_dqqc7i.png"
-                alt="Header Image" class="h-20 w-full object-cover"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 ml-14">
+        <div class="h-20 mb-6">
+            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984254/Shop_By_Brand_dqqc7i.png"
+                alt="Header Image" class="h-full w-full object-cover">
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4 ml-2 sm:ml-14">
             <a href="/products?brands=ASUS"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/ASUS_Logo_udi3xr.webp" alt="ASUS"
-                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=HP"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/HP_Logo_lpsucb.webp" alt="HP"
-                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=ACER"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984255/ACER_Logo_kxred7.webp" alt="ACER"
-                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=LENOVO"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984254/LENOVO_Logo_clukbz.webp"
-                    alt="LENOVO" class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    alt="LENOVO"
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=APPLE"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984253/APPLE_Logo_boqmpu.webp"
-                    alt="APPLE" class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    alt="APPLE"
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=MSI"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984252/MSI_Logo_wxy3yu.webp" alt="MSI"
-                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=INFINIX"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984252/INFINIX_Logo_c3uyzm.webp"
-                    alt="INFINIX" class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
+                    alt="INFINIX"
+                    class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg border-x border-gray-200"></a>
             <a href="/products?brands=SAMSUNG"><img
                     src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/SAMSUNG_Logo_rhq9vh.webp"
-                    alt="SAMSUNG" class="h-[100px] w-[150px] object-cover rounded-xl hover:shadow-lg"></a>
-            <a href="/products?brands=MI">
+                    alt="SAMSUNG"
+                    class="h-[100px] w-[150px] object-cover border-x border-gray-200 rounded-xl hover:shadow-lg"></a>
+            <a href="/products?brands=MI" class="max-sm:hidden">
                 <div
-                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border-2 border-gray-200 flex items-center justify-center">
+                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border border-gray-200 flex items-center justify-center">
                     <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1742105225/1258911-3840x2160-desktop-4k-xiaomi-wallpaper-photo_fmigp3.jpg"
                         alt="MI" class="h-[60px] w-[120px]">
                 </div>
             </a>
-            <a href="/products?brands=HONOR">
+            <a href="/products?brands=HONOR" class="max-sm:hidden">
                 <div
-                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border-2 border-gray-200 flex items-center justify-center">
+                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border border-gray-200 flex items-center justify-center">
                     <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1742105663/Honor-Logo_meyf9e.jpg"
                         alt="HONOR" class="h-[60px] w-[120px]">
                 </div>
             </a>
-            <a href="/products?brands=LG">
+            <a href="/products?brands=LG" class="max-sm:hidden">
                 <div
-                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border-2 border-gray-200 flex items-center justify-center">
+                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border border-gray-200 flex items-center justify-center">
                     <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1742104584/913022-3840x2160-desktop-4k-lg-logo-background-image_ztniqn.jpg"
                         alt="LG" class="h-[50px] w-[120px]">
                 </div>
             </a>
-            <a href="/products?brands=ZEBRONICS">
+            <a href="/products?brands=ZEBRONICS" class="max-sm:hidden">
                 <div
-                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border-2 border-gray-200">
+                    class="h-[100px] w-[150px] bg-white object-cover rounded-xl hover:shadow-lg border border-gray-200">
                     <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1737984251/ZEBRONICS_Logo_idfogi.png"
                         alt="ZEBRONICS" class="pt-3">
                 </div>
@@ -863,16 +1011,16 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-black text-white py-12">
+    <footer class="bg-black text-white py-8 sm:py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
                 <div>
-                    <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
-                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
-                        with
-                        our exclusive collections and latest laptops.</p>
-                    <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
-                    <div class="flex space-x-4">
+                    <a href="/" class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 logo-font">LAPTIX</a>
+                    <p class="text-xs sm:text-sm mb-3 sm:mb-4">We are the biggest hyperstore in the universe. We got you
+                        all covered with our exclusive collections and latest laptops.</p>
+                    <a href="mailto:laptixinfo@gmail.com"
+                        class="text-xs sm:text-sm block mb-3 sm:mb-4">laptixinfo@gmail.com</a>
+                    <div class="flex space-x-3 sm:space-x-4">
                         <a href="#" class="hover:text-gray-400">
                             <i class="fab fa-facebook"></i>
                         </a>
@@ -934,7 +1082,7 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center text-sm mt-12 border-t border-gray-700 pt-4">
+            <div class="text-center text-xs sm:text-sm mt-8 sm:mt-12 border-t border-gray-700 pt-4">
                 <p>© 2025 LAPTIX, Inc</p>
             </div>
         </div>
@@ -1019,16 +1167,98 @@
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
-        const track = document.getElementById('carousel-track');
-        const slides = track.children;
-        let currentIndex = 0;
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('carousel-track');
+            const slides = Array.from(track.children);
+            const prevButton = document.getElementById('prev-btn');
+            const nextButton = document.getElementById('next-btn');
+            const dotsNav = document.getElementById('carousel-dots');
 
-        function scrollCarousel() {
-            currentIndex = (currentIndex + 1) % slides.length;
-            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
+            // Create dots
+            slides.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('w-3', 'h-3', 'rounded-full', 'bg-gray-300');
+                dot.dataset.slideIndex = index;
+                dotsNav.appendChild(dot);
+            });
 
-        setInterval(scrollCarousel, 3000);
+            const dots = Array.from(dotsNav.children);
+            dots[0].classList.add('bg-gray-700');
+
+            // Slide width
+            const slideWidth = slides[0].getBoundingClientRect().width;
+
+            // Arrange slides next to one another
+            const setSlidePosition = (slide, index) => {
+                slide.style.left = slideWidth * index + 'px';
+            };
+            slides.forEach(setSlidePosition);
+
+            // Move to slide
+            const moveToSlide = (track, currentSlide, targetSlide) => {
+                track.style.transform = `translateX(-${targetSlide.style.left})`;
+                currentSlide.classList.remove('current-slide');
+                targetSlide.classList.add('current-slide');
+            };
+
+            // Update dots
+            const updateDots = (currentDot, targetDot) => {
+                currentDot.classList.remove('bg-gray-700');
+                currentDot.classList.add('bg-gray-300');
+                targetDot.classList.remove('bg-gray-300');
+                targetDot.classList.add('bg-gray-700');
+            };
+
+            // Initial slide setup
+            slides[0].classList.add('current-slide');
+
+            // Next button
+            nextButton.addEventListener('click', () => {
+                const currentSlide = track.querySelector('.current-slide');
+                const nextSlide = currentSlide.nextElementSibling || slides[0];
+                const currentDot = dotsNav.querySelector('.bg-gray-700');
+                const nextDot = currentDot.nextElementSibling || dots[0];
+
+                moveToSlide(track, currentSlide, nextSlide);
+                updateDots(currentDot, nextDot);
+            });
+
+            // Previous button
+            prevButton.addEventListener('click', () => {
+                const currentSlide = track.querySelector('.current-slide');
+                const prevSlide = currentSlide.previousElementSibling || slides[slides.length - 1];
+                const currentDot = dotsNav.querySelector('.bg-gray-700');
+                const prevDot = currentDot.previousElementSibling || dots[dots.length - 1];
+
+                moveToSlide(track, currentSlide, prevSlide);
+                updateDots(currentDot, prevDot);
+            });
+
+            // Dot navigation
+            dotsNav.addEventListener('click', (e) => {
+                const targetDot = e.target.closest('button');
+                if (!targetDot) return;
+
+                const currentSlide = track.querySelector('.current-slide');
+                const currentDot = dotsNav.querySelector('.bg-gray-700');
+                const targetIndex = dots.findIndex(dot => dot === targetDot);
+                const targetSlide = slides[targetIndex];
+
+                moveToSlide(track, currentSlide, targetSlide);
+                updateDots(currentDot, targetDot);
+            });
+
+            // Auto slide
+            setInterval(() => {
+                const currentSlide = track.querySelector('.current-slide');
+                const nextSlide = currentSlide.nextElementSibling || slides[0];
+                const currentDot = dotsNav.querySelector('.bg-gray-700');
+                const nextDot = currentDot.nextElementSibling || dots[0];
+
+                moveToSlide(track, currentSlide, nextSlide);
+                updateDots(currentDot, nextDot);
+            }, 5000);
+        });
     </script>
     <script src="/static/js/toastMain.js"></script>
 </body>
