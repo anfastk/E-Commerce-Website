@@ -149,8 +149,8 @@
     </div>
 
     <!-- Main content -->
-    <div class="container mx-auto px-4 py-8">
-        <div class="flex items-center gap-2 text-sm mb-8">
+    <div class="container mx-auto px-4 py-4 sm:py-8">
+        <div class="flex items-center gap-2 text-xs sm:text-sm mb-4 sm:mb-8">
             <a href="#" class="text-gray-600">Home</a>
             <span class="text-gray-400">></span>
             <a href="/cart" class="text-gray-600">Shopping Cart</a>
@@ -158,206 +158,224 @@
             <span class="font-medium">Checkout</span>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="md:col-span-2">
-                <h1 class="text-2xl font-bold mb-4">Shipping Address</h1>
-                <p class="text-sm text-gray-600 mb-8" id="address-subtitle">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
+            <div class="lg:col-span-2">
+                <h1 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Shipping Address</h1>
+                <p class="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-8" id="address-subtitle">
                     Select a existing delivery address or add a new one
                 </p>
-                <div class="space-y-4 mb-8" id="address-container">
+                <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-8" id="address-container">
                     <!-- Addresses will be loaded dynamically -->
                 </div>
 
                 <!-- Modals -->
                 <div id="editAddressModal" class="modal z-40">
-                    <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
+                    <div class="modal-content bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-2 sm:mx-4 relative">
                         <button onclick="closeModal('editAddressModal')"
-                            class="absolute right-4 top-4 text-gray-500 hover:text-gray-700">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="absolute right-2 sm:right-4 top-2 sm:top-4 text-gray-500 hover:text-gray-700">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                        <h2 class="text-xl font-bold mb-6">EDIT SHIPPING ADDRESS</h2>
-                        <form id="editAddressForm" class="space-y-4">
+                        <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6">EDIT SHIPPING ADDRESS</h2>
+                        <form id="editAddressForm" class="space-y-3 sm:space-y-4">
                             <input type="hidden" name="id">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                    <label class="block text-sm mb-1">First Name</label>
-                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">First Name</label>
+                                    <input type="text" name="firstName"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm mb-1">Last Name</label>
-                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">Last Name</label>
+                                    <input type="text" name="lastName"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">LandMark</label>
-                                <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2" required>
+                                <label class="block text-xs sm:text-sm mb-1">LandMark</label>
+                                <input type="text" name="landmark"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Address</label>
-                                <input type="text" name="address" class="w-full border rounded-lg px-3 py-2" required>
+                                <label class="block text-xs sm:text-sm mb-1">Address</label>
+                                <input type="text" name="address"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Country</label>
-                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                <label class="block text-xs sm:text-sm mb-1">Country</label>
+                                <input type="text" name="country"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                     required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Region/State</label>
-                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                <label class="block text-xs sm:text-sm mb-1">Region/State</label>
+                                <input type="text" name="state"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                     required>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                    <label class="block text-sm mb-1">City</label>
-                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    <label class="block text-xs sm:text-sm mb-1">City</label>
+                                    <input type="text" name="city"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                         required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm mb-1">Zip Code</label>
-                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">Zip Code</label>
+                                    <input type="text" name="zipCode"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Phone Number</label>
-                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
-                                    required>
+                                <label class="block text-xs sm:text-sm mb-1">Phone Number</label>
+                                <input type="tel" name="phoneNumber"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
-                            <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">UPDATE
+                            <button type="submit"
+                                class="w-full bg-black text-white py-2 sm:py-3 rounded-lg mt-4 sm:mt-6 text-sm sm:text-base">UPDATE
                                 ADDRESS</button>
                         </form>
                     </div>
                 </div>
 
-                <button onclick="openModal('addAddressModal')" class="w-full border-2 border-black py-3 rounded-lg">
+                <button onclick="openModal('addAddressModal')"
+                    class="w-full border-2 border-black py-2 sm:py-3 rounded-lg text-sm sm:text-base">
                     ADD NEW ADDRESS
                 </button>
                 <div id="addAddressModal" class="modal z-50">
-                    <div class="modal-content bg-white p-6 rounded-lg w-full max-w-md mx-4 relative">
+                    <div class="modal-content bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-2 sm:mx-4 relative">
                         <button onclick="closeModal('addAddressModal')"
-                            class="absolute right-4 top-4 text-gray-500 hover:text-gray-700">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="absolute right-2 sm:right-4 top-2 sm:top-4 text-gray-500 hover:text-gray-700">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                        <h2 class="text-xl font-bold mb-6">ADD NEW ADDRESS</h2>
-                        <form id="addAddressForm" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6">ADD NEW ADDRESS</h2>
+                        <form id="addAddressForm" class="space-y-3 sm:space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                    <label class="block text-sm mb-1">First Name</label>
-                                    <input type="text" name="firstName" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">First Name</label>
+                                    <input type="text" name="firstName"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm mb-1">Last Name</label>
-                                    <input type="text" name="lastName" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">Last Name</label>
+                                    <input type="text" name="lastName"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">LandMark</label>
-                                <input type="text" name="landmark" class="w-full border rounded-lg px-3 py-2" required>
+                                <label class="block text-xs sm:text-sm mb-1">LandMark</label>
+                                <input type="text" name="landmark"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Address</label>
-                                <input type="text" name="address" class="w-full border rounded-lg px-3 py-2" required>
+                                <label class="block text-xs sm:text-sm mb-1">Address</label>
+                                <input type="text" name="address"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Country</label>
-                                <input type="text" name="country" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                <label class="block text-xs sm:text-sm mb-1">Country</label>
+                                <input type="text" name="country"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                     required>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Region/State</label>
-                                <input type="text" name="state" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                <label class="block text-xs sm:text-sm mb-1">Region/State</label>
+                                <input type="text" name="state"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                     required>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
-                                    <label class="block text-sm mb-1">City</label>
-                                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 bg-white"
+                                    <label class="block text-xs sm:text-sm mb-1">City</label>
+                                    <input type="text" name="city"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
                                         required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm mb-1">Zip Code</label>
-                                    <input type="text" name="zipCode" class="w-full border rounded-lg px-3 py-2"
-                                        required>
+                                    <label class="block text-xs sm:text-sm mb-1">Zip Code</label>
+                                    <input type="text" name="zipCode"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm mb-1">Phone Number</label>
-                                <input type="tel" name="phoneNumber" class="w-full border rounded-lg px-3 py-2"
-                                    required>
+                                <label class="block text-xs sm:text-sm mb-1">Phone Number</label>
+                                <input type="tel" name="phoneNumber"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
                             </div>
-                            <button type="submit" class="w-full bg-black text-white py-3 rounded-lg mt-6">SAVE
+                            <button type="submit"
+                                class="w-full bg-black text-white py-2 sm:py-3 rounded-lg mt-4 sm:mt-6 text-sm sm:text-base">SAVE
                                 ADDRESS</button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Order summary remains unchanged -->
-            <div class="md:col-span-1">
-                <div class="bg-white shadow-lg p-6 rounded-lg">
-                    <h2 class="text-lg font-bold mb-6">Order Summary</h2>
-                    <div class="space-y-4 mb-6">
+            <!-- Order summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white shadow-lg p-4 sm:p-6 rounded-lg">
+                    <h2 class="text-base sm:text-lg font-bold mb-4 sm:mb-6">Order Summary</h2>
+                    <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                         {{range .CartItem}}
-                        <div class="flex gap-4">
-                            <img src="{{.ProductImage}}" alt="Camera" class="w-16 h-16 object-contain rounded">
+                        <div class="flex gap-3 sm:gap-4">
+                            <img src="{{.ProductImage}}" alt="Camera"
+                                class="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded">
                             <div>
-                                <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-sm">{{.CartItem.Quantity}} ×</span>
-                                    <span class="font-medium">₹ {{printf "%.2f" .DiscountPrice}}</span>
-                                    <span class="font-semibold text-xs text-gray-400 line-through">₹ {{printf "%.2f"
+                                <p class="text-xs sm:text-sm">{{ .ProductDetails.ProductName }}</p>
+                                <div class="flex items-center gap-1 sm:gap-2 mt-1">
+                                    <span class="text-xs sm:text-sm">{{.CartItem.Quantity}} ×</span>
+                                    <span class="font-medium text-xs sm:text-sm">₹ {{printf "%.2f"
+                                        .DiscountPrice}}</span>
+                                    <span class="font-semibold text-[10px] sm:text-xs text-gray-400 line-through">₹
+                                        {{printf "%.2f"
                                         .ProductDetails.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
                         {{end}}
                     </div>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex flex-col gap-2 mb-4">
+                    <div class="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                        <div class="flex flex-col gap-2 mb-3 sm:mb-4">
                             <div class="flex gap-2">
                                 <input type="text" id="coupon-input" placeholder="Coupon Code"
-                                    class="flex-grow px-3 py-2 rounded bg-gray-200">
+                                    class="flex-grow px-2 sm:px-3 py-1.5 sm:py-2 rounded bg-gray-200 text-xs sm:text-sm">
                                 <button id="apply-coupon-btn"
-                                    class="bg-black text-white px-4 py-2 rounded">APPLY</button>
+                                    class="bg-black text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm">APPLY</button>
                             </div>
-                            <div id="coupon-validation-message" class="text-sm hidden"></div>
+                            <div id="coupon-validation-message" class="text-xs sm:text-sm hidden"></div>
                         </div>
-                        <div id="applied-coupon" class="hidden bg-gray-100 p-3 rounded-md mb-3">
+                        <div id="applied-coupon" class="hidden bg-gray-100 p-2 sm:p-3 rounded-md mb-2 sm:mb-3">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="font-medium" id="applied-coupon-code"></p>
-                                    <p class="text-sm text-gray-600" id="applied-coupon-desc"></p>
+                                    <p class="font-medium text-xs sm:text-sm" id="applied-coupon-code"></p>
+                                    <p class="text-xs sm:text-sm text-gray-600" id="applied-coupon-desc"></p>
                                 </div>
-                                <button id="remove-coupon-btn" class="text-red-600 text-sm">Remove</button>
+                                <button id="remove-coupon-btn" class="text-red-600 text-xs sm:text-sm">Remove</button>
                             </div>
                         </div>
-                        <button id="show-coupons-btn" class="text-blue-600 text-sm flex items-center">
+                        <button id="show-coupons-btn" class="text-blue-600 text-xs sm:text-sm flex items-center">
                             <span>Show available coupons</span>
-                            <svg id="coupon-arrow" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg id="coupon-arrow" xmlns="http://www.w3.org/2000/svg"
+                                class="h-3 w-3 sm:h-4 sm:w-4 ml-1 transform" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
                         <div id="coupon-list" class="coupon-list mt-2 border border-gray-200 rounded-md">
                             {{range .Coupons}}
-                            <div class="p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item"
+                            <div class="p-2 sm:p-3 border-b hover:bg-gray-50 cursor-pointer coupon-item"
                                 data-code="{{.CouponCode}}" data-discount="{{.DiscountValue}}"
                                 data-type="{{.CouponType}}"
                                 data-desc="{{.DiscountValue}} %off Upto{{.MaxDiscountValue}}">
-                                <p class="font-medium text-base">{{.CouponCode}}</p>
-                                <p class="text-sm text-gray-800">{{.Discription}}</p>
-                                <p class="text-xs text-gray-600">Valid on orders above {{.MinOrderValue}}</p>
+                                <p class="font-medium text-xs sm:text-sm">{{.CouponCode}}</p>
+                                <p class="text-xs sm:text-sm text-gray-800">{{.Discription}}</p>
+                                <p class="text-[10px] sm:text-xs text-gray-600">Valid on orders above {{.MinOrderValue}}
+                                </p>
                             </div>
                             {{end}}
                         </div>
@@ -380,22 +398,23 @@
                         <div class="flex justify-between text-gray-600">
                             <span>Shipping</span>
                             <span id="shipping-cost">{{if .Shipping}} {{.Shipping}} {{else}} <span
-                                    class="text-green-600">Free <span class="line-through text-xs">₹100</span></span>
+                                    class="text-green-600">Free <span
+                                        class="line-through text-[10px] sm:text-xs">₹100</span></span>
                                 {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
                             <span id="total-discount">₹ {{printf "%.2f" .TotalDiscount}}</span>
                         </div>
-                        <div class="flex justify-between font-bold pt-4 border-t">
+                        <div class="flex justify-between font-bold pt-3 sm:pt-4 border-t">
                             <span>Total</span>
                             <span id="final-total">₹ {{printf "%.2f" .Total}}</span>
                         </div>
                     </div>
                     <button id="proceedToPaymentBtn"
-                        class="w-full bg-black text-white py-3 rounded-lg mt-6 flex items-center justify-center gap-2">
+                        class="w-full bg-black text-white py-2 sm:py-3 rounded-lg mt-4 sm:mt-6 flex items-center justify-center gap-2 text-sm sm:text-base">
                         PLACE ORDER
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -450,18 +469,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -655,9 +686,9 @@
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
-        
+
     </script>
-        <script src="/static/js/checkout.js"></script>
+    <script src="/static/js/checkout.js"></script>
 
     <script src="/static/js/toastMain.js"></script>
 </body>
