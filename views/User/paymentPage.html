@@ -81,24 +81,24 @@
             </div>
         </header>
     </div>
-    <div class="container mx-auto p-4 md:p-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="container mx-auto p-2 sm:p-4 md:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
             <!-- Left Section -->
-            <div class="md:col-span-2">
+            <div class="lg:col-span-2">
                 <!-- Delivery Address -->
-                <!-- Delivery Address Section -->
-                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <h2 class="text-lg font-semibold mb-2">Delivering to {{.Address.FirstName}} {{.Address.LastName}}
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm mb-4 md:mb-6">
+                    <h2 class="text-base sm:text-lg font-semibold mb-2">Delivering to {{.Address.FirstName}}
+                        {{.Address.LastName}}
                     </h2>
-                    <p class="text-gray-600 text-sm">
+                    <p class="text-gray-600 text-xs sm:text-sm">
                         {{.Address.Address}}, {{.Address.City}},<br>
                         {{.Address.State}}, {{.Address.PinCode}}, {{.Address.Country}}
                     </p>
                 </div>
 
                 <!-- Payment Method -->
-                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-                    <h2 class="text-lg font-semibold mb-4">Payment method</h2>
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-4 md:mb-6">
+                    <h2 class="text-base sm:text-lg font-semibold mb-4">Payment method</h2>
 
                     <!-- Hidden input to store the address ID -->
                     <input type="hidden" id="addressId" value="{{.Address.ID}}">
@@ -109,14 +109,14 @@
                     <input type="hidden" id="isCodAvailable" value="{{.IsCodAvailable}}">
 
                     <!-- Wallet Balance -->
-                    <!-- Wallet Balance -->
-                    <div class="mb-6">
-                        <div class="payment-option flex items-start gap-3 mb-4 p-4 rounded-lg cursor-pointer"
+                    <div class="mb-4 md:mb-6">
+                        <div class="payment-option flex items-start gap-3 mb-4 p-3 sm:p-4 rounded-lg cursor-pointer"
                             id="walletPayment" data-value="Wallet">
                             <div class="custom-radio mt-1"></div>
                             <div class="flex-1">
-                                <p class="payment-title font-medium">Wallet Balance ₹ 0.00 Unavailable</p>
-                                <div class="flex items-center gap-1 text-sm text-blue-600">
+                                <p class="payment-title text-sm sm:text-base font-medium">Wallet Balance ₹ 0.00
+                                    Unavailable</p>
+                                <div class="flex items-center gap-1 text-xs sm:text-sm text-blue-600">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 112 0v4a1 1 0 11-2 0V9z">
                                         </path>
@@ -142,18 +142,19 @@
                     </div>
 
                     <!-- Other Payment Options -->
-                    <div class="space-y-4">
-                        <h3 class="font-medium">Another payment method</h3>
-                        <div class="space-y-3">
-                            <div class="payment-option flex items-center gap-3 p-4 rounded-lg cursor-pointer"
+                    <div class="space-y-3 md:space-y-4">
+                        <h3 class="font-medium text-sm sm:text-base">Another payment method</h3>
+                        <div class="space-y-2 md:space-y-3">
+                            <div class="payment-option flex items-center gap-3 p-3 sm:p-4 rounded-lg cursor-pointer"
                                 id="codPayment" data-value="COD">
                                 <div class="custom-radio"></div>
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2 md:gap-3">
                                     <div
-                                        class="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-                                        <i class="fas fa-truck-fast"></i>
+                                        class="h-8 w-8 sm:h-10 sm:w-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+                                        <i class="fas fa-truck-fast text-sm sm:text-base"></i>
                                     </div>
-                                    <span class="payment-title">Cash on Delivery/Pay on Delivery</span>
+                                    <span class="payment-title text-sm sm:text-base">Cash on Delivery/Pay on
+                                        Delivery</span>
                                 </div>
                             </div>
 
@@ -179,22 +180,23 @@
                 </div>
 
                 <!-- Delivery Info -->
-                <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm">
                     <div class="flex justify-between items-start mb-4">
                         <div id="delivery-info">
-                            <h2 id="delivery-date" class="font-semibold"></h2>
-                            <p id="order-time-left" class="text-sm text-gray-600"></p>
+                            <h2 id="delivery-date" class="font-semibold text-sm sm:text-base"></h2>
+                            <p id="order-time-left" class="text-xs sm:text-sm text-gray-600"></p>
                         </div>
 
                     </div>
                     {{range .CartItem}}
-                    <div class="flex items-center gap-4 p-4  rounded-lg border border-gray-200 mt-1">
-                        <img src="{{.ProductImage}}" alt="Laptop Stand" class="w-20 h-20 object-contain">
+                    <div class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-gray-200 mt-1">
+                        <img src="{{.ProductImage}}" alt="Laptop Stand"
+                            class="w-16 h-16 sm:w-20 sm:h-20 object-contain">
                         <div class="flex flex-col">
-                            <p class="text-sm font-medium">{{ .ProductDetails.ProductSummary }}</p>
+                            <p class="text-xs sm:text-sm font-medium">{{ .ProductDetails.ProductSummary }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{ .CartItem.Quantity }} ×</span>
-                                <span class="font-medium text-sm">&#8377; {{ .DiscountPrice }}</span>
+                                <span class="text-xs sm:text-sm">{{ .CartItem.Quantity }} ×</span>
+                                <span class="font-medium text-xs sm:text-sm">&#8377; {{ .DiscountPrice }}</span>
                                 <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{
                                     .ProductDetails.RegularPrice }}</span>
                             </div>
@@ -205,19 +207,20 @@
             </div>
 
             <!-- Right Section - Order Summary -->
-            <div class="bg-white p-6 rounded-lg shadow-sm h-fit">
-                <h2 class="text-lg font-semibold mb-4 bg-gray-200 p-2">Order Summary</h2>
+            <div class="bg-white p-4 sm:p-6 rounded-lg shadow-sm h-fit">
+                <h2 class="text-base sm:text-lg font-semibold mb-4 bg-gray-200 p-2">Order Summary</h2>
 
                 <!-- Items -->
-                <div class="space-y-4 mb-6">
+                <div class="space-y-3 md:space-y-4 mb-4 md:mb-6">
                     {{range .CartItem}}
-                    <div class="flex gap-4">
-                        <img src="{{.ProductImage}}" alt="Camera" class="w-16 h-16 object-contain">
+                    <div class="flex gap-3 sm:gap-4">
+                        <img src="{{.ProductImage}}" alt="Camera" class="w-12 h-12 sm:w-16 sm:h-16 object-contain">
                         <div>
-                            <p class="text-sm">{{ .ProductDetails.ProductName }}</p>
+                            <p class="text-xs sm:text-sm">{{ .ProductDetails.ProductName }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-sm">{{.CartItem.Quantity}} ×</span>
-                                <span class="font-medium">&#8377; {{printf "%.2f" .DiscountPrice }}</span>
+                                <span class="text-xs sm:text-sm">{{.CartItem.Quantity}} ×</span>
+                                <span class="font-medium text-xs sm:text-sm">&#8377; {{printf "%.2f" .DiscountPrice
+                                    }}</span>
                                 <span class="font-semibold text-xs text-gray-400 line-through">&#8377; {{printf "%.2f"
                                     .ProductDetails.RegularPrice}}</span>
                             </div>
@@ -227,7 +230,7 @@
                 </div>
 
                 <!-- Price Breakdown -->
-                <div class="space-y-2 text-sm">
+                <div class="space-y-2 text-xs sm:text-sm">
                     <div class="flex justify-between">
                         <span>Sub-total</span>
                         <span>&#8377; {{printf "%.2f" .SubTotal}}</span>
@@ -258,13 +261,13 @@
                 </div>
 
                 <div class="border-t mt-4 pt-4">
-                    <div class="flex justify-between font-semibold mb-4">
+                    <div class="flex justify-between font-semibold mb-4 text-sm sm:text-base">
                         <span>Total</span>
                         <span>&#8377; {{printf "%.2f" .Total}}</span>
                     </div>
-                    <div class="mt-6">
+                    <div class="mt-4 md:mt-6">
                         <button id="proceedToPay"
-                            class="w-full bg-black text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-md flex items-center justify-center">
+                            class="w-full bg-black text-white text-sm sm:text-base font-medium py-2 sm:py-3 px-4 rounded-lg transition-colors shadow-md flex items-center justify-center">
                             <span>Proceed to Pay</span>
                         </button>
                     </div>
@@ -286,12 +289,13 @@
     </div>
 
     <!-- Footer Section -->
-    <footer class="bg-black text-white py-12">
+    <footer class="bg-black text-white py-8 sm:py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 <div>
-                    <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
-                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
+                    <a href="/" class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 logo-font">LAPTIX</a>
+                    <p class="text-xs sm:text-sm mb-4">We are the biggest hyperstore in the universe. We got you all
+                        covered
                         with
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
@@ -311,8 +315,8 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">Links</h3>
-                    <ul class="space-y-2 text-sm">
+                    <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Links</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="/" class="hover:text-gray-400">Home</a></li>
                         <li><a href="/product" class="hover:text-gray-400">Shop</a></li>
                         <li><a href="#" class="hover:text-gray-400">About</a></li>
@@ -320,28 +324,40 @@
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">Help</h3>
-                    <ul class="space-y-2 text-sm">
+                    <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Help</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm">
                         <li><a href="#" class="hover:text-gray-400">Payment Options</a></li>
                         <li><a href="#" class="hover:text-gray-400">Returns</a></li>
                         <li><a href="#" class="hover:text-gray-400">Privacy Policies</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
+                    <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
