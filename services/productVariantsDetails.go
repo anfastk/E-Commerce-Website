@@ -67,11 +67,10 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 		return VariantsDetails{}, errors.New("descriptions not found")
 	}
 
-	if err := tx.Order("created_at DESC").Where("product_Variant_id = ? AND is_deleted = ?", variantID, false).Find(&images).Error; err != nil {
+	if err := tx.Order("created_at ASC").Where("product_Variant_id = ? AND is_deleted = ?", variantID, false).Find(&images).Error; err != nil {
 		tx.Rollback()
 		return VariantsDetails{}, errors.New("images not found")
 	}
-
 
 	if err := tx.Where("product_variant_id = ? AND is_deleted = ?", variantID, false).Find(&specification).Error; err != nil {
 		tx.Rollback()
@@ -81,7 +80,7 @@ func ShowSingleProductVariantDetail(variantID uint) (VariantsDetails, error) {
 	if err := tx.Where("product_id = ?", product.ID).First(&offer).Error; err != nil {
 		offer = models.ProductOffer{}
 	}
-	
+
 	tx.Commit()
 	return VariantsDetails{
 		Id:              productVariant.ID,
