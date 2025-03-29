@@ -294,8 +294,7 @@
                                 </div>
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
                                     <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Shipped</p>
-                                    {{if or (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For
-                                    Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
+                                    {{if or (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
                                     <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.ShippedDate}}" data-format="datetime"></span></p>
                                     {{else}}
@@ -313,8 +312,7 @@
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
                                     <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Out For Delivery
                                     </p>
-                                    {{if or (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus
-                                    "Delivered")}}
+                                    {{if or (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
                                     <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.OutOfDeliveryDate}}" data-format="datetime"></span></p>
                                     {{else}}
@@ -337,9 +335,7 @@
                                     <i class="fas fa-house-circle-check text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
-                                    {{if or (eq .OrderItem.OrderStatus "Pending") (eq .OrderItem.OrderStatus
-                                    "Confirmed") (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out
-                                    For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
+                                    {{if or (eq .OrderItem.OrderStatus "Pending") (eq .OrderItem.OrderStatus "Confirmed") (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
                                     <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Delivered</p>
                                     {{if eq .OrderItem.OrderStatus "Delivered"}}
                                     <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
@@ -390,8 +386,7 @@
                                             <i class="fas fa-exchange-alt mr-1"></i>Return Item
                                         </button>
                                         {{end}}
-                                        {{else if or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus
-                                        "Order Not Placed") }}
+                                        {{else if or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") }}
                                         {{else}}
                                         {{if .IsCancelSpecificOrder}}
                                         <form id="cancelForm"
@@ -411,8 +406,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f"
-                                .OrderItem.ProductRegularPrice}}</p>
+                            <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f" .OrderItem.ProductRegularPrice}}</p>
                         </div>
                     </div>
                 </div>
@@ -433,8 +427,7 @@
                                         <p class="text-gray-600 text-xs sm:text-sm">Quantity: {{.Quantity}}</p>
                                     </div>
                                 </div>
-                                <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f"
-                                    .ProductRegularPrice}}</p>
+                                <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f" .ProductRegularPrice}}</p>
                             </div>
                         </a>
                         {{end}}
@@ -480,8 +473,7 @@
                 {{else}}
                 <!-- Payment Section -->
                 <div id="paymentPending" class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-                    <h2 class="text-lg sm:text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq
-                        .Payment.PaymentStatus "Failed")}} Complete Payment{{else}} Payment Status{{end}}</h2>
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq .Payment.PaymentStatus "Failed")}} Complete Payment{{else}} Payment Status{{end}}</h2>
                     <div class="space-y-4">
                         <div
                             class="p-3 sm:p-4 border {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} bg-orange-50 border-orange-200 {{else}}bg-red-50 border-red-200{{end}} rounded-lg">
