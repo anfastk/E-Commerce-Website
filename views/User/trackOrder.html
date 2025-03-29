@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Tracking</title>
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="/static/js/formatDate.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
@@ -17,27 +18,33 @@
             background: linear-gradient(135deg, #1a1a1a, #333333, #666666);
             position: relative;
         }
+
         .modal-backdrop {
             backdrop-filter: blur(3px);
             transition: all 0.3s ease;
         }
+
         .modal-container {
             transform: translateY(-20px);
             opacity: 0;
             transition: all 0.3s ease;
         }
+
         .modal-show {
             transform: translateY(0);
             opacity: 1;
         }
+
         .slide-down {
             animation: slideDown 0.5s ease forwards;
         }
+
         @keyframes slideDown {
             from {
                 transform: translateY(-20px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -144,11 +151,12 @@
                     {{end}}
                 </div>
                 <div class="flex items-center space-x-2 mt-2 sm:mt-0">
-                    {{if not (or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") (eq .OrderItem.OrderStatus "Cancelled"))}}
+                    {{if not (or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") (eq
+                    .OrderItem.OrderStatus "Cancelled"))}}
                     <a href="/profile/order/details/track/invoices/{{.Order.ID}}"
                         class="inline-flex items-center bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 transition border border-blue-400 backdrop-blur-md ">
                         <i class="fas fa-download mr-2"></i> Download Invoice
-                </a>
+                    </a>
                     {{end}}
                     {{if .isAllOrderCancel}}
 
@@ -220,8 +228,9 @@
                 {{if .IsReturnAvailable}}
                 <p>Return Period Ends: <span class="format-date" data-date="{{.ReturnDate}}" data-format="long"></span>
                 </p>
-                {{else}}       
-                <p>Return Window Closed On : <span class="format-date" data-date="{{.ReturnDate}}" data-format="long"></span>
+                {{else}}
+                <p>Return Window Closed On : <span class="format-date" data-date="{{.ReturnDate}}"
+                        data-format="long"></span>
                 </p>
                 {{end}}
                 {{else if eq .OrderItem.OrderStatus "Cancelled"}}
@@ -238,50 +247,56 @@
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Left Column - Progress and Products -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-4 sm:space-y-6">
                 <!-- Improved Tracking Progress -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-8">Order Status</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4 sm:mb-8">Order Status</h2>
                     <div class="relative">
                         <!-- Progress Line -->
-                        <div class="absolute top-4 left-0 h-1 bg-gray-200 w-full z-0">
-                            <div class="h-full transition-all duration-500 progress-bar
+                        <div
+                            class="absolute top-0 left-4 sm:left-0 sm:top-4 w-1 sm:w-full sm:h-1 bg-gray-200 z-0 h-full sm:h-1">
+                            <div class="w-full sm:w-full h-full transition-all duration-500 progress-bar
                             {{if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Order Not Placed`) }}
                              bg-red-500 {{else}} bg-green-500 {{end}}" {{if eq .OrderItem.OrderStatus `Pending`}}
-                                style="width: 12%" {{else if eq .OrderItem.OrderStatus `Confirmed`}} style="width: 27%"
-                                {{else if eq .OrderItem.OrderStatus `Shipped`}} style="width: 42%" {{else if eq .OrderItem.OrderStatus `Out For Delivery`}} style="width: 67%" {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) 
-                                    (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Delivered`)}}
-                                style="width: 100%" {{else if eq .OrderItem.OrderStatus `Order Not Placed`}}
-                                style="width: 6%" {{end}}></div>
+                                style="height: 12%" {{else if eq .OrderItem.OrderStatus `Confirmed`}}
+                                style="height: 27%" {{else if eq .OrderItem.OrderStatus `Shipped`}} style="height: 42%"
+                                {{else if eq .OrderItem.OrderStatus `Out For Delivery`}} style="height: 67%" {{else if
+                                or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq
+                                .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Delivered`)}}
+                                style="height: 100%" {{else if eq .OrderItem.OrderStatus `Order Not Placed`}}
+                                style="height: 6%" {{end}}></div>
                         </div>
 
                         <!-- Progress Steps -->
-                        <div class="relative flex justify-between">
+                        <div class="relative flex flex-col sm:flex-row sm:justify-between">
                             <!-- Order Placed -->
-                            <div class="relative flex flex-col items-center step-item">
+                            <div
+                                class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-8 h-8 border-2 bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Pending`) (eq .OrderItem.OrderStatus `Confirmed`) (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
-                                    <i class="fas fa-shopping-cart text-gray-500 text-sm step-icon"></i>
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2 bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Pending`) (eq .OrderItem.OrderStatus `Confirmed`) (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
+                                    <i class="fas fa-shopping-cart text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
-                                <div class="mt-4 w-32 text-center">
-                                    <p class="font-medium text-gray-400 step-text">Order Placed</p>
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Order Placed</p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.OrderDate}}" data-format="datetime"></span></p>
                                 </div>
                             </div>
 
                             <!-- Shipped -->
-                            <div class="relative flex flex-col items-center step-item">
+                            <div
+                                class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-8 h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
-                                    <i class="fas fa-box-open text-gray-500 text-sm step-icon"></i>
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
+                                    <i class="fas fa-box-open text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
-                                <div class="mt-4 w-32 text-center">
-                                    <p class="font-medium text-gray-400 step-text">Shipped</p>
-                                    {{if or (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Shipped</p>
+                                    {{if or (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For
+                                    Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.ShippedDate}}" data-format="datetime"></span></p>
                                     {{else}}
                                     {{end}}
@@ -289,15 +304,18 @@
                             </div>
 
                             <!-- Out for Delivery -->
-                            <div class="relative flex flex-col items-center step-item">
+                            <div
+                                class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-8 h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200 {{end}}">
-                                    <i class="fas fa-truck text-gray-500 text-sm step-icon"></i>
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200 {{end}}">
+                                    <i class="fas fa-truck text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
-                                <div class="mt-4 w-32 text-center">
-                                    <p class="font-medium text-gray-400 step-text">Out For Delivery</p>
-                                    {{if or (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Out For Delivery
+                                    </p>
+                                    {{if or (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus
+                                    "Delivered")}}
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.OutOfDeliveryDate}}" data-format="datetime"></span></p>
                                     {{else}}
                                     {{end}}
@@ -305,8 +323,9 @@
                             </div>
 
                             <!-- Delivered/Returned/Cancelled -->
-                            <div class="relative flex flex-col items-center step-item final-step">
-                                <div class="w-8 h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle 
+                            <div
+                                class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4">
+                                <div class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle 
                                 {{if .OrderItem.OrderStatus}}
                                     {{if eq .OrderItem.OrderStatus `Delivered`}} border-green-500
                                     {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500
@@ -315,29 +334,32 @@
                                 {{else}}
                                     border-gray-200
                                 {{end}}">
-                                    <i class="fas fa-house-circle-check text-gray-500 text-sm step-icon"></i>
+                                    <i class="fas fa-house-circle-check text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
-                                <div class="mt-4 w-32 text-center">
-                                    {{if or (eq .OrderItem.OrderStatus "Pending") (eq .OrderItem.OrderStatus "Confirmed") (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
-                                    <p class="font-medium text-gray-400 step-text">Delivered</p>
+                                <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
+                                    {{if or (eq .OrderItem.OrderStatus "Pending") (eq .OrderItem.OrderStatus
+                                    "Confirmed") (eq .OrderItem.OrderStatus "Shipped") (eq .OrderItem.OrderStatus "Out
+                                    For Delivery") (eq .OrderItem.OrderStatus "Delivered")}}
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Delivered</p>
                                     {{if eq .OrderItem.OrderStatus "Delivered"}}
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.DeliveryDate}}" data-format="datetime"></span></p>
                                     {{else}}
-                                    <p class="text-xs text-gray-500 mt-1">Expected <span class="format-date"
-                                            data-date="{{.ExpectedDeliveryDate}}" data-format="short"></span></p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1">Expected <span
+                                            class="format-date" data-date="{{.ExpectedDeliveryDate}}"
+                                            data-format="short"></span></p>
                                     {{end}}
                                     {{else if eq .OrderItem.OrderStatus "Returned"}}
-                                    <p class="font-medium text-gray-400 step-text">Returned</p>
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Returned</p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.ReturnDate}}" data-format="datetime"></span></p>
                                     {{else if eq .OrderItem.OrderStatus "Cancelled"}}
-                                    <p class="font-medium text-gray-400 step-text">Cancelled</p>
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Cancelled</p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.CancelDate}}" data-format="datetime"></span></p>
                                     {{else if eq .OrderItem.OrderStatus "Failed"}}
-                                    <p class="font-medium text-gray-400 step-text">Failed</p>
-                                    <p class="text-xs text-gray-500 mt-1"><span class="format-date"
+                                    <p class="font-medium text-gray-400 text-xs sm:text-sm step-text">Failed</p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1"><span class="format-date"
                                             data-date="{{.OrderDate}}" data-format="datetime"></span></p>
                                     {{else}}
                                     {{end}}
@@ -348,104 +370,28 @@
                 </div>
 
                 <!-- Products -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Order Items</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">Order Items</h2>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition">
-                            <div class="flex items-center flex-1">
-                                <img src="{{ .OrderItem.ProductImage}}"
-                                    alt="Product" class="w-20 h-20 object-contain rounded" />
-                                <div class="ml-4">
-                                    <h3 class="font-medium">{{.OrderItem.ProductName}}</h3>
-                                    <p class="text-gray-600">Quantity: {{.OrderItem.Quantity}}</p>
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:shadow-md transition">
+                            <div class="flex items-center flex-1 w-full sm:w-auto">
+                                <img src="{{ .OrderItem.ProductImage}}" alt="Product"
+                                    class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded" />
+                                <div class="ml-3 sm:ml-4">
+                                    <h3 class="font-medium text-sm sm:text-base">{{.OrderItem.ProductName}}</h3>
+                                    <p class="text-gray-600 text-xs sm:text-sm">Quantity: {{.OrderItem.Quantity}}</p>
                                     <div class="flex space-x-2 mt-2">
                                         {{if .IsDelivered}}
                                         {{if .isAlreadyRequested}}
                                         {{else}}
-                                        <button id="returnItemBtn" class="text-blue-600 text-sm hover:text-blue-700 flex items-center">
+                                        <button id="returnItemBtn"
+                                            class="text-blue-600 text-xs sm:text-sm hover:text-blue-700 flex items-center">
                                             <i class="fas fa-exchange-alt mr-1"></i>Return Item
                                         </button>
                                         {{end}}
-                                        <!-- Modal Backdrop -->
-    <div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
-        <!-- Modal Container -->
-        <div id="modalContainer" class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto modal-container overflow-hidden">
-            <!-- Modal Header -->
-            <div class="gradient-bg text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-undo-alt mr-2"></i>Return Item
-                </h3>
-                <button id="closeModalBtn" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Modal Content -->
-            <div class="p-6 ">
-                <div class="mb-6 bg-grey-50  p-4 rounded-lg border border-grey-100 slide-down">
-                    <div class="flex items-start ">
-                        <div class="flex-shrink-0 mr-3">
-                            <img src="{{.OrderItem.ProductImage}}" alt="Product image" class="h-16 w-16 object-contain rounded">
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-800">{{.OrderItem.ProductName}}</h4>
-                            <p class="text-sm text-gray-500">Order ID {{.OrderItem.OrderUID}} <span><br></span> • Delivered on <span class="format-date"
-                                data-date="{{.DeliveryDate}}" data-format="datetime"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <form id="returnForm">
-                    <div class="mb-5">
-                        <label for="returnReason" class="block text-sm font-medium text-gray-700 mb-2">
-                            Why are you returning this item? <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <select id="returnReason" name="returnReason" class="w-full border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 border focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-700" required>
-                                <option value="" disabled selected>Select a reason</option>
-                                <option value="Item arrived damaged">Item arrived damaged</option>
-                                <option value="Item is defective">Item is defective</option>
-                                <option value="Wrong item was sent">Wrong item was sent</option>
-                                <option value="Item not as described">Item not as described</option>
-                                <option value="Found better price elsewhere">Found better price elsewhere</option>
-                                <option value="Changed my mind">Changed my mind</option>
-                                <option value="Order by mistake">Order by mistake</option>
-                                <option value="other">Other reason</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                <i class="fas fa-chevron-down text-gray-400"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-5">
-                        <label for="additionalDetails" class="block text-sm font-medium text-gray-700 mb-2">
-                            Additional details
-                        </label>
-                        <textarea id="additionalDetails" name="additionalDetails" rows="3" class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500 text-gray-700" placeholder="Please provide more information about your return request..."></textarea>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input id="termsAgreed" name="termsAgreed" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" required>
-                        <label for="termsAgreed" class="ml-2 block text-sm text-gray-700">
-                            I understand the refund policy and its terms & conditions.
-                        </label>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="px-6 py-4 bg-gray-50 border-t flex justify-between">
-                <button id="cancelBtn" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium shadow-sm">
-                    Cancel
-                </button>
-                <button id="submitReturnBtn" class="gradient-bg  text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors flex items-center">
-                    <i class="fas fa-paper-plane mr-1"></i> Submit Return Request
-                </button>
-            </div>
-        </div>
-    </div>
-                                        {{else if or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus "Order Not Placed") }}
+                                        {{else if or (eq .OrderItem.OrderStatus "Failed") (eq .OrderItem.OrderStatus
+                                        "Order Not Placed") }}
                                         {{else}}
                                         {{if .IsCancelSpecificOrder}}
                                         <form id="cancelForm"
@@ -453,156 +399,96 @@
                                             class="inline">
                                             <input type="hidden" name="cancelReason" id="cancelReason">
                                             <button type="button" onclick="showCancelPrompt()"
-                                                class=" text-sm flex items-center {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Returned`)}} cursor-not-allowed text-red-300 hover:text-red-300 {{else}}text-red-600 hover:text-red-700{{end}}"
+                                                class="text-xs sm:text-sm flex items-center {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Returned`)}} cursor-not-allowed text-red-300 hover:text-red-300 {{else}}text-red-600 hover:text-red-700{{end}}"
                                                 {{if or (eq .OrderItem.OrderStatus `Cancelled`) (eq
                                                 .OrderItem.OrderStatus `Returned`)}} disabled{{else}}{{end}}>
                                                 <i class="fas fa-times mr-1"></i>Cancel Item
                                             </button>
                                         </form>
-
                                         {{else}}
                                         {{end}}
-                                        <!-- Modal for cancel reason -->
-                                        <div id="cancelModal"
-                                            class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-50 transition-opacity duration-300"
-                                            role="dialog" aria-labelledby="modalTitle" aria-modal="true">
-
-                                            <!-- Modal Content -->
-                                            <div
-                                                class="relative w-full max-w-md mx-4 md:mx-auto bg-white rounded-xl shadow-2xl transform transition-all duration-300">
-                                                <!-- Modal Header -->
-                                                <div
-                                                    class="flex items-center justify-between p-6 border-b border-gray-200">
-                                                    <h3 id="modalTitle" class="text-xl font-bold text-gray-900">
-                                                        Cancel Item
-                                                    </h3>
-                                                    <button onclick="closeModal()"
-                                                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                                                        aria-label="Close modal">
-                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-
-                                                <!-- Modal Body -->
-                                                <div class="p-6">
-                                                    <div class="mb-5">
-                                                        <label for="reasonText"
-                                                            class="block text-sm font-medium text-gray-700 mb-2">
-                                                            Please provide a reason for cancellation
-                                                        </label>
-                                                        <textarea id="reasonText" rows="4"
-                                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow duration-200 resize-none"
-                                                            placeholder="Enter your reason here..."
-                                                            aria-label="Cancellation reason"></textarea>
-                                                    </div>
-
-                                                    <!-- Modal Footer -->
-                                                    <div class="flex justify-end space-x-4">
-                                                        <button onclick="closeModal()"
-                                                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
-                                                            Cancel
-                                                        </button>
-                                                        <button onclick="submitCancelForm()"
-                                                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                                            Submit
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Notification component -->
-                                        <div id="notification"
-                                            class="hidden fixed top-4 right-4 z-50 min-w-[300px] max-w-md">
-                                            <div class="flex items-center p-4 rounded-lg shadow-lg">
-                                                <div class="flex-1 mr-4"></div>
-                                                <button onclick="closeNotification()"
-                                                    class="text-gray-400 hover:text-gray-600">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
                                         {{end}}
                                     </div>
                                 </div>
                             </div>
-                            <p class="font-medium">&#8377; {{printf "%.2f" .OrderItem.ProductRegularPrice}}</p>
+                            <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f"
+                                .OrderItem.ProductRegularPrice}}</p>
                         </div>
                     </div>
                 </div>
                 {{if len .AllProduct}}
-                <div class="bg-gray-50 rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Other Items In This Order</h2>
-                    <div class="space-y-4"> <!-- Apply space-y-4 here -->
+                <div class="bg-gray-50 rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">Other Items In This Order</h2>
+                    <div class="space-y-4">
                         {{range .AllProduct}}
                         <a href="/profile/order/details/track/{{.ID}}">
-                        <div
-                            class="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition bg-white">
-                            <div class="flex items-center flex-1">
-                                <img src="{{ (index .ProductVariantDetails.VariantsImages 0).ProductVariantsImages }}"
-                                    alt="Product" class="w-20 h-20 object-contain rounded" />
-                                <div class="ml-4">
-                                    <h3 class="font-medium">{{.ProductVariantDetails.ProductName}}</h3>
-                                    <p class="text-gray-600">Quantity: {{.Quantity}}</p>
+                            <div
+                                class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:shadow-md transition bg-white">
+                                <div class="flex items-center flex-1 w-full sm:w-auto">
+                                    <img src="{{ (index .ProductVariantDetails.VariantsImages 0).ProductVariantsImages }}"
+                                        alt="Product" class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded" />
+                                    <div class="ml-3 sm:ml-4">
+                                        <h3 class="font-medium text-sm sm:text-base">
+                                            {{.ProductVariantDetails.ProductName}}</h3>
+                                        <p class="text-gray-600 text-xs sm:text-sm">Quantity: {{.Quantity}}</p>
+                                    </div>
                                 </div>
+                                <p class="font-medium text-sm sm:text-base mt-2 sm:mt-0">&#8377; {{printf "%.2f"
+                                    .ProductRegularPrice}}</p>
                             </div>
-                            <p class="font-medium">&#8377; {{printf "%.2f" .ProductRegularPrice}}</p>
-                        </div>
-                    </a>
+                        </a>
                         {{end}}
                     </div>
                 </div>
-
                 {{end}}
             </div>
 
             <!-- Right Column - Payment, Address, Summary -->
-            <div class="space-y-6">
-                <!-- <div data-is-paid="{{.IsPaid}}"> -->
+            <div class="space-y-4 sm:space-y-6">
+                <!-- Payment Information -->
                 {{if eq .Payment.PaymentStatus "Completed"}}
-                <div id="paymentCompleted" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
+                <div id="paymentCompleted" class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">Payment Information</h2>
                     <div class="space-y-4">
-                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <p class="text-green-800 font-medium">Payment Completed</p>
-                            <p class="text-sm text-green-600 mt-1">Paid on {{.PaymentDate}}</p>
+                        <div class="p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-green-800 font-medium text-sm sm:text-base">Payment Completed</p>
+                            <p class="text-xs sm:text-sm text-green-600 mt-1">Paid on {{.PaymentDate}}</p>
                         </div>
 
                         <!-- Payment Method Used -->
                         <div class="flex items-center p-3 border rounded-lg">
                             {{if eq .Payment.PaymentMethod "Wallet"}}
-                            <i class="fas fa-wallet text-2xl text-green-600 mr-2"></i>
+                            <i class="fas fa-wallet text-xl sm:text-2xl text-green-600 mr-2"></i>
                             {{else if eq .Payment.PaymentMethod "Cash On Delivery" }}
-                            <i class="fas fa-hand-holding-usd text-2xl text-yellow-600 mr-2"></i>
+                            <i class="fas fa-hand-holding-usd text-xl sm:text-2xl text-yellow-600 mr-2"></i>
                             {{else if eq .Payment.PaymentMethod "Razorpay" }}
-                            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1742274807/RazorpayIcon_mgfvge.png" class="h-12 w-12 m-2 object-contain" alt="Razorpay">
+                            <img src="https://res.cloudinary.com/dghzlcoco/image/upload/v1742274807/RazorpayIcon_mgfvge.png"
+                                class="h-8 w-8 sm:h-12 sm:w-12 m-2 object-contain" alt="Razorpay">
                             {{end}}
                             <div class="flex-1">
-                                <p class="font-medium">{{.Payment.PaymentMethod}}</p>
+                                <p class="font-medium text-sm sm:text-base">{{.Payment.PaymentMethod}}</p>
                                 {{if or (eq .Payment.PaymentMethod "Wallet") (eq .Payment.PaymentMethod "Razorpay")}}
-                                <p class="text-sm text-gray-500">TXN ID : {{.Payment.TransactionID}}</p>
+                                <p class="text-xs sm:text-sm text-gray-500">TXN ID : {{.Payment.TransactionID}}</p>
                                 {{end}}
                             </div>
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Paid</span>
+                            <span
+                                class="bg-green-100 text-green-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">Paid</span>
                         </div>
                     </div>
                 </div>
                 {{else if or (eq .Payment.PaymentStatus "Cancelled") (eq .Payment.PaymentStatus "Returned") }}
                 {{else}}
                 <!-- Payment Section -->
-                <div id="paymentPending" class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq
+                <div id="paymentPending" class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">{{if or (eq .Payment.PaymentStatus "Pending") (eq
                         .Payment.PaymentStatus "Failed")}} Complete Payment{{else}} Payment Status{{end}}</h2>
                     <div class="space-y-4">
                         <div
-                            class="p-4  border  {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} bg-orange-50  border-orange-200 {{else}}bg-red-50 border-red-200{{end}} rounded-lg">
-                            <p class="text-orange-800 font-medium">Payment {{.Payment.PaymentStatus}}</p>
+                            class="p-3 sm:p-4 border {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} bg-orange-50 border-orange-200 {{else}}bg-red-50 border-red-200{{end}} rounded-lg">
+                            <p class="text-orange-800 font-medium text-sm sm:text-base">Payment
+                                {{.Payment.PaymentStatus}}</p>
                             <p
-                                class="text-sm {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} text-orange-600 {{else}} text-red-600{{end}} mt-1">
+                                class="text-xs sm:text-sm {{if or (eq .Payment.PaymentStatus `Pending`) (eq .Payment.PaymentStatus `Failed`)}} text-orange-600 {{else}} text-red-600{{end}} mt-1">
                                 {{if or (eq .Payment.PaymentStatus "Pending") (eq .Payment.PaymentStatus "Failed")}}
                                 Pay Now {{else}}{{end}}
                             </p>
@@ -615,7 +501,7 @@
                                 <input type="radio" name="Razorpay" class="mr-3" />
                                 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                    viewBox="0 0 122.88 26.53" height="26px"
+                                    viewBox="0 0 122.88 26.53" height="20px" class="sm:h-6"
                                     style="enable-background:new 0 0 122.88 26.53" xml:space="preserve">
                                     <style type="text/css">
                                         .st0 {
@@ -638,27 +524,28 @@
                             </label>
 
                             <button id="payButton"
-                                class="w-full bg-blue-600 text-white py-3 rounded-lg mt-4 hover:bg-blue-700">Pay
+                                class="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg mt-4 hover:bg-blue-700 text-sm sm:text-base">Pay
                                 Now</button>
-
                         </div>
                         {{else if (eq .Payment.PaymentStatus "Refunded")}}
                         <div class="flex items-center p-3 border rounded-lg">
-                            <i class="fas fa-wallet text-2xl text-green-600 mr-2"></i>
+                            <i class="fas fa-wallet text-xl sm:text-2xl text-green-600 mr-2"></i>
                             <div class="flex-1">
-                                <p class="font-medium">{{.Payment.PaymentMethod}}</p>
-                                <p class="text-sm text-gray-500">TXN ID : {{.Payment.TransactionID}}</p>
+                                <p class="font-medium text-sm sm:text-base">{{.Payment.PaymentMethod}}</p>
+                                <p class="text-xs sm:text-sm text-gray-500">TXN ID : {{.Payment.TransactionID}}</p>
                             </div>
-                            <span class=" bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">Refunded</span>
+                            <span
+                                class="bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">Refunded</span>
                         </div>
                         {{end}}
                     </div>
                 </div>
                 {{end}}
+
                 <!-- Shipping Address -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Shipping Address</h2>
-                    <div class="text-gray-700">
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">Shipping Address</h2>
+                    <div class="text-gray-700 text-sm sm:text-base">
                         <p class="font-medium">{{.Address.FirstName}} {{.Address.LastName}}</p>
                         <p>{{.Address.Address}}</p>
                         <p>{{.Address.City}}</p>
@@ -670,28 +557,28 @@
 
                 <!-- Price Summary -->
                 {{if len .AllProduct}}
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Price Details</h2>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">Price Details</h2>
                     <div class="space-y-3">
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Subtotal</span>
                             <span>&#8377; {{printf "%.2f" .OrderItem.SubTotal}}</span>
                         </div>
-                        
-                        <div class="flex justify-between text-gray-600">
+
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Product Discount</span>
                             <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Tax</span>
                             <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
                         </div>
 
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Total Discount</span>
                             <span>&#8377; {{printf "%.2f" .TotalDiscount}}</span>
                         </div>
-                        <div class="flex justify-between font-semibold text-lg pt-3 border-t">
+                        <div class="flex justify-between font-semibold text-base sm:text-lg pt-3 border-t">
                             <span>Total</span>
                             <span>&#8377; {{printf "%.2f" .OrderItem.Total}}</span>
                         </div>
@@ -699,27 +586,27 @@
                 </div>
                 {{else}}
                 {{end}}
-                
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">{{if len .AllProduct}}
+
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+                    <h2 class="text-lg sm:text-xl font-semibold mb-4">{{if len .AllProduct}}
                         All Ordered Items Price Details{{else}}Price Details{{end}}</h2>
                     <div class="space-y-3">
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Subtotal</span>
                             <span>&#8377; {{printf "%.2f" .AllSubTotal}}</span>
                         </div>
-                        
-                        <div class="flex justify-between text-gray-600">
+
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Product Discount</span>
                             <span>&#8377; {{printf "%.2f" .AllProductDiscount}}</span>
                         </div>
-                        
-                        <div class="flex justify-between text-gray-600">
+
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Tax</span>
                             <span>&#8377; {{printf "%.2f" .Order.Tax}}</span>
                         </div>
                         {{if .Order.CouponDiscountAmount }}
-                        <div class="flex justify-between text-green-600 bg-green-50 p-2 rounded">
+                        <div class="flex justify-between text-green-600 bg-green-50 p-2 rounded text-sm sm:text-base">
                             <span class="flex items-center">
                                 <i class="fas fa-tag mr-2"></i>
                                 Coupon ({{.Order.CouponCode}})
@@ -728,18 +615,18 @@
                         </div>
                         {{else}}
                         {{end}}
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Shipping</span>
                             <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge }}
                                 {{else}} <span class="text-green-600">Free </span> <span
-                                    class="line-through text-sm">&#8377;100</span>{{end}}</span>
+                                    class="line-through text-xs sm:text-sm">&#8377;100</span>{{end}}</span>
                         </div>
 
-                        <div class="flex justify-between text-gray-600">
+                        <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Total Discount</span>
                             <span>&#8377; {{printf "%.2f" .AllProductTotalDiscount}}</span>
                         </div>
-                        <div class="flex justify-between font-semibold text-lg pt-3 border-t">
+                        <div class="flex justify-between font-semibold text-base sm:text-lg pt-3 border-t">
                             <span>Total</span>
                             <span>&#8377; {{printf "%.2f" .Order.TotalAmount}}</span>
                         </div>
@@ -807,18 +694,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -840,7 +739,7 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const submitReturnBtn = document.getElementById('submitReturnBtn');
         const returnForm = document.getElementById('returnForm');
-        
+
         // Show modal
         function showModal() {
             modalBackdrop.classList.remove('hidden');
@@ -848,7 +747,7 @@
                 modalContainer.classList.add('modal-show');
             }, 10);
         }
-        
+
         // Hide modal
         function hideModal() {
             modalContainer.classList.remove('modal-show');
@@ -856,44 +755,44 @@
                 modalBackdrop.classList.add('hidden');
             }, 300);
         }
-        
+
         // Event listeners
         returnItemBtn?.addEventListener('click', showModal);
         closeModalBtn?.addEventListener('click', hideModal);
         cancelBtn?.addEventListener('click', hideModal);
-        
+
         // Close modal if clicked outside
         modalBackdrop?.addEventListener('click', (e) => {
             if (e.target === modalBackdrop) {
                 hideModal();
             }
         });
-        
+
         // Handle form submission
         submitReturnBtn?.addEventListener('click', () => {
             // Check form validity
             const returnReason = document.getElementById('returnReason');
             const termsAgreed = document.getElementById('termsAgreed');
             const additionalDetails = document.getElementById('additionalDetails');
-            
+
             if (!returnReason.value) {
                 returnReason.focus();
                 return;
             }
-            
+
             if (!termsAgreed.checked) {
                 termsAgreed.focus();
                 return;
             }
-            
+
             // Create return request data
             const returnData = {
                 reason: returnReason.value,
                 additionalDetails: additionalDetails.value,
-                orderId: orderId, 
+                orderId: orderId,
                 productId: productId,
             };
-            
+
             // Send the return request using fetch API
             fetch('/profile/order/details/track/item/return', {
                 method: 'POST',
@@ -902,15 +801,15 @@
                 },
                 body: JSON.stringify(returnData)
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(data => {
-                // Display success message
-                modalContainer.innerHTML = `
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    // Display success message
+                    modalContainer.innerHTML = `
                     <div class="p-8 text-center">
                         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
                             <i class="fas fa-check text-green-500 text-2xl"></i>
@@ -922,15 +821,15 @@
                         </button>
                     </div>
                 `;
-                
-                document.getElementById('doneBtn').addEventListener('click', hideModal);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Display error message (in production, you'd want more specific error handling)
-                showErrorToast('There was a problem submitting your return request. Please try again.');
-            });
-            
+
+                    document.getElementById('doneBtn').addEventListener('click', hideModal);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Display error message (in production, you'd want more specific error handling)
+                    showErrorToast('There was a problem submitting your return request. Please try again.');
+                });
+
             // Just for demo purposes - immediately show success
             // In a real application, this would happen after the fetch promise resolves
             modalContainer.innerHTML = `
@@ -945,7 +844,7 @@
                     </button>
                 </div>
             `;
-            
+
             document.getElementById('doneBtn').addEventListener('click', hideModal);
         });
 
@@ -1077,7 +976,7 @@
                 });
         }
 
-        
+
 
         function openDeletePopup() {
             document.getElementById("deletePopup").classList.remove("hidden");
@@ -1088,44 +987,44 @@
         }
 
         function confirmDeleteItem() {
-    const reason = document.getElementById("deleteText").value.trim();
-    if (reason === "") {
-        showErrorToast("Please provide a reason for deletion.", "error");
-        return;
-    }
+            const reason = document.getElementById("deleteText").value.trim();
+            if (reason === "") {
+                showErrorToast("Please provide a reason for deletion.", "error");
+                return;
+            }
 
-    document.getElementById("cancelAllReason").value = reason;
+            document.getElementById("cancelAllReason").value = reason;
 
-    fetch(document.getElementById("deleteForm").action, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify({ cancelAllReason: reason })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            showToast(data.error, "error");
-            return;
+            fetch(document.getElementById("deleteForm").action, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({ cancelAllReason: reason })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showToast(data.error, "error");
+                        return;
+                    }
+                    showSuccessToast(data.message || "Item cancelled successfully", "success");
+
+
+
+                    setTimeout(() => {
+                        location.reload();
+
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    showErrorToast("Error cancelling item. Please try again.", "error");
+                });
         }
-        showSuccessToast(data.message || "Item cancelled successfully", "success");
 
-
-
-        setTimeout(() => {
-            location.reload();
-
-        }, 1000);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        showErrorToast("Error cancelling item. Please try again.", "error");
-    });
-}
-
-function submitCancelForm() {
+        function submitCancelForm() {
             const reason = document.getElementById('reasonText').value.trim();
             const form = document.getElementById('cancelForm');
 
