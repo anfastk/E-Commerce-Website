@@ -276,7 +276,7 @@
                             <div
                                 class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2 bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Pending`) (eq .OrderItem.OrderStatus `Confirmed`) (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2 bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Pending`) (eq .OrderItem.OrderStatus `Confirmed`) (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Failed`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
                                     <i class="fas fa-shopping-cart text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
@@ -290,7 +290,7 @@
                             <div
                                 class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200{{end}}">
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Shipped`) (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`)}} border-red-500 {{else}} border-gray-200{{end}}">
                                     <i class="fas fa-box-open text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
@@ -307,7 +307,7 @@
                             <div
                                 class="relative flex sm:flex-col items-start sm:items-center step-item w-full sm:w-1/4 mb-8 sm:mb-0">
                                 <div
-                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500 {{else}} border-gray-200 {{end}}">
+                                    class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle {{if or (eq .OrderItem.OrderStatus `Out For Delivery`) (eq .OrderItem.OrderStatus `Delivered`)}} border-green-500 {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`)}} border-red-500 {{else}} border-gray-200 {{end}}">
                                     <i class="fas fa-truck text-gray-500 text-xs sm:text-sm step-icon"></i>
                                 </div>
                                 <div class="ml-4 sm:ml-0 sm:mt-4 w-full sm:w-32">
@@ -327,7 +327,7 @@
                                 <div class="w-6 h-6 sm:w-8 sm:h-8 border-2  bg-white rounded-full flex items-center justify-center z-10 step-circle 
                                 {{if .OrderItem.OrderStatus}}
                                     {{if eq .OrderItem.OrderStatus `Delivered`}} border-green-500
-                                    {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`)}} border-red-500
+                                    {{else if or (eq .OrderItem.OrderStatus `Returned`) (eq .OrderItem.OrderStatus `Cancelled`) (eq .OrderItem.OrderStatus `Failed`)}} border-red-500
                                     {{else}} border-gray-200
                                     {{end}}
                                 {{else}}
