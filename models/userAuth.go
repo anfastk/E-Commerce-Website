@@ -18,4 +18,4 @@ type UserAuth struct {
 	UserProfile   UserProfile     `gorm:"foreignKey:UserID"`
 	UserAddress   []UserAddress   `gorm:"foreignKey:UserID"`
 	ReservedStock []ReservedStock `gorm:"foreignKey:UserID"`
-}
+} 

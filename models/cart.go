@@ -8,3 +8,4 @@ type Cart struct {
 	UserAuth  UserAuth   `gorm:"foreignKey:UserID"`
 	CartItems []CartItem `gorm:"foreignKey:CartID"`
 }
+ 

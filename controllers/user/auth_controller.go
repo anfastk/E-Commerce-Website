@@ -207,7 +207,7 @@ func ResendOTP(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve OTP record", "Something Went Wrong , Please Try Again ", "")
 			return
 		}
-	} else {
+	} else { 
 		otpRecord.OTP = otp
 		otpRecord.ExpireTime = expiry
 		if err := config.DB.Save(&otpRecord).Error; err != nil {

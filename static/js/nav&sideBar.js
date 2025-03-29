@@ -15,7 +15,7 @@ function toggleSidebar() {
 }
 
 /* ===================================================================NAV BAR===================================================================== */
-
+ 
 function toggleSearchBar() {
   const searchButton = document.getElementById("search-button");
   const searchBar = document.getElementById("search-bar-container");

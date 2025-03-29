@@ -66,7 +66,7 @@ func AddCategory(c *gin.Context) {
 	c.Request.ParseForm()
 
 	logger.Log.Info("Requested TO Add Category")
-
+ 
 	var category models.Categories
 	if err := c.ShouldBind(&category); err != nil {
 		logger.Log.Error("Invaild Data Entered", zap.Error(err))

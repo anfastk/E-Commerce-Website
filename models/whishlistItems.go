@@ -12,3 +12,4 @@ type WishlistItem struct {
 	ProductVariantDetails ProductVariantDetails `gorm:"foreignkey:ProductVariantID"`
 	ProductDetail         ProductDetail         `gorm:"foreignkey:ProductID"`
 }
+ 

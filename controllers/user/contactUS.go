@@ -8,4 +8,4 @@ import (
 
 func ShowContactUs(c *gin.Context){
 	c.HTML(http.StatusOK,"contactUs.html",nil)
-}
+} 

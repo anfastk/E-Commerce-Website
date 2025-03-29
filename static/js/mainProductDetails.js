@@ -14,7 +14,7 @@ function closeUploadPopup() {
     document.getElementById('imageUploadPopup').classList.add('hidden');
     document.getElementById('banner-preview').innerHTML = '';
 }
-
+ 
 function confirmUpload() {
     const previewImg = document.getElementById('banner-preview').querySelector('img');
     const productId = document.getElementById('product-id').value;

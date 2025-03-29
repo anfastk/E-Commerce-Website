@@ -175,7 +175,7 @@ const htmlTemplate = `<!DOCTYPE html>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header"> 
             <div class="logo-container">
                 <!-- Replace with your actual logo image and website URL -->
                 <a href="https://www.laptix.com">

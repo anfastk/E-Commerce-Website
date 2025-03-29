@@ -37,7 +37,7 @@ func InitiateGoogleAuth(c *gin.Context) {
 	logger.Log.Info("Redirecting to Google OAuth URL", zap.String("url", url))
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
-
+ 
 func HandleGoogleCallback(c *gin.Context) {
 	logger.Log.Info("Handling Google OAuth callback")
 
@@ -100,7 +100,7 @@ func HandleGoogleCallback(c *gin.Context) {
 			logger.Log.Warn("Failed to upload profile picture to Cloudinary",
 				zap.String("email", googleUser.Email),
 				zap.Error(uploadErr))
-			cloudinaryURL = "" // Fallback to empty string if upload fails
+			cloudinaryURL = "" 
 		}
 
 		referralCode := helper.GenerateReferralCode()

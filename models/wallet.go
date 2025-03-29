@@ -9,3 +9,4 @@ type Wallet struct {
 	UserAuth          UserAuth          `gorm:"foreignKey:UserID;references:ID"`
 	WalletTransaction []WalletTransaction `gorm:"foreignKey:WalletID;references:ID"`
 }
+ 

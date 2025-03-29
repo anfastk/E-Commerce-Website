@@ -12,7 +12,7 @@ document.querySelectorAll('.menuButton').forEach((button) => {
     });
   });
 });
-
+ 
 document.addEventListener('click', () => {
   document.querySelectorAll('.menuOptions').forEach((menu) => {
     menu.classList.add('hidden');

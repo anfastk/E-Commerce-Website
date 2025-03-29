@@ -79,7 +79,7 @@ func ShowProductsAdmin(c *gin.Context) {
             Images:         images,
             Status:         variant.IsDeleted,
         })
-    }
+    } 
 
     if c.Request.Header.Get("X-Requested-With") != "XMLHttpRequest" {
         c.HTML(http.StatusOK, "productPageAdmin.html", gin.H{

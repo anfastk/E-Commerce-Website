@@ -10,3 +10,4 @@ type ProductImage struct {
 	Product       ProductDetail `gorm:"foreignKey:ProductID"`
 }
 
+ 

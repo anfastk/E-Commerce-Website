@@ -12,7 +12,7 @@ function showToast(message, type) {
     const toastContainer = document.querySelector('.toast-container');
     const toastTemplate = document.getElementById('toast');
     const toast = toastTemplate.cloneNode(true);
-
+ 
     // Set unique ID
     const toastId = 'toast-' + Date.now();
     toast.id = toastId;

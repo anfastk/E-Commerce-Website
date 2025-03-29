@@ -10,7 +10,7 @@ import (
 )
 
 var r *gin.Engine
-
+ 
 func init() {
 	logger.InitLogger()
 	config.LoadEnvFile()

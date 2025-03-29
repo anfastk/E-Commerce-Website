@@ -17,3 +17,4 @@ type ReservedStock struct {
 	ReservedCouponID uint                  `gorm:"index"`
 	ProductVariant   ProductVariantDetails `gorm:"foreignKey:ProductVariantID"`
 }
+ 

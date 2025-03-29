@@ -19,3 +19,4 @@ type ShippingAddress struct {
 	PinCode   string   `gorm:"not null"`
 	UserAuth  UserAuth `gorm:"foreignKey:UserID;references:ID"`
 }
+ 

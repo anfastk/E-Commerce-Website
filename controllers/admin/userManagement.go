@@ -64,7 +64,7 @@ func SearchUsers(c *gin.Context) {
 		"users": users,
 	})
 }
-
+ 
 func BlockUser(c *gin.Context) {
 	logger.Log.Info("Requested to block/unblock user")
 

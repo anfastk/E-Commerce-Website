@@ -16,4 +16,4 @@ func GenerateOTP(length int) string {
 		return ""
 	}
 	return fmt.Sprintf("%0*d", length, n)
-}
+} 

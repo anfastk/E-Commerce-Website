@@ -10,3 +10,4 @@ type Categories struct {
 	IsDeleted       bool              `gorm:"default:false"`
 	OfferByCategory []OfferByCategory `gorm:"foreignKey:CategoryID"`
 }
+ 

@@ -6,7 +6,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 )
-
+ 
 type MainProductDetails struct {
 	Id              uint
 	ProductName     string

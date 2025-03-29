@@ -14,3 +14,4 @@ type Sale struct {
 	SaleDate         time.Time
 	OrderID          uint
 }
+ 

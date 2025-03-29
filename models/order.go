@@ -25,3 +25,4 @@ type Order struct {
 	ShippingAddress      ShippingAddress `gorm:"foreignKey:OrderID;references:ID"`
 	OrderItem            []OrderItem     `gorm:"foreignKey:OrderID;references:ID"`
 }
+ 

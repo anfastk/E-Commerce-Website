@@ -12,7 +12,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-)
+) 
 
 func ShowCheckoutPage(c *gin.Context) {
 	logger.Log.Info("Requested checkout page")

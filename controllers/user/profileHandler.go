@@ -14,7 +14,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-)
+) 
 
 func ProfileDetails(c *gin.Context) {
 	logger.Log.Info("Fetching profile details")

@@ -15,7 +15,7 @@ func GenerateReferralCode() string {
 	if err != nil {
 		panic(err)
 	}
-
+ 
 	randString := hex.EncodeToString(randBytes)
 
 	uuidPart := uuid.New().String()[:4]

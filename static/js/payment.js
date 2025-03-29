@@ -14,7 +14,7 @@ function updateDeliveryDate() {
     // Date format set cheyyuka
     const options = { day: "2-digit", month: "short", year: "numeric" };
     let formattedDeliveryDate = deliveryDate.toLocaleDateString("en-US", options);
-
+ 
     // Remaining time calculate cheyyuka
     let midnight = new Date(now);
     midnight.setHours(23, 59, 59, 999);

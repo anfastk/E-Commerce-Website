@@ -13,7 +13,7 @@
      document.getElementById('addMoneyForm').classList.remove('hidden');
      document.getElementById('giftCardForm').classList.add('hidden');
  });
-
+ 
  document.getElementById('sendGiftBtn').addEventListener('click', function () {
      document.getElementById('giftCardForm').classList.remove('hidden');
      document.getElementById('addMoneyForm').classList.add('hidden');

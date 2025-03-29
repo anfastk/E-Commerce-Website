@@ -11,7 +11,7 @@ import (
 func FetchUserID(c *gin.Context) uint {
 	tokenString, err := c.Cookie("jwtTokensUser")
 	var userID uint
-
+ 
 	if err == nil && tokenString != "" {
 		claims := &middleware.Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {

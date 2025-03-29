@@ -7,3 +7,4 @@ type Wishlist struct {
 	UserID   uint     `gorm:"not null;index"`
 	UserAuth UserAuth `gorm:"foreignkey:UserID"`
 }
+ 

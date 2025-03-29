@@ -481,7 +481,7 @@ func ShowProductDetail(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Variants Not Found", "Something Went Wrong", "")
 		return
 	}
-
+ 
 	var otherVariantDetails []otherVariantDetail
 	for _, row := range otherVariant {
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(row.ProductID, row.CategoryID, row.RegularPrice, row.SalePrice)

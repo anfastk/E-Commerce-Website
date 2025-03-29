@@ -218,7 +218,7 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
 		return 0
 	}
-
+ 
 	if CouponCode != "" && CouponDiscountAmount != 0 && CouponDiscription != "" {
 		order.IsCouponApplied = true
 		if err := tx.Save(&order).Error; err != nil {

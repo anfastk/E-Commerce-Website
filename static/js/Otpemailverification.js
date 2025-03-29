@@ -13,7 +13,7 @@ async function handleSubmit(event) {
   ).join('');
 
   document.getElementById('combinedOtp').value = otp;
-
+ 
   try {
     const formData = new FormData(event.target);
     const response = await fetch(event.target.action, {

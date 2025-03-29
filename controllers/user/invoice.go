@@ -14,7 +14,7 @@ import (
 	"github.com/jung-kurt/gofpdf"
 	"go.uber.org/zap"
 )
-
+ 
 func DownloadInvoice(c *gin.Context) {
 	logger.Log.Info("Requested invoice download")
 

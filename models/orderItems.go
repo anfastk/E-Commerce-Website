@@ -36,3 +36,4 @@ type OrderItem struct {
 	ProductVariantDetails ProductVariantDetails `gorm:"foreignKey:ProductVariantID;references:ID"`
 	CreatedAt             time.Time             `gorm:"index"`
 }
+ 

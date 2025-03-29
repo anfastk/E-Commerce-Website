@@ -23,7 +23,7 @@ function handleFileUpload(input, previewContainerId) {
     reader.readAsDataURL(file);
   }
 }
-
+ 
 function removePreview(inputId, previewContainerId) {
   const input = document.getElementById(inputId);
   const previewContainer = document.getElementById(previewContainerId);

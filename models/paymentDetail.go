@@ -17,3 +17,4 @@ type PaymentDetail struct {
 	OrderItem     OrderItem `gorm:"foreignKey:OrderItemID"`
 	UserAuth      UserAuth  `gorm:"foreignKey:UserID"`
 }
+ 

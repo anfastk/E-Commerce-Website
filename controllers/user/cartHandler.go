@@ -27,7 +27,7 @@ func ShowCart(c *gin.Context) {
 		DiscountPrice float64
 		Status        string
 	}
-
+ 
 	var cart models.Cart
 	if err := config.DB.First(&cart, "user_id = ?", userID).Error; err != nil {
 		cart = models.Cart{

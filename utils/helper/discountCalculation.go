@@ -11,7 +11,7 @@ func DiscountCalculation(productID uint, categoryID uint, regularPrice float64, 
 	if regularPrice <= 0 || salePrice < 0 {
 		return 0, 0, errors.New("invalid price values")
 	}
-
+ 
 	var productOffer models.ProductOffer
 	var categoryOffer models.OfferByCategory
 

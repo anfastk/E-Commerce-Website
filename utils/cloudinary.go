@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mime/multipart"
 )
-
+ 
 var (
 	ErrInvalidFile  = errors.New("invalid file")
 	ErrUploadFailed = errors.New("upload to Cloudinary failed")

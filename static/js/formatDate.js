@@ -4,7 +4,7 @@ function formatDates() {
         let formatType = element.dataset.format;  // Get format type
 
         if (!rawDate || !formatType) return;
-
+ 
         // ✅ Convert backend date format to a valid ISO format
         let formattedRawDate = rawDate.replace(" ", "T"); // Replace space with 'T' for ISO
         let date = new Date(formattedRawDate); // Parse to Date object

@@ -477,7 +477,7 @@ func ProceedToPayment(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusInternalServerError, "Wallet Transaction Creation Failed", "Something Went Wrong", "/cart")
 			return
 		}
-
+ 
 		ClearCart(c, tx, result.ReservedMap)
 		if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
 			logger.Log.Warn("Failed to delete reserved coupon",

@@ -9,7 +9,7 @@ import (
 var RoleUser = "User"
 
 func UserRouter(r *gin.Engine) {
-
+	
 	auth := r.Group("/auth")
 	{
 		auth.GET("/google/login", controllers.InitiateGoogleAuth)
@@ -37,7 +37,7 @@ func UserRouter(r *gin.Engine) {
 
 	userProfile := r.Group("/profile")
 	userProfile.Use(middleware.AuthMiddleware(RoleUser))
-	{
+	{ 
 		userProfile.GET("/", controllers.ProfileDetails)
 		userProfile.PATCH("/", controllers.ProfileUpdate)
 		userProfile.PATCH("/avathar/update", controllers.ProfileImageUpdate)

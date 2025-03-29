@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
-
+ 
 func ShowWishlist(c *gin.Context) {
 	logger.Log.Info("Showing wishlist")
 

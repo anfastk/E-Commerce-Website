@@ -17,3 +17,4 @@ type UserAddress struct {
 	IsDefault bool     `gorm:"default:false"`
 	UserAuth  UserAuth `gorm:"foreignKey:UserID"`
 }
+ 

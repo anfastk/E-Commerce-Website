@@ -16,3 +16,4 @@ type ReturnRequest struct {
 	ProductVariantDetails ProductVariantDetails `gorm:"foreignKey:ProductVariantID;references:ID"`
 	OrderItem             OrderItem             `gorm:"foreignKey:OrderItemID;references:ID"`
 }
+ 

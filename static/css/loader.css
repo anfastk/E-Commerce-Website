@@ -12,7 +12,7 @@
     background-color: rgba(255, 255, 255, 0.5);
     z-index: 9999;
 }
-
+ 
 /* Your existing spinner styles */
 .spinner {
     position: relative;

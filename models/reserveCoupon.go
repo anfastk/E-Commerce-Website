@@ -11,3 +11,4 @@ type ReservedCoupon struct {
 	CouponDiscountAmount float64   `json:"couponDiscountAmount"`
 	CouponID             uint      `gorm:"not null;index"`
 }
+ 

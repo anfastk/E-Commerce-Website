@@ -113,7 +113,7 @@ func SearchOrders(c *gin.Context) {
 			Where("order_items.product_name ILIKE ? OR order_items.order_uid ILIKE ? OR user_auths.full_name ILIKE ?",
 				"%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
 	}
-
+ 
 	if err := query.Find(&orderDetails).Error; err != nil {
 		logger.Log.Error("Failed to fetch orders", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders", "Something Went Wrong", "")

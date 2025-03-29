@@ -10,3 +10,4 @@ type UserProfile struct {
 	State    string   `gorm:"size:100" json:"user_state"`
 	Pincode  string   `gorm:"size:10"  json:"pincode"`
 }
+ 

@@ -23,4 +23,4 @@ func InitCloudinary() *cloudinary.Cloudinary {
 	IsConfigErr = true
 	ConfigErr = nil
 	return Cld
-}
+} 

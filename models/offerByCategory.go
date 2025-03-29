@@ -17,3 +17,4 @@ type OfferByCategory struct {
 	EndDate                 time.Time  `json:"validto"`
 	Category                Categories `gorm:"foreignKey:CategoryID;references:ID"`
 }
+ 

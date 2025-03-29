@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
-
+ 
 func ShowReferralPage(c *gin.Context) {
 	logger.Log.Info("Showing referral page")
 

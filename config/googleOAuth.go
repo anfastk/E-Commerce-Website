@@ -10,7 +10,7 @@ import (
 var (
 	GoogleOAuthConfig *oauth2.Config
 )
-
+ 
 func InitializeGoogleOAuth() {
 	GoogleOAuthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),

@@ -24,3 +24,4 @@ type ProductVariantDetails struct {
 	VariantsImages []ProductVariantsImage `gorm:"foreignKey:ProductVariantID"`
 	Specification  []ProductSpecification `gorm:"foreignKey:ProductVariantID"`
 }
+ 

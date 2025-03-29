@@ -557,7 +557,7 @@ func ReplaceVariantProductImage(c *gin.Context) {
 		tx.Rollback()
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete image from Cloudinary", "Replace Image Failed", "")
 		return
-	}
+	} 
 
 	tx.Commit()
 	logger.Log.Info("Variant product image replaced successfully", zap.Int("imageID", imageID))

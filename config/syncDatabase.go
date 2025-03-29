@@ -5,7 +5,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
 	"go.uber.org/zap"
 )
-
+ 
 func SyncDatabase() {
 	err := DB.AutoMigrate(
 		&models.AdminModel{}, &models.UserAuth{}, &models.Categories{}, &models.ProductDetail{}, &models.ProductImage{},

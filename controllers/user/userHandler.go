@@ -16,7 +16,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
-
+ 
 var RoleUser = "User"
 
 func ShowSignup(c *gin.Context) {

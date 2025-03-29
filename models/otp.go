@@ -11,3 +11,4 @@ type Otp struct {
 	OTP        string `gorm:"size:10"  json:"otp"`
 	ExpireTime time.Time
 }
+ 

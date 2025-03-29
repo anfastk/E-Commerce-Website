@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
-
+ 
 func AddProductOffer(c *gin.Context) {
 	logger.Log.Info("Requested to add product offer")
 	

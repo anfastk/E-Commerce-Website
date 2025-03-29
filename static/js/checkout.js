@@ -1,6 +1,6 @@
 // Global variable to track selected address
 let selectedAddressId = null;
-
+ 
 // Address Management Functions
 async function loadAddresses() {
     try {

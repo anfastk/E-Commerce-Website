@@ -10,7 +10,7 @@ function changeImage(thumbnailImg) {
 
     thumbnailImg.parentElement.classList.add('active');
 }
-
+ 
 function scrollThumbnails(direction) {
     const container = document.getElementById('thumbnail-container');
     const scrollAmount = 160;

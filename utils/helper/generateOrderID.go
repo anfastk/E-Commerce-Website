@@ -15,3 +15,4 @@ func GenerateOrderID() string {
 
 	return strings.ToUpper(fmt.Sprintf("#%d-%d-%07d", section1, section2, section3))
 }
+ 

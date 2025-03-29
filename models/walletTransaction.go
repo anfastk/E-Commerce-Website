@@ -16,3 +16,4 @@ type WalletTransaction struct {
 	PaymentMethod string   `gorm:"size:50"`
 	UserAuth      UserAuth `gorm:"foreignKey:UserID;references:ID"`
 }
+ 

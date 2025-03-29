@@ -32,7 +32,6 @@ func SearchWalletTransactions(c *gin.Context) {
         Amount        float64 `json:"Amount"`
     }
 
-    // Get query parameters
     search := c.Query("search")
     transactionType := c.Query("type")
     page := c.DefaultQuery("page", "1")
@@ -42,20 +41,17 @@ func SearchWalletTransactions(c *gin.Context) {
 
     var walletTransactions []models.WalletTransaction
     query := config.DB.Order("created_at DESC").Preload("UserAuth")
-
-    // Apply search filter with JOIN
+ 
     if search != "" {
         query = query.Joins("JOIN user_auths ON user_auths.id = wallet_transactions.user_id").
             Where("wallet_transactions.transaction_id LIKE ? OR user_auths.full_name LIKE ?",
                 "%"+search+"%", "%"+search+"%")
     }
 
-    // Apply type filter
     if transactionType != "" {
         query = query.Where("wallet_transactions.type = ?", transactionType)
     }
 
-    // Get total count for pagination
     var total int64
     countQuery := config.DB.Model(&models.WalletTransaction{})
     if search != "" {
@@ -72,7 +68,6 @@ func SearchWalletTransactions(c *gin.Context) {
         return
     }
 
-    // Get paginated results
     if err := query.Limit(perPage).Offset(offset).Find(&walletTransactions).Error; err != nil {
         logger.Log.Error("Failed to fetch wallet transactions", zap.Error(err))
         helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch wallet transactions", "Something Went Wrong", "")

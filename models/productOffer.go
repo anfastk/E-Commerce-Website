@@ -17,3 +17,4 @@ type ProductOffer struct {
 	Status          string        `gorm:"not null"`
 	Product         ProductDetail `gorm:"foreignKey:ProductID"`
 }
+ 

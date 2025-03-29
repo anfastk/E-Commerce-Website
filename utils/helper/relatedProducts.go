@@ -16,7 +16,7 @@ type productsResponse struct {
 	IsInCart        bool    `json:"is_in_cart"`
 	IsInWishlist    bool    `json:"is_in_wishlist"`
 }
-
+ 
 func RelatedProducts(categoryID uint) ([]productsResponse, error) {
 	var products []models.ProductVariantDetails
 	if err := config.DB.Preload("VariantsImages", "is_deleted = ?", false).

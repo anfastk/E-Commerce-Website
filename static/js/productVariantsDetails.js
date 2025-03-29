@@ -11,7 +11,7 @@ openPopup.addEventListener("click", () => {
 closePopup.addEventListener("click", () => {
     popupModal.classList.add("hidden");
 });
-
+ 
 const addSpecBtn = document.getElementById("addSpecBtn");
 const specificationsList = document.getElementById("specificationsList");
 

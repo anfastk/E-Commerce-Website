@@ -14,3 +14,4 @@ type CartItem struct {
 	ProductDetail    ProductDetail         `gorm:"foreignKey:ProductID"`
 	ProductVariant   ProductVariantDetails `gorm:"foreignKey:ProductVariantID"`
 }
+ 

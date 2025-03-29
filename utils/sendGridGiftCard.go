@@ -14,11 +14,9 @@ func SendGiftCardToEmail(senderName,senderProdile, message, email, amount, giftC
 	subject := "You've Received a Gift Card!"
 	to := mail.NewEmail("Recipient", email)
 	
-	// Prepare plain text content
 	plainTextContent := fmt.Sprintf("You've received a gift card!\nAmount: %s\nCode: %s\nExpires: %s\nFrom: %s\nMessage: %s",
 		amount, giftCode, expDate, senderName, message)
-	
-	// Replace placeholders in HTML template
+	 
 	htmlContent := giftCardTemplate
 	htmlContent = strings.ReplaceAll(htmlContent, "%SENDER_NAME%", senderName)
 	htmlContent = strings.ReplaceAll(htmlContent, "%MESSAGE%", message)

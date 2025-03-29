@@ -254,7 +254,7 @@ func VerifyAddTOWalletRazorpayPayment(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid signature", "Payment verification failed", "/profile/order/details")
 		return
 	}
-
+ 
 	var wallet models.Wallet
 	if err := tx.First(&wallet, "user_id = ?", userID).Error; err != nil {
 		logger.Log.Error("Wallet not found",

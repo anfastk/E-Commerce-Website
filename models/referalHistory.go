@@ -13,3 +13,4 @@ type ReferalHistory struct {
 	JoinedUser      UserAuth        `gorm:"foreignKey:JoinedUserId;references:ID"`
 	ReferralAccount ReferralAccount `gorm:"foreignKey:ReferralID;references:ID"`
 }
+ 

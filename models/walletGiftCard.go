@@ -12,7 +12,7 @@ type WalletGiftCard struct {
 	GiftCardValue  float64   `gorm:"not null;index"`
 	ExpDate        time.Time `gorm:"not null;index"`
 	UserID         uint      `gorm:"not null;index"`
-	RecipientName  string    `gorm:"size:255"`
+	RecipientName  string    `gorm:"size:255"` 
 	RecipientEmail string    `gorm:"size:255"`
 	Message        string    `gorm:"size:1000"`
 	Status         string    `gorm:"default:Active"`

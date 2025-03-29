@@ -15,3 +15,4 @@ func RespondWithError(c *gin.Context, status int, error string, message string, 
 		"redirect": redirect,
 	})
 }
+ 

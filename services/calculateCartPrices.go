@@ -3,7 +3,7 @@ package services
 import (
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 )
-
+ 
 func CalculateCartPrices(cartItems []CartItemDetailWithDiscount) (float64, float64, float64, float64, float64, int) {
 	var (
 		regularPrice    float64

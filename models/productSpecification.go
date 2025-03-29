@@ -10,3 +10,4 @@ type ProductSpecification struct {
 	IsDeleted          bool                  `gorm:"default:false"`
 	ProductVariant     ProductVariantDetails `gorm:"foreignKey:ProductVariantID"`
 }
+ 

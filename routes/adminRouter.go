@@ -75,7 +75,7 @@ func AdminRoutes(r *gin.Engine) {
 		OrderList.PATCH("/details/status/update", controllers.ChangeOrderStatus)
 		OrderList.POST("/details/return/request", controllers.ApproveReturn)
 	}
-
+	// Admin Coupon Management
 	coupon := r.Group("/admin/coupon")
 	coupon.Use(middleware.AuthMiddleware(RoleAdmin))
 	{
@@ -85,16 +85,16 @@ func AdminRoutes(r *gin.Engine) {
 		coupon.GET("/details/:id", controllers.CouponDetails)
 		coupon.POST("/details/edit/:id", controllers.UpdateCoupon)
 	}
-
+	//Admin Sales
 	sales := r.Group("/sales")
 	sales.Use(middleware.AuthMiddleware(RoleAdmin))
 	{
 		sales.GET("/", controllers.GetSalesDashboard)
 		sales.GET("/filter", controllers.GetSalesData)
-		sales.GET("/recent-orders", controllers.GetRecentOrdersUnfiltered) // New endpoint
+		sales.GET("/recent-orders", controllers.GetRecentOrdersUnfiltered)
 		sales.GET("/download/report", controllers.DownloadSalesReport)
 	}
-
+	// Admin Wallet Management
 	wallet := r.Group("/admin/wallet")
 	wallet.Use(middleware.AuthMiddleware(RoleAdmin))
 	{

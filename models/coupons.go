@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 )
-
+ 
 type Coupon struct {
 	gorm.Model
 	CouponCode       string    `gorm:"unique;index" json:"code"`

@@ -10,3 +10,4 @@ type ReferralAccount struct {
 	UserAuth       UserAuth         `gorm:"foreignKey:UserID;references:ID"`
 	ReferalHistory []ReferalHistory `gorm:"foreignKey:ReferralID;references:ID"`
 }
+ 

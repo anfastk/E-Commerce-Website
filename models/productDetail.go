@@ -18,4 +18,4 @@ type ProductDetail struct {
 	Variants       []ProductVariantDetails `gorm:"foreignKey:ProductID"`
 	Images         []ProductImage          `gorm:"foreignKey:ProductID"`
 	Offers         []ProductOffer          `gorm:"foreignKey:ProductID"`
-}
+} 

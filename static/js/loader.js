@@ -11,7 +11,7 @@ function showLoader() {
   // Example usage with promise/async operations
   async function fetchData() {
     showLoader();
-    try {
+    try { 
         // Simulate API call or other async operation
         await new Promise(resolve => setTimeout(resolve, 2000));
         // Your actual data fetching code here

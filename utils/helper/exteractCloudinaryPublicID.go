@@ -12,7 +12,6 @@ func ExtractCloudinaryPublicID(imageURL string) (string, error) {
         return "", fmt.Errorf("invalid Cloudinary URL")
     }
     
-    // Find the index of "upload" to get the public ID with folder path
     uploadIndex := -1
     for i, part := range urlParts {
         if part == "upload" {

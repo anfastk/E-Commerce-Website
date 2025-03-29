@@ -12,3 +12,4 @@ type Review struct {
 	UserAuth      UserAuth      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ProductDetail ProductDetail `gorm:"foreignKey:ProductID;references:ID"`
 }
+ 
