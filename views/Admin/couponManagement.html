@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupon Management</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -224,49 +225,7 @@
                             <a href="#"
                                 class="inline-block py-3 px-4 text-indigo-600 font-medium border-b-2 border-indigo-600">Active</a>
                         </li>
-                        <li class="mr-2">
-                            <a href="#"
-                                class="inline-block py-3 px-4 text-gray-500 hover:text-gray-700 font-medium">Scheduled</a>
-                        </li>
-                        <li class="mr-2">
-                            <a href="#"
-                                class="inline-block py-3 px-4 text-gray-500 hover:text-gray-700 font-medium">Expired</a>
-                        </li>
                     </ul>
-                </div>
-
-                <!-- Filters -->
-                <div class="flex flex-col sm:flex-row flex-wrap gap-4 mb-6">
-                    <div class="relative w-full sm:w-auto">
-                        <select
-                            class="w-full sm:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-400 appearance-none">
-                            <option>All Types</option>
-                            <option>Percentage</option>
-                            <option>Fixed Amount</option>
-                            <option>Free Shipping</option>
-                        </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i data-feather="chevron-down" class="h-4 w-4"></i>
-                        </div>
-                    </div>
-                    <div class="relative w-full sm:w-auto">
-                        <select
-                            class="w-full sm:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-400 appearance-none">
-                            <option>All Categories</option>
-                            {{range .Category}}
-                            <option value="{{.Name}}">{{.Name}}</option>
-                            {{end}}
-                        </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i data-feather="chevron-down" class="h-4 w-4"></i>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-auto">
-                        <input type="text" placeholder="Search coupons..."
-                            class="w-full sm:w-auto bg-white border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                    </div>
                 </div>
 
                 <!-- Coupons Table -->
@@ -364,65 +323,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination -->
-                    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 flex justify-between sm:hidden">
-                                <a href="#"
-                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                    Previous
-                                </a>
-                                <a href="#"
-                                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                    Next
-                                </a>
-                            </div>
-                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                                <div>
-                                    <p class="text-sm text-gray-700">
-                                        Showing <span class="font-medium">1</span> to <span class="font-medium">5</span>
-                                        of <span class="font-medium">24</span> coupons
-                                    </p>
-                                </div>
-                                <div>
-                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                                        aria-label="Pagination">
-                                        <a href="#"
-                                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                            <span class="sr-only">Previous</span>
-                                            <i data-feather="chevron-left" class="h-5 w-5"></i>
-                                        </a>
-                                        <a href="#" aria-current="page"
-                                            class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                            1
-                                        </a>
-                                        <a href="#"
-                                            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                            2
-                                        </a>
-                                        <a href="#"
-                                            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                            3
-                                        </a>
-                                        <span
-                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                                            ...
-                                        </span>
-                                        <a href="#"
-                                            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                            5
-                                        </a>
-                                        <a href="#"
-                                            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                            <span class="sr-only">Next</span>
-                                            <i data-feather="chevron-right" class="h-5 w-5"></i>
-                                        </a>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </main>
 
@@ -449,7 +349,7 @@
                         </div>
 
                         <!-- Form -->
-                        <form>
+                        <form onsubmit="return validateForm()">
                             <div class="space-y-6">
                                 <!-- Basic Information -->
                                 <div>
@@ -461,7 +361,8 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="text" id="coupon-code" name="coupon-code"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400"
-                                                placeholder="e.g. SUMMER20" required>
+                                                placeholder="e.g. SUMMER20" required pattern="[A-Za-z]+[A-Za-z0-9]*"
+                                                title="Coupon code must start with a letter and contain only letters and numbers">
                                         </div>
                                         <div>
                                             <label for="description"
@@ -498,7 +399,7 @@
                                                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">%</span>
                                                 </div>
-                                                <input type="number" id="value" name="value"
+                                                <input type="number" id="value" name="value" min="0"
                                                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                                                     placeholder="e.g. 10" required>
                                             </div>
@@ -531,7 +432,7 @@
                                                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">$</span>
                                                 </div>
-                                                <input type="number" id="min-order" name="min-order"
+                                                <input type="number" id="min-order" name="min-order" min="0"
                                                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                                                     placeholder="e.g. 50">
                                             </div>
@@ -540,14 +441,13 @@
                                         <div>
                                             <label for="max-discount"
                                                 class="block text-sm font-medium text-gray-700 mb-1">Maximum Discount
-                                                Amount
-                                                Value</label>
+                                                Amount Value</label>
                                             <div class="relative">
                                                 <div
                                                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">$</span>
                                                 </div>
-                                                <input type="number" id="max-discount" name="max-discount"
+                                                <input type="number" id="max-discount" name="max-discount" min="0"
                                                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
                                                     placeholder="e.g. 50">
                                             </div>
@@ -556,9 +456,8 @@
                                         <div>
                                             <label for="usage-limit"
                                                 class="block text-sm font-medium text-gray-700 mb-1">Usage Limit</label>
-                                            <input type="number" id="usage-limit" name="usage-limit"
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                placeholder="Leave empty for unlimited">
+                                            <input type="number" id="usage-limit" name="usage-limit" min="0"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
                                         </div>
                                     </div>
                                 </div>
@@ -1172,6 +1071,28 @@
                     });
             });
         });
+        function validateForm() {
+            // Coupon code validation is handled by HTML pattern
+
+            // Value validation based on discount type
+            const discountType = document.getElementById('type').value;
+            const value = document.getElementById('value').value;
+
+            if (discountType === 'Percentage' && value > 90) {
+                return false;
+            }
+
+            // Date validation
+            const validDate = new Date(document.getElementById('valid-date').value);
+            const expiryDate = new Date(document.getElementById('expiry-date').value);
+
+            if (validDate > expiryDate) {
+                alert('Valid From date cannot be later than Expiry Date');
+                return false;
+            }
+
+            return true;
+        }
     </script>
     <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/formatDate.js"></script>

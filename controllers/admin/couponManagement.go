@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
- 
+
 	"github.com/anfastk/E-Commerce-Website/config"
 	"github.com/anfastk/E-Commerce-Website/models"
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
@@ -16,7 +16,7 @@ import (
 
 func ShowCoupon(c *gin.Context) {
 	logger.Log.Info("Requested to Show Coupons")
-	
+
 	type couponDetail struct {
 		ID             uint
 		CouponCode     string
@@ -29,14 +29,14 @@ func ShowCoupon(c *gin.Context) {
 		ApplicableFor  string
 		Status         string
 	}
-	
+
 	var coupons []models.Coupon
 	if err := config.DB.Find(&coupons).Error; err != nil {
 		logger.Log.Error("Failed to fetch coupons", zap.Error(err))
 		helper.RespondWithError(c, http.StatusNotFound, "Coupons Not Found", "Something Went Wrong", "")
 		return
 	}
-	
+
 	var couponsDetail []couponDetail
 	for _, coupon := range coupons {
 		cpn := couponDetail{
@@ -53,13 +53,13 @@ func ShowCoupon(c *gin.Context) {
 		}
 		couponsDetail = append(couponsDetail, cpn)
 	}
-	
+
 	count := len(coupons)
 	var category []models.Categories
 	if err := config.DB.Find(&category).Error; err != nil {
 		logger.Log.Error("Failed to fetch categories", zap.Error(err))
 	}
-	
+
 	logger.Log.Info("Coupons displayed successfully", zap.Int("count", count))
 	c.HTML(http.StatusOK, "couponManagement.html", gin.H{
 		"Coupons":  couponsDetail,
@@ -70,7 +70,7 @@ func ShowCoupon(c *gin.Context) {
 
 func AddCoupon(c *gin.Context) {
 	logger.Log.Info("Requested to Add Coupon")
-	
+
 	var couponInput struct {
 		CouponCode        string `json:"code" binding:"required"`
 		Discription       string `json:"description" binding:"required"`
@@ -89,11 +89,32 @@ func AddCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Something Went Wrong", "")
 		return
 	}
-	
+
 	discountValue, err := strconv.ParseFloat(couponInput.DiscountValue, 64)
+	if (couponInput.CouponType != "Fixed" && (discountValue > 90 || discountValue < 1)) || discountValue < 1 {
+		logger.Log.Error("Invalid data.Discount value should be greater than 0 and less than 90")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data. Discount value should be greater than 0 and less than 90", "Invalid data. Discount value should be greater than 0 and less than 90", "")
+		return
+	}
+
 	maxDiscountValue, err := strconv.ParseFloat(couponInput.MaxDiscountValue, 64)
+	if maxDiscountValue < 1 {
+		logger.Log.Error("Invalid data.Max discount value should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater yhan 0 ", "")
+		return
+	}
 	minOrderValue, err := strconv.ParseFloat(couponInput.MinOrdervalue, 64)
+	if minOrderValue < 1 {
+		logger.Log.Error("Invalid data.Min order value should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater yhan 0 ", "")
+		return
+	}
 	maxUseCount, err := strconv.Atoi(couponInput.MaxUseCount)
+	if maxUseCount < 1 {
+		logger.Log.Error("Invalid data.Amount should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater yhan 0 ", "")
+		return
+	}
 	layout := "2006-01-02"
 	validFrom, err := time.Parse(layout, couponInput.ValidFrom)
 	expirationDate, err := time.Parse(layout, couponInput.ExpirationDate)
@@ -102,7 +123,7 @@ func AddCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Something Went Wrong", "")
 		return
 	}
-	
+
 	if validFrom.Before(time.Now().Truncate(24 * time.Hour)) {
 		logger.Log.Error("Invalid starting date - date in past")
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Starting Date", "Start date must be today or in the future", "")
@@ -118,12 +139,12 @@ func AddCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
 		return
 	}
-	
+
 	status := "Active"
 	if validFrom.After(time.Now()) {
 		status = "Scheduled"
 	}
-	
+
 	couponFixed := models.Coupon{
 		CouponCode:       strings.ToUpper(couponInput.CouponCode),
 		Discription:      couponInput.Discription,
@@ -138,7 +159,7 @@ func AddCoupon(c *gin.Context) {
 		ApplicableFor:    couponInput.ApplicableProduct,
 		Status:           status,
 	}
-	
+
 	if err := config.DB.Create(&couponFixed).Error; err != nil {
 		logger.Log.Error("Failed to create coupon", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Failed to create coupon code already exist", "Failed to create coupon code already exist", "")
@@ -156,7 +177,7 @@ func AddCoupon(c *gin.Context) {
 func DeleteCoupon(c *gin.Context) {
 	couponID := c.Param("id")
 	logger.Log.Info("Requested to Delete Coupon", zap.String("couponID", couponID))
-	
+
 	var coupon models.Coupon
 	if err := config.DB.First(&coupon, couponID).Error; err != nil {
 		logger.Log.Error("Coupon not found", zap.String("couponID", couponID), zap.Error(err))
@@ -165,7 +186,7 @@ func DeleteCoupon(c *gin.Context) {
 	}
 
 	coupon.Status = "Deleted"
-	
+
 	if err := config.DB.Save(&coupon).Error; err != nil {
 		logger.Log.Error("Failed to update coupon status", zap.String("couponID", couponID), zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to delete coupon", "Failed to delete coupon", "")
@@ -189,7 +210,7 @@ func DeleteCoupon(c *gin.Context) {
 func CouponDetails(c *gin.Context) {
 	couponID := c.Param("id")
 	logger.Log.Info("Requested Coupon Details", zap.String("couponID", couponID))
-	
+
 	var coupon models.Coupon
 	if err := config.DB.First(&coupon, couponID).Error; err != nil {
 		logger.Log.Error("Failed to fetch coupon", zap.String("couponID", couponID), zap.Error(err))
@@ -209,7 +230,7 @@ func CouponDetails(c *gin.Context) {
 func UpdateCoupon(c *gin.Context) {
 	couponID := c.Param("id")
 	logger.Log.Info("Requested to Update Coupon", zap.String("couponID", couponID))
-	
+
 	var request struct {
 		CouponCode       string `json:"code"`
 		Description      string `json:"description"`
@@ -249,7 +270,7 @@ func UpdateCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid expiry date format", "Something Went Wrong", "")
 		return
 	}
-	
+
 	discountValue, err := strconv.ParseFloat(request.DiscountValue, 64)
 	maxDiscountValue, err := strconv.ParseFloat(request.MaxDiscountValue, 64)
 	minOrderValue, err := strconv.ParseFloat(request.MinOrderValue, 64)
@@ -287,7 +308,7 @@ func UpdateCoupon(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Date Range", "Start date must be before end date", "")
 		return
 	}
-	
+
 	coupon.Status = "Active"
 	if validFrom.After(time.Now()) {
 		coupon.Status = "Scheduled"
