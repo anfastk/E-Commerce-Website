@@ -1,30 +1,35 @@
-# ***E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)***
+# *** 🎯 E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)***
 
 ## 📌 Project Overview
 
-This is a full-fledged e-commerce website built using the **Gin** framework in **Golang**, following the **MVC architecture**. The project includes both admin and user sides, handling product management, stock management, user authentication, order processing, and payment integration with **Razorpay**.
+This is a full-fledged e-commerce website built using the **Gin** framework in **Golang**, following the **MVC architecture**. The project includes both admin and user sides, handling:  
+✅ Product management  
+✅ Stock management  
+✅ User authentication  
+✅ Order processing  
+✅ Payment integration with **Razorpay**  
 
 ## 🚀 Features
 
-- User authentication (signup, login, logout, password reset)
+✔️ **User Authentication** – Signup, login, logout, password reset 
 
-- Admin dashboard for product and order management
+✔️ **Admin Dashboard** – Manage products and orders  
 
-- Product catalog with categories and filters
+✔️ **Product Catalog** – Categories, search, and filters  
 
-- Shopping cart and checkout system
+✔️ **Shopping Cart & Checkout** – Seamless user experience  
 
-- Secure payments via **Razorpay**
+✔️ **Secure Payments** – Integrated with **Razorpay**  
 
-- Stock management to prevent overselling
+✔️ **Stock Management** – Prevents overselling  
 
-- Order tracking system
+✔️ **Order Tracking** – Status updates for users  
 
-- Responsive UI using **HTML**, and **Tailwind CSS**
+✔️ **Responsive UI** – Built with **HTML + Tailwind CSS**  
 
-- Logging using **Zap**
+✔️ **Logging** – Implemented using **Zap Logger**  
 
-- Hosted on **AWS with Nginx**, secured with **HTTPS/TLS**
+✔️ **Hosting & Security** – AWS, Nginx, HTTPS/TLS  
 
 ## 🛠️ Tech Stack
 
@@ -44,13 +49,13 @@ This is a full-fledged e-commerce website built using the **Gin** framework in *
 
 ## Installation and Setup
 
-### Prerequisites:
+### 📌 Prerequisites:
 
-- Golang installed
+✔️ Golang installed
 
-- PostgreSQL database setup
+✔️ PostgreSQL database setup
 
-- AWS instance with Nginx configured
+✔️ AWS instance with Nginx configured
 
 ## Steps to Run the Project:
 
@@ -97,14 +102,17 @@ go run main.go
 - **Admin Panel:** [http://localhost:8080/admin/login](http://localhost:8080/admin/login)  
 
 
-## Deployment on AWS with Nginx
+## 🌍 Deployment on AWS with Nginx
 
-1. Set up an EC2 instance and install Golang & PostgreSQL.
+1️⃣ Set up an EC2 instance and install Golang & PostgreSQL.
 
-2. Clone the repository and set up environment variables.
+2️⃣ Clone the repository and set up environment variables.
 
-3. Install and configure Nginx to reverse proxy the Golang server.
+3️⃣ Install and configure Nginx to reverse proxy the Golang server.
 
-4. Set up SSL/TLS security using Let's Encrypt.
+4️⃣ Set up SSL/TLS security using Let's Encrypt.
 
-5. Run the application in production mode.
+5️⃣ Run the application in production mode.
+
+6️⃣ Run the Application – Start the Golang server in production mode.
+
