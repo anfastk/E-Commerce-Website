@@ -20,7 +20,7 @@ This is a full-fledged e-commerce website built using the **Gin** framework in *
 
 - Order tracking system
 
-- Responsive UI using **HTML**, and **Tailwind Css**
+- Responsive UI using **HTML**, and **Tailwind CSS**
 
 - Logging using **Zap**
 
@@ -55,10 +55,10 @@ This is a full-fledged e-commerce website built using the **Gin** framework in *
 ## Steps to Run the Project:
 
 ### 1️⃣ Clone the repository:
-
-```sh 
+```sh
 git clone https://github.com/anfastk/E-Commerce-Website.git
-
+cd E-Commerce-Website 
+```
 
 ### 2️⃣ Set up environment variables:
 Create a `.env` file and configure database credentials, AWS settings, and Razorpay keys.
@@ -77,22 +77,25 @@ GOOGLE_REDIRECT_URL=your-google-redirecturl
 DEFAULT_PROFILE_PIC=https://res.cloudinary.com/dghzlcoco/image/upload/v1740382266/e3b0c44298fc1Default_c149afbf4c8996fb92427aImagee41e4649b934ca4959Profile91b7852b855_rlwzij.jpg
 RAZORPAY_KEY_ID=your-razorpay-key-id
 RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+```
 
 ### 3️⃣ Install dependencies:
 
 ```sh
 go mod tidy
+```
 
 ### 4️⃣ Start the server
 
 ```sh
 go run main.go
+```
 
 ### 5️⃣ Access the website:
 
-- **User:**`http://localhost:8080`
+- **User Panel:** [http://localhost:8080](http://localhost:8080)  
+- **Admin Panel:** [http://localhost:8080/admin/login](http://localhost:8080/admin/login)  
 
-- **Admin:** `http://localhost:8080/admin/login`
 
 ## Deployment on AWS with Nginx
 
