@@ -214,7 +214,7 @@ func ShowCheckoutPage(c *gin.Context) {
 
 	tx.Commit()
 
-	CreateWallet(c, userID)
+	helper.CreateWallet(c, userID)
 	logger.Log.Info("Checkout page loaded successfully",
 		zap.Uint("userID", userID),
 		zap.Int("cartItemCount", len(cartItems)),

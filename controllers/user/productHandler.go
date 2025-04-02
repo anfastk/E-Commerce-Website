@@ -64,6 +64,8 @@ func UserHome(c *gin.Context) {
 		mouse = helper.CheckCartAndWishlist(mouse, userID)
 		logger.Log.Debug("Checked cart and wishlist for user",
 			zap.Uint("userID", userID))
+		helper.CreateCart(c, userID)
+		helper.CreateWishlist(c, userID)
 	}
 
 	logger.Log.Info("User home page loaded",
@@ -481,7 +483,7 @@ func ShowProductDetail(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusInternalServerError, "Variants Not Found", "Something Went Wrong", "")
 		return
 	}
- 
+
 	var otherVariantDetails []otherVariantDetail
 	for _, row := range otherVariant {
 		discountAmount, TotalPercentage, disErr := helper.DiscountCalculation(row.ProductID, row.CategoryID, row.RegularPrice, row.SalePrice)
