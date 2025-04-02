@@ -16,7 +16,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
- 
+
 var RoleUser = "User"
 
 func ShowSignup(c *gin.Context) {
@@ -330,27 +330,36 @@ func ForgotUserEmail(c *gin.Context) {
 		logger.Log.Warn("Invalid token found", zap.Error(err))
 	}
 
-	userEmail := c.PostForm("email")
-	if userEmail == "" {
+	var userInput struct {
+		Email string `json:"email" form:"email"`
+	}
+
+	if err := c.ShouldBind(&userInput); err != nil {
+		logger.Log.Error("Invalid request payload", zap.Error(err))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Invalid request", "")
+		return
+	}
+
+	if userInput.Email == "" {
 		logger.Log.Warn("Email not provided")
-		helper.RespondWithError(c, http.StatusBadRequest, "Enter email", "Enter email", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Please enter your email address", "Please enter your email address", "")
 		return
 	}
 
 	var existingUser models.UserAuth
-	if err := config.DB.Where("email = ?", userEmail).First(&existingUser).Error; err != nil {
+	if err := config.DB.Where("email = ?", userInput.Email).First(&existingUser).Error; err != nil {
 		logger.Log.Warn("User not found for forgot password",
-			zap.String("email", userEmail),
+			zap.String("email", userInput.Email),
 			zap.Error(err))
-		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		helper.RespondWithError(c, http.StatusNotFound, "Email not found", "Email not found", "")
 		return
 	}
 
 	logger.Log.Info("Forgot password email verified, showing reset page",
-		zap.String("email", userEmail))
+		zap.String("email", userInput.Email))
 	c.HTML(http.StatusOK, "resetPassword.html", gin.H{
 		"status": "OK",
-		"Email":  userEmail,
+		"Email":  userInput.Email,
 		"code":   http.StatusOK,
 	})
 }

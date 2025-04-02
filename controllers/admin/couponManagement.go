@@ -91,26 +91,26 @@ func AddCoupon(c *gin.Context) {
 	}
 
 	discountValue, err := strconv.ParseFloat(couponInput.DiscountValue, 64)
-	if (couponInput.CouponType != "Fixed" && (discountValue > 90 || discountValue < 1)) || discountValue < 1 {
+	if (couponInput.CouponType != "Fixed" && (discountValue > 90 || discountValue < 1)) || discountValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Discount value should be greater than 0 and less than 90")
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data. Discount value should be greater than 0 and less than 90", "Invalid data. Discount value should be greater than 0 and less than 90", "")
 		return
 	}
 
 	maxDiscountValue, err := strconv.ParseFloat(couponInput.MaxDiscountValue, 64)
-	if maxDiscountValue < 1 {
+	if maxDiscountValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Max discount value should be greater than 0")
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater yhan 0 ", "")
 		return
 	}
 	minOrderValue, err := strconv.ParseFloat(couponInput.MinOrdervalue, 64)
-	if minOrderValue < 1 {
+	if minOrderValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Min order value should be greater than 0")
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater yhan 0 ", "")
 		return
 	}
 	maxUseCount, err := strconv.Atoi(couponInput.MaxUseCount)
-	if maxUseCount < 1 {
+	if maxUseCount < 1 || err != nil {
 		logger.Log.Error("Invalid data.Amount should be greater than 0")
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater yhan 0 ", "")
 		return
@@ -272,12 +272,27 @@ func UpdateCoupon(c *gin.Context) {
 	}
 
 	discountValue, err := strconv.ParseFloat(request.DiscountValue, 64)
+	if (request.CouponType != "Fixed" && (discountValue > 90 || discountValue < 1)) || discountValue < 1 || err != nil {
+		logger.Log.Error("Invalid data.Discount value should be greater than 0 and less than 90")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data. Discount value should be greater than 0 and less than 90", "Invalid data. Discount value should be greater than 0 and less than 90", "")
+		return
+	}
 	maxDiscountValue, err := strconv.ParseFloat(request.MaxDiscountValue, 64)
+	if maxDiscountValue < 1 || err != nil {
+		logger.Log.Error("Invalid data.Max discount value should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater yhan 0 ", "")
+		return
+	}
 	minOrderValue, err := strconv.ParseFloat(request.MinOrderValue, 64)
+	if minOrderValue < 1 || err != nil {
+		logger.Log.Error("Invalid data.Min order value should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater yhan 0 ", "")
+		return
+	}
 	maxUseCount, err := strconv.Atoi(request.UsageLimit)
-	if err != nil {
-		logger.Log.Error("Invalid data format", zap.Error(err))
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Data", "Something Went Wrong", "")
+	if maxUseCount < 1 || err != nil {
+		logger.Log.Error("Invalid data.Amount should be greater than 0")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater yhan 0 ", "")
 		return
 	}
 

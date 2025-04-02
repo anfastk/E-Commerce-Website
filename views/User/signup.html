@@ -5,9 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - LAPTIX</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .field-icon {
+            float: right;
+            margin-right: 10px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
@@ -36,12 +56,13 @@
                 <a href="/auth/login" class="text-blue-500 hover:underline">Login</a>
             </p>
 
-            <form action="/auth/signup/" method="post">
+            <form action="/auth/signup/" method="post" id="signup-form">
                 <div class="mb-4">
                     <label for="full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input id="full-name" type="text"
                         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         placeholder="Full Name" name="full_name" required>
+                    <div id="full-name-error" class="error-message"></div>
                 </div>
 
                 <div class="mb-4">
@@ -49,6 +70,7 @@
                     <input id="email" type="email"
                         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                         placeholder="Email" name="email" required>
+                    <div id="email-error" class="error-message"></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
@@ -57,6 +79,8 @@
                         <input id="password" type="password"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                             placeholder="Password" name="password" required>
+                        <span toggle="#password" class="fas fa-eye field-icon toggle-password"></span>
+                        <div id="password-error" class="error-message"></div>
                     </div>
 
                     <div class="mb-4">
@@ -65,6 +89,8 @@
                         <input id="confirm-password" type="password"
                             class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                             placeholder="Confirm Password" name="confirm_password" required>
+                        <span toggle="#confirm-password" class="fas fa-eye field-icon toggle-password"></span>
+                        <div id="confirm-password-error" class="error-message"></div>
                     </div>
                 </div>
 
@@ -127,6 +153,138 @@
             <p class="text-center text-gray-500 text-sm mt-8">Copyright &copy; 2025 LAPTIX Inc</p>
         </div>
     </footer>
+    <script>
+        // Toggle password visibility
+        $(".toggle-password").click(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            var input = $($(this).attr("toggle"));
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } else {
+                input.attr("type", "password");
+            }
+        });
+
+        // Validation functions
+        function validateFullName() {
+            const fullNameInput = document.getElementById('full-name');
+            const fullNameError = document.getElementById('full-name-error');
+            const fullName = fullNameInput.value.trim();
+
+            // Clear previous error message
+            fullNameError.textContent = '';
+
+            // Check if name is at least 3 characters
+            if (fullName.length < 3) {
+                fullNameError.textContent = 'Name must be at least 3 characters';
+                return false;
+            }
+
+            // Check if name contains at least one space (first and last name)
+            if (!fullName.includes(' ')) {
+                fullNameError.textContent = 'Please enter your full name (first and last name)';
+                return false;
+            }
+
+            // Check if name only contains letters and spaces
+            if (!/^[A-Za-z\s]+$/.test(fullName)) {
+                fullNameError.textContent = 'Name should only contain letters';
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateEmail() {
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            const email = emailInput.value.trim();
+
+            // Clear previous error message
+            emailError.textContent = '';
+
+            // Basic email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'Please enter a valid email address';
+                return false;
+            }
+
+            return true;
+        }
+
+        function validatePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordError = document.getElementById('password-error');
+            const password = passwordInput.value;
+
+            // Clear previous error message
+            passwordError.textContent = '';
+
+            // Check password length
+            if (password.length < 8) {
+                passwordError.textContent = 'Password must be at least 8 characters';
+                return false;
+            }
+
+            // Check for uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                passwordError.textContent = 'Password must contain at least one uppercase letter';
+                return false;
+            }
+
+            // Check for lowercase letter
+            if (!/[a-z]/.test(password)) {
+                passwordError.textContent = 'Password must contain at least one lowercase letter';
+                return false;
+            }
+
+            // Check for special character
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                passwordError.textContent = 'Password must contain at least one special character';
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateConfirmPassword() {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const confirmPasswordError = document.getElementById('confirm-password-error');
+
+            // Clear previous error message
+            confirmPasswordError.textContent = '';
+
+            // Check if passwords match
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordError.textContent = 'Passwords do not match';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Add event listeners for real-time validation
+        document.getElementById('full-name').addEventListener('input', validateFullName);
+        document.getElementById('email').addEventListener('input', validateEmail);
+        document.getElementById('password').addEventListener('input', validatePassword);
+        document.getElementById('confirm-password').addEventListener('input', validateConfirmPassword);
+
+        // Form submission
+        document.getElementById('signup-form').addEventListener('submit', function (event) {
+            // Validate all fields
+            const isFullNameValid = validateFullName();
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            const isConfirmPasswordValid = validateConfirmPassword();
+
+            // Prevent form submission if any validation fails
+            if (!isFullNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 
 </html>

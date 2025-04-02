@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/static/css/admin_login_style.css" type="text/css">
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .error-message {
             color: red;
@@ -16,6 +17,23 @@
         }
         .error {
             border-color: red;
+        }
+        .input-group {
+            position: relative;
+        }
+        .field-icon {
+            position: absolute;
+            right: 10px; /* Adjust distance from right edge */
+            top: 70%; /* Center vertically */
+            transform: translateY(-50%); /* Fine-tune vertical centering */
+            z-index: 2;
+            cursor: pointer;
+            color: #666; /* Optional: adjust icon color */
+            font-size: 12px;
+        }
+        /* Ensure input has enough padding on the right for the icon */
+        #password {
+            padding-right: 35px; /* Space for the icon */
         }
     </style>
 </head>
@@ -41,6 +59,7 @@
                     <div class="input-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" placeholder="Password" required>
+                        <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                         <div id="passwordError" class="error-message"></div>
                     </div>
                     <div class="actions">
@@ -51,16 +70,27 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        async function handleLogin(event) {
-            event.preventDefault(); // Prevent the default form submission
+        $(document).ready(function() {
+            $(".toggle-password").click(function() {
+                $(this).toggleClass("fa-eye fa-eye-slash");
+                var input = $($(this).attr("toggle"));
+                if (input.attr("type") == "password") {
+                    input.attr("type", "text");
+                } else {
+                    input.attr("type", "password");
+                }
+            });
+        });
 
+        async function handleLogin(event) {
+            event.preventDefault();
             const emailField = document.getElementById('email');
             const passwordField = document.getElementById('password');
             const emailError = document.getElementById('emailError');
             const passwordError = document.getElementById('passwordError');
 
-            // Clear previous error messages and styles
             emailError.textContent = "";
             passwordError.textContent = "";
             emailField.classList.remove('error');
@@ -81,15 +111,13 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Successful login - Redirect to dashboard
                     console.log('Login successful:', result);
                     window.location.href = '/admin/dashboard/';
                 } else {
-                    // Display error messages under respective fields
                     if (result.error.includes("Email")) {
                         emailError.textContent = result.error;
                         emailField.classList.add('error');
-                    } 
+                    }
                     if (result.error.includes("Password")) {
                         passwordError.textContent = result.error;
                         passwordField.classList.add('error');

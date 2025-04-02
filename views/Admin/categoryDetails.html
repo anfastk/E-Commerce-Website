@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Category Details</title>
-  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+  <link rel="icon" type="image/png"
+    href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
   <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
   <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -862,6 +863,36 @@
         showErrorToast('An error occurred while deleting the offer');
       }
     }
+    document.getElementById('editForm').addEventListener('submit', function (e) {
+      const nameInput = document.getElementById('editName');
+      const descInput = document.getElementById('editDescription');
+
+      // Validate Category Name (only letters and spaces)
+      const nameRegex = /^[A-Za-z\s]+$/;
+      if (!nameRegex.test(nameInput.value)) {
+        e.preventDefault();
+        alert('Category Name can only contain letters and spaces');
+        return;
+      }
+
+      const descRegex = /^[A-Za-z\s]+$/;
+      const wordCount = descInput.value.trim().split(/\s+/).length;
+
+      if (!descRegex.test(descInput.value)) {
+        e.preventDefault();
+        alert('Description can only contain letters and spaces');
+        return;
+      }
+    });
+
+    // Real-time input sanitization
+    document.getElementById('editName').addEventListener('input', function (e) {
+      this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+    });
+
+    document.getElementById('editDescription').addEventListener('input', function (e) {
+      this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+    });
   </script>
   <script src="/static/js/toastMain.js"></script>
 </body>
