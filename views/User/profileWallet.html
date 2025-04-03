@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{.CSRFToken}}"> <!-- CSRF token for backend security -->
     <title>Wallet</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
@@ -23,7 +25,6 @@
             position: relative;
         }
 
-
         .transaction-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -32,19 +33,15 @@
 </head>
 
 <body class="bg-gray-50">
-    <div class="bg-black py-4 sticky top-0 z-50 ">
+    <div class="bg-black py-4 sticky top-0 z-50">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
-                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
+                <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="/contactUs" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
@@ -72,12 +69,8 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -85,8 +78,6 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
@@ -95,13 +86,12 @@
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
                     <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
     </div>
+
     <div class="container mx-auto px-4 py-4">
-        <!-- Breadcrumb -->
         <div class="flex items-center text-sm mb-4 md:mb-8">
             <a href="#" class="text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24"
@@ -115,9 +105,7 @@
             <span class="text-gray-900">Profile</span>
         </div>
 
-        <!-- Content Layout -->
         <div class="flex flex-col lg:flex-row gap-4 md:gap-8">
-            <!-- Sidebar -->
             <div class="w-full lg:w-64 flex-shrink-0">
                 <div class="p-4 border-b bg-white rounded-t-lg">
                     <div class="flex items-center space-x-3">
@@ -128,7 +116,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Navigation Menu -->
                 <div class="bg-white rounded-b-lg shadow-sm">
                     <nav class="flex flex-col p-2">
                         <a href="/profile"
@@ -224,10 +211,8 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="w-full">
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <!-- Header -->
                     <div class="gradient-bg rounded-t-2xl p-4 md:p-6 mb-2 text-white relative overflow-hidden">
                         <div class="absolute top-0 right-0 opacity-10">
                             <i class="fas fa-wallet text-6xl md:text-9xl m-2"></i>
@@ -236,18 +221,15 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                             <div>
                                 <p class="text-sm opacity-80">Current Balance</p>
-                                <p id="amount" class="text-3xl md:text-4xl font-bold">&#8377;{{.Wallet.Balance}}</p>
+                                <p id="amount" class="text-3xl md:text-4xl font-bold">₹{{.Wallet.Balance}}</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Main Content -->
                     <div class="p-4 md:p-6">
-                        <!-- Referral Stats -->
                         <div class="bg-gray-50 rounded-xl p-4 md:p-6 mb-6 md:mb-8">
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-                                <h2 class="text-lg md:text-xl font-bold text-indigo-900 mb-2 md:mb-0">Referral Program
-                                </h2>
+                                <h2 class="text-lg md:text-xl font-bold text-indigo-900 mb-2 md:mb-0">Referral Program</h2>
                                 <a href="/profile/referral"
                                     class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 text-sm md:text-base">
                                     Go to Referral Dashboard
@@ -266,13 +248,12 @@
                                     <p class="text-gray-500 text-sm">Referral Earnings</p>
                                     <div class="flex items-center mt-1">
                                         <span id="amount"
-                                            class="text-2xl md:text-3xl font-bold text-indigo-800">&#8377;{{.ReferralDetails.Balance}}</span>
+                                            class="text-2xl md:text-3xl font-bold text-indigo-800">₹{{.ReferralDetails.Balance}}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Quick Actions -->
                         <div class="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 md:mb-8">
                             <button id="addMoneyBtn"
                                 class="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-2 md:py-3 px-4 rounded-lg transition flex items-center justify-center gap-2 text-sm md:text-base">
@@ -286,12 +267,11 @@
                             </button>
                         </div>
 
-                        <!-- Forms -->
                         <div id="addMoneyForm"
                             class="hidden bg-white rounded-xl border border-gray-200 p-4 md:p-6 mb-6 md:mb-8">
                             <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Add Money to Wallet</h2>
                             <div id="walletFormContainer">
-                                <!-- Quick Amount Selection -->
+                                <input type="hidden" id="selectedAmount" name="selectedAmount">
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-medium mb-2">
                                         Select Amount
@@ -299,43 +279,39 @@
                                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3 mb-2">
                                         <button type="button"
                                             class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base"
-                                            data-amount="10">&#8377;10</button>
+                                            data-amount="10">₹10</button>
                                         <button type="button"
                                             class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base"
-                                            data-amount="20">&#8377;20</button>
+                                            data-amount="20">₹20</button>
                                         <button type="button"
                                             class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base"
-                                            data-amount="50">&#8377;50</button>
+                                            data-amount="50">₹50</button>
                                         <button type="button"
                                             class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base"
-                                            data-amount="100">&#8377;100</button>
+                                            data-amount="100">₹100</button>
                                         <button type="button"
                                             class="amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base"
-                                            data-amount="200">&#8377;200</button>
+                                            data-amount="200">₹200</button>
                                         <button type="button" id="otherAmountBtn"
                                             class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 md:py-3 rounded text-sm md:text-base">
                                             Other
                                         </button>
                                     </div>
                                 </div>
-
-                                <!-- Custom Amount Input -->
                                 <div id="customAmountSection" class="mb-4 hidden">
-                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="amount">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="customAmountInput">
                                         Enter Amount
                                     </label>
                                     <div class="relative">
                                         <div
                                             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500">&#8377;</span>
+                                            <span class="text-gray-500">₹</span>
                                         </div>
                                         <input type="number" id="customAmountInput" name="amount"
                                             class="pl-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 text-sm md:text-base"
                                             placeholder="0.00" min="1">
                                     </div>
                                 </div>
-
-                                <!-- Payment Method -->
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-medium mb-2" for="payment-method">
                                         Payment Method
@@ -345,10 +321,7 @@
                                         <option value="Razorpay">RazorPay</option>
                                     </select>
                                 </div>
-
-                                <!-- Status message -->
                                 <div id="statusMessage" class="mb-4 hidden rounded-md p-3 text-sm md:text-base"></div>
-
                                 <div class="flex justify-end gap-3">
                                     <button type="button" id="cancelAddMoney"
                                         class="px-3 md:px-4 py-2 text-gray-600 hover:text-gray-800 text-sm md:text-base">Cancel</button>
@@ -385,7 +358,7 @@
                                     <div class="relative">
                                         <div
                                             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500">&#8377;</span>
+                                            <span class="text-gray-500">₹</span>
                                         </div>
                                         <input type="number" id="gift-amount" name="gift-amount"
                                             class="pl-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5"
@@ -410,7 +383,6 @@
                             </form>
                         </div>
 
-                        <!-- Transaction History -->
                         <div>
                             <div
                                 class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
@@ -427,8 +399,6 @@
                                     <button class="text-indigo-600 font-medium text-sm">Apply</button>
                                 </div>
                             </div>
-
-                            <!-- Mobile Card View (visible on small screens) -->
                             <div class="block sm:hidden space-y-4">
                                 {{range .WalletTransactions}}
                                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -471,21 +441,13 @@
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            {{if or (eq .Type "Deposit") (eq .Type "Refund") (eq .Type "Gift Redeemed")
-                                            (eq .Type "Referral")}}
-                                            <p class="text-sm font-medium text-green-600 inline-block">+&#8377;{{printf
-                                                "%.2f" .Amount}}</p>
+                                            {{if or (eq .Type "Deposit") (eq .Type "Refund") (eq .Type "Gift Redeemed") (eq .Type "Referral")}}
+                                            <p class="text-sm font-medium text-green-600 inline-block">+₹{{printf "%.2f" .Amount}}</p>
                                             {{else}}
-                                            <p class="text-sm font-medium text-red-600 inline-block">-&#8377;{{printf
-                                                "%.2f" .Amount}}</p>
+                                            <p class="text-sm font-medium text-red-600 inline-block">-₹{{printf "%.2f" .Amount}}</p>
                                             {{end}}
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
-                                                {{if eq .Type " Deposit"}}bg-blue-100 text-blue-800 {{else if eq
-                                                .Type "Deduct" }}bg-red-100 text-red-800 {{else if eq .Type "Refund"
-                                                }}bg-emerald-100 text-emerald-800 {{else if eq .Type "Gift Send"
-                                                }}bg-purple-100 text-purple-800 {{else if eq .Type "Gift Redeemed"
-                                                }}bg-violet-100 text-violet-800 {{else if eq .Type "Referral"
-                                                }}bg-green-100 text-green-800 {{end}}">
+                                                {{if eq .Type "Deposit"}}bg-blue-100 text-blue-800 {{else if eq .Type "Deduct"}}bg-red-100 text-red-800 {{else if eq .Type "Refund"}}bg-emerald-100 text-emerald-800 {{else if eq .Type "Gift Send"}}bg-purple-100 text-purple-800 {{else if eq .Type "Gift Redeemed"}}bg-violet-100 text-violet-800 {{else if eq .Type "Referral"}}bg-green-100 text-green-800 {{end}}">
                                                 {{.Type}}
                                             </span>
                                         </div>
@@ -493,8 +455,6 @@
                                 </div>
                                 {{end}}
                             </div>
-
-                            <!-- Desktop Table View (hidden on small screens) -->
                             <div class="hidden sm:block">
                                 <div class="overflow-x-auto -mx-4 sm:mx-0">
                                     <div class="inline-block min-w-full align-middle">
@@ -540,7 +500,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-green-600 text-right font-medium">
-                                                            +&#8377;{{printf "%.2f" .Amount}}
+                                                            +₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -562,7 +522,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-red-600 text-right font-medium">
-                                                            -&#8377;{{printf "%.2f" .Amount}}
+                                                            -₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -584,7 +544,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-red-600 text-right font-medium">
-                                                            - &#8377;{{printf "%.2f" .Amount}}
+                                                            - ₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -606,7 +566,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-red-600 text-right font-medium">
-                                                            - &#8377;{{printf "%.2f" .Amount}}
+                                                            - ₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -628,7 +588,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-green-600 text-right font-medium">
-                                                            +&#8377;{{printf "%.2f" .Amount}}
+                                                            +₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -650,7 +610,7 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-green-600 text-right font-medium">
-                                                            +&#8377;{{printf "%.2f" .Amount}}
+                                                            +₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
@@ -672,14 +632,13 @@
                                                         </td>
                                                         <td
                                                             class="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-green-600 text-right font-medium">
-                                                            +&#8377;{{printf "%.2f" .Amount}}
+                                                            +₹{{printf "%.2f" .Amount}}
                                                         </td>
                                                     </tr>
                                                     {{end}}
                                                     {{end}}
                                                 </tbody>
                                             </table>
-
                                         </div>
                                     </div>
                                 </div>
@@ -690,6 +649,7 @@
             </div>
         </div>
     </div>
+
     <div class="toast-container z-40 fixed top-0 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
@@ -703,29 +663,18 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
     <footer class="bg-black text-white py-12 mt-16">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
-                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
-                        with
-                        our exclusive collections and latest laptops.</p>
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-x"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-youtube"></i>
-                        </a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-x"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div>
@@ -748,30 +697,18 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span
-                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -780,13 +717,349 @@
             </div>
         </div>
     </footer>
+
     <script>
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
+
+        let amountElement = document.getElementById("amount");
+        let rawAmount = amountElement.innerText.replace("₹", "").trim();
+        let amount = parseFloat(rawAmount);
+        let formattedAmount = new Intl.NumberFormat('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+        amountElement.innerHTML = `₹${formattedAmount}`;
+
+        document.getElementById('addMoneyBtn').addEventListener('click', function () {
+            document.getElementById('addMoneyForm').classList.remove('hidden');
+            document.getElementById('giftCardForm').classList.add('hidden');
+        });
+
+        document.getElementById('sendGiftBtn').addEventListener('click', function () {
+            document.getElementById('giftCardForm').classList.remove('hidden');
+            document.getElementById('addMoneyForm').classList.add('hidden');
+        });
+
+        document.getElementById('cancelAddMoney').addEventListener('click', function () {
+            document.getElementById('addMoneyForm').classList.add('hidden');
+            resetForm();
+        });
+
+        document.getElementById('cancelGiftCard').addEventListener('click', function () {
+            document.getElementById('giftCardForm').classList.add('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const amountButtons = document.querySelectorAll('.amount-btn');
+            const otherAmountBtn = document.getElementById('otherAmountBtn');
+            const customAmountSection = document.getElementById('customAmountSection');
+            const amountInput = document.getElementById('customAmountInput');
+            const selectedAmountField = document.getElementById('selectedAmount');
+            const submitButton = document.getElementById('submitButton');
+            const cancelButton = document.getElementById('cancelAddMoney');
+            const statusMessage = document.getElementById('statusMessage');
+
+            function enableSubmitButton() {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50');
+            }
+
+            function disableSubmitButton() {
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50');
+            }
+
+            function resetForm() {
+                amountInput.value = '';
+                document.getElementById('payment-method').selectedIndex = 0;
+                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
+                customAmountSection.classList.add('hidden');
+                selectedAmountField.value = '';
+                disableSubmitButton();
+                submitButton.textContent = 'Add Money';
+                statusMessage.classList.add('hidden');
+            }
+
+            disableSubmitButton();
+
+            amountButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                    otherAmountBtn.classList.remove('bg-blue-500', 'text-white');
+                    this.classList.add('bg-blue-500', 'text-white');
+                    customAmountSection.classList.add('hidden');
+                    selectedAmountField.value = this.getAttribute('data-amount');
+                    enableSubmitButton();
+                    statusMessage.classList.add('hidden');
+                });
+            });
+
+            otherAmountBtn.addEventListener('click', function () {
+                amountButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
+                this.classList.add('bg-blue-500', 'text-white');
+                customAmountSection.classList.remove('hidden');
+                amountInput.value = '';
+                selectedAmountField.value = '';
+                amountInput.focus();
+                disableSubmitButton();
+                statusMessage.classList.add('hidden');
+            });
+
+            function validateCustomAmount() {
+                const value = amountInput.value.trim();
+                const amount = parseFloat(value);
+                if (value && !isNaN(amount) && amount >= 1) {
+                    selectedAmountField.value = amount;
+                    enableSubmitButton();
+                } else {
+                    selectedAmountField.value = '';
+                    disableSubmitButton();
+                }
+            }
+
+            if (amountInput) {
+                amountInput.addEventListener('input', validateCustomAmount);
+                amountInput.addEventListener('change', validateCustomAmount);
+            }
+
+            submitButton.addEventListener('click', function () {
+                if (!customAmountSection.classList.contains('hidden')) {
+                    validateCustomAmount();
+                }
+
+                const amount = selectedAmountField.value;
+                if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) < 1) {
+                    showErrorToast('Please select or enter a valid amount');
+                    return;
+                }
+
+                disableSubmitButton();
+                submitButton.textContent = 'Processing...';
+
+                const data = {
+                    amount: parseFloat(amount),
+                    paymentMethod: document.getElementById('payment-method').value
+                };
+
+                fetch('/profile/wallet/add/amount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        showSuccessToast("Payment initiated successfully!");
+                        initializeRazorpay(data);
+                        setTimeout(() => {
+                            resetForm();
+                            document.getElementById('addMoneyForm').classList.add('hidden');
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error("Payment initiation failed:", error);
+                        showErrorToast(error.message || 'Failed to add money. Please try again.');
+                        enableSubmitButton();
+                        submitButton.textContent = 'Add Money';
+                    });
+            });
+
+            cancelButton.addEventListener('click', resetForm);
+
+            const giftCardForm = document.getElementById('giftCardForm');
+            const sendGiftButton = giftCardForm.querySelector('button[type="submit"]');
+            const recipientName = document.getElementById('recipient-name');
+            const recipientEmail = document.getElementById('recipient-email');
+            const giftAmount = document.getElementById('gift-amount');
+            const giftMessage = document.getElementById('gift-message');
+
+            function enableGiftButton() {
+                sendGiftButton.disabled = false;
+                sendGiftButton.classList.remove('opacity-50');
+            }
+
+            function disableGiftButton() {
+                sendGiftButton.disabled = true;
+                sendGiftButton.classList.add('opacity-50');
+            }
+
+            function resetGiftForm() {
+                recipientName.value = '';
+                recipientEmail.value = '';
+                giftAmount.value = '';
+                giftMessage.value = '';
+                enableGiftButton();
+                sendGiftButton.textContent = 'Send Gift Card';
+            }
+
+            enableGiftButton();
+
+            giftCardForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                if (!recipientName.value.trim()) {
+                    showErrorToast('Please enter recipient name');
+                    return;
+                }
+                if (!recipientEmail.value.trim() || !/^\S+@\S+\.\S+$/.test(recipientEmail.value)) {
+                    
+   
+showErrorToast('Please enter a valid email');
+                    return;
+                }
+                const amount = parseFloat(giftAmount.value);
+                if (!amount || amount < 5) {
+                    showErrorToast('Please enter an amount of at least ₹5');
+                    return;
+                }
+
+                disableGiftButton();
+                sendGiftButton.textContent = 'Sending...';
+
+                const giftData = {
+                    recipient_name: recipientName.value.trim(),
+                    recipient_email: recipientEmail.value.trim(),
+                    amount: amount,
+                    message: giftMessage.value.trim()
+                };
+
+                fetch('/profile/wallet/send/gift/card', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(giftData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        showSuccessToast(data.message || 'Gift card sent successfully!');
+                        resetGiftForm();
+                        setTimeout(() => {
+                            document.getElementById('giftCardForm').classList.add('hidden');
+                            window.location.reload();
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Gift card sending failed:', error);
+                        showErrorToast(error.message || 'Failed to send gift card. Please try again.');
+                        enableGiftButton();
+                        sendGiftButton.textContent = 'Send Gift Card';
+                    });
+            });
+        });
+
+        function initializeRazorpay(data) {
+            const options = {
+                key: data.key_id,
+                amount: data.amount * 100, // Convert to paise
+                currency: "INR",
+                name: "LAPTIX",
+                description: "Wallet Recharge",
+                image: "https://res.cloudinary.com/dghzlcoco/image/upload/v1740498507/text-1740498489427_ir9mat.png",
+                order_id: data.order_id,
+                handler: function (response) {
+                    verifyPayment({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        amount: data.amount
+                    });
+                },
+                prefill: {
+                    name: data.prefill.name,
+                    email: data.prefill.email
+                },
+                notes: data.notes,
+                theme: {
+                    color: "#000000"
+                },
+                modal: {
+                    ondismiss: function () {
+                        showErrorToast("Payment cancelled");
+                        document.getElementById('submitButton').textContent = 'Add Money';
+                        enableSubmitButton();
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                showErrorToast("Payment Failed: " + response.error.description);
+            });
+            rzp.open();
+        }
+
+        function verifyPayment(paymentData) {
+            fetch('/profile/wallet/add/amount/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(paymentData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    showSuccessToast("Amount Added Successfully");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                })
+                .catch(error => {
+                    console.error('Verification error:', error);
+                    showErrorToast(error.message || "Payment verification failed.");
+                    document.getElementById('submitButton').textContent = 'Add Money';
+                    enableSubmitButton();
+                });
+        }
+
+        function showSuccessToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.querySelector('.toast-message');
+            const successIcon = document.querySelector('.toast-icon-success');
+            const errorIcon = document.querySelector('.toast-icon-error');
+            toastMessage.textContent = message;
+            successIcon.classList.remove('hidden');
+            errorIcon.classList.add('hidden');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                successIcon.classList.add('hidden');
+            }, 3000);
+        }
+
+        function showErrorToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.querySelector('.toast-message');
+            const successIcon = document.querySelector('.toast-icon-success');
+            const errorIcon = document.querySelector('.toast-icon-error');
+            toastMessage.textContent = message;
+            successIcon.classList.add('hidden');
+            errorIcon.classList.remove('hidden');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                errorIcon.classList.add('hidden');
+            }, 3000);
+        }
     </script>
-    <script src="/static/js/profileWallet.js" defer></script>
     <script src="/static/js/toastMain.js" defer></script>
 </body>
 
