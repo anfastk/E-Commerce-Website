@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -202,8 +203,10 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">My Wishlist</h1>
                     <p class="text-sm sm:text-base text-gray-600 mt-1">Items you've saved for later</p>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-                    <div class="bg-white shadow-md rounded-lg px-3 sm:px-4 py-2 flex items-center w-full sm:w-auto justify-center">
+                <div
+                    class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                    <div
+                        class="bg-white shadow-md rounded-lg px-3 sm:px-4 py-2 flex items-center w-full sm:w-auto justify-center">
                         <span class="text-sm sm:text-base text-gray-800 font-medium">Total Items:</span>
                         <span id="wishlist-count"
                             class="ml-2 bg-black text-white rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-sm sm:text-base">{{.Count}}</span>
@@ -223,20 +226,24 @@
 
     <div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 pb-8 sm:pb-12">
         <div id="empty-wishlist" class="hidden flex flex-col items-center justify-center py-8 sm:py-16 my-12 sm:my-24">
-            <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mt-4 sm:mt-6 text-center">Your wishlist is empty</h3>
-            <p class="text-sm sm:text-base text-gray-600 mt-2 text-center max-w-md px-4">Start saving items you love by clicking the heart icon on products.</p>
+            <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mt-4 sm:mt-6 text-center">Your wishlist is empty
+            </h3>
+            <p class="text-sm sm:text-base text-gray-600 mt-2 text-center max-w-md px-4">Start saving items you love by
+                clicking the heart icon on products.</p>
             <a href="/products"
                 class="mt-4 sm:mt-6 bg-black text-white rounded-lg px-4 sm:px-6 py-2 sm:py-3 font-medium hover:bg-gray-800 transition-colors duration-300 action-button text-sm sm:text-base">
                 Continue Shopping
             </a>
         </div>
 
-        <div id="wishlist-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <div id="wishlist-items"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {{range .Data}}
             <div class="wishlist-card bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
                 <div class="relative h-48 sm:h-56 md:h-64 group">
                     <div class="absolute -left-6 top-6 transform -rotate-45 z-10">
-                        <div class="ribbon bg-red-600 text-white text-xs px-6 sm:px-8 py-1 font-bold relative overflow-hidden">
+                        <div
+                            class="ribbon bg-red-600 text-white text-xs px-6 sm:px-8 py-1 font-bold relative overflow-hidden">
                             {{.DiscountPercentage}}% OFF</div>
                     </div>
                     <form action="/wishlist/remove/{{.ProductID}}" method="post">
@@ -248,15 +255,18 @@
                     <div
                         class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition bg-black/30">
                         <a href="/products/details/{{.ProductID}}"
-                            class="bg-white/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full font-medium">Quick View</a>
+                            class="bg-white/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full font-medium">Quick
+                            View</a>
                     </div>
                     <img src="{{.ProductImage}}" alt="{{.ProductName}}" class="w-full h-full object-contain p-2 sm:p-4">
                 </div>
                 <div class="p-3 sm:p-4">
                     <h3 class="text-base sm:text-lg font-semibold truncate">{{.ProductName}}</h3>
                     <div class="mt-2 flex items-center space-x-2">
-                        <span class="text-black font-bold text-base sm:text-lg">₹{{printf "%.2f" .ProductSalePrice}}</span>
-                        <span class="line-through text-gray-400 text-xs sm:text-sm">₹{{printf "%.2f" .ProductRegularPrice}}</span>
+                        <span class="text-black font-bold text-base sm:text-lg">₹{{printf "%.2f"
+                            .ProductSalePrice}}</span>
+                        <span class="line-through text-gray-400 text-xs sm:text-sm">₹{{printf "%.2f"
+                            .ProductRegularPrice}}</span>
                     </div>
                     {{if .IsStockAvailable}}
                     {{if .IsInCart}}
@@ -286,8 +296,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                 <div>
                     <a href="/" class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 logo-font">LAPTIX</a>
-                    <p class="text-xs sm:text-sm mb-3 sm:mb-4">We are the biggest hyperstore in the universe. We got you all covered with our exclusive collections and latest laptops.</p>
-                    <a href="mailto:laptixinfo@gmail.com" class="text-xs sm:text-sm block mb-3 sm:mb-4">laptixinfo@gmail.com</a>
+                    <p class="text-xs sm:text-sm mb-3 sm:mb-4">We are the biggest hyperstore in the universe. We got you
+                        all covered with our exclusive collections and latest laptops.</p>
+                    <a href="mailto:laptixinfo@gmail.com"
+                        class="text-xs sm:text-sm block mb-3 sm:mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-3 sm:space-x-4">
                         <a href="#" class="hover:text-gray-400">
                             <i class="fab fa-facebook text-sm sm:text-base"></i>
@@ -323,18 +335,35 @@
                 <div>
                     <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Apple
+                                Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Asus
+                                Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Red
+                                Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Hp
+                                Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Lenovo
+                                Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -440,11 +469,11 @@
                                 const wishlistCard = form.closest('.wishlist-card');
                                 const buttonContainer = form.parentElement;
                                 buttonContainer.innerHTML = `
-                                <a href="/cart" 
-                                   class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
-                                   <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
-                                </a>
-                            `;
+                                    <a href="/cart" 
+                                       class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                       <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
+                                    </a>
+                                `;
                                 const cartCounter = document.querySelector('.cart-counter');
                                 if (cartCounter && data.cartCount) {
                                     cartCounter.textContent = data.cartCount;
@@ -472,88 +501,91 @@
                 });
             });
 
-            // Handle "Move All to Cart" functionality
-            window.handleMoveAllToCart = function (event) {
-                event.preventDefault();
-                const button = document.getElementById('move-all-to-cart');
-                button.disabled = true;
-                button.innerHTML = `
-                    <span class="relative z-10 flex items-center">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>
-                        Moving...
-                    </span>
-                `;
-                fetch('/wishlist/all/products/move/cart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        button.disabled = false;
-                        button.innerHTML = `
-                        <div class="custom-shine-element"></div>
+            // Handle "Move All to Cart" button
+            const moveAllButton = document.getElementById('move-all-to-cart');
+            if (moveAllButton) {
+                moveAllButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const button = this;
+                    button.disabled = true;
+                    button.innerHTML = `
                         <span class="relative z-10 flex items-center">
-                            <i class="fas fa-shopping-cart mr-2"></i>
-                            Move All to Cart
+                            <i class="fas fa-spinner fa-spin mr-2"></i>
+                            Moving...
                         </span>
                     `;
-                        if (data.success) {
-                            const wishlistItems = document.getElementById('wishlist-items');
-                            const emptyWishlist = document.getElementById('empty-wishlist');
-                            document.querySelectorAll('.black-cart-button').forEach(btn => {
-                                const container = btn.parentElement.parentElement;
-                                container.innerHTML = `
-                                <a href="/cart" 
-                                   class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
-                                   <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
-                                </a>
-                            `;
-                            });
-                            const wishlistCount = document.getElementById('wishlist-count');
-                            if (wishlistCount && data.remainingCount !== undefined) {
-                                wishlistCount.textContent = data.remainingCount;
-                            }
-                            if (data.remainingCount === 0) {
-                                wishlistItems.classList.add('hidden');
-                                emptyWishlist.classList.remove('hidden');
-                            }
-                            showSuccessToast(data.message || 'Items moved to cart successfully', 'success');
-                            if (data.cartCount) {
-                                const cartCounter = document.querySelector('.cart-counter');
-                                if (cartCounter) {
-                                    cartCounter.textContent = data.cartCount;
-                                    cartCounter.classList.remove('hidden');
-                                }
-                            }
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1250);
-                        } else {
-                            showSuccessToast(data.message || 'Failed to move items to cart', 'error');
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1250);
+                    fetch('/wishlist/all/products/move/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        button.disabled = false;
-                        button.innerHTML = `
-                        <div class="custom-shine-element"></div>
-                        <span class="relative z-10 flex items-center">
-                            <i class="fas fa-shopping-cart mr-2"></i>
-                            Move All to Cart
-                        </span>
-                    `;
-                        showSuccessToast('An error occurred while moving items to cart', 'error');
-                    });
-            };
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            button.disabled = false;
+                            button.innerHTML = `
+                                <div class="custom-shine-element"></div>
+                                <span class="relative z-10 flex items-center">
+                                    <i class="fas fa-shopping-cart mr-2"></i>
+                                    Move All to Cart
+                                </span>
+                            `;
+                            if (data.success) {
+                                const wishlistItems = document.getElementById('wishlist-items');
+                                const emptyWishlist = document.getElementById('empty-wishlist');
+                                document.querySelectorAll('.black-cart-button').forEach(btn => {
+                                    const container = btn.parentElement.parentElement;
+                                    container.innerHTML = `
+                                        <a href="/cart" 
+                                           class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                           <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
+                                        </a>
+                                    `;
+                                });
+                                const wishlistCount = document.getElementById('wishlist-count');
+                                if (wishlistCount && data.remainingCount !== undefined) {
+                                    wishlistCount.textContent = data.remainingCount;
+                                }
+                                if (data.remainingCount === 0) {
+                                    wishlistItems.classList.add('hidden');
+                                    emptyWishlist.classList.remove('hidden');
+                                }
+                                showSuccessToast(data.message || 'Items moved to cart successfully', 'success');
+                                if (data.cartCount) {
+                                    const cartCounter = document.querySelector('.cart-counter');
+                                    if (cartCounter) {
+                                        cartCounter.textContent = data.cartCount;
+                                        cartCounter.classList.remove('hidden');
+                                    }
+                                }
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1250);
+                            } else {
+                                showSuccessToast(data.message || 'Failed to move items to cart', 'error');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1250);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            button.disabled = false;
+                            button.innerHTML = `
+                                <div class="custom-shine-element"></div>
+                                <span class="relative z-10 flex items-center">
+                                    <i class="fas fa-shopping-cart mr-2"></i>
+                                    Move All to Cart
+                                </span>
+                            `;
+                            showSuccessToast('An error occurred while moving items to cart', 'error');
+                        });
+                });
+            }
 
             // Animation styles
             const styleElement = document.createElement('style');
@@ -577,6 +609,7 @@
             `;
             document.head.appendChild(styleElement);
         });
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
