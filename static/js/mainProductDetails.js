@@ -14,7 +14,7 @@ function closeUploadPopup() {
     document.getElementById('imageUploadPopup').classList.add('hidden');
     document.getElementById('banner-preview').innerHTML = '';
 }
- 
+
 function confirmUpload() {
     const previewImg = document.getElementById('banner-preview').querySelector('img');
     const productId = document.getElementById('product-id').value;
@@ -394,25 +394,25 @@ if (updateOfferForm) {
     });
 }
 
- // Wait for the DOM to be fully loaded
- document.addEventListener('DOMContentLoaded', function() {
+// Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function () {
     // Select all delete buttons
     const deleteButtons = document.querySelectorAll('.delete-btn');
-    
+
     // Add click event listener to each delete button
     deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             // Get the parent form
             const form = this.closest('.delete-product-form');
-            
+
             // Get the product ID from the hidden input
             const productId = form.querySelector('.product-id').value;
-            
+
             // Confirm before proceeding
             if (confirm(`Are you sure you want to delete product offer`)) {
                 // Option 1: Submit the form (traditional approach)
                 // form.submit();
-                
+
                 // Option 2: Use fetch API (modern approach)
                 fetch('/admin/products/main/delete/offer', {
                     method: 'POST',
@@ -425,27 +425,27 @@ if (updateOfferForm) {
                         productId: productId
                     })
                 })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok');
-                })
-                .then(data => {
-                    // Handle successful deletion
-                    
-                    console.log('Product deleted successfully');
-                    location.reload();
-                    // Remove the product element from the DOM
-                    const productElement = form.closest('.border-b');
-                    if (productElement) {
-                        productElement.remove();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting product:', error);
-                    showErrorToast('Failed to delete product. Please try again.');
-                });
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Network response was not ok');
+                    })
+                    .then(data => {
+                        // Handle successful deletion
+
+                        console.log('Product deleted successfully');
+                        location.reload();
+                        // Remove the product element from the DOM
+                        const productElement = form.closest('.border-b');
+                        if (productElement) {
+                            productElement.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                        showErrorToast('Failed to delete product. Please try again.');
+                    });
             }
         });
     });

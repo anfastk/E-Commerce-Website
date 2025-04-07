@@ -49,9 +49,7 @@ func TrackingPage(c *gin.Context) {
 	}
 
 	var allOrderItems []models.OrderItem
-	if err := config.DB.Preload("ProductVariantDetails").
-		Preload("ProductVariantDetails.VariantsImages").
-		Find(&allOrderItems, "id != ? AND user_id = ? AND order_id = ?", orderID, userID, order.ID).Error; err != nil {
+	if err := config.DB.Find(&allOrderItems, "id != ? AND user_id = ? AND order_id = ?", orderID, userID, order.ID).Error; err != nil {
 		logger.Log.Error("Failed to fetch all order items",
 			zap.String("orderID", orderID),
 			zap.Uint("userID", userID),
@@ -87,13 +85,11 @@ func TrackingPage(c *gin.Context) {
 	totalDiscount := productDiscount + order.CouponDiscountAmount
 
 	var (
-		allSubTotal             float64
 		allProductDiscount      float64
 		allProductTotalDiscount float64
 		shipCharge              float64
 	)
 
-	allSubTotal += order.SubTotal
 	allProductDiscount = order.TotalProductDiscount
 	if order.ShippingCharge == 0.0 {
 		shipCharge = 100
@@ -179,7 +175,6 @@ func TrackingPage(c *gin.Context) {
 		"DeliveryDate":            orderItem.DeliveryDate.Format("2006-01-02T15:04:05.000-07:00"),
 		"CancelDate":              orderItem.CancelDate.Format("2006-01-02T15:04:05.000-07:00"),
 		"AllProduct":              allOrderItems,
-		"AllSubTotal":             allSubTotal,
 		"AllProductDiscount":      allProductDiscount,
 		"AllProductTotalDiscount": allProductTotalDiscount,
 	})
@@ -218,7 +213,7 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create order", "Something Went Wrong", "/checkout")
 		return 0
 	}
- 
+
 	if CouponCode != "" && CouponDiscountAmount != 0 && CouponDiscription != "" {
 		order.IsCouponApplied = true
 		if err := tx.Save(&order).Error; err != nil {
@@ -708,7 +703,7 @@ func CancelSpecificOrder(c *gin.Context) {
 				return
 			}
 			IscouponRemoved = true
-		}else{
+		} else {
 			refundAmount = orderItems.Total
 		}
 	} else {

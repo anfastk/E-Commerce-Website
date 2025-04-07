@@ -5,13 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Address</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
 </head>
 
 <body class="bg-gray-50">
+    <div class="toast-container z-40 fixed top-0 right-4">
+        <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
+            <div class="toast-content flex items-center">
+                <div class="toast-icon mr-2">
+                    <i class="toast-icon-success fas fa-check-circle text-green-500 hidden"></i>
+                    <i class="toast-icon-error fas fa-exclamation-circle text-red-500 hidden"></i>
+                </div>
+                <div class="toast-message text-gray-800">This is a toast message</div>
+            </div>
+            <div class="toast-progress h-1 bg-blue-500 mt-2"></div>
+        </div>
+    </div>
+
     <div class="bg-black py-4 sticky top-0 z-50 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
@@ -52,9 +66,7 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -75,7 +87,6 @@
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
                     <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
@@ -211,56 +222,66 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                                 <input type="text" id="firstName" name="firstName"
-                                    class="w-full px-4 py-2 border rounded-lg   " required>
+                                    class="w-full px-4 py-2 border rounded-lg">
+                                <span class="error text-red-500 text-xs mt-1 hidden"></span>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                                 <input type="text" id="lastName" name="lastName"
-                                    class="w-full px-4 py-2 border rounded-lg   " required>
+                                    class="w-full px-4 py-2 border rounded-lg">
+                                <span class="error text-red-500 text-xs mt-1 hidden"></span>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
-                            <input type="text" id="landmark" name="landmark"
-                                class="w-full px-4 py-2 border rounded-lg   " required>
+                            <input type="text" id="landmark" name="landmark" class="w-full px-4 py-2 border rounded-lg">
+                            <span class="error text-red-500 text-xs mt-1 hidden"></span>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded-lg   "
-                                required>
+                            <input type="text" id="address" name="address" class="w-full px-4 py-2 border rounded-lg">
+                            <span class="error text-red-500 text-xs mt-1 hidden"></span>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                            <input type="text" id="country" name="country" class="w-full px-4 py-2 border rounded-lg   "
-                                required>
+                            <select id="country" name="country" class="w-full px-4 py-2 border rounded-lg">
+                                <option value="">Select Country</option>
+                            </select>
+                            <span class="error text-red-500 text-xs mt-1 hidden"></span>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Region/State</label>
-                            <input type="text" id="state" name="state" class="w-full px-4 py-2 border rounded-lg   "
-                                required>
+                            <select id="state" name="state" class="w-full px-4 py-2 border rounded-lg">
+                                <option value="">Select State</option>
+                            </select>
+                            <span class="error text-red-500 text-xs mt-1 hidden"></span>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" id="city" name="city" class="w-full px-4 py-2 border rounded-lg   "
-                                    required>
+                                <select id="city" name="city" class="w-full px-4 py-2 border rounded-lg">
+                                    <option value="">Select City</option>
+                                </select>
+                                <span class="error text-red-500 text-xs mt-1 hidden"></span>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
                                 <input type="text" id="zipCode" name="zipCode"
-                                    class="w-full px-4 py-2 border rounded-lg   " required>
+                                    class="w-full px-4 py-2 border rounded-lg">
+                                <span class="error text-red-500 text-xs mt-1 hidden"></span>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                             <input type="tel" id="phoneNumber" name="phoneNumber"
-                                class="w-full px-4 py-2 border rounded-lg   " required>
+                                class="w-full px-4 py-2 border rounded-lg">
+                            <span class="error text-red-500 text-xs mt-1 hidden"></span>
                         </div>
 
                         <button type="submit"
@@ -317,18 +338,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -338,10 +371,89 @@
         </div>
     </footer>
     <script>
+        // Validation functions
+        const validators = {
+            firstName: (value) => {
+                const regex = /^[A-Za-z]{3,}$/;
+                if (!value) return "First name cannot be empty";
+                if (!regex.test(value)) return "First name must be minimum 3 letters, no spaces, numbers or special characters";
+                return "";
+            },
+            lastName: (value) => {
+                const regex = /^[A-Za-z]{1,}$/;
+                if (!value) return "Last name cannot be empty";
+                if (!regex.test(value)) return "Last name must be minimum 1 letter, no spaces, numbers or special characters";
+                return "";
+            },
+            landmark: (value) => {
+                const regex = /^[A-Za-z]{7,}$/;
+                if (!value) return "Landmark cannot be empty";
+                if (!regex.test(value)) return "Landmark must be minimum 7 letters, text only";
+                return "";
+            },
+            address: (value) => {
+                const onlyNumbers = /^\d+$/;
+                const onlySpecial = /^[^A-Za-z0-9]+$/;
+                if (!value) return "Address cannot be empty";
+                if (value.length < 15) return "Address must be minimum 15 characters";
+                if (onlyNumbers.test(value) || onlySpecial.test(value)) return "Address cannot be only numbers or special characters";
+                return "";
+            },
+            country: (value) => !value ? "Please select a country" : "",
+            state: (value) => !value ? "Please select a state" : "",
+            city: (value) => !value ? "Please select a city" : "",
+            zipCode: (value) => {
+                if (!value) return "Zip code cannot be empty";
+                if (value.length > 10) return "Zip code cannot exceed 10 characters";
+                return "";
+            },
+            phoneNumber: (value) => {
+                const regex = /^\d{10}$/;
+                if (!value) return "Phone number cannot be empty";
+                if (!regex.test(value)) return "Phone number must be exactly 10 digits";
+                return "";
+            }
+        };
+
+        // Real-time validation
+        const inputs = document.querySelectorAll('#addressForm input, #addressForm select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function () {
+                validateField(this);
+            });
+        });
+
+        // Validate individual field
+        function validateField(input) {
+            const errorSpan = input.nextElementSibling;
+            const validator = validators[input.id];
+            const error = validator(input.value);
+
+            if (error) {
+                errorSpan.textContent = error;
+                errorSpan.classList.remove('hidden');
+                input.classList.add('border-red-500');
+            } else {
+                errorSpan.textContent = '';
+                errorSpan.classList.add('hidden');
+                input.classList.remove('border-red-500');
+            }
+            return !error;
+        }
+
+        // Form submission
         document.getElementById('addressForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Create an object with the form data
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!validateField(input)) isValid = false;
+            });
+
+            if (!isValid) {
+                return;
+            }
+
             const formData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -359,8 +471,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // Add any additional headers if needed
-                        // 'Authorization': 'Bearer your-token'
                     },
                     body: JSON.stringify(formData)
                 });
@@ -370,9 +480,7 @@
                 }
 
                 const data = await response.json();
-                console.log('Success:', data);
                 showSuccessToast('Address saved successfully!');
-
                 window.location.href = "/profile/manage/address";
 
             } catch (error) {
@@ -380,11 +488,215 @@
                 showErrorToast('There was an error saving the address. Please try again.');
             }
         });
+
+        // Country, State, City population (using sample data)
+        const countrySelect = document.getElementById('country');
+        const stateSelect = document.getElementById('state');
+        const citySelect = document.getElementById('city');
+
+        // Sample data (replace with actual API calls in production)
+        const countries = {
+            "USA": {
+                states: {
+                    "Alabama": ["Birmingham", "Montgomery", "Mobile"],
+                    "Alaska": ["Anchorage", "Fairbanks", "Juneau"],
+                    "Arizona": ["Phoenix", "Tucson", "Mesa"],
+                    "Arkansas": ["Little Rock", "Fayetteville", "Fort Smith"],
+                    "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento"],
+                    "Colorado": ["Denver", "Colorado Springs", "Aurora"],
+                    "Connecticut": ["Hartford", "New Haven", "Bridgeport"],
+                    "Delaware": ["Wilmington", "Dover", "Newark"],
+                    "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville"],
+                    "Georgia": ["Atlanta", "Savannah", "Augusta"],
+                    "Hawaii": ["Honolulu", "Hilo", "Kailua"],
+                    "Idaho": ["Boise", "Meridian", "Nampa"],
+                    "Illinois": ["Chicago", "Springfield", "Peoria"],
+                    "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"],
+                    "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"],
+                    "Kansas": ["Wichita", "Overland Park", "Topeka"],
+                    "Kentucky": ["Louisville", "Lexington", "Bowling Green"],
+                    "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"],
+                    "Maine": ["Portland", "Bangor", "Augusta"],
+                    "Maryland": ["Baltimore", "Annapolis", "Frederick"],
+                    "Massachusetts": ["Boston", "Worcester", "Springfield"],
+                    "Michigan": ["Detroit", "Grand Rapids", "Lansing"],
+                    "Minnesota": ["Minneapolis", "St. Paul", "Duluth"],
+                    "Mississippi": ["Jackson", "Gulfport", "Biloxi"],
+                    "Missouri": ["St. Louis", "Kansas City", "Springfield"],
+                    "Montana": ["Billings", "Missoula", "Bozeman"],
+                    "Nebraska": ["Omaha", "Lincoln", "Grand Island"],
+                    "Nevada": ["Las Vegas", "Reno", "Henderson"],
+                    "New Hampshire": ["Manchester", "Nashua", "Concord"],
+                    "New Jersey": ["Newark", "Jersey City", "Trenton"],
+                    "New Mexico": ["Albuquerque", "Santa Fe", "Las Cruces"],
+                    "New York": ["New York City", "Buffalo", "Rochester", "Albany"],
+                    "North Carolina": ["Charlotte", "Raleigh", "Greensboro"],
+                    "North Dakota": ["Fargo", "Bismarck", "Grand Forks"],
+                    "Ohio": ["Columbus", "Cleveland", "Cincinnati"],
+                    "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"],
+                    "Oregon": ["Portland", "Salem", "Eugene"],
+                    "Pennsylvania": ["Philadelphia", "Pittsburgh", "Harrisburg"],
+                    "Rhode Island": ["Providence", "Warwick", "Cranston"],
+                    "South Carolina": ["Charleston", "Columbia", "Greenville"],
+                    "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"],
+                    "Tennessee": ["Nashville", "Memphis", "Knoxville"],
+                    "Texas": ["Houston", "Austin", "Dallas", "San Antonio"],
+                    "Utah": ["Salt Lake City", "Provo", "Ogden"],
+                    "Vermont": ["Burlington", "Montpelier", "Rutland"],
+                    "Virginia": ["Virginia Beach", "Richmond", "Norfolk"],
+                    "Washington": ["Seattle", "Spokane", "Tacoma"],
+                    "West Virginia": ["Charleston", "Huntington", "Morgantown"],
+                    "Wisconsin": ["Milwaukee", "Madison", "Green Bay"],
+                    "Wyoming": ["Cheyenne", "Casper", "Laramie"]
+                }
+            },
+            "India": {
+                states: {
+                    "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+                    "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat"],
+                    "Assam": ["Guwahati", "Silchar", "Dibrugarh"],
+                    "Bihar": ["Patna", "Gaya", "Bhagalpur"],
+                    "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur"],
+                    "Goa": ["Panaji", "Margao", "Vasco da Gama"],
+                    "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
+                    "Haryana": ["Gurugram", "Faridabad", "Chandigarh"],
+                    "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala"],
+                    "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad"],
+                    "Karnataka": ["Bangalore", "Mysore", "Hubli"],
+                    "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode"],
+                    "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior"],
+                    "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+                    "Manipur": ["Imphal", "Thoubal", "Bishnupur"],
+                    "Meghalaya": ["Shillong", "Tura", "Nongstoin"],
+                    "Mizoram": ["Aizawl", "Lunglei", "Champhai"],
+                    "Nagaland": ["Kohima", "Dimapur", "Mokokchung"],
+                    "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela"],
+                    "Punjab": ["Amritsar", "Ludhiana", "Jalandhar"],
+                    "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur"],
+                    "Sikkim": ["Gangtok", "Namchi", "Pelling"],
+                    "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+                    "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
+                    "Tripura": ["Agartala", "Udaipur", "Dharmanagar"],
+                    "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi"],
+                    "Uttarakhand": ["Dehradun", "Haridwar", "Nainital"],
+                    "West Bengal": ["Kolkata", "Siliguri", "Durgapur"],
+                    "Andaman and Nicobar Islands": ["Port Blair", "Havelock", "Neil Island"],
+                    "Chandigarh": ["Chandigarh"],
+                    "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Silvassa"],
+                    "Delhi": ["New Delhi", "Old Delhi"],
+                    "Jammu and Kashmir": ["Srinagar", "Jammu", "Leh"],
+                    "Ladakh": ["Leh", "Kargil"],
+                    "Lakshadweep": ["Kavaratti", "Minicoy", "Agatti"],
+                    "Puducherry": ["Puducherry", "Karaikal", "Yanam"]
+                }
+            },
+            "Canada": {
+                states: {
+                    "Alberta": ["Calgary", "Edmonton", "Red Deer"],
+                    "British Columbia": ["Vancouver", "Victoria", "Kelowna"],
+                    "Manitoba": ["Winnipeg", "Brandon", "Steinbach"],
+                    "New Brunswick": ["Fredericton", "Moncton", "Saint John"],
+                    "Newfoundland and Labrador": ["St. John's", "Corner Brook", "Mount Pearl"],
+                    "Nova Scotia": ["Halifax", "Sydney", "Dartmouth"],
+                    "Ontario": ["Toronto", "Ottawa", "Hamilton"],
+                    "Prince Edward Island": ["Charlottetown", "Summerside", "Stratford"],
+                    "Quebec": ["Montreal", "Quebec City", "Laval"],
+                    "Saskatchewan": ["Saskatoon", "Regina", "Prince Albert"],
+                    "Northwest Territories": ["Yellowknife", "Inuvik", "Hay River"],
+                    "Nunavut": ["Iqaluit", "Rankin Inlet", "Arviat"],
+                    "Yukon": ["Whitehorse", "Dawson City", "Watson Lake"]
+                }
+            },
+            "Australia": {
+                states: {
+                    "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
+                    "Victoria": ["Melbourne", "Geelong", "Ballarat"],
+                    "Queensland": ["Brisbane", "Gold Coast", "Cairns"],
+                    "South Australia": ["Adelaide", "Mount Gambier", "Whyalla"],
+                    "Western Australia": ["Perth", "Fremantle", "Bunbury"],
+                    "Tasmania": ["Hobart", "Launceston", "Devonport"],
+                    "Northern Territory": ["Darwin", "Alice Springs", "Katherine"],
+                    "Australian Capital Territory": ["Canberra", "Queanbeyan"]
+                }
+            },
+            "Brazil": {
+                states: {
+                    "Acre": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira"],
+                    "Alagoas": ["Maceió", "Arapiraca", "Palmeira dos Índios"],
+                    "Amapá": ["Macapá", "Santana", "Laranjal do Jari"],
+                    "Amazonas": ["Manaus", "Parintins", "Itacoatiara"],
+                    "Bahia": ["Salvador", "Feira de Santana", "Vitória da Conquista"],
+                    "Ceará": ["Fortaleza", "Juazeiro do Norte", "Sobral"],
+                    "Espírito Santo": ["Vitória", "Vila Velha", "Cariacica"],
+                    "Goiás": ["Goiânia", "Anápolis", "Aparecida de Goiânia"],
+                    "Maranhão": ["São Luís", "Imperatriz", "Caxias"],
+                    "Mato Grosso": ["Cuiabá", "Várzea Grande", "Rondonópolis"],
+                    "Mato Grosso do Sul": ["Campo Grande", "Dourados", "Três Lagoas"],
+                    "Minas Gerais": ["Belo Horizonte", "Uberlândia", "Juiz de Fora"],
+                    "Pará": ["Belém", "Ananindeua", "Santarém"],
+                    "Paraíba": ["João Pessoa", "Campina Grande", "Patos"],
+                    "Paraná": ["Curitiba", "Londrina", "Maringá"],
+                    "Pernambuco": ["Recife", "Jaboatão dos Guararapes", "Olinda"],
+                    "Piauí": ["Teresina", "Parnaíba", "Picos"],
+                    "Rio de Janeiro": ["Rio de Janeiro", "Niterói", "Petrópolis"],
+                    "Rio Grande do Norte": ["Natal", "Mossoró", "Parnamirim"],
+                    "Rio Grande do Sul": ["Porto Alegre", "Caxias do Sul", "Pelotas"],
+                    "Rondônia": ["Porto Velho", "Ji-Paraná", "Ariquemes"],
+                    "Roraima": ["Boa Vista", "Rorainópolis", "Caracaraí"],
+                    "Santa Catarina": ["Florianópolis", "Joinville", "Blumenau"],
+                    "São Paulo": ["São Paulo", "Campinas", "Santos"],
+                    "Sergipe": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto"],
+                    "Tocantins": ["Palmas", "Araguaína", "Gurupi"],
+                    "Distrito Federal": ["Brasília"]
+                }
+            }
+        };
+
+        // Populate countries
+        Object.keys(countries).forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countrySelect.appendChild(option);
+        });
+
+        // Update states when country changes
+        countrySelect.addEventListener('change', function () {
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            const states = countries[this.value]?.states || {};
+            Object.keys(states).forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+            validateField(this);
+        });
+
+        // Update cities when state changes
+        stateSelect.addEventListener('change', function () {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            const cities = countries[countrySelect.value]?.states[this.value] || [];
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+            validateField(this);
+        });
+
+        citySelect.addEventListener('change', function () {
+            validateField(this);
+        });
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
-        
     </script>
     <script src="/static/js/toastMain.js"></script>
 </body>

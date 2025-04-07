@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Order Details</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
@@ -352,6 +353,7 @@
             </div>
 
             <!-- Products Table -->
+            {{if len .AllProduct}}
             <div class="bg-white rounded-lg border shadow-sm">
                 <div class="p-6 border-b">
                     <h2 class="font-medium text-lg">Products</h2>
@@ -394,28 +396,13 @@
                                 <span>Subtotal</span>
                                 <span>&#8377; {{printf "%.2f" .OrderItem.SubTotal}}</span>
                             </div>
-
-                            <div class="flex justify-between text-gray-600">
-                                <span>Tax (18%)</span>
-                                <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
-                            </div>
                             <div class="flex justify-between text-gray-600">
                                 <span>Product Discount</span>
                                 <span>&#8377; {{printf "%.2f" .ProductDiscount}}</span>
                             </div>
                             <div class="flex justify-between text-gray-600">
-                                <span>Shipping </span>
-                                <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge}}
-                                    {{else}}
-                                    <span class="text-green-600">Free </span> <span
-                                        class="line-through text-sm">&#8377;100</span>{{end}}</span>
-
-                            </div>
-                            <div class="flex justify-between text-green-600 ">
-                                <span class="flex items-center">
-                                    Coupon (SAVE20)
-                                </span>
-                                <span>-00</span>
+                                <span>Tax (18%)</span>
+                                <span>&#8377; {{printf "%.2f" .OrderItem.Tax}}</span>
                             </div>
                             <div class="flex justify-between text-gray-600">
                                 <span>Total Discount</span>
@@ -425,6 +412,97 @@
                             <div class="flex justify-between font-bold text-xl">
                                 <span>Total</span>
                                 <span>&#8377; {{printf "%.2f" .OrderItem.Total}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            {{end}}
+
+            <div class="bg-white rounded-lg border shadow-sm mt-8">
+                <div class="p-6 border-b">
+                    <h2 class="font-medium text-lg">{{if len .AllProduct}}All Items In This Order{{else}}Products{{end}}
+                    </h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left p-4 font-medium text-gray-600">Product Name</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Order ID</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Quantity</th>
+                                <th class="text-left p-4 font-medium text-gray-600">Unit Price</th>
+                                <th class="text-center p-4 font-medium text-gray-600">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .AllProduct}}
+                            <tr class="border-t">
+                                <td class="p-4">
+                                    <a href="/admin/orderlist/details/{{.ID}}">
+                                        <div class="flex items-center gap-4">
+                                            <img src="{{.ProductImage}}" alt="Adidas ultra boost"
+                                                class="w-16 h-16 object-contain rounded-md">
+                                            <span class="font-medium">{{.ProductName}}</span>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td class="p-4 text-gray-600"> <a
+                                        href="/admin/orderlist/details/{{.ID}}">{{.OrderUID}}</a></td>
+                                <td class="p-4 text-gray-600"> <a
+                                        href="/admin/orderlist/details/{{.ID}}">&#10240;&#x2800;{{.Quantity}}</a></td>
+                                <td class="p-4 text-gray-600"> <a href="/admin/orderlist/details/{{.ID}}">&#8377;
+                                        {{printf "%.2f" .ProductRegularPrice}}</a>
+                                </td>
+                                <td class="p-4 text-center font-medium"> <a
+                                        href="/admin/orderlist/details/{{.ID}}">&#8377; {{printf "%.2f" .SubTotal}}</a>
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 border-t">
+                    <div class="flex justify-end">
+                        <div class="w-72 space-y-4">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Subtotal</span>
+                                <span>&#8377; {{.Order.SubTotal}}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Product Discount</span>
+                                <span>&#8377; {{printf "%.2f" .AllProductDiscount}}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Tax (18%)</span>
+                                <span>&#8377; {{printf "%.2f" .Order.Tax}}</span>
+                            </div>
+                            {{if .Order.CouponDiscountAmount }}
+                            <div class="flex justify-between text-green-600 ">
+                                <span class="flex items-center">
+                                    Coupon ({{.Order.CouponCode}})
+                                </span>
+                                <span>-{{.Order.CouponDiscountAmount }}</span>
+                            </div>
+                            {{else}}
+                            {{end}}
+                            <div class="flex justify-between text-gray-600">
+                                <span>Shipping </span>
+                                <span>{{if .Order.ShippingCharge}}&#8377; {{printf "%.2f" .Order.ShippingCharge}}
+                                    {{else}}
+                                    <span class="text-green-600">Free </span> <span
+                                        class="line-through text-sm">&#8377;100</span>{{end}}</span>
+
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Total Discount</span>
+                                <span>&#8377; {{printf "%.2f" .AllProductTotalDiscount}}</span>
+                            </div>
+                            <div class="border-t pt-4 mt-2"></div>
+                            <div class="flex justify-between font-bold text-xl">
+                                <span>Total</span>
+                                <span>&#8377; {{printf "%.2f" .Order.TotalAmount}}</span>
                             </div>
                         </div>
                     </div>

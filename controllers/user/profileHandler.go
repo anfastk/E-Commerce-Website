@@ -14,7 +14,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-) 
+)
 
 func ProfileDetails(c *gin.Context) {
 	logger.Log.Info("Fetching profile details")
@@ -46,7 +46,6 @@ func ProfileUpdate(c *gin.Context) {
 	var userUpdate struct {
 		Id       string `json:"userid"`
 		FullName string `json:"fullName"`
-		Email    string `json:"email"`
 		Mobile   string `json:"phone"`
 		Country  string `json:"country"`
 		State    string `json:"state"`
@@ -63,7 +62,19 @@ func ProfileUpdate(c *gin.Context) {
 		logger.Log.Error("Invalid user ID",
 			zap.String("userID", userUpdate.Id),
 			zap.Error(err))
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user_id", "Invalid user_id", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid user_id", "Something Went Wrong", "")
+		return
+	}
+
+	if !helper.IsValidFullName(userUpdate.FullName) {
+		logger.Log.Error("Enter Valid Full Name")
+		helper.RespondWithError(c, http.StatusBadRequest, "Enter Valid Full Name", "Enter Valid Full Name", "")
+		return
+	}
+
+	if len(userUpdate.Mobile) != 10 {
+		logger.Log.Error("Enter Valid Phone Number")
+		helper.RespondWithError(c, http.StatusBadRequest, "Enter Valid Phone Number", "Enter Valid Phone Number", "")
 		return
 	}
 
@@ -74,7 +85,6 @@ func ProfileUpdate(c *gin.Context) {
 
 	if err := tx.Model(&authDetails).Where("id = ? ", userID).Updates(map[string]interface{}{
 		"full_name": strings.ToUpper(userUpdate.FullName),
-		"email":     userUpdate.Email,
 	}).Error; err != nil {
 		logger.Log.Error("Failed to update user auth details",
 			zap.Uint("userID", uint(userID)),
@@ -98,7 +108,7 @@ func ProfileUpdate(c *gin.Context) {
 				zap.Uint("userID", uint(userID)),
 				zap.Error(err))
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user", "Failed to create user", "")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user", "Mobile number already existing", "")
 			return
 		}
 	} else {
@@ -729,126 +739,126 @@ func OrderDetails(c *gin.Context) {
 }
 
 func OrderHistory(c *gin.Context) {
-    logger.Log.Info("Rendering order history page")
-    userID := helper.FetchUserID(c)
-    if userID == 0 {
-        logger.Log.Warn("No user ID found, using fallback ID 1 for testing")
-        userID = 1 // Fallback for testing - remove in production
-    }
+	logger.Log.Info("Rendering order history page")
+	userID := helper.FetchUserID(c)
+	if userID == 0 {
+		logger.Log.Warn("No user ID found, using fallback ID 1 for testing")
+		userID = 1 // Fallback for testing - remove in production
+	}
 
-    var userauth models.UserAuth
-    if err := config.DB.First(&userauth, userID).Error; err != nil {
-        logger.Log.Error("User not found", zap.Uint("userID", userID), zap.Error(err))
-        helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
-        return
-    }
+	var userauth models.UserAuth
+	if err := config.DB.First(&userauth, userID).Error; err != nil {
+		logger.Log.Error("User not found", zap.Uint("userID", userID), zap.Error(err))
+		helper.RespondWithError(c, http.StatusNotFound, "User not found", "User not found", "")
+		return
+	}
 
-    logger.Log.Info("Rendering page for user", zap.Uint("userID", userID), zap.String("fullName", userauth.FullName))
-    c.HTML(http.StatusOK, "profileOrderHistory.html", gin.H{
-        "User": userauth,
-    })
+	logger.Log.Info("Rendering page for user", zap.Uint("userID", userID), zap.String("fullName", userauth.FullName))
+	c.HTML(http.StatusOK, "profileOrderHistory.html", gin.H{
+		"User": userauth,
+	})
 }
 
 func OrderHistoryData(c *gin.Context) {
-    logger.Log.Info("Fetching order history data")
-    userID := helper.FetchUserID(c)
-    if userID == 0 {
-        logger.Log.Warn("No user ID found, using fallback ID 1 for testing")
-        userID = 1 // Fallback for testing - remove in production
-    }
+	logger.Log.Info("Fetching order history data")
+	userID := helper.FetchUserID(c)
+	if userID == 0 {
+		logger.Log.Warn("No user ID found, using fallback ID 1 for testing")
+		userID = 1 // Fallback for testing - remove in production
+	}
 
-    timeFilter := c.Query("time")
-    statusFilter := c.Query("status")
-    searchQuery := c.Query("search")
+	timeFilter := c.Query("time")
+	statusFilter := c.Query("status")
+	searchQuery := c.Query("search")
 
-    logger.Log.Debug("Filter parameters",
-        zap.String("time", timeFilter),
-        zap.String("status", statusFilter),
-        zap.String("search", searchQuery),
-        zap.Uint("userID", userID))
+	logger.Log.Debug("Filter parameters",
+		zap.String("time", timeFilter),
+		zap.String("status", statusFilter),
+		zap.String("search", searchQuery),
+		zap.Uint("userID", userID))
 
-    type OrderHistoryResponse struct {
-        ID          uint    `json:"id"`
-        OrderUID    string  `json:"orderid"`
-        ProductName string  `json:"productname"`
-        Image       string  `json:"image"`
-        Quantity    uint    `json:"quantity"`
-        OrderStatus string  `json:"orderststus"`
-        Total       float64 `json:"total"`
-        OrderDate   string  `json:"orderdate"`
-    }
+	type OrderHistoryResponse struct {
+		ID          uint    `json:"id"`
+		OrderUID    string  `json:"orderid"`
+		ProductName string  `json:"productname"`
+		Image       string  `json:"image"`
+		Quantity    uint    `json:"quantity"`
+		OrderStatus string  `json:"orderststus"`
+		Total       float64 `json:"total"`
+		OrderDate   string  `json:"orderdate"`
+	}
 
-    query := config.DB.Model(&models.OrderItem{}).
-        Where("user_id = ?", userID).
-        Order("created_at DESC")
+	query := config.DB.Model(&models.OrderItem{}).
+		Where("user_id = ?", userID).
+		Order("created_at DESC")
 
-    // Apply time filter
-    if timeFilter != "" && timeFilter != "all" {
-        days, err := strconv.Atoi(timeFilter)
-        if err != nil {
-            logger.Log.Warn("Invalid time filter value", zap.String("timeFilter", timeFilter), zap.Error(err))
-            c.JSON(http.StatusBadRequest, gin.H{
-                "status":  "error",
-                "message": "Invalid time filter value",
-            })
-            return
-        }
-        since := time.Now().AddDate(0, 0, -days)
-        query = query.Where("created_at >= ?", since)
-        logger.Log.Debug("Applied time filter", zap.Int("days", days), zap.Time("since", since))
-    } else {
-        logger.Log.Debug("No time filter applied (all time)")
-    }
+	// Apply time filter
+	if timeFilter != "" && timeFilter != "all" {
+		days, err := strconv.Atoi(timeFilter)
+		if err != nil {
+			logger.Log.Warn("Invalid time filter value", zap.String("timeFilter", timeFilter), zap.Error(err))
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "Invalid time filter value",
+			})
+			return
+		}
+		since := time.Now().AddDate(0, 0, -days)
+		query = query.Where("created_at >= ?", since)
+		logger.Log.Debug("Applied time filter", zap.Int("days", days), zap.Time("since", since))
+	} else {
+		logger.Log.Debug("No time filter applied (all time)")
+	}
 
-    // Apply status filter
-    if statusFilter != "all" && statusFilter != "" {
-        query = query.Where("order_status = ?", statusFilter)
-        logger.Log.Debug("Applied status filter", zap.String("status", statusFilter))
-    }
+	// Apply status filter
+	if statusFilter != "all" && statusFilter != "" {
+		query = query.Where("order_status = ?", statusFilter)
+		logger.Log.Debug("Applied status filter", zap.String("status", statusFilter))
+	}
 
-    // Apply search filter (order ID or product name)
-    if searchQuery != "" {
-        searchPattern := "%" + searchQuery + "%"
-        query = query.Where("order_uid ILIKE ? OR product_name ILIKE ?", searchPattern, searchPattern)
-        logger.Log.Debug("Applied search filter", zap.String("searchQuery", searchQuery))
-    }
+	// Apply search filter (order ID or product name)
+	if searchQuery != "" {
+		searchPattern := "%" + searchQuery + "%"
+		query = query.Where("order_uid ILIKE ? OR product_name ILIKE ?", searchPattern, searchPattern)
+		logger.Log.Debug("Applied search filter", zap.String("searchQuery", searchQuery))
+	}
 
-    var orderItems []models.OrderItem
-    if err := query.Find(&orderItems).Error; err != nil {
-        logger.Log.Error("Failed to fetch order items", zap.Uint("userID", userID), zap.Error(err))
-        c.JSON(http.StatusInternalServerError, gin.H{
-            "status":  "error",
-            "message": "Failed to fetch orders from database",
-        })
-        return
-    }
+	var orderItems []models.OrderItem
+	if err := query.Find(&orderItems).Error; err != nil {
+		logger.Log.Error("Failed to fetch order items", zap.Uint("userID", userID), zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": "Failed to fetch orders from database",
+		})
+		return
+	}
 
-    if len(orderItems) == 0 {
-        logger.Log.Info("No orders found for user with applied filters", zap.Uint("userID", userID))
-    }
+	if len(orderItems) == 0 {
+		logger.Log.Info("No orders found for user with applied filters", zap.Uint("userID", userID))
+	}
 
-    var orderHistoryResponse []OrderHistoryResponse
-    for _, item := range orderItems {
-        historyResponse := OrderHistoryResponse{
-            ID:          item.ID,
-            OrderUID:    item.OrderUID,
-            ProductName: item.ProductName,
-            Image:       item.ProductImage,
-            Quantity:    uint(item.Quantity),
-            OrderStatus: item.OrderStatus,
-            Total:       item.Total,
-            OrderDate:   item.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
-        }
-        orderHistoryResponse = append(orderHistoryResponse, historyResponse)
-    }
+	var orderHistoryResponse []OrderHistoryResponse
+	for _, item := range orderItems {
+		historyResponse := OrderHistoryResponse{
+			ID:          item.ID,
+			OrderUID:    item.OrderUID,
+			ProductName: item.ProductName,
+			Image:       item.ProductImage,
+			Quantity:    uint(item.Quantity),
+			OrderStatus: item.OrderStatus,
+			Total:       item.Total,
+			OrderDate:   item.CreatedAt.Format("2006-01-02T15:04:05.000-07:00"),
+		}
+		orderHistoryResponse = append(orderHistoryResponse, historyResponse)
+	}
 
-    logger.Log.Info("Order history data loaded",
-        zap.Uint("userID", userID),
-        zap.Int("orderCount", len(orderHistoryResponse)))
+	logger.Log.Info("Order history data loaded",
+		zap.Uint("userID", userID),
+		zap.Int("orderCount", len(orderHistoryResponse)))
 
-    c.JSON(http.StatusOK, gin.H{
-        "status":  "success",
-        "message": "Order details fetched successfully",
-        "Order":   orderHistoryResponse,
-    })
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"message": "Order details fetched successfully",
+		"Order":   orderHistoryResponse,
+	})
 }

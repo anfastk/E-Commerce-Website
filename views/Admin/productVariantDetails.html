@@ -157,12 +157,6 @@
                             GO TO MAIN PRODUCT
                         </button>
                     </a>
-                    <a href="/admin/products/variant/details?product_id={{.Variant.ProductId}}">
-                        <button
-                            class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
-                            SHOW ALL VARIANTS
-                        </button>
-                    </a>
                     <form action="/admin/products/variant/delete/{{.Variant.Id}}" method="post"
                         onsubmit="handleSubmit(event)">
                         {{if .Variant.IsDeleted}}
@@ -177,8 +171,8 @@
                         </button>
                         {{end}}
                     </form>
-                    <a href="/admin/products/variant/detail/update/{{.Variant.Id}}">
-                        <button
+                    <a href="/admin/products/variant/detail/update/{{.Variant.Id}}" id="updateProductLink">
+                        <button id="updateProductBtn"
                             class="bg-black text-sm text-white py-2 px-4 rounded font-bold hover:bg-gray-800 transition">
                             UPDATE PRODUCT
                         </button>
@@ -439,6 +433,44 @@
         </main>
     </div>
 
+    <script>
+       document.addEventListener("DOMContentLoaded", function() {
+    const updateBtn = document.getElementById('updateProductBtn');
+    const updateLink = document.getElementById('updateProductLink');
+
+    updateBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const response = await fetch(updateLink.href, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/html, application/json'
+                }
+            });
+
+            if (response.ok) {
+                const htmlContent = await response.text();
+                document.documentElement.innerHTML = htmlContent;
+                // Add this to update the URL without reloading
+                window.history.pushState({}, document.title, updateLink.href);
+                showSuccessToast('Successfully loaded update page');
+            } else {
+                let errorMessage = 'Unknown error occurred';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorData.error || 'Unknown error';
+                } catch {
+                    errorMessage = response.statusText || 'Unknown error';
+                }
+                showErrorToast(errorMessage);
+            }
+        } catch (error) {
+            showErrorToast('Network error occurred');
+        }
+    });
+});
+    </script>
     <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>
     <script src="/static/js/productVariantsDetails.js" defer></script>

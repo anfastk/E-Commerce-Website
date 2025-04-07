@@ -12,10 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
- 
+
 func AddProductOffer(c *gin.Context) {
 	logger.Log.Info("Requested to add product offer")
-	
+
 	productIDStr := c.PostForm("product_id")
 	productID, parseErr := strconv.Atoi(productIDStr)
 	if parseErr != nil {
@@ -34,6 +34,18 @@ func AddProductOffer(c *gin.Context) {
 	if percentageErr != nil {
 		logger.Log.Error("Invalid percentage", zap.String("percentage", offerPercentage), zap.Error(percentageErr))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid percentage", "Invalid percentage", "")
+		return
+	}
+
+	if percentageValue > 90 {
+		logger.Log.Error("Invalid offer value. Maximum allowed discount is 90%.", zap.String("percentage", offerPercentage))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid offer value. Maximum allowed discount is 90%.", "Invalid offer value. Maximum allowed discount is 90%.", "")
+		return
+	}
+
+	if percentageValue < 1 {
+		logger.Log.Error("Offer value must be at least 1%. Please enter a valid amount.", zap.String("percentage", offerPercentage))
+		helper.RespondWithError(c, http.StatusBadRequest, "Offer value must be at least 1%. Please enter a valid amount.", "Offer value must be at least 1%. Please enter a valid amount.", "")
 		return
 	}
 
@@ -107,7 +119,7 @@ func AddProductOffer(c *gin.Context) {
 
 func UpdateProductOffer(c *gin.Context) {
 	logger.Log.Info("Requested to update product offer")
-	
+
 	var editOfferInput struct {
 		Id              string `json:"offerId"`
 		ProductId       string `json:"productId"`
@@ -142,6 +154,18 @@ func UpdateProductOffer(c *gin.Context) {
 	if err != nil {
 		logger.Log.Error("Invalid offer percentage", zap.String("percentage", editOfferInput.OfferPercentage), zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Offer Value", "Offer Value must be a valid number", "")
+		return
+	}
+
+	if offerPercentage > 90 {
+		logger.Log.Error("Invalid offer value. Maximum allowed discount is 90%.", zap.String("percentage", editOfferInput.OfferPercentage))
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid offer value. Maximum allowed discount is 90%.", "Invalid offer value. Maximum allowed discount is 90%.", "")
+		return
+	}
+
+	if offerPercentage < 1 {
+		logger.Log.Error("Offer value must be at least 1%. Please enter a valid amount.", zap.String("percentage", editOfferInput.OfferPercentage))
+		helper.RespondWithError(c, http.StatusBadRequest, "Offer value must be at least 1%. Please enter a valid amount.", "Offer value must be at least 1%. Please enter a valid amount.", "")
 		return
 	}
 
@@ -213,7 +237,7 @@ func UpdateProductOffer(c *gin.Context) {
 
 func DeleteProductOffer(c *gin.Context) {
 	logger.Log.Info("Requested to delete product offer")
-	
+
 	var deleteOfferInput struct {
 		Id string `json:"productId"`
 	}
@@ -254,7 +278,7 @@ func DeleteProductOffer(c *gin.Context) {
 
 func AddCategoryOffer(c *gin.Context) {
 	logger.Log.Info("Requested to add category offer")
-	
+
 	var addOfferInput struct {
 		Id               string `json:"categoryId"`
 		OfferName        string `json:"offerName"`
@@ -263,7 +287,7 @@ func AddCategoryOffer(c *gin.Context) {
 		StartDate        string `json:"startDate"`
 		EndDate          string `json:"endDate"`
 	}
-	
+
 	if err := c.ShouldBindJSON(&addOfferInput); err != nil {
 		logger.Log.Error("Invalid request payload", zap.Error(err))
 		helper.RespondWithError(c, http.StatusBadRequest, "Invalid request payload", "Enter Details Correctly", "")
@@ -350,7 +374,7 @@ func AddCategoryOffer(c *gin.Context) {
 
 func UpdateCategoryOffer(c *gin.Context) {
 	logger.Log.Info("Requested to update category offer")
-	
+
 	var editOfferInput struct {
 		Id               string `json:"offerId"`
 		OfferName        string `json:"offerName"`
@@ -447,7 +471,7 @@ func UpdateCategoryOffer(c *gin.Context) {
 
 func DeleteCategoryOffer(c *gin.Context) {
 	logger.Log.Info("Requested to delete category offer")
-	
+
 	var DeleteOfferInput struct {
 		OfferId string `json:"offerId"`
 	}

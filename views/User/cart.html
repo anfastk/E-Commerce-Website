@@ -114,7 +114,7 @@
                                     <div class="flex items-center gap-4">
                                         <p class="line-through text-gray-400">&#8377;{{
                                             .ProductDetail.RegularPrice }}</p>
-                                        <p class="font-bold">&#8377;{{ .DiscountPrice }}</p>
+                                        <p class="font-bold">&#8377;{{printf "%.2f" .DiscountPrice }}</p>
                                     </div>
                                 </a>
                                 <div class="flex items-center gap-4">

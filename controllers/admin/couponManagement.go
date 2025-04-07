@@ -100,19 +100,28 @@ func AddCoupon(c *gin.Context) {
 	maxDiscountValue, err := strconv.ParseFloat(couponInput.MaxDiscountValue, 64)
 	if maxDiscountValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Max discount value should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater than 0 ", "")
 		return
 	}
+
+	if couponInput.CouponType == "Fixed" {
+		if maxDiscountValue > discountValue {
+			logger.Log.Error("Invalid data.Max discount value should be equal to value")
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be equal to value", "Invalid data.Max discount value should be equal to value ", "")
+			return
+		}
+	}
+
 	minOrderValue, err := strconv.ParseFloat(couponInput.MinOrdervalue, 64)
 	if minOrderValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Min order value should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater than 0 ", "")
 		return
 	}
 	maxUseCount, err := strconv.Atoi(couponInput.MaxUseCount)
 	if maxUseCount < 1 || err != nil {
 		logger.Log.Error("Invalid data.Amount should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater than 0 ", "")
 		return
 	}
 	layout := "2006-01-02"
@@ -280,19 +289,27 @@ func UpdateCoupon(c *gin.Context) {
 	maxDiscountValue, err := strconv.ParseFloat(request.MaxDiscountValue, 64)
 	if maxDiscountValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Max discount value should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be greater than 0", "Invalid data.Max discount value should be greater than 0 ", "")
 		return
 	}
+	if request.CouponType == "Fixed" {
+		if maxDiscountValue > discountValue {
+			logger.Log.Error("Invalid data.Max discount value should be equal to value")
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max discount value should be equal to value", "Invalid data.Max discount value should be equal to value ", "")
+			return
+		}
+	}
+
 	minOrderValue, err := strconv.ParseFloat(request.MinOrderValue, 64)
 	if minOrderValue < 1 || err != nil {
 		logger.Log.Error("Invalid data.Min order value should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Min order value should be greater than 0", "Invalid data.Min order value should be greater than 0 ", "")
 		return
 	}
 	maxUseCount, err := strconv.Atoi(request.UsageLimit)
 	if maxUseCount < 1 || err != nil {
 		logger.Log.Error("Invalid data.Amount should be greater than 0")
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater yhan 0 ", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid data.Max use count should be greater than 0", "Invalid data.Max use count should be greater than 0 ", "")
 		return
 	}
 

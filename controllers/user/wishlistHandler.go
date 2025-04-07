@@ -101,7 +101,7 @@ func ShowWishlist(c *gin.Context) {
 		zap.Uint("wishlistID", wishlist.ID),
 		zap.Int("itemCount", count))
 	c.HTML(http.StatusOK, "wishlist.html", gin.H{
-		"status":  "Success",
+		"status":  "success",
 		"Data":    wishlistResponse,
 		"Count":   count,
 		"message": "Added to Wishlist Successfully",
@@ -139,7 +139,7 @@ func AddToWishlist(c *gin.Context) {
 			zap.String("productID", c.Param("id")),
 			zap.Error(err))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Product ID", "Product ID Not Found", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Invalid Product ID", "Product not found", "")
 		return
 	}
 
@@ -149,7 +149,7 @@ func AddToWishlist(c *gin.Context) {
 			zap.Int("productID", productID),
 			zap.Error(err))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product Not Found", "")
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product not found", "")
 		return
 	}
 
@@ -185,7 +185,7 @@ func AddToWishlist(c *gin.Context) {
 		zap.Uint("userID", userID),
 		zap.Uint("productID", uint(productID)))
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Success",
+		"status":  "success",
 		"message": "Added to Wishlist Successfully",
 		"code":    http.StatusOK,
 	})
@@ -235,7 +235,7 @@ func RemoveFromWishlist(c *gin.Context) {
 		zap.Uint("wishlistID", wishlist.ID),
 		zap.String("itemID", itemID))
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Status OK",
+		"status":  "success",
 		"message": "Item Removed Successfully",
 		"code":    http.StatusOK,
 	})
@@ -286,7 +286,7 @@ func WishlistTOCart(c *gin.Context) {
 			zap.Uint("productVariantID", wishlistItem.ProductVariantID),
 			zap.Error(err))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product Not Found", "")
+		helper.RespondWithError(c, http.StatusNotFound, "Product Not Found", "Product not found", "")
 		return
 	}
 
@@ -294,7 +294,7 @@ func WishlistTOCart(c *gin.Context) {
 		logger.Log.Warn("Product out of stock",
 			zap.Uint("productID", product.ID))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusConflict, "Product Out Of Stock", "Product Out Of Stock", "")
+		helper.RespondWithError(c, http.StatusConflict, "Product Out Of Stock", "Product out of stock", "")
 		return
 	}
 
@@ -312,7 +312,7 @@ func WishlistTOCart(c *gin.Context) {
 				zap.Uint("productID", product.ID),
 				zap.Error(createErr))
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
+			helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to cart failed", "")
 			return
 		}
 
@@ -328,7 +328,7 @@ func WishlistTOCart(c *gin.Context) {
 			zap.Uint("cartID", cart.ID),
 			zap.Uint("productID", product.ID))
 		tx.Rollback()
-		helper.RespondWithError(c, http.StatusBadRequest, "Product Already In Your Cart", "Product Already In Your Cart", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Product already in your cart", "Product already in your cart", "")
 		return
 	}
 
@@ -339,7 +339,7 @@ func WishlistTOCart(c *gin.Context) {
 		zap.Uint("cartID", cart.ID),
 		zap.Uint("productID", product.ID))
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Status OK",
+		"status":  "success",
 		"message": "Product Moved TO Cart Successfully",
 		"code":    http.StatusOK,
 	})
@@ -380,6 +380,10 @@ func WishlistAllTOCart(c *gin.Context) {
 		helper.RespondWithError(c, http.StatusNotFound, "Cart Not Found", "Something Went Wrong", "")
 		return
 	}
+	if len(wishlistItems)==0 {
+		helper.RespondWithError(c, http.StatusBadRequest, "Wishlist is empty", "Wishlist is empty", "")
+		return
+	}
 
 	movedCount := 0
 	for _, item := range wishlistItems {
@@ -411,7 +415,7 @@ func WishlistAllTOCart(c *gin.Context) {
 					zap.Uint("productID", product.ID),
 					zap.Error(createErr))
 				tx.Rollback()
-				helper.RespondWithError(c, http.StatusInternalServerError, "Add to Cart Failed", "Add to Cart Failed", "")
+				helper.RespondWithError(c, http.StatusInternalServerError, "Add to cart failed", "Add to cart failed", "")
 				return
 			}
 
@@ -426,6 +430,11 @@ func WishlistAllTOCart(c *gin.Context) {
 		}
 	}
 
+	if movedCount==0 {
+		helper.RespondWithError(c, http.StatusBadRequest, "All products already in cart", "All products already in cart", "")
+		return
+	}
+
 	tx.Commit()
 	logger.Log.Info("All wishlist items moved to cart",
 		zap.Uint("userID", userID),
@@ -433,8 +442,8 @@ func WishlistAllTOCart(c *gin.Context) {
 		zap.Uint("cartID", cart.ID),
 		zap.Int("movedCount", movedCount))
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "Status OK",
-		"message": "All Products Moved TO Cart Successfully",
+		"status":  "success",
+		"message": "All products moved to cart successfully",
 		"code":    http.StatusOK,
 	})
 }

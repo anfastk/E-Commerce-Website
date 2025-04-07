@@ -361,7 +361,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="text" id="coupon-code" name="coupon-code"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400"
-                                                placeholder="e.g. SUMMER20" required pattern="[A-Za-z]+[A-Za-z0-9]*"
+                                                placeholder="e.g. SUMMER20"  pattern="[A-Za-z]+[A-Za-z0-9]*"
                                                 title="Coupon code must start with a letter and contain only letters and numbers">
                                         </div>
                                         <div>
@@ -383,7 +383,7 @@
                                                 <span class="text-red-500">*</span></label>
                                             <select id="type" name="type"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                                 <option value="" disabled selected>Select discount type</option>
                                                 <option value="Percentage">Percentage</option>
                                                 <option value="Fixed">Fixed Amount</option>
@@ -401,7 +401,7 @@
                                                 </div>
                                                 <input type="number" id="value" name="value" min="0"
                                                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                    placeholder="e.g. 10" required>
+                                                    placeholder="e.g. 10" >
                                             </div>
                                         </div>
                                     </div>
@@ -472,7 +472,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="date" id="valid-date" name="valid-date"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                         </div>
 
                                         <div id="expiry-date-field" class="mt-4">
@@ -481,7 +481,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="date" id="expiry-date" name="expiry-date"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                         </div>
                                     </div>
                                 </div>
@@ -526,7 +526,7 @@
                         </div>
 
                         <!-- Form -->
-                        <form id="edit-coupon-form">
+                        <form id="edit-coupon-form" onsubmit="return validateEditForm()">
                             <input type="hidden" id="edit-coupon-id" name="edit-coupon-id">
                             <div class="space-y-6">
                                 <!-- Basic Information -->
@@ -539,7 +539,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="text" id="edit-coupon-code" name="edit-coupon-code"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400"
-                                                placeholder="e.g. SUMMER20" required>
+                                                placeholder="e.g. SUMMER20" >
                                         </div>
                                         <div>
                                             <label for="edit-description"
@@ -561,7 +561,7 @@
                                                 <span class="text-red-500">*</span></label>
                                             <select id="edit-type" name="edit-type"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                                 <option value="" disabled>Select discount type</option>
                                                 <option value="Percentage">Percentage</option>
                                                 <option value="Fixed">Fixed Amount</option>
@@ -580,7 +580,7 @@
                                                 </div>
                                                 <input type="number" id="edit-value" name="edit-value"
                                                     class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                    placeholder="e.g. 10" required>
+                                                    placeholder="e.g. 10" >
                                             </div>
                                         </div>
                                     </div>
@@ -654,7 +654,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="date" id="edit-valid-date" name="edit-valid-date"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                         </div>
 
                                         <div id="edit-expiry-date-field" class="mt-4">
@@ -663,7 +663,7 @@
                                                     class="text-red-500">*</span></label>
                                             <input type="date" id="edit-expiry-date" name="edit-expiry-date"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                                required>
+                                                >
                                         </div>
                                     </div>
                                 </div>
@@ -689,16 +689,24 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Feather icons for any newly added elements
             feather.replace();
-
-            // Edit Modal functionality
+    
+            // Modal for Adding Coupon
+            const openButtons = document.querySelectorAll('.modal-open');
+            const closeButtons = document.querySelectorAll('.modal-close');
+            const modal = document.querySelector('.modal');
+            const overlay = document.querySelector('.modal-overlay');
+    
+            openButtons.forEach(button => button.addEventListener('click', openModal));
+            closeButtons.forEach(button => button.addEventListener('click', closeModal));
+            overlay.addEventListener('click', closeModal);
+    
+            // Modal for Editing Coupon
             const editButtons = document.querySelectorAll('.edit-coupon-btn');
             const editCloseButtons = document.querySelectorAll('.edit-modal-close');
             const editModal = document.querySelector('.edit-modal');
             const editOverlay = document.querySelector('.edit-modal-overlay');
-
-            // Add event listeners to edit buttons
+    
             editButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -706,132 +714,129 @@
                     fetchCouponDetails(couponId);
                 });
             });
-
-            // Add event listeners to close buttons
-            editCloseButtons.forEach(button => {
-                button.addEventListener('click', closeEditModal);
+    
+            editCloseButtons.forEach(button => button.addEventListener('click', closeEditModal));
+            editOverlay.addEventListener('click', closeEditModal);
+    
+            // Add Coupon Form Logic
+            const couponForm = document.querySelector('.modal-container form');
+            const typeSelect = document.getElementById('type');
+            const valueField = document.getElementById('value-field');
+            const valueInput = document.getElementById('value');
+            const maxDiscountInput = document.getElementById('max-discount');
+            const prefix = valueInput.previousElementSibling.querySelector('span');
+    
+            typeSelect.addEventListener('change', function () {
+                if (this.value === 'Fixed') {
+                    maxDiscountInput.readOnly = true;
+                    maxDiscountInput.value = valueInput.value || '';
+                    prefix.textContent = '$';
+                } else if (this.value === 'Percentage') {
+                    maxDiscountInput.readOnly = false;
+                    prefix.textContent = '%';
+                }
+                valueField.style.display = 'block';
             });
-
-            if (editOverlay) {
-                editOverlay.addEventListener('click', closeEditModal);
-            }
-
-            // Discount type change handler for edit form
+    
+            valueInput.addEventListener('input', function () {
+                if (typeSelect.value === 'Fixed') {
+                    maxDiscountInput.value = this.value;
+                }
+            });
+    
+            // Edit Coupon Form Logic
             const editTypeSelect = document.getElementById('edit-type');
             const editValueField = document.getElementById('edit-value-field');
-            const editValuePrefix = document.getElementById('edit-value-prefix');
-
-            if (editTypeSelect) {
-                editTypeSelect.addEventListener('change', function () {
-                    if (this.value === 'shipping') {
-                        editValueField.style.display = 'none';
-                    } else {
-                        editValueField.style.display = 'block';
-
-                        // Update prefix based on type
-                        if (this.value === 'Percentage') {
-                            editValuePrefix.textContent = '%';
-                        } else if (this.value === 'Fixed') {
-                            editValuePrefix.textContent = '$';
-                        }
-                    }
-                });
-            }
-
-            // Function to fetch coupon details
-            function fetchCouponDetails(couponId) {
-                fetch(`/admin/coupon/details/${couponId}`)
+            const editValueInput = document.getElementById('edit-value');
+            const editMaxDiscountInput = document.getElementById('edit-max-discount');
+            const editPrefix = document.getElementById('edit-value-prefix');
+    
+            editTypeSelect.addEventListener('change', function () {
+                if (this.value === 'Fixed') {
+                    editMaxDiscountInput.readOnly = true;
+                    editMaxDiscountInput.value = editValueInput.value || '';
+                    editPrefix.textContent = '$';
+                } else if (this.value === 'Percentage') {
+                    editMaxDiscountInput.readOnly = false;
+                    editPrefix.textContent = '%';
+                }
+                editValueField.style.display = 'block';
+            });
+    
+            editValueInput.addEventListener('input', function () {
+                if (editTypeSelect.value === 'Fixed') {
+                    editMaxDiscountInput.value = this.value;
+                }
+            });
+    
+            // Add Coupon Form Submission
+            couponForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+    
+                const formData = new FormData(this);
+                const couponData = {
+                    code: formData.get('coupon-code'),
+                    description: formData.get('description'),
+                    type: formData.get('type'),
+                    value: formData.get('value'),
+                    appliedTo: formData.get('applied-to'),
+                    minOrderValue: formData.get('min-order'),
+                    maxDiscount: formData.get('type') === 'Fixed' ? formData.get('value') : formData.get('max-discount'),
+                    usageLimit: formData.get('usage-limit'),
+                    expiryDate: formData.get('expiry-date'),
+                    validDate: formData.get('valid-date')
+                };
+    
+                console.log('Add Coupon Data:', couponData);
+    
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.textContent = 'Creating...';
+                submitButton.disabled = true;
+    
+                fetch('/admin/coupon/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(couponData)
+                })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Failed to fetch coupon details');
+                            return response.json().then(errData => {
+                                throw new Error(errData.message || 'Something went wrong');
+                            });
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log("Received data:", data);
-                        if (data && data.coupon) {
-                            console.log("Coupon data:", data.coupon);
-                            populateEditForm(data.coupon);
-                            openEditModal();
-                        } else {
-                            throw new Error('Invalid coupon data received');
-                        }
+                        showSuccessToast(data.message || `Coupon "${couponData.code}" has been created successfully.`);
+                        couponForm.reset();
+                        closeModal();
+                        window.location.reload();
                     })
                     .catch(error => {
-                        showErrorToast(error.message || 'Failed to load coupon details');
+                        showErrorToast(error.message || 'Failed to create coupon. Please try again.');
                         console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        submitButton.textContent = originalText;
+                        submitButton.disabled = false;
                     });
-            }
-
-            // Function to populate edit form with fetched data
-            function populateEditForm(couponData) {
-                document.getElementById('edit-coupon-id').value = couponData.ID;
-                document.getElementById('edit-coupon-code').value = couponData.code || couponData.CouponCode;
-                document.getElementById('edit-description').value = couponData.Discription || '';
-
-                const typeSelect = document.getElementById('edit-type');
-                typeSelect.value = couponData.CouponType || 'Percentage';
-
-                // Trigger change event to update the value field prefix
-                const changeEvent = new Event('change');
-                typeSelect.dispatchEvent(changeEvent);
-
-                document.getElementById('edit-value').value = couponData.discount_value || 0;
-
-                const appliedToSelect = document.getElementById('edit-applied-to');
-                appliedToSelect.value = couponData.applicable || couponData.ApplicableFor || 'AllProducts';
-
-                document.getElementById('edit-min-order').value = couponData.min_productvalue || couponData.MinOrdervalue || '';
-                document.getElementById('edit-max-discount').value = couponData.max_value || couponData.MaxDiscountValue || '';
-                document.getElementById('edit-usage-limit').value = couponData.max_use_count || couponData.MaxUseCount || '';
-
-                // Format dates for input date fields (YYYY-MM-DD)
-                if (couponData.validfrom || couponData.ValidFrom) {
-                    document.getElementById('edit-valid-date').value = formatDateForInput(couponData.validfrom || couponData.ValidFrom);
-                }
-
-                if (couponData.validto || couponData.ExpirationDate) {
-                    document.getElementById('edit-expiry-date').value = formatDateForInput(couponData.validto || couponData.ExpirationDate);
-                }
-            }
-
-            // Helper function to format date for input fields
-            function formatDateForInput(dateString) {
-                const date = new Date(dateString);
-                return date.toISOString().split('T')[0];
-            }
-
-            // Function to open edit modal
-            function openEditModal() {
-                if (editModal) {
-                    editModal.classList.remove('opacity-0');
-                    editModal.classList.remove('pointer-events-none');
-                    document.body.classList.add('modal-active');
-
-                    // Re-initialize Feather icons for modal content
-                    feather.replace();
-                }
-            }
-
-            // Function to close edit modal
-            function closeEditModal() {
-                if (editModal) {
-                    editModal.classList.add('opacity-0');
-                    editModal.classList.add('pointer-events-none');
-                    document.body.classList.remove('modal-active');
-                }
-            }
-
-            // Handle edit form submission
+            });
+    
+            // Edit Coupon Form Submission
             const editCouponForm = document.getElementById('edit-coupon-form');
             if (editCouponForm) {
                 editCouponForm.addEventListener('submit', function (event) {
                     event.preventDefault();
-
-                    // Gather form data
+    
+                    if (!validateEditForm()) {
+                        return;
+                    }
+    
                     const formData = new FormData(this);
                     const couponId = formData.get('edit-coupon-id');
-
                     const couponData = {
                         id: couponId,
                         code: formData.get('edit-coupon-code'),
@@ -840,19 +845,19 @@
                         value: formData.get('edit-value'),
                         appliedTo: formData.get('edit-applied-to'),
                         minOrderValue: formData.get('edit-min-order'),
-                        maxDiscount: formData.get('edit-max-discount'),
+                        maxDiscount: formData.get('edit-type') === 'Fixed' ? formData.get('edit-value') : formData.get('edit-max-discount'),
                         usageLimit: formData.get('edit-usage-limit'),
                         validDate: formData.get('edit-valid-date'),
                         expiryDate: formData.get('edit-expiry-date')
                     };
-
-                    // Show loading state
+    
+                    console.log('Edit Coupon Data:', couponData);
+    
                     const submitButton = this.querySelector('button[type="submit"]');
                     const originalText = submitButton.textContent;
                     submitButton.textContent = 'Updating...';
                     submitButton.disabled = true;
-
-                    // API call to update the coupon
+    
                     fetch(`/admin/coupon/details/edit/${couponId}`, {
                         method: 'POST',
                         headers: {
@@ -869,230 +874,202 @@
                             return response.json();
                         })
                         .then(data => {
-                            // Show success toast with backend response
                             showSuccessToast(data.message || `Coupon "${couponData.code}" has been updated successfully.`);
-
-                            // Close modal
                             closeEditModal();
-
-                            // Refresh the page to show updated data
                             window.location.reload();
                         })
                         .catch(error => {
-                            // Show error toast with backend response
                             showErrorToast(error.message || 'Failed to update coupon. Please try again.');
                             console.error('Error:', error);
                         })
                         .finally(() => {
-                            // Reset button state
                             submitButton.textContent = originalText;
                             submitButton.disabled = false;
                         });
                 });
             }
-        });
-
-        // Add edit button click handler to all edit buttons
-        // This is outside the DOMContentLoaded event to ensure it catches dynamically added buttons
-        function attachEditButtonHandlers() {
-            const editButtons = document.querySelectorAll('.edit-coupon-btn');
-            editButtons.forEach(button => {
-                if (!button.hasAttribute('data-handler-attached')) {
-                    button.setAttribute('data-handler-attached', 'true');
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const couponId = e.currentTarget.getAttribute('data-id');
-                        fetchCouponDetails(couponId);
-                    });
-                }
-            });
-        }
-
-        // Call this function after page load and after any AJAX operations that might add new buttons
-        document.addEventListener('DOMContentLoaded', attachEditButtonHandlers);
-
-
-        // Initialize Feather icons
-        document.addEventListener('DOMContentLoaded', () => {
-            feather.replace();
-
-            // Modal functionality
-            const openButtons = document.querySelectorAll('.modal-open');
-            const closeButtons = document.querySelectorAll('.modal-close');
-            const modal = document.querySelector('.modal');
-            const overlay = document.querySelector('.modal-overlay');
-
-            // Add event listeners
-            openButtons.forEach(button => {
-                button.addEventListener('click', openModal);
-            });
-
-            closeButtons.forEach(button => {
-                button.addEventListener('click', closeModal);
-            });
-
-            overlay.addEventListener('click', closeModal);
-
-            // Discount type change handler
-            const typeSelect = document.getElementById('type');
-            const valueField = document.getElementById('value-field');
-
-            typeSelect.addEventListener('change', function () {
-                if (this.value === 'shipping') {
-                    valueField.style.display = 'none';
-                } else {
-                    valueField.style.display = 'block';
-
-                    // Update prefix based on type
-                    const valueInput = document.getElementById('value');
-                    const prefix = valueInput.previousElementSibling.querySelector('span');
-
-                    if (this.value === 'percentage') {
-                        prefix.textContent = '%';
-                    } else if (this.value === 'fixed') {
-                        prefix.textContent = '$';
-                    }
-                }
-            });
-
-            const expiryDateField = document.getElementById('expiry-date-field');
-            const validDateField = document.getElementById('valid-date-field');
-        });
-
-        // Open modal function - moved outside the DOMContentLoaded event
-        const openModal = () => {
-            const modal = document.querySelector('.modal');
-            modal.classList.remove('opacity-0');
-            modal.classList.remove('pointer-events-none');
-            document.body.classList.add('modal-active');
-        };
-
-        // Close modal function - moved outside the DOMContentLoaded event
-        const closeModal = () => {
-            const modal = document.querySelector('.modal');
-            modal.classList.add('opacity-0');
-            modal.classList.add('pointer-events-none');
-            document.body.classList.remove('modal-active');
-        };
-
-        // Form submission handler
-        const couponForm = document.querySelector('.modal-container form');
-
-        couponForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Gather form data
-            const formData = new FormData(this);
-            const couponData = {
-                code: formData.get('coupon-code'),
-                description: formData.get('description'),
-                type: formData.get('type'),
-                value: formData.get('value'),
-                appliedTo: formData.get('applied-to'),
-                minOrderValue: formData.get('min-order'),
-                maxDiscount: formData.get('max-discount'),
-                usageLimit: formData.get('usage-limit'),
-                expiryDate: formData.get('expiry-date'),
-                validDate: formData.get('valid-date')
-            };
-
-            // Show loading state
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
-            submitButton.textContent = 'Creating...';
-            submitButton.disabled = true;
-
-            // API call to save the coupon
-            fetch('/admin/coupon/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(couponData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errData => {
-                            throw new Error(errData.message || 'Something went wrong');
+    
+            // Delete Coupon Logic
+            document.querySelectorAll('form[action^="/admin/coupon/delete/"]').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+    
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                showSuccessToast('Coupon deleted successfully');
+                                this.closest('tr').remove();
+                            } else {
+                                showErrorToast('Failed to delete coupon');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showErrorToast('An error occurred');
                         });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Show success toast with backend response
-                    showSuccessToast(data.message || `Coupon "${couponData.code}" has been created successfully.`);
-                    // Reset form
-                    couponForm.reset();
-
-                    // Close modal
-                    closeModal();
-                    // Refresh coupon list if it exists
-                    if (typeof refreshCouponList === 'function') {
-                        refreshCouponList();
-                    }
-                    window.location.reload();
-                })
-                .catch(error => {
-                    // Show error toast with backend response
-                    showErrorToast(error.message || 'Failed to create coupon. Please try again.');
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    // Reset button state
-                    submitButton.textContent = originalText;
-                    submitButton.disabled = false;
                 });
-        });
-
-        document.querySelectorAll('form[action^="/admin/coupon/delete/"]').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                // Submit the form via AJAX
-                fetch(this.action, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-                })
+            });
+    
+            // Fetch Coupon Details for Editing
+            function fetchCouponDetails(couponId) {
+                fetch(`/admin/coupon/details/${couponId}`)
                     .then(response => {
-                        if (response.ok) {
-                            // Show success toast and remove the row from the UI
-                            showSuccessToast('Coupon deleted successfully');
-                            this.closest('tr').remove(); // Remove the row from the table
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch coupon details');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Received data:", data);
+                        if (data && data.coupon) {
+                            populateEditForm(data.coupon);
+                            openEditModal();
                         } else {
-                            // Show error toast
-                            showErrorToast('Failed to delete coupon');
+                            throw new Error('Invalid coupon data received');
                         }
                     })
                     .catch(error => {
+                        showErrorToast(error.message || 'Failed to load coupon details');
                         console.error('Error:', error);
-                        showErrorToast('An error occurred');
                     });
-            });
+            }
+    
+            // Populate Edit Form
+            function populateEditForm(couponData) {
+                document.getElementById('edit-coupon-id').value = couponData.ID || '';
+                document.getElementById('edit-coupon-code').value = couponData.code || couponData.CouponCode || '';
+                document.getElementById('edit-description').value = couponData.Discription || '';
+    
+                const typeSelect = document.getElementById('edit-type');
+                typeSelect.value = couponData.CouponType || 'Percentage';
+                const changeEvent = new Event('change');
+                typeSelect.dispatchEvent(changeEvent);
+    
+                document.getElementById('edit-value').value = couponData.discount_value || couponData.DiscountValue || 0;
+                document.getElementById('edit-applied-to').value = couponData.applicable || couponData.ApplicableFor || 'AllProducts';
+                document.getElementById('edit-min-order').value = couponData.min_productvalue || couponData.MinOrdervalue || '';
+                document.getElementById('edit-max-discount').value = couponData.max_value || couponData.MaxDiscountValue || '';
+                document.getElementById('edit-usage-limit').value = couponData.max_use_count || couponData.MaxUseCount || '';
+    
+                if (couponData.validfrom || couponData.ValidFrom) {
+                    document.getElementById('edit-valid-date').value = formatDateForInput(couponData.validfrom || couponData.ValidFrom);
+                }
+                if (couponData.validto || couponData.ExpirationDate) {
+                    document.getElementById('edit-expiry-date').value = formatDateForInput(couponData.validto || couponData.ExpirationDate);
+                }
+            }
+    
+            // Format Date for Input
+            function formatDateForInput(dateString) {
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0];
+            }
+    
+            // Modal Open/Close Functions
+            function openModal() {
+                modal.classList.remove('opacity-0');
+                modal.classList.remove('pointer-events-none');
+                document.body.classList.add('modal-active');
+            }
+    
+            function closeModal() {
+                modal.classList.add('opacity-0');
+                modal.classList.add('pointer-events-none');
+                document.body.classList.remove('modal-active');
+            }
+    
+            function openEditModal() {
+                editModal.classList.remove('opacity-0');
+                editModal.classList.remove('pointer-events-none');
+                document.body.classList.add('modal-active');
+                feather.replace();
+            }
+    
+            function closeEditModal() {
+                editModal.classList.add('opacity-0');
+                editModal.classList.add('pointer-events-none');
+                document.body.classList.remove('modal-active');
+            }
+    
+            // Form Validation for Add Coupon
+            function validateForm() {
+                const discountType = document.getElementById('type').value;
+                const value = document.getElementById('value').value;
+                const couponCode = document.getElementById('coupon-code').value;
+                const validDate = new Date(document.getElementById('valid-date').value);
+                const expiryDate = new Date(document.getElementById('expiry-date').value);
+    
+                if (!couponCode || !discountType || !value || !validDate || !expiryDate) {
+                    alert('Please fill all required fields');
+                    return false;
+                }
+    
+                const couponCodePattern = /^[A-Za-z]+[A-Za-z0-9]*$/;
+                if (!couponCodePattern.test(couponCode)) {
+                    alert('Coupon code must start with a letter and contain only letters and numbers');
+                    return false;
+                }
+    
+                if (discountType === 'Percentage' && (value > 90 || value <= 0)) {
+                    alert('Percentage discount must be between 1 and 90');
+                    return false;
+                }
+    
+                if (discountType === 'Fixed' && value <= 0) {
+                    alert('Fixed amount must be greater than 0');
+                    return false;
+                }
+    
+                if (validDate > expiryDate) {
+                    alert('Valid From date cannot be later than Expiry Date');
+                    return false;
+                }
+    
+                return true;
+            }
+    
+            // Form Validation for Edit Coupon
+            function validateEditForm() {
+                const discountType = document.getElementById('edit-type').value;
+                const value = document.getElementById('edit-value').value;
+                const couponCode = document.getElementById('edit-coupon-code').value;
+                const validDate = new Date(document.getElementById('edit-valid-date').value);
+                const expiryDate = new Date(document.getElementById('edit-expiry-date').value);
+    
+                if (!couponCode || !discountType || !value || !validDate || !expiryDate) {
+                    alert('Please fill all required fields');
+                    return false;
+                }
+    
+                const couponCodePattern = /^[A-Za-z]+[A-Za-z0-9]*$/;
+                if (!couponCodePattern.test(couponCode)) {
+                    alert('Coupon code must start with a letter and contain only letters and numbers');
+                    return false;
+                }
+    
+                if (discountType === 'Percentage' && (value > 90 || value <= 0)) {
+                    alert('Percentage discount must be between 1 and 90');
+                    return false;
+                }
+    
+                if (discountType === 'Fixed' && value <= 0) {
+                    alert('Fixed amount must be greater than 0');
+                    return false;
+                }
+    
+                if (validDate > expiryDate) {
+                    alert('Valid From date cannot be later than Expiry Date');
+                    return false;
+                }
+    
+                return true;
+            }
         });
-        function validateForm() {
-            // Coupon code validation is handled by HTML pattern
-
-            // Value validation based on discount type
-            const discountType = document.getElementById('type').value;
-            const value = document.getElementById('value').value;
-
-            if (discountType === 'Percentage' && value > 90) {
-                return false;
-            }
-
-            // Date validation
-            const validDate = new Date(document.getElementById('valid-date').value);
-            const expiryDate = new Date(document.getElementById('expiry-date').value);
-
-            if (validDate > expiryDate) {
-                alert('Valid From date cannot be later than Expiry Date');
-                return false;
-            }
-
-            return true;
-        }
     </script>
     <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/formatDate.js"></script>

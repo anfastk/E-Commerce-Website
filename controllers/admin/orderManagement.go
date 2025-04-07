@@ -113,7 +113,7 @@ func SearchOrders(c *gin.Context) {
 			Where("order_items.product_name ILIKE ? OR order_items.order_uid ILIKE ? OR user_auths.full_name ILIKE ?",
 				"%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
 	}
- 
+
 	if err := query.Find(&orderDetails).Error; err != nil {
 		logger.Log.Error("Failed to fetch orders", zap.Error(err))
 		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch orders", "Something Went Wrong", "")
@@ -234,6 +234,23 @@ func ShowOrderDetailManagement(c *gin.Context) {
 	}
 
 	logger.Log.Info("Order details fetched successfully", zap.String("orderItemID", orderItemID))
+	var allOrderDetails []models.OrderItem
+	if err := config.DB.Find(&allOrderDetails, "order_id = ?", orderDetails.ID).Error; err != nil {
+		logger.Log.Error("Failed to all ordernDetails", zap.Error(err))
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to all ordernDetails", "Something Went Wrong", "")
+		return
+	}
+	var (
+		allProductDiscount      float64
+		allProductTotalDiscount float64
+		shipCharge              float64
+	)
+
+	allProductDiscount = orderDetails.TotalProductDiscount
+	if orderDetails.ShippingCharge == 0.0 {
+		shipCharge = 100
+	}
+	allProductTotalDiscount = allProductDiscount + orderDetails.ShippingCharge + shipCharge + orderDetails.CouponDiscountAmount
 	c.HTML(http.StatusOK, "orderDetailsManagement.html", gin.H{
 		"status":            "success",
 		"message":           "Order details fetched successfully",
@@ -248,6 +265,9 @@ func ShowOrderDetailManagement(c *gin.Context) {
 		"Address":           shippingAddress,
 		"ProductDiscount":   productDiscount,
 		"TotalDiscount":     totalDiscount,
+		"AllProduct":        allOrderDetails,
+		"AllProductDiscount":      allProductDiscount,
+		"AllProductTotalDiscount": allProductTotalDiscount,
 	})
 }
 

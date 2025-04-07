@@ -12,7 +12,7 @@ import (
 	"github.com/anfastk/E-Commerce-Website/utils/helper"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-) 
+)
 
 func ShowCheckoutPage(c *gin.Context) {
 	logger.Log.Info("Requested checkout page")
@@ -60,7 +60,7 @@ func ShowCheckoutPage(c *gin.Context) {
 	}
 
 	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
-	total := salePrice + tax
+	total := salePrice + tax +float64(shippingCharge)
 
 	isAllCategorySame := true
 	for _, items := range cartItems {
@@ -83,8 +83,8 @@ func ShowCheckoutPage(c *gin.Context) {
 
 		var categoryCoupons []models.Coupon
 		if err := config.DB.Where(
-			"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ?",
-			salePrice, category.Name, time.Now(), "Active",
+			"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ? AND max_discount_value <= ?",
+			salePrice, category.Name, time.Now(), "Active", salePrice,
 		).Find(&categoryCoupons).Error; err != nil {
 			logger.Log.Error("Failed to fetch category coupons",
 				zap.Float64("salePrice", salePrice),
@@ -100,8 +100,8 @@ func ShowCheckoutPage(c *gin.Context) {
 
 	var allProductCoupons []models.Coupon
 	if err := config.DB.Where(
-		"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ?",
-		salePrice, "AllProducts", time.Now(), "Active",
+		"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ? AND max_discount_value <= ?",
+		salePrice, "AllProducts", time.Now(), "Active", salePrice,
 	).Find(&allProductCoupons).Error; err != nil {
 		logger.Log.Error("Failed to fetch all products coupons",
 			zap.Float64("salePrice", salePrice),
@@ -307,7 +307,7 @@ func CheckCoupon(c *gin.Context) {
 		logger.Log.Warn("Coupon not yet valid",
 			zap.String("couponCode", couponCode),
 			zap.Time("validFrom", coupon.ValidFrom))
-		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Started", "Coupon Not Started", "")
+		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Started", "Coupon Not Available", "")
 		return
 	}
 
@@ -345,7 +345,7 @@ func CheckCoupon(c *gin.Context) {
 	}
 
 	purchaseAmount := couponInput.SubTotal - couponInput.ProductDiscount
-	if purchaseAmount < coupon.MinOrderValue {
+	if purchaseAmount < coupon.MinOrderValue || purchaseAmount < coupon.MaxDiscountValue {
 		logger.Log.Warn("Purchase amount below minimum for coupon",
 			zap.String("couponCode", couponCode),
 			zap.Float64("purchaseAmount", purchaseAmount),

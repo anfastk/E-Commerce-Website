@@ -367,7 +367,7 @@ func EditProductVariant(c *gin.Context) {
 	var existingVariant models.ProductVariantDetails
 	if err := config.DB.First(&existingVariant, variantID).Error; err != nil {
 		logger.Log.Error("Product variant not found", zap.String("variantID", variantID), zap.Error(err))
-		helper.RespondWithError(c, http.StatusNotFound, "Product variant not found", "Not Found", "")
+		helper.RespondWithError(c, http.StatusNotFound, "Product variant not found", "Product variant not found", "")
 		return
 	}
 

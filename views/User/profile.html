@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
@@ -18,15 +19,11 @@
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="/contactUs" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
@@ -54,12 +51,8 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -67,8 +60,6 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
@@ -77,13 +68,11 @@
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
                     <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
     </div>
     <div class="container mx-auto px-4 py-4">
-        <!-- Breadcrumb -->
         <div class="flex items-center text-sm mb-8">
             <a href="#" class="text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24"
@@ -97,11 +86,8 @@
             <span class="text-gray-900">Profile</span>
         </div>
 
-        <!-- Content Layout -->
         <div class="flex flex-col md:flex-row gap-8">
-            <!-- Sidebar -->
             <div class="w-full md:w-64">
-                <!-- Profile Card -->
                 <div class="p-4 border-b bg-white rounded-t-lg">
                     <div class="flex items-center space-x-3">
                         <img src="{{.User.ProfilePic}}" alt="Profile" class="w-16 h-16 rounded-full" />
@@ -111,7 +97,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Navigation Menu -->
                 <div class="bg-white rounded-b-lg shadow-sm">
                     <nav class="flex flex-col p-2">
                         <a href="/profile" class="p-2 text-white bg-black rounded flex items-center gap-2">
@@ -204,22 +189,15 @@
                 </div>
             </div>
 
-
-
-            <!-- Main Content -->
             <div class="flex-1">
                 <div class="bg-white rounded-lg shadow-sm p-8">
                     <h2 class="text-xl font-medium mb-8">ACCOUNT SETTING</h2>
                     <div class="flex flex-col md:flex-row gap-12">
-                        <!-- User ID from template -->
                         <div class="relative w-32 h-32 group">
-                            <!-- Profile Image Container -->
                             <div class="w-full h-full rounded-full overflow-hidden">
                                 <img id="profileImage" src="{{.User.ProfilePic}}" alt="Profile"
                                     class="w-full h-full object-cover" />
                             </div>
-
-                            <!-- Hover Overlay -->
                             <div
                                 class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <label for="imageInput" class="cursor-pointer">
@@ -235,12 +213,9 @@
                                     </div>
                                 </label>
                             </div>
-
-                            <!-- Hidden File Input -->
                             <input type="file" id="imageInput" class="hidden" accept="image/*">
                         </div>
 
-                        <!-- Cropper Modal -->
                         <div id="cropperModal"
                             class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
                             <div class="bg-white p-4 rounded-lg max-w-lg w-full mx-4">
@@ -260,7 +235,6 @@
                             </div>
                         </div>
 
-                        <!-- Loading Indicator -->
                         <div id="loadingIndicator"
                             class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                             <div class="bg-white p-4 rounded-lg">
@@ -268,59 +242,89 @@
                                 <p class="mt-2">Uploading...</p>
                             </div>
                         </div>
+
                         <form id="profileForm">
                             <input type="hidden" id="user_id" name="user_id" value="{{.User.ID}}">
-                            <!-- Form -->
                             <div class="flex-1 max-w-2xl">
                                 <div class="space-y-6">
-                                    <!-- Full Name and Email row -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
+                                        <div class="field-container">
                                             <label class="block text-sm mb-2">Full Name</label>
                                             <input name="fullName" type="text" value="{{.User.FullName}}"
-                                                class="w-full p-2.5 border border-gray-200 rounded-md" />
+                                                class="w-full p-2.5 border border-gray-200 rounded-md"
+                                                pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed"
+                                                onkeydown="return /[a-zA-Z\s]/i.test(event.key) || event.key === 'Backspace' || event.key === ' '" />
+                                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                         </div>
-                                        <div>
+                                        <div class="field-container">
                                             <label class="block text-sm mb-2">Email</label>
-                                            <input name="email" type="email" value="{{.User.Email}}"
-                                                class="w-full p-2.5 border border-gray-200 rounded-md" disabled/>
+                                            <div class="flex items-center gap-2">
+                                                <input name="email" type="email" value="{{.User.Email}}"
+                                                    class="w-full p-2.5 border border-gray-200 rounded-md" disabled />
+                                            </div>
+                                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                         </div>
                                     </div>
 
-                                    <!-- Phone Number -->
-                                    <div>
+                                    <div class="field-container">
                                         <label class="block text-sm mb-2">Phone Number</label>
                                         <div class="flex">
                                             <input name="phone" type="tel" value="{{.User.UserProfile.Mobile}}"
                                                 placeholder="Enter phone number"
-                                                class="w-full p-2.5 border border-gray-200 rounded-md  focus:ring-blue-500 focus:border-blue-500" />
+                                                class="w-full p-2.5 border border-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                                {{if .User.UserProfile.Mobile}}readonly{{end}} />
                                         </div>
+                                        <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                     </div>
 
-                                    <!-- Country, State, Zip Code row -->
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div>
+                                        <div class="field-container">
                                             <label class="block text-sm mb-2">Country/Region</label>
-                                            <input name="country" type="text" value="{{.User.UserProfile.Country}}"
-                                                class="w-full p-2.5 border border-gray-200 rounded-md appearance-none bg-white" />
+                                            <select name="country"
+                                                class="w-full p-2.5 border border-gray-200 rounded-md appearance-none bg-white">
+                                                <option value="">Select Country</option>
+                                                <option value="US" {{if eq .User.UserProfile.Country "US"
+                                                    }}selected{{end}}>United States</option>
+                                                <option value="IN" {{if eq .User.UserProfile.Country "IN"
+                                                    }}selected{{end}}>India</option>
+                                                <option value="UK" {{if eq .User.UserProfile.Country "UK"
+                                                    }}selected{{end}}>United Kingdom</option>
+                                                <option value="CA" {{if eq .User.UserProfile.Country "CA"
+                                                    }}selected{{end}}>Canada</option>
+                                                <option value="AU" {{if eq .User.UserProfile.Country "AU"
+                                                    }}selected{{end}}>Australia</option>
+                                                <option value="DE" {{if eq .User.UserProfile.Country "DE"
+                                                    }}selected{{end}}>Germany</option>
+                                                <option value="FR" {{if eq .User.UserProfile.Country "FR"
+                                                    }}selected{{end}}>France</option>
+                                                <option value="JP" {{if eq .User.UserProfile.Country "JP"
+                                                    }}selected{{end}}>Japan</option>
+                                            </select>
+                                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                         </div>
-                                        <div>
+                                        <div class="field-container">
                                             <label class="block text-sm mb-2">States</label>
-                                            <input name="state" type="text" value="{{.User.UserProfile.State}}"
-                                                class="w-full p-2.5 border border-gray-200 rounded-md appearance-none bg-white" />
+                                            <select name="state"
+                                                class="w-full p-2.5 border border-gray-200 rounded-md appearance-none bg-white">
+                                                <option value="">Select State</option>
+                                            </select>
+                                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                         </div>
-                                        <div>
+                                        <div class="field-container">
                                             <label class="block text-sm mb-2">Zip Code</label>
                                             <input name="zipCode" type="text" value="{{.User.UserProfile.Pincode}}"
                                                 class="w-full p-2.5 border border-gray-200 rounded-md" />
+                                            <span class="error-message text-red-500 text-xs mt-1 block"></span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <button type="submit"
-                                    class="mt-8 px-8 py-2.5 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors">
+                                <button type="submit" id="saveBtn"
+                                    class="mt-8 px-8 py-2.5 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors"
+                                    disabled>
                                     SAVE CHANGES
                                 </button>
+                                <span id="formError" class="error-message text-red-500 text-xs mt-2 block"></span>
                             </div>
                         </form>
                     </div>
@@ -328,15 +332,14 @@
             </div>
         </div>
     </div>
-    <!-- Footer Section -->
+
     <footer class="bg-black text-white py-12 mt-16">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
                     <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
-                        with
-                        our exclusive collections and latest laptops.</p>
+                        with our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
                         <a href="#" class="hover:text-gray-400">
@@ -373,18 +376,30 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Popular Tag</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/products?categories=LAPTOP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=APPLE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
-                        <a href="/products?categories=MOUSE"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
-                        <a href="/products?categories=LAPTOP&brands=ASUS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
-                        <a href="/products?categories=KEYBOARD"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
-                        <a href="/products?categories=HEADSET"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
-                        <a href="/products?brands=ZEBRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
-                        <a href="/products?brands=RED DRAGON"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
-                        <a href="/products?categories=LAPTOP&brands=HP"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
-                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
-                        <a href="/products?brands=LOGITECH"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
-                        <a href="/products?brands=PORTRONICS"><span class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
+                        <a href="/products?categories=LAPTOP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=APPLE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Apple Laptop</span></a>
+                        <a href="/products?categories=MOUSE"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Mouse</span></a>
+                        <a href="/products?categories=LAPTOP&brands=ASUS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Asus Laptops</span></a>
+                        <a href="/products?categories=KEYBOARD"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Keyboard</span></a>
+                        <a href="/products?categories=HEADSET"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Headphone</span></a>
+                        <a href="/products?brands=ZEBRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Zebronics</span></a>
+                        <a href="/products?brands=RED DRAGON"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Red Dragon</span></a>
+                        <a href="/products?categories=LAPTOP&brands=HP"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Hp Laptop</span></a>
+                        <a href="/products?categories=LAPTOP&brands=LENOVO"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Lenovo Laptop</span></a>
+                        <a href="/products?brands=LOGITECH"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Logitech</span></a>
+                        <a href="/products?brands=PORTRONICS"><span
+                                class="bg-gray-700 text-white text-xs px-3 py-1 rounded">Portronics</span></a>
                     </div>
                 </div>
             </div>
@@ -393,7 +408,7 @@
             </div>
         </div>
     </footer>
-    <!-- Toast container -->
+
     <div class="toast-container z-40 fixed top-0 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
@@ -408,15 +423,201 @@
     </div>
 
     <script>
-        document.getElementById('profileForm').addEventListener('submit', async function (e) {
+        const originalValues = {
+            fullName: "{{.User.FullName}}",
+            email: "{{.User.Email}}",
+            phone: "{{.User.UserProfile.Mobile}}",
+            country: "{{.User.UserProfile.Country}}",
+            state: "{{.User.UserProfile.State}}",
+            zipCode: "{{.User.UserProfile.Pincode}}"
+        };
+
+        const form = document.getElementById('profileForm');
+        const saveBtn = document.getElementById('saveBtn');
+        const inputs = form.querySelectorAll('input:not([type="hidden"]), select');
+        let usedNames = new Set([originalValues.fullName]);
+        let usedEmails = new Set([originalValues.email]);
+
+        const statesByCountry = {
+            'US': [
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+                'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
+                'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+                'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+                'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+                'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+                'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+                'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+                'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+                'West Virginia', 'Wisconsin', 'Wyoming'
+            ],
+            'IN': [
+                'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+                'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+                'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+                'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan',
+                'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
+                'Uttarakhand', 'West Bengal', 'Delhi'
+            ],
+            'UK': [
+                'England', 'Scotland', 'Wales', 'Northern Ireland'
+            ],
+            'CA': [
+                'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+                'Newfoundland and Labrador', 'Nova Scotia', 'Ontario',
+                'Prince Edward Island', 'Quebec', 'Saskatchewan'
+            ],
+            'AU': [
+                'New South Wales', 'Victoria', 'Queensland', 'South Australia',
+                'Western Australia', 'Tasmania', 'Northern Territory',
+                'Australian Capital Territory'
+            ],
+            'DE': [
+                'Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen',
+                'Hamburg', 'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern',
+                'North Rhine-Westphalia', 'Rhineland-Palatinate', 'Saarland',
+                'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein', 'Thuringia'
+            ],
+            'FR': [
+                'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Brittany',
+                'Centre-Val de Loire', 'Corsica', 'Grand Est', 'Hauts-de-France',
+                'Île-de-France', 'Normandy', 'Nouvelle-Aquitaine', 'Occitanie',
+                'Pays de la Loire', 'Provence-Alpes-Côte d\'Azur'
+            ],
+            'JP': [
+                'Hokkaido', 'Aomori', 'Iwate', 'Miyagi', 'Akita', 'Yamagata',
+                'Fukushima', 'Ibaraki', 'Tochigi', 'Gunma', 'Saitama', 'Chiba',
+                'Tokyo', 'Kanagawa', 'Niigata', 'Toyama', 'Ishikawa', 'Fukui',
+                'Yamanashi', 'Nagano', 'Gifu', 'Shizuoka', 'Aichi', 'Mie',
+                'Shiga', 'Kyoto', 'Osaka', 'Hyogo', 'Nara', 'Wakayama', 'Tottori',
+                'Shimane', 'Okayama', 'Hiroshima', 'Yamaguchi', 'Tokushima',
+                'Kagawa', 'Ehime', 'Kochi', 'Fukuoka', 'Saga', 'Nagasaki',
+                'Kumamoto', 'Oita', 'Miyazaki', 'Kagoshima', 'Okinawa'
+            ]
+        };
+
+
+
+        // Updated validateFullName function
+        function validateFullName(value) {
+            const trimmedValue = value.trim();
+
+            const nameRegex = /^[A-Za-z]{1,}(\s[A-Za-z]{1,}){1,4}$/;
+
+            if (!nameRegex.test(trimmedValue)) {
+                return "Please enter a valid name";
+            }
+
+            if (trimmedValue.split(' ')[0].length < 1) {
+                return "First name must be at least 3 letters";
+            }
+
+            if (usedNames.has(trimmedValue) && trimmedValue !== originalValues.fullName) {
+                return "This name is already used";
+            }
+
+            return "";
+        }
+
+        function validatePhone(value) {
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(value)) return "Phone number must be exactly 10 digits";
+            return "";
+        }
+
+        function validateEmail(value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) return "Please enter a valid email";
+            if (usedEmails.has(value) && value !== originalValues.email) return "This email is already used";
+            return "";
+        }
+
+        function validateRequired(value, fieldName) {
+            if (!value.trim()) return `${fieldName} is required`;
+            return "";
+        }
+
+        function updateStates() {
+            const countrySelect = form.querySelector('select[name="country"]');
+            const stateSelect = form.querySelector('select[name="state"]');
+            const selectedCountry = countrySelect.value;
+
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            if (selectedCountry && statesByCountry[selectedCountry]) {
+                statesByCountry[selectedCountry].forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    if (state === originalValues.state && selectedCountry === originalValues.country) {
+                        option.selected = true;
+                    }
+                    stateSelect.appendChild(option);
+                });
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const container = this.closest('.field-container');
+                const errorSpan = container.querySelector('.error-message');
+                let error = "";
+
+                switch (this.name) {
+                    case 'fullName':
+                        error = validateFullName(this.value);
+                        break;
+                    case 'phone':
+                        if (!originalValues.phone) {
+                            error = validatePhone(this.value);
+                        }
+                        break;
+                    case 'country':
+                        error = validateRequired(this.value, "Country");
+                        updateStates();
+                        break;
+                    case 'state':
+                        error = validateRequired(this.value, "State");
+                        break;
+                    case 'zipCode':
+                        error = validateRequired(this.value, "Zip Code");
+                        break;
+                }
+
+                if (errorSpan) errorSpan.textContent = error;
+                updateSaveButtonState();
+            });
+        });
+
+        function hasChanges() {
+            return Array.from(inputs).some(input => {
+                if (input.name === 'email') return false;
+                return input.value !== originalValues[input.name];
+            });
+        }
+
+        function updateSaveButtonState() {
+            const allValid = Array.from(inputs).every(input => {
+                if (input.name === 'email') return true;
+                const container = input.closest('.field-container');
+                const errorSpan = container.querySelector('.error-message');
+                return errorSpan && errorSpan.textContent === "";
+            });
+            saveBtn.disabled = !allValid || !hasChanges();
+        }
+
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Get form data
+            const formError = document.getElementById('formError');
+            if (!hasChanges()) {
+                if (formError) formError.textContent = "No changes detected";
+                return;
+            }
+
             const formData = new FormData(this);
             const data = {
                 userid: formData.get('user_id'),
                 fullName: formData.get('fullName'),
-                email: formData.get('email'),
                 phone: formData.get('phone'),
                 country: formData.get('country'),
                 state: formData.get('state'),
@@ -426,22 +627,31 @@
             try {
                 const response = await fetch('/profile', {
                     method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
+                    usedNames.add(data.fullName);
+                    Object.assign(originalValues, data);
                     showSuccessToast('Profile updated successfully!');
+                    updateSaveButtonState();
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+
                 } else {
                     throw new Error('Failed to update profile');
                 }
             } catch (error) {
-                console.error('Error:', error);
                 showErrorToast('Failed to update profile. Please try again.');
             }
         });
+
+        // Initial setup
+        updateStates();
+        inputs.forEach(input => input.dispatchEvent(new Event('change')));
+
         let cropper;
         const modal = document.getElementById('cropperModal');
         const imageInput = document.getElementById('imageInput');
@@ -491,12 +701,9 @@
             canvas.toBlob(async (blob) => {
                 try {
                     showLoading();
-
-                    // Create FormData
                     const formData = new FormData();
                     formData.append('image', blob, 'profile.jpg');
 
-                    // Send POST request
                     const response = await fetch('/profile/avathar/update', {
                         method: 'PATCH',
                         body: formData
@@ -506,10 +713,7 @@
                         throw new Error('Upload failed');
                     }
 
-                    // Update preview on success
                     profileImage.src = canvas.toDataURL();
-
-                    // Close modal
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
                     imageInput.value = '';
@@ -522,6 +726,7 @@
                 }
             }, 'image/jpeg');
         }
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');

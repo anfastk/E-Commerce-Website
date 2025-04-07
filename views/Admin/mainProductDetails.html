@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Main Product Detail</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,8 +155,9 @@
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-bold text-gray-800">Product Details</h1>
                     <div class="space-x-3">
-                        <a href="/admin/products/main/details/update/{{.Product.Id}}">
-                            <button class="bg-black text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        <a href="/admin/products/main/details/update/{{.Product.Id}}" id="updateProductLink">
+                            <button id="updateProductBtn"
+                                class="bg-black text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                                 UPDATE PRODUCT
                             </button>
                         </a>
@@ -468,7 +470,8 @@
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-xl font-semibold text-gray-800">Product Variants</h2>
                             <div class="space-x-2">
-                                <a href="/admin/products/variants/add/{{.Product.Id}}" class="bg-black text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                                <a href="/admin/products/variants/add/{{.Product.Id}}"
+                                    class="bg-black text-white px-3 py-1 rounded hover:bg-green-700 transition">
                                     Add Variant
                                 </a>
                             </div>
@@ -727,6 +730,93 @@
             endDateInput.value = endDateFormatted;
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+    const updateBtn = document.getElementById('updateProductBtn');
+    const updateLink = document.getElementById('updateProductLink');
+
+    updateBtn.addEventListener('click', async function (e) {
+        e.preventDefault(); // Prevent default link behavior
+
+        try {
+            const response = await fetch(updateLink.href, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/html, application/json' // Added application/json to handle JSON responses
+                }
+            });
+
+            if (response.ok) {
+                // If success, get the HTML content
+                const htmlContent = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                document.documentElement.innerHTML = htmlContent;
+                // Add this to update the browser URL without reloading
+                window.history.pushState({}, document.title, updateLink.href);
+                showSuccessToast('Successfully loaded update page');
+            } else {
+                // Try to parse JSON error response
+                let errorMessage = 'Unknown error occurred';
+                try {
+                    const errorData = await response.json();
+                    // Assuming the backend sends a JSON with a 'message' field
+                    errorMessage = errorData.message || errorData.error || 'Unknown error';
+                } catch {
+                    // If not JSON, use status text
+                    errorMessage = response.statusText || 'Unknown error';
+                }
+                showErrorToast(errorMessage);
+            }
+        } catch (error) {
+            showErrorToast('Network error occurred');
+        }
+    });
+});
+
+        // Add this near your other modal handlers
+        document.addEventListener('DOMContentLoaded', function () {
+            const addOfferForm = document.getElementById('addOfferForm');
+
+            if (addOfferForm) {
+                addOfferForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    // Create FormData object from the form
+                    const formData = new FormData(addOfferForm);
+
+                    try {
+                        const response = await fetch('/admin/products/main/submit-offer', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.status === 'success') {
+                            showSuccessToast(data.message || 'Offer Added Successfully');
+                            // Close modal and reset form
+                            offerModal.classList.add('hidden');
+                            addOfferForm.reset();
+                            // Optional: Reload page after a delay to show the toast
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            // Handle error response
+                            showErrorToast(data.message || data.error || 'Failed to add offer');
+                            if (data.redirect) {
+                                setTimeout(() => {
+                                    window.location.href = data.redirect;
+                                }, 1000);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error submitting offer:', error);
+                        showErrorToast('An error occurred while adding the offer');
+                    }
+                });
+            }
+        });
     </script>
     <script src="/static/js/toastMain.js"></script>
     <script src="/static/js/nav&sideBar.js" defer></script>

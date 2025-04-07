@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -76,24 +77,30 @@
         .modal-content::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        .error-message {
+            color: red;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error {
+            border-color: red;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50">
-    <!-- Header remains unchanged -->
     <div class="bg-black py-4 sticky top-0 z-50 ">
         <header class="bg-white rounded-lg shadow-md mx-4 px-6">
             <div class="flex justify-between items-center py-2">
                 <a href="#" class="text-3xl font-bold tracking-widest text-black logo-font">LAPTIX</a>
-
-                <!-- Desktop Navigation -->
                 <nav style="font-family: Poppins;" class="hidden lg:flex space-x-24 text-md font-medium ">
                     <a href="/" class="hover:text-gray-600">Home</a>
                     <a href="/products" class="hover:text-gray-600">Shop</a>
                     <a href="/contactUs" class="hover:text-gray-600">Contact</a>
                 </nav>
-
-                <!-- Icons Section -->
                 <div class="hidden lg:flex items-center space-x-8">
                     <a href="/products"><button class="hover:text-gray-600"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24">
@@ -121,12 +128,8 @@
                                     d="M20.37 21.25a.75.75 0 0 1-.75.75H4.38a.75.75 0 0 1-.75-.75c0-4.1 4.5-7.28 8.37-7.28s8.37 3.18 8.37 7.28M17.1 7.11A5.1 5.1 0 1 1 12 2a5.11 5.11 0 0 1 5.1 5.11" />
                             </svg>
                         </button>
-
                     </a>
-
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <button class="lg:hidden" onclick="toggleMobileMenu()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
@@ -134,8 +137,6 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Mobile Navigation -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white rounded-lg shadow-md mt-4 px-6 py-4">
                 <nav class="flex flex-col space-y-4 text-md font-medium">
                     <a href="/" class="hover:text-gray-600">Home</a>
@@ -144,13 +145,11 @@
                     <a href="/cart" class="hover:text-gray-600">Cart</a>
                     <a href="/wishlist" class="hover:text-gray-600">Wishlist</a>
                     <a href="/profile" class="hover:text-gray-600">Profile</a>
-
                 </nav>
             </div>
         </header>
     </div>
 
-    <!-- Main content -->
     <div class="container mx-auto px-4 py-4 sm:py-8">
         <div class="flex items-center gap-2 text-xs sm:text-sm mb-4 sm:mb-8">
             <a href="#" class="text-gray-600">Home</a>
@@ -167,10 +166,8 @@
                     Select a existing delivery address or add a new one
                 </p>
                 <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-8" id="address-container">
-                    <!-- Addresses will be loaded dynamically -->
                 </div>
 
-                <!-- Modals -->
                 <div id="editAddressModal" class="modal z-40">
                     <div class="modal-content bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-2 sm:mx-4 relative">
                         <button onclick="closeModal('editAddressModal')"
@@ -181,59 +178,71 @@
                             </svg>
                         </button>
                         <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6">EDIT SHIPPING ADDRESS</h2>
-                        <form id="editAddressForm" class="space-y-3 sm:space-y-4">
+                        <form id="editAddressForm" class="space-y-3 sm:space-y-4" data-route="/profile/edit/address">
                             <input type="hidden" name="id">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">First Name</label>
                                     <input type="text" name="firstName"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="edit-firstName-error"></div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">Last Name</label>
                                     <input type="text" name="lastName"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="edit-lastName-error"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">LandMark</label>
                                 <input type="text" name="landmark"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="edit-landmark-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Address</label>
                                 <input type="text" name="address"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="edit-address-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Country</label>
-                                <input type="text" name="country"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                    required>
+                                <select name="country"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                    <option value="">Select Country</option>
+                                </select>
+                                <div class="error-message" id="edit-country-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Region/State</label>
-                                <input type="text" name="state"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                    required>
+                                <select name="state"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                    <option value="">Select State</option>
+                                </select>
+                                <div class="error-message" id="edit-state-error"></div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">City</label>
-                                    <input type="text" name="city"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                        required>
+                                    <select name="city"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                        <option value="">Select City</option>
+                                    </select>
+                                    <div class="error-message" id="edit-city-error"></div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">Zip Code</label>
                                     <input type="text" name="zipCode"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="edit-zipCode-error"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Phone Number</label>
                                 <input type="tel" name="phoneNumber"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="edit-phoneNumber-error"></div>
                             </div>
                             <button type="submit"
                                 class="w-full bg-black text-white py-2 sm:py-3 rounded-lg mt-4 sm:mt-6 text-sm sm:text-base">UPDATE
@@ -256,58 +265,70 @@
                             </svg>
                         </button>
                         <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6">ADD NEW ADDRESS</h2>
-                        <form id="addAddressForm" class="space-y-3 sm:space-y-4">
+                        <form id="addAddressForm" class="space-y-3 sm:space-y-4" data-route="/profile/add/address">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">First Name</label>
                                     <input type="text" name="firstName"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="add-firstName-error"></div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">Last Name</label>
                                     <input type="text" name="lastName"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="add-lastName-error"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">LandMark</label>
                                 <input type="text" name="landmark"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="add-landmark-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Address</label>
                                 <input type="text" name="address"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="add-address-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Country</label>
-                                <input type="text" name="country"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                    required>
+                                <select name="country"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                    <option value="">Select Country</option>
+                                </select>
+                                <div class="error-message" id="add-country-error"></div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Region/State</label>
-                                <input type="text" name="state"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                    required>
+                                <select name="state"
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                    <option value="">Select State</option>
+                                </select>
+                                <div class="error-message" id="add-state-error"></div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">City</label>
-                                    <input type="text" name="city"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white"
-                                        required>
+                                    <select name="city"
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm bg-white">
+                                        <option value="">Select City</option>
+                                    </select>
+                                    <div class="error-message" id="add-city-error"></div>
                                 </div>
                                 <div>
                                     <label class="block text-xs sm:text-sm mb-1">Zip Code</label>
                                     <input type="text" name="zipCode"
-                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                        class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                    <div class="error-message" id="add-zipCode-error"></div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm mb-1">Phone Number</label>
                                 <input type="tel" name="phoneNumber"
-                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm" required>
+                                    class="w-full border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-sm">
+                                <div class="error-message" id="add-phoneNumber-error"></div>
                             </div>
                             <button type="submit"
                                 class="w-full bg-black text-white py-2 sm:py-3 rounded-lg mt-4 sm:mt-6 text-sm sm:text-base">SAVE
@@ -317,7 +338,6 @@
                 </div>
             </div>
 
-            <!-- Order summary -->
             <div class="lg:col-span-1">
                 <div class="bg-white shadow-lg p-4 sm:p-6 rounded-lg">
                     <h2 class="text-base sm:text-lg font-bold mb-4 sm:mb-6">Order Summary</h2>
@@ -333,8 +353,7 @@
                                     <span class="font-medium text-xs sm:text-sm">₹ {{printf "%.2f"
                                         .DiscountPrice}}</span>
                                     <span class="font-semibold text-[10px] sm:text-xs text-gray-400 line-through">₹
-                                        {{printf "%.2f"
-                                        .ProductDetails.RegularPrice}}</span>
+                                        {{printf "%.2f" .ProductDetails.RegularPrice}}</span>
                                 </div>
                             </div>
                         </div>
@@ -401,8 +420,7 @@
                             <span>Shipping</span>
                             <span id="shipping-cost">{{if .Shipping}} {{.Shipping}} {{else}} <span
                                     class="text-green-600">Free <span
-                                        class="line-through text-[10px] sm:text-xs">₹100</span></span>
-                                {{end}}</span>
+                                        class="line-through text-[10px] sm:text-xs">₹100</span></span> {{end}}</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Total Discount</span>
@@ -426,29 +444,19 @@
         </div>
     </div>
 
-    <!-- Footer remains unchanged -->
     <footer class="bg-black text-white py-12">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <a href="/" class="text-2xl font-bold mb-6 logo-font">LAPTIX</a>
-                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered
-                        with
+                    <p class="text-sm mb-4">We are the biggest hyperstore in the universe. We got you all covered with
                         our exclusive collections and latest laptops.</p>
                     <a href="mailto:laptixinfo@gmail.com" class="text-sm block mb-4">laptixinfo@gmail.com</a>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-x"></i>
-                        </a>
-                        <a href="#" class="hover:text-gray-400">
-                            <i class="fab fa-youtube"></i>
-                        </a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-x"></i></a>
+                        <a href="#" class="hover:text-gray-400"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div>
@@ -504,7 +512,6 @@
         </div>
     </footer>
 
-    <!-- Toast remains unchanged -->
     <div class="toast-container z-40 fixed top-24 right-4">
         <div id="toast" class="z-40 toast bg-white shadow-lg rounded-lg p-4">
             <div class="toast-content flex items-center">
@@ -519,7 +526,6 @@
     </div>
 
     <script>
-
         const rawSubTotal = "{{.SubTotal}}";
         const rawProductDiscount = "{{.ProductDiscount}}";
         const rawTax = "{{.Tax}}";
@@ -689,9 +695,599 @@
             mobileMenu.classList.toggle('hidden');
         }
 
-    </script>
-    <script src="/static/js/checkout.js"></script>
+        const countries = {
+            "USA": {
+                states: {
+                    "Alabama": ["Birmingham", "Montgomery", "Mobile"],
+                    "Alaska": ["Anchorage", "Fairbanks", "Juneau"],
+                    "Arizona": ["Phoenix", "Tucson", "Mesa"],
+                    "Arkansas": ["Little Rock", "Fayetteville", "Fort Smith"],
+                    "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento"],
+                    "Colorado": ["Denver", "Colorado Springs", "Aurora"],
+                    "Connecticut": ["Hartford", "New Haven", "Bridgeport"],
+                    "Delaware": ["Wilmington", "Dover", "Newark"],
+                    "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville"],
+                    "Georgia": ["Atlanta", "Savannah", "Augusta"],
+                    "Hawaii": ["Honolulu", "Hilo", "Kailua"],
+                    "Idaho": ["Boise", "Meridian", "Nampa"],
+                    "Illinois": ["Chicago", "Springfield", "Peoria"],
+                    "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"],
+                    "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"],
+                    "Kansas": ["Wichita", "Overland Park", "Topeka"],
+                    "Kentucky": ["Louisville", "Lexington", "Bowling Green"],
+                    "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"],
+                    "Maine": ["Portland", "Bangor", "Augusta"],
+                    "Maryland": ["Baltimore", "Annapolis", "Frederick"],
+                    "Massachusetts": ["Boston", "Worcester", "Springfield"],
+                    "Michigan": ["Detroit", "Grand Rapids", "Lansing"],
+                    "Minnesota": ["Minneapolis", "St. Paul", "Duluth"],
+                    "Mississippi": ["Jackson", "Gulfport", "Biloxi"],
+                    "Missouri": ["St. Louis", "Kansas City", "Springfield"],
+                    "Montana": ["Billings", "Missoula", "Bozeman"],
+                    "Nebraska": ["Omaha", "Lincoln", "Grand Island"],
+                    "Nevada": ["Las Vegas", "Reno", "Henderson"],
+                    "New Hampshire": ["Manchester", "Nashua", "Concord"],
+                    "New Jersey": ["Newark", "Jersey City", "Trenton"],
+                    "New Mexico": ["Albuquerque", "Santa Fe", "Las Cruces"],
+                    "New York": ["New York City", "Buffalo", "Rochester", "Albany"],
+                    "North Carolina": ["Charlotte", "Raleigh", "Greensboro"],
+                    "North Dakota": ["Fargo", "Bismarck", "Grand Forks"],
+                    "Ohio": ["Columbus", "Cleveland", "Cincinnati"],
+                    "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"],
+                    "Oregon": ["Portland", "Salem", "Eugene"],
+                    "Pennsylvania": ["Philadelphia", "Pittsburgh", "Harrisburg"],
+                    "Rhode Island": ["Providence", "Warwick", "Cranston"],
+                    "South Carolina": ["Charleston", "Columbia", "Greenville"],
+                    "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"],
+                    "Tennessee": ["Nashville", "Memphis", "Knoxville"],
+                    "Texas": ["Houston", "Austin", "Dallas", "San Antonio"],
+                    "Utah": ["Salt Lake City", "Provo", "Ogden"],
+                    "Vermont": ["Burlington", "Montpelier", "Rutland"],
+                    "Virginia": ["Virginia Beach", "Richmond", "Norfolk"],
+                    "Washington": ["Seattle", "Spokane", "Tacoma"],
+                    "West Virginia": ["Charleston", "Huntington", "Morgantown"],
+                    "Wisconsin": ["Milwaukee", "Madison", "Green Bay"],
+                    "Wyoming": ["Cheyenne", "Casper", "Laramie"]
+                }
+            },
+            "India": {
+                states: {
+                    "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+                    "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat"],
+                    "Assam": ["Guwahati", "Silchar", "Dibrugarh"],
+                    "Bihar": ["Patna", "Gaya", "Bhagalpur"],
+                    "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur"],
+                    "Goa": ["Panaji", "Margao", "Vasco da Gama"],
+                    "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
+                    "Haryana": ["Gurugram", "Faridabad", "Chandigarh"],
+                    "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala"],
+                    "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad"],
+                    "Karnataka": ["Bangalore", "Mysore", "Hubli"],
+                    "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode"],
+                    "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior"],
+                    "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+                    "Manipur": ["Imphal", "Thoubal", "Bishnupur"],
+                    "Meghalaya": ["Shillong", "Tura", "Nongstoin"],
+                    "Mizoram": ["Aizawl", "Lunglei", "Champhai"],
+                    "Nagaland": ["Kohima", "Dimapur", "Mokokchung"],
+                    "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela"],
+                    "Punjab": ["Amritsar", "Ludhiana", "Jalandhar"],
+                    "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur"],
+                    "Sikkim": ["Gangtok", "Namchi", "Pelling"],
+                    "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+                    "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
+                    "Tripura": ["Agartala", "Udaipur", "Dharmanagar"],
+                    "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi"],
+                    "Uttarakhand": ["Dehradun", "Haridwar", "Nainital"],
+                    "West Bengal": ["Kolkata", "Siliguri", "Durgapur"],
+                    "Andaman and Nicobar Islands": ["Port Blair", "Havelock", "Neil Island"],
+                    "Chandigarh": ["Chandigarh"],
+                    "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Silvassa"],
+                    "Delhi": ["New Delhi", "Old Delhi"],
+                    "Jammu and Kashmir": ["Srinagar", "Jammu", "Leh"],
+                    "Ladakh": ["Leh", "Kargil"],
+                    "Lakshadweep": ["Kavaratti", "Minicoy", "Agatti"],
+                    "Puducherry": ["Puducherry", "Karaikal", "Yanam"]
+                }
+            },
+            "Canada": {
+                states: {
+                    "Alberta": ["Calgary", "Edmonton", "Red Deer"],
+                    "British Columbia": ["Vancouver", "Victoria", "Kelowna"],
+                    "Manitoba": ["Winnipeg", "Brandon", "Steinbach"],
+                    "New Brunswick": ["Fredericton", "Moncton", "Saint John"],
+                    "Newfoundland and Labrador": ["St. John's", "Corner Brook", "Mount Pearl"],
+                    "Nova Scotia": ["Halifax", "Sydney", "Dartmouth"],
+                    "Ontario": ["Toronto", "Ottawa", "Hamilton"],
+                    "Prince Edward Island": ["Charlottetown", "Summerside", "Stratford"],
+                    "Quebec": ["Montreal", "Quebec City", "Laval"],
+                    "Saskatchewan": ["Saskatoon", "Regina", "Prince Albert"],
+                    "Northwest Territories": ["Yellowknife", "Inuvik", "Hay River"],
+                    "Nunavut": ["Iqaluit", "Rankin Inlet", "Arviat"],
+                    "Yukon": ["Whitehorse", "Dawson City", "Watson Lake"]
+                }
+            },
+            "Australia": {
+                states: {
+                    "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
+                    "Victoria": ["Melbourne", "Geelong", "Ballarat"],
+                    "Queensland": ["Brisbane", "Gold Coast", "Cairns"],
+                    "South Australia": ["Adelaide", "Mount Gambier", "Whyalla"],
+                    "Western Australia": ["Perth", "Fremantle", "Bunbury"],
+                    "Tasmania": ["Hobart", "Launceston", "Devonport"],
+                    "Northern Territory": ["Darwin", "Alice Springs", "Katherine"],
+                    "Australian Capital Territory": ["Canberra", "Queanbeyan"]
+                }
+            },
+            "Brazil": {
+                states: {
+                    "Acre": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira"],
+                    "Alagoas": ["Maceió", "Arapiraca", "Palmeira dos Índios"],
+                    "Amapá": ["Macapá", "Santana", "Laranjal do Jari"],
+                    "Amazonas": ["Manaus", "Parintins", "Itacoatiara"],
+                    "Bahia": ["Salvador", "Feira de Santana", "Vitória da Conquista"],
+                    "Ceará": ["Fortaleza", "Juazeiro do Norte", "Sobral"],
+                    "Espírito Santo": ["Vitória", "Vila Velha", "Cariacica"],
+                    "Goiás": ["Goiânia", "Anápolis", "Aparecida de Goiânia"],
+                    "Maranhão": ["São Luís", "Imperatriz", "Caxias"],
+                    "Mato Grosso": ["Cuiabá", "Várzea Grande", "Rondonópolis"],
+                    "Mato Grosso do Sul": ["Campo Grande", "Dourados", "Três Lagoas"],
+                    "Minas Gerais": ["Belo Horizonte", "Uberlândia", "Juiz de Fora"],
+                    "Pará": ["Belém", "Ananindeua", "Santarém"],
+                    "Paraíba": ["João Pessoa", "Campina Grande", "Patos"],
+                    "Paraná": ["Curitiba", "Londrina", "Maringá"],
+                    "Pernambuco": ["Recife", "Jaboatão dos Guararapes", "Olinda"],
+                    "Piauí": ["Teresina", "Parnaíba", "Picos"],
+                    "Rio de Janeiro": ["Rio de Janeiro", "Niterói", "Petrópolis"],
+                    "Rio Grande do Norte": ["Natal", "Mossoró", "Parnamirim"],
+                    "Rio Grande do Sul": ["Porto Alegre", "Caxias do Sul", "Pelotas"],
+                    "Rondônia": ["Porto Velho", "Ji-Paraná", "Ariquemes"],
+                    "Roraima": ["Boa Vista", "Rorainópolis", "Caracaraí"],
+                    "Santa Catarina": ["Florianópolis", "Joinville", "Blumenau"],
+                    "São Paulo": ["São Paulo", "Campinas", "Santos"],
+                    "Sergipe": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto"],
+                    "Tocantins": ["Palmas", "Araguaína", "Gurupi"],
+                    "Distrito Federal": ["Brasília"]
+                }
+            }
+        };
 
+        function validateForm(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input:not([type="hidden"]), select');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                const fieldName = input.name;
+                const value = input.value.trim();
+                const errorElement = document.getElementById(`${formId.split('AddressForm')[0]}-${fieldName}-error`);
+
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                errorElement.textContent = '';
+
+                if (fieldName === 'firstName') {
+                    if (!value) {
+                        showError(input, errorElement, 'First name is required');
+                        isValid = false;
+                    } else if (!/^[a-zA-Z]{3,}$/.test(value)) {
+                        showError(input, errorElement, 'First name must be at least 3 letters, no spaces, numbers, or special characters');
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'lastName') {
+                    if (!value) {
+                        showError(input, errorElement, 'Last name is required');
+                        isValid = false;
+                    } else if (!/^[a-zA-Z]+$/.test(value)) {
+                        showError(input, errorElement, 'Last name must be at least 1 letter, no spaces, numbers, or special characters');
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'landmark') {
+                    if (!value) {
+                        showError(input, errorElement, 'Landmark is required');
+                        isValid = false;
+                    } else if (!/^[a-zA-Z]{7,}$/.test(value)) {
+                        showError(input, errorElement, 'Landmark must be at least 7 letters, no numbers or special characters');
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'address') {
+                    if (!value) {
+                        showError(input, errorElement, 'Address is required');
+                        isValid = false;
+                    } else if (value.length < 15) {
+                        showError(input, errorElement, 'Address must be at least 15 characters');
+                        isValid = false;
+                    } else if (/^[0-9]+$/.test(value) || /^[^a-zA-Z0-9]+$/.test(value)) {
+                        showError(input, errorElement, 'Address cannot be only numbers or special characters');
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'country' || fieldName === 'state' || fieldName === 'city') {
+                    if (!value) {
+                        showError(input, errorElement, `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`);
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'zipCode') {
+                    if (!value) {
+                        showError(input, errorElement, 'Zip code is required');
+                        isValid = false;
+                    } else if (value.length > 10) {
+                        showError(input, errorElement, 'Zip code must not exceed 10 characters');
+                        isValid = false;
+                    }
+                }
+
+                if (fieldName === 'phoneNumber') {
+                    if (!value) {
+                        showError(input, errorElement, 'Phone number is required');
+                        isValid = false;
+                    } else if (!/^\d{10}$/.test(value)) {
+                        showError(input, errorElement, 'Phone number must be exactly 10 digits');
+                        isValid = false;
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        function showError(input, errorElement, message) {
+            input.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        async function submitForm(formId) {
+            const form = document.getElementById(formId);
+            const route = form.getAttribute('data-route');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Determine the method based on form type
+            const method = formId === 'editAddressForm' ? 'PATCH' : 'POST';
+
+            try {
+                const response = await fetch(route, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to submit form');
+                }
+
+                const result = await response.json();
+                console.log('Form submitted successfully:', result);
+                form.reset();
+                return true;
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                return false;
+            }
+        }
+
+        function setupFormValidation(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input:not([type="hidden"]), select');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    validateForm(formId);
+                });
+                if (input.name === 'country') {
+                    input.addEventListener('change', () => populateStates(formId));
+                }
+                if (input.name === 'state') {
+                    input.addEventListener('change', () => populateCities(formId));
+                }
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const errorElements = form.querySelectorAll('.error-message');
+                errorElements.forEach(element => {
+                    element.style.display = 'none';
+                    element.textContent = '';
+                });
+
+                const isValid = validateForm(formId);
+
+                if (isValid) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'SUBMITTING...';
+
+                    const success = await submitForm(formId);
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = formId === 'editAddressForm' ? 'UPDATE ADDRESS' : 'SAVE ADDRESS';
+
+                    if (success) {
+                        closeModal(`${formId.split('AddressForm')[0]}AddressModal`);
+                        showSuccessToast(formId === 'editAddressForm' ? 'Address updated successfully' : 'Address added successfully');
+                        await loadAddresses();
+                    } else {
+                        showErrorToast('Failed to submit address. Please try again.');
+                    }
+                }
+            });
+        }
+
+        function populateCountries(formId) {
+            const countrySelect = document.querySelector(`#${formId} select[name="country"]`);
+            countrySelect.innerHTML = '<option value="">Select Country</option>';
+            Object.keys(countries).forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+        }
+
+        function populateStates(formId) {
+            const countrySelect = document.querySelector(`#${formId} select[name="country"]`);
+            const stateSelect = document.querySelector(`#${formId} select[name="state"]`);
+            const selectedCountry = countrySelect.value;
+
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            if (selectedCountry && countries[selectedCountry]) {
+                Object.keys(countries[selectedCountry].states).forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateSelect.appendChild(option);
+                });
+            }
+        }
+
+        function populateCities(formId) {
+            const countrySelect = document.querySelector(`#${formId} select[name="country"]`);
+            const stateSelect = document.querySelector(`#${formId} select[name="state"]`);
+            const citySelect = document.querySelector(`#${formId} select[name="city"]`);
+            const selectedCountry = countrySelect.value;
+            const selectedState = stateSelect.value;
+
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            if (selectedCountry && selectedState && countries[selectedCountry]?.states[selectedState]) {
+                countries[selectedCountry].states[selectedState].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        let selectedAddressId = null;
+
+        async function loadAddresses() {
+            try {
+                const response = await fetch('/checkout/addresses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (data.status === 'Success') {
+                    const container = document.getElementById('address-container');
+                    container.innerHTML = '';
+
+                    document.getElementById('address-subtitle').style.display =
+                        data.Addresses.length >= 2 ? 'block' : 'none';
+
+                    data.Addresses.forEach(address => {
+                        const isDefault = address.is_default;
+                        container.innerHTML += `
+                            <div class="address-card border rounded-lg p-4 ${isDefault ? 'selected' : ''}" 
+                                data-address-id="${address.ID}"
+                                onclick="handleCardClick(this, event)">
+                                <div class="flex items-start gap-4">
+                                    <input type="radio" name="address_card" class="mt-1 cursor-pointer" 
+                                        value="${address.ID}" ${isDefault ? 'checked' : ''} 
+                                        onclick="event.stopPropagation(); selectAddress('${address.ID}', this.parentElement.parentElement)">
+                                    <div class="flex-grow">
+                                        <h3 class="font-medium">${address.user_firstname} ${address.user_lastname}</h3>
+                                        <p class="text-sm text-gray-600">
+                                            ${address.user_address} <br> 
+                                            ${address.user_city}, ${address.user_state} ${address.user_pincode} <br> 
+                                            ${address.user_country}
+                                        </p>
+                                        <p class="text-sm text-gray-600">LandMark: ${address.user_landmark}</p>
+                                    </div>
+                                </div>
+                                <div class="action-buttons flex gap-4 mt-4 ml-8" onclick="event.stopPropagation()">
+                                    <button onclick="openEditModal('${address.ID}', '${address.user_firstname}', 
+                                        '${address.user_lastname}', '${address.user_landmark}', '${address.user_address}', 
+                                        '${address.user_country}', '${address.user_state}', '${address.user_city}', 
+                                        '${address.user_pincode}', '${address.user_number}')"
+                                        class="text-gray-600 flex items-center gap-1 hover:text-gray-800">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <button onclick="deleteAddress('${address.ID}')"
+                                        class="text-red-400 flex items-center gap-1 hover:text-red-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        if (isDefault) {
+                            selectedAddressId = address.ID;
+                        }
+                    });
+
+                    if (!selectedAddressId && data.Addresses.length > 0) {
+                        const firstAddress = data.Addresses[0];
+                        selectedAddressId = firstAddress.ID;
+                        const firstCard = container.querySelector('.address-card');
+                        firstCard.classList.add('selected');
+                        firstCard.querySelector('input[type="radio"]').checked = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+                showErrorToast('Failed to load addresses');
+            }
+        }
+
+        function openEditModal(id, firstName, lastName, landmark, address, country, state, city, pinCode, mobile) {
+            const form = document.getElementById('editAddressForm');
+
+            form.id.value = id;
+            form.firstName.value = firstName;
+            form.lastName.value = lastName;
+            form.landmark.value = landmark;
+            form.address.value = address;
+            form.zipCode.value = pinCode;
+            form.phoneNumber.value = mobile;
+
+            populateCountries('editAddressForm');
+            form.country.value = country;
+            populateStates('editAddressForm');
+            form.state.value = state;
+            populateCities('editAddressForm');
+            form.city.value = city;
+
+            openModal('editAddressModal');
+        }
+
+        async function deleteAddress(id) {
+            if (!confirm('Are you sure you want to delete this address?')) return;
+
+            try {
+                const response = await fetch(`/profile/delete/address/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showSuccessToast('Address deleted successfully');
+                    await loadAddresses();
+                } else {
+                    throw new Error('Failed to delete address');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorToast('Failed to delete address');
+            }
+        }
+
+        function selectAddress(addressId, card) {
+            selectedAddressId = addressId;
+            document.querySelectorAll('.address-card').forEach(c => {
+                c.classList.remove('selected');
+                const radio = c.querySelector('input[type="radio"]');
+                if (radio) radio.checked = false;
+            });
+            card.classList.add('selected');
+            const radioInput = card.querySelector('input[type="radio"]');
+            if (radioInput) radioInput.checked = true;
+        }
+
+        function handleCardClick(card, event) {
+            if (event.target.closest('.action-buttons')) return;
+            const addressId = card.getAttribute('data-address-id');
+            selectAddress(addressId, card);
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['editAddressForm', 'addAddressForm'].forEach(formId => {
+                setupFormValidation(formId);
+                populateCountries(formId);
+            });
+            loadAddresses();
+        });
+
+        document.getElementById('proceedToPaymentBtn').addEventListener('click', async function (e) {
+            e.preventDefault();
+
+            const selectedRadio = document.querySelector('input[name="address_card"]:checked');
+            if (selectedRadio) {
+                selectedAddressId = selectedRadio.value;
+            }
+
+            if (!selectedAddressId) {
+                showErrorToast('Please select a shipping address');
+                return;
+            }
+
+            const paymentData = {
+                addressId: selectedAddressId
+            };
+
+            if (appliedCoupon) {
+                paymentData.couponCode = appliedCoupon.code;
+                paymentData.couponId = appliedCoupon.couponId;
+                paymentData.couponDiscountAmount = couponDiscountAmount;
+            }
+
+            try {
+                const response = await fetch('/checkout/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData),
+                });
+
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const result = await response.json();
+                        window.location.href = result.redirectUrl;
+                    } else {
+                        const result = await response.text();
+                        document.open();
+                        document.write(result);
+                        document.close();
+                    }
+                } else {
+                    const result = await response.json();
+                    throw new Error(result.message || 'Payment proceeding failed');
+                }
+            } catch (error) {
+                console.error('Payment Error:', error);
+                showErrorToast(error.message || 'Error proceeding to payment');
+            }
+        });
+    </script>
     <script src="/static/js/toastMain.js"></script>
 </body>
 

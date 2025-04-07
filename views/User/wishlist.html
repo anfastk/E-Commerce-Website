@@ -388,7 +388,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Check if wishlist has items
+            // Check if wishlist has items (unchanged)
             const wishlistItems = document.getElementById('wishlist-items');
             const emptyWishlist = document.getElementById('empty-wishlist');
             if (wishlistItems && wishlistItems.children.length === 0) {
@@ -411,34 +411,34 @@
                                 'X-Requested-With': 'XMLHttpRequest'
                             }
                         })
-                            .then(response => {
-                                if (!response.ok) throw new Error('Network response was not ok');
-                                return response.json();
-                            })
+                            .then(response => response.json())
                             .then(data => {
-                                if (data.success) {
+                                if (data.status === 'success') {
                                     wishlistCard.classList.add('fade-out');
-                                    setTimeout(() => {
-                                        location.reload();
-                                    }, 1250);
                                     setTimeout(() => {
                                         wishlistCard.remove();
                                         if (wishlistItems.children.length === 0) {
                                             wishlistItems.classList.add('hidden');
                                             emptyWishlist.classList.remove('hidden');
                                         }
-                                        showSuccessToast('Item removed from wishlist', 'success');
+                                        showSuccessToast(data.message || 'Item removed from wishlist');
                                     }, 300);
-                                } else {
-                                    showSuccessToast(data.message);
                                     setTimeout(() => {
                                         location.reload();
-                                    }, 1250);
+                                    }, 1500);
+                                } else {
+                                    showErrorToast(data.message || 'Failed to remove item');
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1500);
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                showSuccessToast('An error occurred while removing the item', 'error');
+                                showErrorToast('An error occurred while removing the item');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
                             });
                     }
                 });
@@ -453,6 +453,7 @@
                     const button = form.querySelector('button');
                     button.disabled = true;
                     button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
+
                     fetch(form.action, {
                         method: 'POST',
                         headers: {
@@ -460,43 +461,39 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Network response was not ok');
-                            return response.json();
-                        })
+                        .then(response => response.json())
                         .then(data => {
-                            if (data.success) {
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
+
+                            if (data.status === 'success') {
                                 const wishlistCard = form.closest('.wishlist-card');
                                 const buttonContainer = form.parentElement;
                                 buttonContainer.innerHTML = `
                                     <a href="/cart" 
-                                       class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                       class="mt-3 sm:mt-4 w-full bg-gray-100 text-black py-1.5 sm:py-2 rounded-lg text-center block hover:bg-gray-200 text-sm sm:text-base">
                                        <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
                                     </a>
                                 `;
-                                const cartCounter = document.querySelector('.cart-counter');
-                                if (cartCounter && data.cartCount) {
-                                    cartCounter.textContent = data.cartCount;
-                                    cartCounter.classList.remove('hidden');
-                                }
-                                showSuccessToast('Item added to your cart', 'success');
+                                showSuccessToast(data.message || 'Product Moved To Cart Successfully');
                                 setTimeout(() => {
                                     location.reload();
-                                }, 1250);
+                                }, 1500);
                             } else {
-                                button.disabled = false;
-                                button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-                                showSuccessToast(data.message || 'Failed to add item to cart', 'error');
+                                showErrorToast(data.message || 'Failed to add item to cart');
                                 setTimeout(() => {
                                     location.reload();
-                                }, 1250);
+                                }, 1500);
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
                             button.disabled = false;
                             button.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Move to Cart';
-                            showSuccessToast('An error occurred while adding to cart', 'error');
+                            showErrorToast('An error occurred while adding to cart');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
                         });
                 });
             });
@@ -514,6 +511,7 @@
                             Moving...
                         </span>
                     `;
+
                     fetch('/wishlist/all/products/move/cart', {
                         method: 'POST',
                         headers: {
@@ -521,10 +519,7 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Network response was not ok');
-                            return response.json();
-                        })
+                        .then(response => response.json())
                         .then(data => {
                             button.disabled = false;
                             button.innerHTML = `
@@ -534,42 +529,34 @@
                                     Move All to Cart
                                 </span>
                             `;
-                            if (data.success) {
+
+                            if (data.status === 'success') {
                                 const wishlistItems = document.getElementById('wishlist-items');
                                 const emptyWishlist = document.getElementById('empty-wishlist');
                                 document.querySelectorAll('.black-cart-button').forEach(btn => {
                                     const container = btn.parentElement.parentElement;
                                     container.innerHTML = `
                                         <a href="/cart" 
-                                           class="mt-4 w-full bg-gray-100 text-black py-2 rounded-lg text-center block hover:bg-gray-200">
+                                           class="mt-3 sm:mt-4 w-full bg-gray-100 text-black py-1.5 sm:py-2 rounded-lg text-center block hover:bg-gray-200 text-sm sm:text-base">
                                            <i class="fas fa-shopping-cart mr-2"></i> Go to Cart
                                         </a>
                                     `;
                                 });
                                 const wishlistCount = document.getElementById('wishlist-count');
-                                if (wishlistCount && data.remainingCount !== undefined) {
-                                    wishlistCount.textContent = data.remainingCount;
+                                if (wishlistCount) {
+                                    wishlistCount.textContent = '0';
                                 }
-                                if (data.remainingCount === 0) {
-                                    wishlistItems.classList.add('hidden');
-                                    emptyWishlist.classList.remove('hidden');
-                                }
-                                showSuccessToast(data.message || 'Items moved to cart successfully', 'success');
-                                if (data.cartCount) {
-                                    const cartCounter = document.querySelector('.cart-counter');
-                                    if (cartCounter) {
-                                        cartCounter.textContent = data.cartCount;
-                                        cartCounter.classList.remove('hidden');
-                                    }
-                                }
+                                wishlistItems.classList.add('hidden');
+                                emptyWishlist.classList.remove('hidden');
+                                showSuccessToast(data.message || 'All items moved to cart successfully');
                                 setTimeout(() => {
                                     location.reload();
-                                }, 1250);
+                                }, 1500);
                             } else {
-                                showSuccessToast(data.message || 'Failed to move items to cart', 'error');
+                                showErrorToast(data.message || 'Failed to move items to cart');
                                 setTimeout(() => {
                                     location.reload();
-                                }, 1250);
+                                }, 1500);
                             }
                         })
                         .catch(error => {
@@ -582,12 +569,15 @@
                                     Move All to Cart
                                 </span>
                             `;
-                            showSuccessToast('An error occurred while moving items to cart', 'error');
+                            showErrorToast('An error occurred while moving items to cart');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
                         });
                 });
             }
 
-            // Animation styles
+            // Animation styles (unchanged)
             const styleElement = document.createElement('style');
             styleElement.textContent = `
                 .fade-out {

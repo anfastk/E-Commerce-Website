@@ -11,35 +11,30 @@ func DiscountCalculation(productID uint, categoryID uint, regularPrice float64, 
 	if regularPrice <= 0 || salePrice < 0 {
 		return 0, 0, errors.New("invalid price values")
 	}
- 
+
 	var productOffer models.ProductOffer
 	var categoryOffer models.OfferByCategory
 
 	if err := config.DB.First(&productOffer, "product_id = ? AND status = ?", productID, "Active").Error; err != nil {
-		productOffer.OfferPercentage = 0 
+		productOffer.OfferPercentage = 0
 	}
 
 	if err := config.DB.First(&categoryOffer, "category_id = ? AND offer_status = ?", categoryID, "Active").Error; err != nil {
-		categoryOffer.CategoryOfferPercentage = 0 
-	}
-
-	discountPercentage := productOffer.OfferPercentage
-	if categoryOffer.CategoryOfferPercentage > productOffer.OfferPercentage {
-		discountPercentage = categoryOffer.CategoryOfferPercentage
-	}
-
-	discountAmount := 0.0
-	if discountPercentage > 0 {
-		discountAmount = regularPrice * discountPercentage / 100
+		categoryOffer.CategoryOfferPercentage = 0
 	}
 
 	difference := regularPrice - salePrice
-	productDiscountPercentage := 0.0
-	if regularPrice > 0 {
-		productDiscountPercentage = (difference / regularPrice) * 100
+	productDiscountPercentage := (difference / regularPrice) * 100
+
+	discountPercentage := productOffer.OfferPercentage + productDiscountPercentage
+	if categoryOffer.CategoryOfferPercentage > discountPercentage {
+		discountPercentage = categoryOffer.CategoryOfferPercentage
+	}
+	if discountPercentage > 100 {
+		discountPercentage = 100
 	}
 
-	totalPercentage := productDiscountPercentage + discountPercentage
+	discountAmount := (regularPrice * discountPercentage / 100) - difference
 
-	return discountAmount, totalPercentage, nil
+	return discountAmount, discountPercentage, nil
 }

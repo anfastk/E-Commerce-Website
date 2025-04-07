@@ -8,7 +8,6 @@
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
-    <script src="/static/js/formatDate.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -169,46 +168,6 @@
                             <i class="fas fa-times mr-2"></i> Cancel All
                         </button>
                     </form>
-
-                    <div id="deletePopup"
-                        class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-30 transition-opacity duration-300"
-                        role="dialog" aria-labelledby="popupTitle" aria-modal="true">
-                        <div
-                            class="relative w-full max-w-md mx-4 md:mx-auto bg-white rounded-xl shadow-2xl transform transition-all duration-300">
-                            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                                <h3 id="popupTitle" class="text-xl font-bold text-gray-900">Delete Item</h3>
-                                <button onclick="closeDeletePopup()"
-                                    class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                                    aria-label="Close popup">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="p-6">
-                                <div class="mb-5">
-                                    <label for="deleteText" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Please provide a reason for deletion
-                                    </label>
-                                    <textarea id="deleteText" rows="4"
-                                        class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow duration-200 resize-none"
-                                        placeholder="Enter your reason here..." aria-label="Deletion reason"></textarea>
-                                </div>
-                                <div class="flex justify-end space-x-4">
-                                    <button onclick="closeDeletePopup()"
-                                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
-                                        Cancel
-                                    </button>
-                                    <button onclick="confirmDeleteItem()"
-                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                        Confirm
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div id="alertBox" class="hidden fixed top-4 right-4 z-50 min-w-[300px] max-w-md">
                         <div class="flex items-center p-4 rounded-lg shadow-lg">
                             <div class="flex-1 mr-4"></div>
@@ -218,6 +177,152 @@
                         </div>
                     </div>
                     {{end}}
+                </div>
+            </div>
+            
+
+            <div id="deletePopup"
+            class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-30 transition-opacity duration-300"
+            role="dialog" aria-labelledby="popupTitle" aria-modal="true">
+            <div
+                class="relative w-full max-w-md mx-4 md:mx-auto bg-white rounded-xl shadow-2xl transform transition-all duration-300">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h3 id="popupTitle" class="text-xl font-bold text-gray-900">Delete Item</h3>
+                    <button onclick="closeDeletePopup()"
+                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                        aria-label="Close popup">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-5">
+                        <label for="deleteText" class="block text-sm font-medium text-gray-700 mb-2">
+                            Please provide a reason for deletion
+                        </label>
+                        <textarea id="deleteText" rows="4"
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow duration-200 resize-none"
+                            placeholder="Enter your reason here..." aria-label="Deletion reason"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button onclick="closeDeletePopup()"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                            Cancel
+                        </button>
+                        <button onclick="confirmDeleteItem()"
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-30 transition-opacity duration-300" role="dialog" aria-labelledby="cancelModalTitle" aria-modal="true">
+            <div class="relative w-full max-w-md mx-4 md:mx-auto bg-white rounded-xl shadow-2xl transform transition-all duration-300">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h3 id="cancelModalTitle" class="text-xl font-bold text-gray-900">Cancel Item</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200" aria-label="Close popup">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-5">
+                        <label for="reasonText" class="block text-sm font-medium text-gray-700 mb-2">
+                            Please provide a reason for cancellation
+                        </label>
+                        <textarea id="reasonText" rows="4" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow duration-200 resize-none" placeholder="Enter your reason here..." aria-label="Cancellation reason"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                            Cancel
+                        </button>
+                        <button onclick="submitCancelForm()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>  
+            <div id="modalBackdrop" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden flex items-center justify-center z-50">
+                <!-- Modal Container -->
+                <div id="modalContainer" class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto modal-container overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="gradient-bg text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-undo-alt mr-2"></i>Return Item
+                        </h3>
+                        <button id="closeModalBtn" class="text-white hover:text-gray-200">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+        
+                    <!-- Modal Content -->
+                    <div class="p-6 ">
+                        <div class="mb-6 bg-grey-50  p-4 rounded-lg border border-grey-100 slide-down">
+                            <div class="flex items-start ">
+                                <div class="flex-shrink-0 mr-3">
+                                    <img src="{{.OrderItem.ProductImage}}" alt="Product image" class="h-16 w-16 object-contain rounded">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">{{.OrderItem.ProductName}}</h4>
+                                    <p class="text-sm text-gray-500">Order ID {{.OrderItem.OrderUID}} <span><br></span> • Delivered on <span class="format-date"
+                                        data-date="{{.DeliveryDate}}" data-format="datetime"></p>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <form id="returnForm">
+                            <div class="mb-5">
+                                <label for="returnReason" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Why are you returning this item? <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select id="returnReason" name="returnReason" class="w-full border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 border focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-700" required>
+                                        <option value="" disabled selected>Select a reason</option>
+                                        <option value="Item arrived damaged">Item arrived damaged</option>
+                                        <option value="Item is defective">Item is defective</option>
+                                        <option value="Wrong item was sent">Wrong item was sent</option>
+                                        <option value="Item not as described">Item not as described</option>
+                                        <option value="Found better price elsewhere">Found better price elsewhere</option>
+                                        <option value="Changed my mind">Changed my mind</option>
+                                        <option value="Order by mistake">Order by mistake</option>
+                                        <option value="other">Other reason</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="mb-5">
+                                <label for="additionalDetails" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Additional details
+                                </label>
+                                <textarea id="additionalDetails" name="additionalDetails" rows="3" class="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500 text-gray-700" placeholder="Please provide more information about your return request..."></textarea>
+                            </div>
+        
+                            <div class="flex items-center">
+                                <input id="termsAgreed" name="termsAgreed" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" required>
+                                <label for="termsAgreed" class="ml-2 block text-sm text-gray-700">
+                                    I understand the refund policy and its terms & conditions.
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-4 bg-gray-50 border-t flex justify-between">
+                        <button id="cancelBtn" class="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium shadow-sm">
+                            Cancel
+                        </button>
+                        <button id="submitReturnBtn" class="gradient-bg  text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors flex items-center">
+                            <i class="fas fa-paper-plane mr-1"></i> Submit Return Request
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="text-sm text-gray-600">
@@ -420,11 +525,11 @@
                             <div
                                 class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:shadow-md transition bg-white">
                                 <div class="flex items-center flex-1 w-full sm:w-auto">
-                                    <img src="{{ (index .ProductVariantDetails.VariantsImages 0).ProductVariantsImages }}"
+                                    <img src="{{.ProductImage}}"
                                         alt="Product" class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded" />
                                     <div class="ml-3 sm:ml-4">
                                         <h3 class="font-medium text-sm sm:text-base">
-                                            {{.ProductVariantDetails.ProductName}}</h3>
+                                            {{.ProductName}}</h3>
                                         <p class="text-gray-600 text-xs sm:text-sm">Quantity: {{.Quantity}}</p>
                                     </div>
                                 </div>
@@ -586,7 +691,7 @@
                     <div class="space-y-3">
                         <div class="flex justify-between text-gray-600 text-sm sm:text-base">
                             <span>Subtotal</span>
-                            <span>&#8377; {{printf "%.2f" .AllSubTotal}}</span>
+                            <span>&#8377; {{.Order.SubTotal}}</span>
                         </div>
 
                         <div class="flex justify-between text-gray-600 text-sm sm:text-base">
@@ -733,76 +838,88 @@
         const submitReturnBtn = document.getElementById('submitReturnBtn');
         const returnForm = document.getElementById('returnForm');
 
-        // Show modal
-        function showModal() {
-            modalBackdrop.classList.remove('hidden');
-            setTimeout(() => {
-                modalContainer.classList.add('modal-show');
-            }, 10);
-        }
+        // Debug element existence
+    console.log({ returnItemBtn, modalBackdrop, modalContainer });
 
-        // Hide modal
-        function hideModal() {
-            modalContainer.classList.remove('modal-show');
-            setTimeout(() => {
-                modalBackdrop.classList.add('hidden');
-            }, 300);
-        }
+// Show modal
+function showModal() {
+    if (!modalBackdrop || !modalContainer) {
+        console.error('Modal elements not found:', { modalBackdrop, modalContainer });
+        return;
+    }
+    modalBackdrop.classList.remove('hidden');
+    setTimeout(() => {
+        modalContainer.classList.add('modal-show');
+    }, 10);
+}
+
+// Hide modal
+function hideModal() {
+    if (!modalContainer || !modalBackdrop) return;
+    modalContainer.classList.remove('modal-show');
+    setTimeout(() => {
+        modalBackdrop.classList.add('hidden');
+    }, 300);
+}
 
         // Event listeners
-        returnItemBtn?.addEventListener('click', showModal);
-        closeModalBtn?.addEventListener('click', hideModal);
-        cancelBtn?.addEventListener('click', hideModal);
+        if (returnItemBtn) {
+        returnItemBtn.addEventListener('click', showModal);
+    } else {
+        console.warn('Return item button not found in the DOM');
+    }
+    closeModalBtn?.addEventListener('click', hideModal);
+    cancelBtn?.addEventListener('click', hideModal);
 
-        // Close modal if clicked outside
-        modalBackdrop?.addEventListener('click', (e) => {
-            if (e.target === modalBackdrop) {
-                hideModal();
-            }
-        });
+    // Close modal if clicked outside
+    modalBackdrop?.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) {
+            hideModal();
+        }
+    });
 
         // Handle form submission
         submitReturnBtn?.addEventListener('click', () => {
-            // Check form validity
-            const returnReason = document.getElementById('returnReason');
-            const termsAgreed = document.getElementById('termsAgreed');
-            const additionalDetails = document.getElementById('additionalDetails');
+        // Check form validity
+        const returnReason = document.getElementById('returnReason');
+        const termsAgreed = document.getElementById('termsAgreed');
+        const additionalDetails = document.getElementById('additionalDetails');
 
-            if (!returnReason.value) {
-                returnReason.focus();
-                return;
-            }
+        if (!returnReason.value) {
+            returnReason.focus();
+            return;
+        }
 
-            if (!termsAgreed.checked) {
-                termsAgreed.focus();
-                return;
-            }
+        if (!termsAgreed.checked) {
+            termsAgreed.focus();
+            return;
+        }
 
-            // Create return request data
-            const returnData = {
-                reason: returnReason.value,
-                additionalDetails: additionalDetails.value,
-                orderId: orderId,
-                productId: productId,
-            };
+        // Create return request data
+        const returnData = {
+            reason: returnReason.value,
+            additionalDetails: additionalDetails.value,
+            orderId: orderId,
+            productId: productId,
+        };
 
-            // Send the return request using fetch API
-            fetch('/profile/order/details/track/item/return', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(returnData)
+        // Send the return request using fetch API
+        fetch('/profile/order/details/track/item/return', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(returnData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
             })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok');
-                })
-                .then(data => {
-                    // Display success message
-                    modalContainer.innerHTML = `
+            .then(data => {
+                // Display success message
+                modalContainer.innerHTML = `
                     <div class="p-8 text-center">
                         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
                             <i class="fas fa-check text-green-500 text-2xl"></i>
@@ -814,79 +931,13 @@
                         </button>
                     </div>
                 `;
-
-                    document.getElementById('doneBtn').addEventListener('click', hideModal);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Display error message (in production, you'd want more specific error handling)
-                    showErrorToast('There was a problem submitting your return request. Please try again.');
-                });
-
-            // Just for demo purposes - immediately show success
-            // In a real application, this would happen after the fetch promise resolves
-            modalContainer.innerHTML = `
-                <div class="p-8 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                        <i class="fas fa-check text-green-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Return Request Submitted!</h3>
-                    <p class="text-gray-600 mb-6">Your return request has been received. We'll process it within 1-2 business days.</p>
-                    <button id="doneBtn" class="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md text-sm font-medium shadow-sm transition-colors">
-                        Done
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('doneBtn').addEventListener('click', hideModal);
-        });
-
-        document.getElementById("payButton").addEventListener("click", async function () {
-            let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
-            if (!selectedPayment) {
-                showErrorToast("Please select a payment method.");
-                return;
-            }
-
-
-            let addressId = "{{ .Address.ID }}";
-            let paymentData = {
-                method: selectedPayment.name,
-                orderId: orderId,
-                addressId: addressId
-            };
-
-            // Show loading state
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-            this.disabled = true;
-
-            try {
-                let response = await fetch("/profile/order/details/track/pay/now", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(paymentData)
-                });
-
-                let result = await response.json();
-                if (response.ok) {
-                    showSuccessToast("Payment initiated successfully!");
-                    if (result.redirect) {
-                        window.location.href = result.redirect;
-                    } else {
-                        initializeRazorpay(result);
-                    }
-                } else {
-                    showErrorToast("Payment failed: " + result.message);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                showErrorToast(error.message || "An error occurred while processing the payment.");
-            } finally {
-                // Reset button state
-                this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
-                this.disabled = false;
-            }
-        });
+                document.getElementById('doneBtn').addEventListener('click', hideModal);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorToast('There was a problem submitting your return request. Please try again.');
+            });
+    });
 
         function initializeRazorpay(data) {
             const options = {
@@ -1133,11 +1184,96 @@
                 closeModal();
             }
         }
+        function formatDates() {
+    document.querySelectorAll(".format-date").forEach((element) => {
+        let rawDate = element.dataset.date.trim(); // Get raw date
+        let formatType = element.dataset.format;  // Get format type
+
+        if (!rawDate || !formatType) return;
+ 
+        // ✅ Convert backend date format to a valid ISO format
+        let formattedRawDate = rawDate.replace(" ", "T"); // Replace space with 'T' for ISO
+        let date = new Date(formattedRawDate); // Parse to Date object
+
+        if (isNaN(date.getTime())) {
+            element.innerHTML = "Invalid Date"; // Handle parsing failure
+            return;
+        }
+
+        // Define different formats
+        let formattedDate;
+        if (formatType === "long") {
+            formattedDate = date.toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' }); // February 27, 2025
+        } else if (formatType === "datetime") {
+            formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`; // 27 Feb, 10:33 AM
+        } else if (formatType === "short") {
+            formattedDate = `${date.getDate()} ${date.toLocaleString('en', { month: 'short' })}`; // 27 Feb
+        } else if (formatType === "custom") {
+            formattedDate = `${date.toLocaleString('en', { month: 'short' })} ${date.getDate()}, ${date.getFullYear()}`; // Example: Mar 2, 2025
+        }
+
+        element.innerHTML = formattedDate;
+    });
+}
+
+// Run function when page loads
+document.addEventListener("DOMContentLoaded", formatDates);
+function showCancelPrompt() {
+    document.getElementById('cancelModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
 
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
+
+        document.getElementById("payButton").addEventListener("click", async function () {
+            let selectedPayment = document.querySelector("input[name='Razorpay']:checked");
+            if (!selectedPayment) {
+                showErrorToast("Please select a payment method.");
+                return;
+            }
+
+
+            let addressId = "{{ .Address.ID }}";
+            let paymentData = {
+                method: selectedPayment.name,
+                orderId: orderId,
+                addressId: addressId
+            };
+
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
+
+            try {
+                let response = await fetch("/profile/order/details/track/pay/now", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentData)
+                });
+
+                let result = await response.json();
+                if (response.ok) {
+                    showSuccessToast("Payment initiated successfully!");
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
+                        initializeRazorpay(result);
+                    }
+                } else {
+                    showErrorToast("Payment failed: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showErrorToast(error.message || "An error occurred while processing the payment.");
+            } finally {
+                // Reset button state
+                this.innerHTML = '<span>Pay Now</span><i class="fas fa-arrow-right ml-2"></i>';
+                this.disabled = false;
+            }
+        });
     </script>
     <script src="/static/js/toastMain.js"></script>
 </body>
