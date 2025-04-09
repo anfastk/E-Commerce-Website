@@ -1,4 +1,4 @@
-# *** 🎯 E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)***
+# 🎯 E-Commerce Website (Golang + Gin + GORM + PostgreSQL + AWS)
 
 ## 📌 Project Overview
 
