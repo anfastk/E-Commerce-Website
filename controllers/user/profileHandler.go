@@ -108,7 +108,7 @@ func ProfileUpdate(c *gin.Context) {
 				zap.Uint("userID", uint(userID)),
 				zap.Error(err))
 			tx.Rollback()
-			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to create user", "Mobile number already existing", "")
+			helper.RespondWithError(c, http.StatusConflict, "Failed to add number", "Mobile number already existing", "")
 			return
 		}
 	} else {

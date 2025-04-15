@@ -387,17 +387,6 @@
                             <div
                                 class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                                 <h2 class="text-lg md:text-xl font-bold text-gray-800">Recent Transactions</h2>
-                                <div class="flex items-center gap-2 w-full sm:w-auto">
-                                    <select id="transaction-filter"
-                                        class="w-full sm:w-auto text-sm border rounded-md p-1.5 text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                        <option value="all">All Transactions</option>
-                                        <option value="added">Money Added</option>
-                                        <option value="sent">Gift Cards Sent</option>
-                                        <option value="received">Gift Cards Received</option>
-                                        <option value="referrals">Referral Bonuses</option>
-                                    </select>
-                                    <button class="text-indigo-600 font-medium text-sm">Apply</button>
-                                </div>
                             </div>
                             <div class="block sm:hidden space-y-4">
                                 {{range .WalletTransactions}}

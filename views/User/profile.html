@@ -639,12 +639,15 @@
                     setTimeout(() => {
                         location.reload();
                     }, 3000);
-
                 } else {
-                    throw new Error('Failed to update profile');
+                    // Parse the error response from the backend
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update profile');
                 }
             } catch (error) {
-                showErrorToast('Failed to update profile. Please try again.');
+                // Display the backend error message
+                showErrorToast(error.message || 'Failed to update profile. Please try again.');
+                if (formError) formError.textContent = error.message || 'Failed to update profile';
             }
         });
 
