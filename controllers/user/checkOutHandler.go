@@ -60,7 +60,7 @@ func ShowCheckoutPage(c *gin.Context) {
 	}
 
 	regularPrice, salePrice, tax, productDiscount, totalDiscount, shippingCharge := services.CalculateCartPrices(cartItems)
-	total := salePrice + tax +float64(shippingCharge)
+	total := salePrice + tax + float64(shippingCharge)
 
 	isAllCategorySame := true
 	for _, items := range cartItems {
@@ -83,8 +83,8 @@ func ShowCheckoutPage(c *gin.Context) {
 
 		var categoryCoupons []models.Coupon
 		if err := config.DB.Where(
-			"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ? AND max_discount_value <= ?",
-			salePrice, category.Name, time.Now(), "Active", salePrice,
+			"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ?",
+			salePrice, category.Name, time.Now(), "Active",
 		).Find(&categoryCoupons).Error; err != nil {
 			logger.Log.Error("Failed to fetch category coupons",
 				zap.Float64("salePrice", salePrice),
@@ -94,14 +94,28 @@ func ShowCheckoutPage(c *gin.Context) {
 			return
 		}
 		for _, coupon := range categoryCoupons {
-			allResponceCoupons = append(allResponceCoupons, coupon)
+			if coupon.IsFixedCoupon == true && coupon.CouponType == "Fixed" {
+				if coupon.MaxDiscountValue <= salePrice {
+					allResponceCoupons = append(allResponceCoupons, coupon)
+				}
+			}
+
+			if coupon.IsFixedCoupon == false && coupon.CouponType == "Percentage" {
+				discountAmount := (coupon.DiscountValue * salePrice) / 100
+				if discountAmount > coupon.MaxDiscountValue {
+					discountAmount = coupon.MaxDiscountValue
+				}
+				if discountAmount <= salePrice {
+					allResponceCoupons = append(allResponceCoupons, coupon)
+				}
+			}
 		}
 	}
 
 	var allProductCoupons []models.Coupon
 	if err := config.DB.Where(
-		"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ? AND max_discount_value <= ?",
-		salePrice, "AllProducts", time.Now(), "Active", salePrice,
+		"min_order_value <= ? AND users_used_count < max_use_count AND applicable_for = ? AND expiration_date >= ? AND status = ?",
+		salePrice, "AllProducts", time.Now(), "Active",
 	).Find(&allProductCoupons).Error; err != nil {
 		logger.Log.Error("Failed to fetch all products coupons",
 			zap.Float64("salePrice", salePrice),
@@ -111,7 +125,21 @@ func ShowCheckoutPage(c *gin.Context) {
 	}
 
 	for _, coupon := range allProductCoupons {
-		allResponceCoupons = append(allResponceCoupons, coupon)
+		if coupon.IsFixedCoupon == true && coupon.CouponType == "Fixed" {
+			if coupon.MaxDiscountValue <= salePrice {
+				allResponceCoupons = append(allResponceCoupons, coupon)
+			}
+		}
+
+		if coupon.IsFixedCoupon == false && coupon.CouponType == "Percentage" {
+			discountAmount := (coupon.DiscountValue * salePrice) / 100
+			if discountAmount > coupon.MaxDiscountValue {
+				discountAmount = coupon.MaxDiscountValue
+			}
+			if discountAmount <= salePrice {
+				allResponceCoupons = append(allResponceCoupons, coupon)
+			}
+		}
 	}
 
 	tx := config.DB.Begin()
@@ -345,13 +373,39 @@ func CheckCoupon(c *gin.Context) {
 	}
 
 	purchaseAmount := couponInput.SubTotal - couponInput.ProductDiscount
-	if purchaseAmount < coupon.MinOrderValue || purchaseAmount < coupon.MaxDiscountValue {
+	if purchaseAmount < coupon.MinOrderValue {
 		logger.Log.Warn("Purchase amount below minimum for coupon",
 			zap.String("couponCode", couponCode),
 			zap.Float64("purchaseAmount", purchaseAmount),
 			zap.Float64("minOrderValue", coupon.MinOrderValue))
 		helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Applicable", "Coupon Not Applicable", "/cart")
 		return
+	} else {
+		if coupon.IsFixedCoupon == true && coupon.CouponType == "Fixed" {
+			if coupon.MaxDiscountValue > purchaseAmount {
+				logger.Log.Warn("Discount amount is greater than the purchase amount",
+					zap.String("couponCode", couponCode),
+					zap.Float64("purchaseAmount", purchaseAmount),
+					zap.Float64("minOrderValue", coupon.MinOrderValue))
+				helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Applicable", "Coupon Not Applicable", "/cart")
+				return
+			}
+		}
+
+		if coupon.IsFixedCoupon == false && coupon.CouponType == "Percentage" {
+			discountAmount := (coupon.DiscountValue * purchaseAmount) / 100
+			if discountAmount > coupon.MaxDiscountValue {
+				discountAmount = coupon.MaxDiscountValue
+			}
+			if discountAmount > purchaseAmount {
+				logger.Log.Warn("Discount amount is greater than the purchase amount",
+					zap.String("couponCode", couponCode),
+					zap.Float64("purchaseAmount", purchaseAmount),
+					zap.Float64("minOrderValue", coupon.MinOrderValue))
+				helper.RespondWithError(c, http.StatusBadRequest, "Coupon Not Applicable", "Coupon Not Applicable", "/cart")
+				return
+			}
+		}
 	}
 
 	var Discount float64
