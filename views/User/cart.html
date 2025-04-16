@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
@@ -235,96 +236,99 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Product Card -->
             {{range .Suggestion}}
-            <div
-                class="max-w-xs bg-white rounded-xl shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full">
-                <!-- Product Image -->
-                <div class="relative flex justify-center h-64">
-                    <img src="{{.Images}}" alt="Product" class="w-3/4 h-full object-contain">
+            <a href="/products/details/{{.ID}}">
+                <div
+                    class="max-w-xs bg-white rounded-xl shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full">
+                    <!-- Product Image -->
+                    <div class="relative flex justify-center h-64">
+                        <img src="{{.Images}}" alt="Product" class="w-3/4 h-full object-contain">
 
-                    <!-- Discount Tag -->
-                    <div
-                        class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                        {{if gt .OfferPersentage 5}}{{.OfferPersentage}}% OFF {{else}}SALE{{end}}
-                    </div>
-
-                    <!-- Wishlist Button -->
-                    <button
-                        class="wishlist-btn absolute top-3 right-3 bg-white bg-opacity-80 rounded-full p-2 shadow-md hover:bg-red-50 transition-all duration-300 group"
-                        data-id="{{.ID}}" data-in-wishlist="{{.IsInWishlist}}"
-                        onclick="toggleWishlist(this); return false;">
-                        <svg class="w-5 h-5 transition-colors duration-300 {{if .IsInWishlist}}text-red-500{{else}}text-gray-500{{end}}"
-                            fill="{{if .IsInWishlist}}currentColor{{else}}none{{end}}" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Product Info -->
-                <div class="p-5 flex flex-col flex-grow">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span
-                                class="text-xs font-medium text-indigo-500 uppercase tracking-wider">{{.CategoryName}}</span>
-                            <h3 class="text-lg font-bold text-gray-800 leading-tight mt-1 line-clamp-2">{{.ProductName}}
-                            </h3>
+                        <!-- Discount Tag -->
+                        <div
+                            class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                            {{if gt .OfferPersentage 5}}{{.OfferPersentage}}% OFF {{else}}SALE{{end}}
                         </div>
-                        <div class="flex flex-col items-end">
-                            <span class="text-sm text-gray-400 line-through">₹{{printf "%.2f" .RegularPrice}}</span>
-                            <span class="text-xl font-bold text-gray-800">₹{{printf "%.2f" .SalePrice}}</span>
-                        </div>
-                    </div>
 
-                    <!-- Rating -->
-                    <div class="flex items-center space-x-1 mb-4">
-                        <div class="flex text-yellow-400">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                        <!-- Wishlist Button -->
+                        <button
+                            class="wishlist-btn absolute top-3 right-3 bg-white bg-opacity-80 rounded-full p-2 shadow-md hover:bg-red-50 transition-all duration-300 group"
+                            data-id="{{.ID}}" data-in-wishlist="{{.IsInWishlist}}"
+                            onclick="toggleWishlist(this); return false;">
+                            <svg class="w-5 h-5 transition-colors duration-300 {{if .IsInWishlist}}text-red-500{{else}}text-gray-500{{end}}"
+                                fill="{{if .IsInWishlist}}currentColor{{else}}none{{end}}" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                                 </path>
                             </svg>
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                </path>
-                            </svg>
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                </path>
-                            </svg>
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                </path>
-                            </svg>
-                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                </path>
-                            </svg>
-                        </div>
-                        <span class="text-xs text-gray-500">(128)</span>
-                    </div>
-
-                    <!-- Add to Cart Button -->
-                    <div class="flex space-x-2 mt-auto">
-                        <button onclick="addToCart('{{.ID}}'); return false;"
-                            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md">
-                            <div class="flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
-                                    </path>
-                                </svg>
-                                Add to Cart
-                            </div>
                         </button>
                     </div>
+
+                    <!-- Product Info -->
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span
+                                    class="text-xs font-medium text-indigo-500 uppercase tracking-wider">{{.CategoryName}}</span>
+                                <h3 class="text-lg font-bold text-gray-800 leading-tight mt-1 line-clamp-2">
+                                    {{.ProductName}}
+                                </h3>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm text-gray-400 line-through">₹{{printf "%.2f" .RegularPrice}}</span>
+                                <span class="text-xl font-bold text-gray-800">₹{{printf "%.2f" .SalePrice}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="flex items-center space-x-1 mb-4">
+                            <div class="flex text-yellow-400">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                    </path>
+                                </svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                    </path>
+                                </svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                    </path>
+                                </svg>
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                    </path>
+                                </svg>
+                                <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-gray-500">(128)</span>
+                        </div>
+
+                        <!-- Add to Cart Button -->
+                        <div class="flex space-x-2 mt-auto">
+                            <button onclick="addToCart('{{.ID}}'); return false;"
+                                class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-md">
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                                        </path>
+                                    </svg>
+                                    Add to Cart
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </a>
             {{end}}
         </div>
     </div>
