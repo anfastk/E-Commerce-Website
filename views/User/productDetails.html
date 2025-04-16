@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dghzlcoco/image/upload/v1743229133/letter-l-cool-logo-icon-design_1122425-152_kouse3.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/static/css/toast.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/font_style.css" type="text/css" />
@@ -966,7 +967,6 @@
 
                             // Show success message
                             showSuccessToast("Item added to cart!");
-                            button.disabled = false;
                             // Transform button to "GO TO CART"
                             button.innerHTML = `
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -979,7 +979,7 @@
                         </svg>
                         GO TO CART
                     `;
-
+                            button.disabled = false;
                             // Change form to link behavior
                             form.removeEventListener('submit', arguments.callee);
                             form.addEventListener('click', function (e) {
