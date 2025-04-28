@@ -711,7 +711,7 @@ func CancelSpecificOrder(c *gin.Context) {
 			if order.IsCouponFixed {
 				couponAmt = order.CouponValue
 			}
-			refundAmount = (orderItems.Total - order.CouponDiscountAmount) - couponAmt
+			refundAmount = orderItems.Total - couponAmt
 			if refundAmount <= 0 {
 				IsMinusAmount = true
 			}
@@ -931,7 +931,7 @@ func CancelSpecificOrder(c *gin.Context) {
 		if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
 			Updates(map[string]interface{}{
 				"shipping_charge":        shipCharge,
-				"coupon_discount_amount": order.CouponDiscountAmount-couponAmt,
+				"coupon_discount_amount": order.CouponDiscountAmount - couponAmt,
 			}).Error; err != nil {
 			logger.Log.Error("Failed to update order shipping charge",
 				zap.Uint("orderID", order.ID),
