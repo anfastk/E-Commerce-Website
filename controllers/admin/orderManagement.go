@@ -523,7 +523,7 @@ func ApproveReturn(c *gin.Context) {
 				if order.IsCouponFixed {
 					couponAmt = order.CouponValue
 				}
-				refundAmount = (orderItems.Total - order.CouponDiscountAmount) - couponAmt
+				refundAmount = orderItems.Total  - couponAmt
 				if refundAmount <= 0 {
 					IsMinusAmount = true
 				}
