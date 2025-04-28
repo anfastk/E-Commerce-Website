@@ -180,7 +180,7 @@ func TrackingPage(c *gin.Context) {
 	})
 }
 
-func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, totalProductDiscount float64, totalDiscount float64, tax float64, shippingCharge float64, totalAmount float64, currentTime time.Time, CouponCode string, CouponDiscountAmount float64, CouponDiscription string) uint {
+func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, totalProductDiscount float64, totalDiscount float64, tax float64, shippingCharge float64, totalAmount float64, currentTime time.Time, CouponCode string, CouponDiscountAmount float64, CouponDiscription string, CouponValue float64, IsCouponFixed bool) uint {
 	logger.Log.Info("Creating new order", zap.Uint("userID", userID))
 	IsCouponApplied := false
 	if CouponDiscountAmount > 0 {
@@ -202,6 +202,8 @@ func CreateOrder(c *gin.Context, tx *gorm.DB, userID uint, subTotal float64, tot
 		IsCouponApplied:      IsCouponApplied,
 		CouponDiscountAmount: CouponDiscountAmount,
 		CouponDiscription:    CouponDiscription,
+		CouponValue:          CouponValue,
+		IsCouponFixed:        IsCouponFixed,
 	}
 
 	if err := tx.Create(&order).Error; err != nil {
@@ -645,6 +647,17 @@ func CancelSpecificOrder(c *gin.Context) {
 		return
 	}
 
+	var allItems []models.OrderItem
+	if err := tx.Find(&allItems, "order_id = ? AND order_status != ? AND order_status != ?", order.ID, "Cancelled", "Returned").Error; err != nil {
+		logger.Log.Error("Order item not found",
+			zap.String("orderItemID", orderItemID),
+			zap.Uint("userID", userID),
+			zap.Error(err))
+		tx.Rollback()
+		helper.RespondWithError(c, http.StatusNotFound, "Order Items Not Found", "Something Went Wrong", "")
+		return
+	}
+
 	switch orderItems.OrderStatus {
 	case "Returned":
 		logger.Log.Warn("Cannot cancel returned order",
@@ -673,10 +686,14 @@ func CancelSpecificOrder(c *gin.Context) {
 	}
 
 	var refundAmount float64
-	total := order.SubTotal - order.TotalProductDiscount
+	var total float64
+	for _, val := range allItems {
+		total += val.ProductSalePrice
+	}
 	productTotal := orderItems.ProductSalePrice
-	IscouponRemoved := false
+	isCouponRemoved := false
 	IsMinusAmount := false
+	couponAmt := 0.0
 
 	if order.IsCouponApplied {
 		var couponDetails models.Coupon
@@ -688,8 +705,17 @@ func CancelSpecificOrder(c *gin.Context) {
 			helper.RespondWithError(c, http.StatusNotFound, "Coupon Not Found", "Something Went Wrong", "")
 			return
 		}
+		if !order.IsCouponFixed {
+			couponAmt = (order.CouponValue * productTotal) / 100
+			if couponAmt > couponDetails.MaxDiscountValue {
+				couponAmt = couponDetails.MaxDiscountValue
+			}
+		}
 		if (total - productTotal) < couponDetails.MinOrderValue {
-			refundAmount = orderItems.Total - order.CouponDiscountAmount
+			if order.IsCouponFixed {
+				couponAmt = order.CouponValue
+			}
+			refundAmount = (orderItems.Total - order.CouponDiscountAmount) - couponAmt
 			if refundAmount <= 0 {
 				IsMinusAmount = true
 			}
@@ -701,10 +727,12 @@ func CancelSpecificOrder(c *gin.Context) {
 				tx.Rollback()
 				helper.RespondWithError(c, http.StatusNotFound, "Failed to Update Coupon", "Something Went Wrong", "")
 				return
+			} else {
+				isCouponRemoved = true
 			}
-			IscouponRemoved = true
+
 		} else {
-			refundAmount = orderItems.Total
+			refundAmount = orderItems.Total - couponAmt
 		}
 	} else {
 		refundAmount = orderItems.Total
@@ -888,7 +916,7 @@ func CancelSpecificOrder(c *gin.Context) {
 		shipCharge = 0
 	}
 
-	if IscouponRemoved {
+	if isCouponRemoved {
 		if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
 			Updates(map[string]interface{}{
 				"coupon_code":            gorm.Expr("NULL"),
@@ -907,7 +935,7 @@ func CancelSpecificOrder(c *gin.Context) {
 		if err := tx.Model(&order).Where("user_id = ? AND id = ?", userID, order.ID).
 			Updates(map[string]interface{}{
 				"shipping_charge":        shipCharge,
-				"coupon_discount_amount": gorm.Expr("NULL"),
+				"coupon_discount_amount": order.CouponDiscountAmount-couponAmt,
 			}).Error; err != nil {
 			logger.Log.Error("Failed to update order shipping charge",
 				zap.Uint("orderID", order.ID),

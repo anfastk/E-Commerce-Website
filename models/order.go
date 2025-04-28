@@ -22,7 +22,8 @@ type Order struct {
 	CouponCode           string          `gorm:"size:255"`
 	CouponDiscountAmount float64         `gorm:"index;type:numeric(10,2)"`
 	CouponDiscription    string          `gorm:"size:255"`
+	CouponValue          float64             
+	IsCouponFixed        bool            `gorm:"default:false"`
 	ShippingAddress      ShippingAddress `gorm:"foreignKey:OrderID;references:ID"`
 	OrderItem            []OrderItem     `gorm:"foreignKey:OrderID;references:ID"`
 }
- 

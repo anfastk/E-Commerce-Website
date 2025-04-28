@@ -246,8 +246,15 @@ func ProceedToPayment(c *gin.Context) {
 		return
 	}
 
-	var coupon models.ReservedCoupon
-	if err := config.DB.First(&coupon, paymentRequest.CouponId).Error; err != nil {
+	var reservedCoupon models.ReservedCoupon
+	if err := config.DB.First(&reservedCoupon, "coupon_id = ?", paymentRequest.CouponId).Error; err != nil {
+		logger.Log.Warn("Reserved coupon not found",
+			zap.String("couponID", paymentRequest.CouponId),
+			zap.Error(err))
+	}
+
+	var coupon models.Coupon
+	if err := config.DB.First(&coupon, reservedCoupon.CouponID).Error; err != nil {
 		logger.Log.Warn("Reserved coupon not found",
 			zap.String("couponID", paymentRequest.CouponId),
 			zap.Error(err))
@@ -266,7 +273,7 @@ func ProceedToPayment(c *gin.Context) {
 	case "COD":
 		paymentStatus := true
 		tx := config.DB.Begin()
-		orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+		orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription, coupon.DiscountValue, coupon.IsFixedCoupon)
 		if orderID == 0 {
 			return
 		}
@@ -293,7 +300,7 @@ func ProceedToPayment(c *gin.Context) {
 		if paymentStatus {
 			ClearCart(c, tx, result.ReservedMap)
 		}
-		if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
+		if err := tx.Unscoped().Delete(&reservedCoupon, paymentRequest.CouponId).Error; err != nil {
 			logger.Log.Warn("Failed to delete reserved coupon",
 				zap.String("couponID", paymentRequest.CouponId),
 				zap.Error(err))
@@ -375,7 +382,7 @@ func ProceedToPayment(c *gin.Context) {
 			return
 		}
 
-		orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription)
+		orderID := CreateOrder(c, tx, userDetails.ID, result.RegularPrice, result.ProductDiscount, result.TotalDiscount+couponDiscountAmount, result.Tax, float64(result.ShippingCharge), result.Total-couponDiscountAmount, currentTime, paymentRequest.CouponCode, couponDiscountAmount, coupon.Discription, coupon.DiscountValue, coupon.IsFixedCoupon)
 		if orderID == 0 {
 			return
 		}
@@ -479,7 +486,7 @@ func ProceedToPayment(c *gin.Context) {
 		}
 
 		ClearCart(c, tx, result.ReservedMap)
-		if err := tx.Unscoped().Delete(&coupon, paymentRequest.CouponId).Error; err != nil {
+		if err := tx.Unscoped().Delete(&reservedCoupon, paymentRequest.CouponId).Error; err != nil {
 			logger.Log.Warn("Failed to delete reserved coupon",
 				zap.String("couponID", paymentRequest.CouponId),
 				zap.Error(err))
