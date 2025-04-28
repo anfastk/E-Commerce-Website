@@ -97,10 +97,6 @@ func TrackingPage(c *gin.Context) {
 	allProductTotalDiscount = allProductDiscount + order.ShippingCharge + shipCharge + order.CouponDiscountAmount
 
 	IsCancelSpecificOrder := true
-	cancelCheckAmount := order.SubTotal - orderItem.SubTotal
-	if cancelCheckAmount-order.CouponDiscountAmount < 0 {
-		IsCancelSpecificOrder = false
-	}
 
 	isAllOrderCancel := false
 	count := 0
