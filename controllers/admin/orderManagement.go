@@ -498,7 +498,7 @@ func ApproveReturn(c *gin.Context) {
 		for _, val := range allItems {
 			total += val.ProductSalePrice
 		}
-		productTotal := orderItems.ProductSalePrice
+		productTotal := orderItems.ProductSalePrice * float64(orderItems.Quantity)
 		isCouponRemoved := false
 		IsMinusAmount := false
 		couponAmt := 0.0
