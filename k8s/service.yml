@@ -3,12 +3,10 @@ kind: Service
 metadata:
   name: ecom-app-service
 spec:
-  type: NodePort
   selector:
     app: ecom-app
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
-      nodePort: 30080
-
+      port: 80          
+      targetPort: 8080  
+  type: ClusterIP      
