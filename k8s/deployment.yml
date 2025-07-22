@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-app
+  template:
+    metadata:
+      labels:
+        app: ecom-app
+    spec:
+      containers:
+      - name: ecom-app
+        image: anfastk/laptix-ecom:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+          - secretRef:
+              name: ecommerce-secret
