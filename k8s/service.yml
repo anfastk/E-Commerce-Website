@@ -7,7 +7,6 @@ spec:
     app: ecom-app
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
-      nodePort: 30080
-  type: NodePort
+      port: 80         # expose port 80 inside cluster
+      targetPort: 8080 # your app listens on 8080
+  type: ClusterIP    # internal service only, no NodePort
