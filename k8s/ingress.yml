@@ -1,11 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: ecom-app-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod 
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
-  ingressClassName: nginx   
+  ingressClassName: nginx
   rules:
   - host: laptix.ddns.net
     http:
@@ -17,7 +18,7 @@ spec:
             name: ecom-app-service
             port:
               number: 80
-  tls:   
+  tls:
   - hosts:
     - laptix.ddns.net
     secretName: tls-laptix-ddns-net
