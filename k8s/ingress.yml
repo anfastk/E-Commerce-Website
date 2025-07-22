@@ -8,17 +8,17 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: laptix.ddns.net
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ecom-app-service
-            port:
-              number: 80
+    - host: laptix.ddns.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ecom-app-service
+                port:
+                  number: 80
   tls:
-  - hosts:
-    - laptix.ddns.net
-    secretName: tls-laptix-ddns-net
+    - hosts:
+        - laptix.ddns.net
+      secretName: tls-laptix-ddns-net
