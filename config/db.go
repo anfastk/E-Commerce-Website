@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/anfastk/E-Commerce-Website/pkg/logger"
@@ -19,16 +18,13 @@ var (
 func DBconnect() {
     var err error
 
-    dbHost := os.Getenv("DB_HOST")     // "postgres-service"
+    /* dbHost := os.Getenv("DB_HOST")     // "postgres-service"
     dbUser := os.Getenv("DB_USER")
     dbPass := os.Getenv("DB_PASSWORD")
     dbName := os.Getenv("DB_NAME")
-    dbPort := os.Getenv("DB_PORT")
+    dbPort := os.Getenv("DB_PORT") */
 
-    dsn := fmt.Sprintf(
-        "host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Kolkata",
-        dbHost, dbUser, dbPass, dbName, dbPort,
-    )
+    dsn := os.Getenv("DB")
 
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
     if err != nil {
