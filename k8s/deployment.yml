@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ecom-app
-        image: anfastk/go-app:1.2.2
+        image: anfastk/laptix-ecom:latest
         ports:
         - containerPort: 8080
         envFrom:

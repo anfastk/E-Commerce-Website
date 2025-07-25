@@ -18,12 +18,6 @@ var (
 func DBconnect() {
     var err error
 
-    /* dbHost := os.Getenv("DB_HOST")     // "postgres-service"
-    dbUser := os.Getenv("DB_USER")
-    dbPass := os.Getenv("DB_PASSWORD")
-    dbName := os.Getenv("DB_NAME")
-    dbPort := os.Getenv("DB_PORT") */
-
     dsn := os.Getenv("DB")
 
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
