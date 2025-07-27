@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: ecom-app-service
 spec:
-  type: ClusterIP
   selector:
     app: ecom-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
+  type: ClusterIP

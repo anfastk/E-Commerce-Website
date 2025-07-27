@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: ecom-app
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: ecom-app
@@ -18,5 +18,18 @@ spec:
         ports:
         - containerPort: 8080
         envFrom:
-          - secretRef:
-              name: ecommerce-secret
+        - secretRef:
+            name: ecommerce-secret
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
