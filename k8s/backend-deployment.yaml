@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: backend-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -14,9 +14,11 @@ spec:
     spec:
       containers:
       - name: backend
-        image: anfastk/my-backend:latest
+        image: 851955146635.dkr.ecr.us-east-1.amazonaws.com/myapp-backend:latest
         ports:
         - containerPort: 8080
         envFrom:
         - configMapRef:
-            name: backend-env
+            name: backend-config
+        - secretRef:
+            name: backend-secret

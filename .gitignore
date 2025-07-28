@@ -1,2 +1,2 @@
 .env
-k8s/ecommerce-secret.yaml
+k8s/backend-secret.yaml
